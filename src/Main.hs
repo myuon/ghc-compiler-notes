@@ -113,6 +113,8 @@ main = runSimpleApp $ liftIO $ do
   current <- Dir.getCurrentDirectory
 
   let outDir = "docs"
+  Dir.createDirectoryIfMissing True $ Path.joinPath [outDir, path]
+
   foldOnDir path
     (\filename content -> do
         let path = Path.replaceExtensions (Path.joinPath [outDir, filename]) ".md"
