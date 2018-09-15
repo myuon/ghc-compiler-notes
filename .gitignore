@@ -1,0 +1,4 @@
+.stack-work/
+ghc-docs-book.cabal
+*~
+docs/
