@@ -108,6 +108,7 @@ foldOnDir base onFile onDir = do
       Directory -> do
         foldOnDir path onFile onDir
 
+main :: IO ()
 main = runSimpleApp $ liftIO $ do
   (path:_) <- getArgs
   current <- Dir.getCurrentDirectory
