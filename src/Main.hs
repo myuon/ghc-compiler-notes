@@ -12,35 +12,6 @@ import qualified Data.Text.Format as Format
 import System.Environment
 import Parser
 
-{-
-parseDoc :: T.Text -> Doc
-parseDoc text = (\(Just x) -> x)
-  $ parseNote
-  <|> parseTeXSection <|> parseSection <|> parseMdSection
---  <|> parseCopyright
-  <|> parsePragma
-  <|> Just (Paragraph text)
-
-  where
-    genParser :: T.Text -> (T.Text -> Doc) -> Maybe Doc
-    genParser regex con = do
-      let re = Regex.regex [] regex
-      match <- Regex.find re text
-      fmap con $ Regex.group 1 match
-
-    parseCopyright :: Maybe Doc
-    parseCopyright = do
-      let re = Regex.regex [] "(\\(c\\) (.+)\n)+"
-      match <- Regex.find re text
-      fmap Copyright $ sequence $ map (\n -> Regex.group n match) [1..5]
-
-    parseTeXSection = genParser "\\\\section\\[.+\\]\\{(.+)\\}" Section
-    parseSection = genParser "\\*{3}[\\s\\*]+([^\\*]*)[\\s\\*]+\\*{3}" Section
-    parseMdSection = genParser "(\\s.+)\n~+~{5}" (Section . T.strip)
-    parseNote = genParser "Note \\[(.*)\\](~+~{5})?" Note
-    parsePragma = genParser "#\\s(.+)\\s#" Pragma
--}
-
 renderDoc :: Doc -> Maybe T.Text
 renderDoc doc = case doc of
   Section t -> Just $ TL.toStrict $ Format.format "# {}" [t]
