@@ -28,6 +28,7 @@ dependencies:
 
 default-extensions:
 - NoImplicitPrelude
+- OverloadedStrings
 
 library:
   source-dirs: src

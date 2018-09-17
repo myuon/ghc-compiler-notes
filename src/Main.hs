@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import Prelude (print)
@@ -11,15 +10,9 @@ import qualified RIO.Directory as Dir
 import qualified Data.Text.ICU as Regex
 import qualified Data.Text.Format as Format
 import System.Environment
+import Parser
 
-data Doc
-  = Section T.Text
-  | Note T.Text
-  | Pragma T.Text
-  | Copyright [T.Text]
-  | Paragraph T.Text
-  deriving Show
-
+{-
 parseDoc :: T.Text -> Doc
 parseDoc text = (\(Just x) -> x)
   $ parseNote
@@ -46,6 +39,7 @@ parseDoc text = (\(Just x) -> x)
     parseMdSection = genParser "(\\s.+)\n~+~{5}" (Section . T.strip)
     parseNote = genParser "Note \\[(.*)\\](~+~{5})?" Note
     parsePragma = genParser "#\\s(.+)\\s#" Pragma
+-}
 
 renderDoc :: Doc -> Maybe T.Text
 renderDoc doc = case doc of
@@ -124,7 +118,7 @@ main = runSimpleApp $ liftIO $ do
         writeFileUtf8 path
           $ T.append (TL.toStrict $ Format.format "[[src]](https://github.com/ghc/ghc/tree/master/{})\n" [T.dropPrefix "ghc/" $ T.pack filename])
           $ T.intercalate "\n\n"
-          $ catMaybes $ map (renderDoc . parseDoc) $ concat
+          $ catMaybes $ map (renderDoc <=< resultAsMaybe . parseDoc) $ concat
           $ map (T.splitOn "\n\n")
           $ getBlockComments
           $ preprocess
