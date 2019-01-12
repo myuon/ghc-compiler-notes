@@ -1,3 +1,5 @@
 .stack-work/
 ghc-docs-book.cabal
 *~
+.ghc.*
+dist-newstyle/
