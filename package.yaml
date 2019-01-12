@@ -9,6 +9,7 @@ copyright:           "2018 Author name here"
 extra-source-files:
 - README.md
 - ChangeLog.md
+- sample/*
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -25,6 +26,7 @@ dependencies:
 - text-icu
 - text-format
 - trifecta
+- ghc-syntax-highlighter ^>= 0.0.3.0
 
 default-extensions:
 - NoImplicitPrelude
@@ -43,6 +45,8 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+  comment:
+    main: app/Comment.hs
 
 tests:
   ghc-docs-book-test:
@@ -55,4 +59,3 @@ tests:
     dependencies:
     - ghc-docs-book
     - hspec
-
