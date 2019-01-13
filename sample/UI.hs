@@ -1781,7 +1781,7 @@ doLoadAndCollectInfo :: Bool -> LoadHowMuch -> InputT GHCi SuccessFlag
 doLoadAndCollectInfo retain_context howmuch = do
   doCollectInfo <- lift (isOptionSet CollectInfo)
 
-  -- doLoad retain_context howmuch >>= \case
+  doLoad retain_context howmuch >>= \case
     Succeeded | doCollectInfo -> do
       mod_summaries <- GHC.mgModSummaries <$> getModuleGraph
       loaded <- filterM GHC.isLoaded $ map GHC.ms_mod_name mod_summaries

@@ -1,3 +1,6 @@
 resolver: lts-13.2
 packages:
 - .
+extra-deps:
+- github: waddlaw/ghc-syntax-highlighter
+  commit: b08d97ac36673a66dfb9b381c7fafc63a1cdf828
