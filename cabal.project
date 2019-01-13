@@ -1,0 +1,7 @@
+packages:
+  ./
+
+source-repository-package
+  type: git
+  location: https://github.com/waddlaw/ghc-syntax-highlighter
+  tag: b08d97ac36673a66dfb9b381c7fafc63a1cdf828

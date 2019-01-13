@@ -302,7 +302,6 @@
 -- since those commands are designed to be used by editors and
 -- tooling, it's useless to collect this data for normal GHCi
 -- sessions.
--- doLoad retain_context howmuch >>= \case
 -- turn off breakpoints before we load: we can't turn them off later, because
 -- the ModBreaks will have gone away.
 -- Enable buffering stdout and stderr as we're compiling. Keeping these
