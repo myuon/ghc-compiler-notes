@@ -4,4 +4,4 @@ ghc-docs-book.cabal
 .ghc.*
 dist-newstyle/
 cabal.project.local
-subs
+output/
