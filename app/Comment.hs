@@ -17,8 +17,10 @@ main = do
 
 getCommentC :: MonadIO m => FilePath -> ConduitT FilePath o m ()
 getCommentC fp
-  | ".hs" `RIO.List.isSuffixOf` fp = liftIO $ getComment fp
+  | ".hs" `RIO.List.isSuffixOf` fp && not (skipDir `RIO.List.isPrefixOf` fp) = liftIO $ getComment fp
   | otherwise = return ()
+  where
+    skipDir = "submodules/ghc/testsuite/tests"
 
 getComment :: FilePath -> IO ()
 getComment fp = do
