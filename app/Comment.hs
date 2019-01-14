@@ -12,7 +12,7 @@ import Path.IO
 
 main :: IO ()
 main = do
-  runConduitRes $ sourceDirectoryDeep False "subs/ghc" .| awaitForever getCommentC
+  runConduitRes $ sourceDirectoryDeep False "submodules/ghc" .| awaitForever getCommentC
   return ()
 
 getCommentC :: MonadIO m => FilePath -> ConduitT FilePath o m ()
