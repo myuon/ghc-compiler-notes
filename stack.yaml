@@ -3,4 +3,4 @@ packages:
 - .
 extra-deps:
 - github: waddlaw/ghc-syntax-highlighter
-  commit: b08d97ac36673a66dfb9b381c7fafc63a1cdf828
+  commit: 342d0a681c6bce22d7968dc83a516c21cdf34857
