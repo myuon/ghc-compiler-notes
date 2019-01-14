@@ -6,10 +6,7 @@ import RIO
 import qualified RIO.List
 import qualified RIO.Text
 import Conduit
-import qualified EnumSet as ES
-import GHC.LanguageExtensions.Type
 import GHC.SyntaxHighlighter
-import qualified Lexer as L
 import Path
 import Path.IO
 
@@ -26,8 +23,7 @@ getCommentC fp
 getComment :: FilePath -> IO ()
 getComment fp = do
   file <- readFileUtf8 fp
-  let pf = defaultParserFlags { L.pExtensionFlags = ES.fromList [QuasiQuotes,TypeSynonymInstances,TemplateHaskell,MultiParamTypeClasses,FlexibleInstances,DeriveDataTypeable,ScopedTypeVariables,Cpp,OverloadedStrings] }
-  case map snd . filter isComment <$> tokenizeHaskell' pf (preprocess file) of
+  case map snd . filter isComment <$> tokenizeHaskell (preprocess file) of
     Nothing -> putStrLn (show fp ++": invalid token")
     Just ts -> do
       dir <- parent <$> parseRelFile fp
