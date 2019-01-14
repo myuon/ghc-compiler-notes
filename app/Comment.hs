@@ -20,7 +20,7 @@ getCommentC fp
   | ".hs" `RIO.List.isSuffixOf` fp && not (skipDir `RIO.List.isPrefixOf` fp) = liftIO $ getComment fp
   | otherwise = return ()
   where
-    skipDir = "submodules/ghc/testsuite/tests"
+    skipDir = "submodules/ghc/testsuite"
 
 getComment :: FilePath -> IO ()
 getComment fp = do
