@@ -8,3 +8,19 @@
 - subs/ghc/libraries/ghc-prim/GHC/Classes.hs
 - subs/ghc/libraries/integer-gmp/src/GHC/Integer/Logarithms.hs
 - subs/ghc/compiler/main/GHC.hs
+
+# Development
+
+Using stack.
+
+```shell
+$ stack run
+$ stack test
+```
+
+Using cabal.
+
+```shell
+$ cabal new-run
+$ cabal new-test --enable-tests
+```
