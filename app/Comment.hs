@@ -1,18 +1,21 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LambdaCase #-}
 module Main (main) where
 
 import RIO
 import qualified RIO.List
 import qualified RIO.Text
 import Conduit
-import GHC.SyntaxHighlighter
 import Path
 import Path.IO
 
+import GHC.Compiler.Notes
+
 main :: IO ()
 main = do
-  runConduitRes $ sourceDirectoryDeep False "submodules/ghc" .| awaitForever getCommentC
+  let targetDir = "submodules/ghc"
+  runConduitRes $ sourceDirectoryDeep False targetDir .| awaitForever getCommentC
   return ()
 
 getCommentC :: MonadIO m => FilePath -> ConduitT FilePath o m ()
@@ -24,25 +27,10 @@ getCommentC fp
 
 getComment :: FilePath -> IO ()
 getComment fp = do
-  file <- readFileUtf8 fp
-  case map snd . filter isComment <$> tokenizeHaskell (preprocess file) of
+  readComments fp >>= \case
     Nothing -> putStrLn (show fp ++": invalid token")
     Just ts -> do
       dir <- parent <$> parseRelFile fp
       let outDir = $(mkRelDir "output") </> dir
       ensureDir outDir
       writeFileUtf8 ("output/"++fp) $ RIO.Text.unlines ts
-
-preprocess :: Text -> Text
-preprocess = RIO.Text.unlines . map removeCPP . RIO.Text.lines
-
-removeCPP :: Text -> Text
-removeCPP txt
-  | or (RIO.Text.isPrefixOf <$> cpp <*> [RIO.Text.stripStart txt]) = ""
-  | otherwise = txt
-  where
-    cpp = ["#include", "#define", "#if", "#ifdef", "#ifndef", "#elif", "#else", "#endif", "#undef"]
-
-isComment :: (Token, Text) -> Bool
-isComment (CommentTok, _) = True
-isComment _ = False

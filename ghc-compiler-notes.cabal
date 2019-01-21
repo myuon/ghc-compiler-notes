@@ -8,18 +8,45 @@ author: myuon
 homepage: https://github.com/myuon/ghc-compiler-notes
 category: Language
 build-type: Simple
+
 extra-source-files:
     ChangeLog.md
     README.md
+
+library
+    hs-source-dirs: src
+    default-language: Haskell2010
+    ghc-options: -Wall -fwarn-tabs
+    build-depends:
+        base ^>=4.12.0.0,
+        ghc-syntax-highlighter ^>=0.0.3.0,
+        text ^>= 1.2.3.1
+    exposed-modules:
+        GHC.Compiler.Notes
 
 executable ghc-compiler-notes
     main-is: Comment.hs
     hs-source-dirs: app
     default-language: Haskell2010
+    ghc-options: -Wall
     build-depends:
+        ghc-compiler-notes,
         base ^>=4.12.0.0,
         rio ^>=0.1.8.0,
-        ghc-syntax-highlighter ^>=0.0.3.0,
         conduit ^>=1.3.1,
         path-io ^>=1.4.1,
-        path ^>= 0.6.1
+        path ^>=0.6.1
+
+test-suite unit-tests
+    type: exitcode-stdio-1.0
+    main-is: Driver.hs
+    hs-source-dirs: tests
+    other-modules:
+        UnitTests
+    default-language: Haskell2010
+    ghc-options: -Wall
+    build-depends:
+        ghc-compiler-notes,
+        base ^>=4.12.0.0,
+        tasty ^>=1.2,
+        tasty-hspec ^>=1.1.5.1
