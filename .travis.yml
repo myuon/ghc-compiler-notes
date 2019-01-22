@@ -71,6 +71,9 @@ install:
     cabal)
       mkdir -p $HOME/.cabal/bin
 
+      cabal new-update
+      cabal new-install tasty-discover
+
       cabal --numeric-version
       ghc --version
       ;;
@@ -80,6 +83,8 @@ install:
       travis_retry curl -sL https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
       stack upgrade --binary-version=$STACK_VERSION
+
+      stack install tasty-discover
 
       stack --numeric-version
       stack --hpack-numeric-version
@@ -96,7 +101,6 @@ script:
       curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s .
       ;;
     cabal)
-      cabal new-update
       cabal new-test --enable-tests -fdev
       ;;
     stack)
