@@ -50,6 +50,9 @@ matrix:
     - env: BUILD=style
     - env: BUILD=pedantic ARGS="--resolver lts-13 --system-ghc"
 
+git:
+  submodules: false
+
 before_install:
   - case "$BUILD" in
       style)
