@@ -98,7 +98,8 @@ script:
   set -ex
   case "$BUILD" in
     style)
-      curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s .
+      curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s app
+      curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s src
       ;;
     cabal)
       cabal new-test --enable-tests -fdev
