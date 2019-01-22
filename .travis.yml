@@ -22,13 +22,7 @@ matrix:
     - env: BUILD=cabal
       ghc: "8.4.4"
 
-    - env: BUILD=cabal
-      ghc: "8.2.2"
-
       # --system-ghc is used to take advantage of language: haskell and save build time. If the stack resolver ghc and system-ghc become different, stack will download the right ghc
-    - env: BUILD=stack ARGS="--resolver lts-11 --system-ghc"
-      ghc: "8.2.2"
-
     - env: BUILD=stack ARGS="--resolver lts-12 --system-ghc"
       ghc: "8.4.4"
 
@@ -42,6 +36,7 @@ matrix:
     - env: BUILD=style
       ghc: "8.6.3"
 
+      # pedantic
     - env: BUILD=pedantic ARGS="--resolver lts-13 --system-ghc"
       ghc: "8.6.3"
 
@@ -76,6 +71,9 @@ install:
     cabal)
       mkdir -p $HOME/.cabal/bin
 
+      cabal new-update
+      cabal new-install tasty-discover
+
       cabal --numeric-version
       ghc --version
       ;;
@@ -85,6 +83,8 @@ install:
       travis_retry curl -sL https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
       stack upgrade --binary-version=$STACK_VERSION
+
+      stack install tasty-discover
 
       stack --numeric-version
       stack --hpack-numeric-version
@@ -98,14 +98,14 @@ script:
   set -ex
   case "$BUILD" in
     style)
-      curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s .
+      curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s app
+      curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s src
       ;;
     cabal)
-      cabal new-update
-      cabal new-test all
+      cabal new-test --enable-tests -fdev
       ;;
     stack)
-      stack --no-terminal $ARGS test --haddock --no-haddock-deps
+      stack --no-terminal $ARGS test --haddock --no-haddock-deps --flag ghc-compiler-notes:dev
       ;;
     pedantic)
       stack --no-terminal $ARGS test --pedantic --no-run-tests
