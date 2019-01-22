@@ -97,10 +97,10 @@ script:
       ;;
     cabal)
       cabal new-update
-      cabal new-test all
+      cabal new-test --enable-tests -fdev
       ;;
     stack)
-      stack --no-terminal $ARGS test --haddock --no-haddock-deps
+      stack --no-terminal $ARGS test --haddock --no-haddock-deps --flag ghc-compiler-notes:dev
       ;;
     pedantic)
       stack --no-terminal $ARGS test --pedantic --no-run-tests
