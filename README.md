@@ -15,12 +15,12 @@ Using stack.
 
 ```shell
 $ stack run
-$ stack test
+$ stack test --flag ghc-compiler-notes:dev
 ```
 
 Using cabal.
 
 ```shell
 $ cabal new-run
-$ cabal new-test --enable-tests
+$ cabal new-test --enable-tests -fdev
 ```
