@@ -26,7 +26,7 @@ getCommentC fp
     skipDir = "submodules/ghc/testsuite"
 
 getComment :: FilePath -> IO ()
-getComment fp = do
+getComment fp =
   readComments fp >>= \case
     Nothing -> putStrLn (show fp ++": invalid token")
     Just ts -> do
