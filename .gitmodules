@@ -1,3 +1,3 @@
 [submodule "submodules/ghc"]
 	path = submodules/ghc
-	url = https://github.com/ghc/ghc.git
+	url = https://github.com/waddlaw/ghc.git
