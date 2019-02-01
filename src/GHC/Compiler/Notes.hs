@@ -1,12 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module GHC.Compiler.Notes
   ( readComments
   , getComments
   ) where
 
-import Data.Text (Text)
+import Data.Text ( Text )
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
+
 import GHC.SyntaxHighlighter
 
 readComments :: FilePath -> IO (Maybe [Text])
@@ -26,10 +28,13 @@ removeCPP txt
   | otherwise = txt
 
 isCpp :: Text -> Bool
-isCpp text = or (T.isPrefixOf <$> cppKeywords <*> [T.stripStart text])
+isCpp text = or (T.isPrefixOf
+                 <$> cppKeywords
+                 <*> [ T.stripStart text ])
 
 cppKeywords :: [Text]
-cppKeywords = ["#include", "#define", "#if", "#ifdef", "#ifndef", "#elif", "#else", "#endif", "#undef"]
+cppKeywords =
+  [ "#include", "#define", "#if", "#ifdef", "#ifndef", "#elif", "#else", "#endif", "#undef" ]
 
 isComment :: (Token, a) -> Bool
 isComment (CommentTok, _) = True
