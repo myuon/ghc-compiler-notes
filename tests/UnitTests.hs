@@ -1,8 +1,8 @@
 module UnitTests where
 
-import Test.Tasty.Hspec
-
 import GHC.Compiler.Notes
+
+import Test.Tasty.Hspec
 
 spec_prelude :: Spec
 spec_prelude = do
