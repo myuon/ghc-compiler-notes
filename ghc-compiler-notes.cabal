@@ -119,6 +119,10 @@ test-suite unit-tests
   type: exitcode-stdio-1.0
   hs-source-dirs: test
   main-is: SpecDriver.hs
+  build-tool-depends:
+    tasty-discover:tasty-discover,
   build-depends:
     tasty >=1.1.0.4 && <1.3,
-    tasty-hspec ^>=1.1.5.1,
+    tasty-hspec,
+  other-modules:
+    ResourceTests
