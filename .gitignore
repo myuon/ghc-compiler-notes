@@ -1,7 +1,8 @@
+/output/
+
 .stack-work/
-ghc-docs-book.cabal
-*~
 .ghc.*
-dist-newstyle/
+/dist*/
 cabal.project.local
-output/
+
+*~

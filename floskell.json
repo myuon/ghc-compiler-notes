@@ -1,225 +1,236 @@
 {
-  "style": "cramer",
-  "extensions": [
-    "DataKinds",
-    "ExplicitForAll",
-    "FlexibleContexts",
-    "LambdaCase",
-    "MultiParamTypeClasses",
-    "NoImplicitPrelude",
-    "OverloadedLabels",
-    "OverloadedStrings",
-    "PolyKinds",
-    "QuasiQuotes",
-    "RankNTypes",
-    "RecordWildCards",
-    "TemplateHaskell",
-    "TypeApplications",
-    "TypeFamilies",
-    "TypeOperators"
-  ],
-  "formatting": {
-      "op": {
-          "default": {
-              "force-linebreak": false,
-              "spaces": "both",
-              "linebreaks": "before"
-          },
-          ",": {
-              "force-linebreak": false,
-              "spaces": "after",
-              "linebreaks": "before"
-          },
-          "=": {
-              "force-linebreak": false,
-              "spaces": "both",
-              "linebreaks": "after"
-          },
-          "@": {
-              "force-linebreak": false,
-              "spaces": "none",
-              "linebreaks": "none"
-          },
-          ". in expression": {
-              "force-linebreak": false,
-              "spaces": "both",
-              "linebreaks": "before"
-          },
-          "-> in expression": {
-              "force-linebreak": false,
-              "spaces": "both",
-              "linebreaks": "after"
-          },
-          ". in type": {
-              "force-linebreak": false,
-              "spaces": "after",
-              "linebreaks": "after"
-          },
-          "$": {
-              "force-linebreak": false,
-              "spaces": "both",
-              "linebreaks": "after"
-          },
-          "$$": {
-              "force-linebreak": false,
-              "spaces": "before",
-              "linebreaks": "none"
-          },
-          "record in pattern": {
-              "force-linebreak": false,
-              "spaces": "none",
-              "linebreaks": "none"
-          },
-          "record": {
-              "force-linebreak": false,
-              "spaces": "after",
-              "linebreaks": "none"
-          },
-          "<: in expression": {
-            "force-linebreak": true,
-            "spaces": "after",
-            "linebreaks": "before"
-          },
-          "<* in expression": {
-            "force-linebreak": true,
-            "spaces": "both",
-            "linebreaks": "before"
-          },
-          "<$> in expression": {
-            "force-linebreak": true,
-            "spaces": "both",
-            "linebreaks": "before"
-          },
-          "<*> in expression": {
-            "force-linebreak": true,
-            "spaces": "both",
-            "linebreaks": "before"
-          }
-      },
-      "group": {
-          "default": {
-              "force-linebreak": false,
-              "spaces": "both",
-              "linebreaks": "after"
-          },
-          "$(": {
-              "force-linebreak": false,
-              "spaces": "none",
-              "linebreaks": "none"
-          },
-          "[ in pattern": {
-              "force-linebreak": false,
-              "spaces": "both",
-              "linebreaks": "after"
-          },
-          "(# in pattern": {
-              "force-linebreak": false,
-              "spaces": "both",
-              "linebreaks": "after"
-          },
-          "( in other": {
-              "force-linebreak": false,
-              "spaces": "both",
-              "linebreaks": "after"
-          },
-          "(# in expression": {
-              "force-linebreak": false,
-              "spaces": "both",
-              "linebreaks": "after"
-          },
-          "* in type": {
-              "force-linebreak": false,
-              "spaces": "none",
-              "linebreaks": "after"
-          },
-          "* in pattern": {
-              "force-linebreak": false,
-              "spaces": "none",
-              "linebreaks": "after"
-          },
-          "(": {
-              "force-linebreak": false,
-              "spaces": "none",
-              "linebreaks": "after"
-          },
-          "[|": {
-              "force-linebreak": false,
-              "spaces": "none",
-              "linebreaks": "none"
-          },
-          "[p|": {
-              "force-linebreak": false,
-              "spaces": "none",
-              "linebreaks": "none"
-          },
-          "[d|": {
-              "force-linebreak": false,
-              "spaces": "none",
-              "linebreaks": "none"
-          },
-          "[t|": {
-              "force-linebreak": false,
-              "spaces": "none",
-              "linebreaks": "none"
-          }
-      },
-      "layout": {
-          "infix-app": "flex",
-          "if": "try-oneline",
-          "import-spec-list": "try-oneline",
-          "con-decls": "vertical",
-          "typesig": "try-oneline",
-          "declaration": "flex",
-          "app": "try-oneline",
-          "let": "try-oneline",
-          "record": "try-oneline",
-          "export-spec-list": "vertical",
-          "list-comp": "try-oneline"
-      },
-      "penalty": {
-          "overfull": 10,
-          "indent": 1,
-          "overfull-once": 200,
-          "max-line-length": 100,
-          "linebreak": 100
-      },
-      "indent": {
-          "deriving": 2,
-          "if": "align",
-          "let-binds": "align",
-          "import-spec-list": "align-or-indent-by 17",
-          "onside": 2,
-          "where": 2,
-          "do": "indent-by 2",
-          "app": "align",
-          "case": "indent-by 2",
-          "let-in": "indent-by 2",
-          "where-binds": "indent-by 2",
-          "let": "align",
-          "export-spec-list": "indent-by 2",
-          "multi-if": "indent-by 2",
-          "class": "indent-by 2"
-      },
-      "align": {
-          "let-binds": false,
-          "where": true,
-          "limits": [
-              10,
-              25
-          ],
-          "case": true,
-          "import-module": false,
-          "import-spec": false,
-          "class": false,
-          "record-fields": true
-      },
-      "options": {
-          "sort-pragmas": true,
-          "split-language-pragmas": true,
-          "sort-import-lists": true,
-          "preserve-vertical-space": true,
-          "sort-imports": true
-      }
-  },
-  "language": "Haskell2010"
+    "style": "cramer",
+    "extensions": [
+        "BangPatterns",
+        "DataKinds",
+        "ExplicitForAll",
+        "FlexibleContexts",
+        "LambdaCase",
+        "MultiParamTypeClasses",
+        "NoImplicitPrelude",
+        "OverloadedLabels",
+        "OverloadedStrings",
+        "PolyKinds",
+        "QuasiQuotes",
+        "RankNTypes",
+        "RecordWildCards",
+        "TemplateHaskell",
+        "TypeApplications",
+        "TypeFamilies",
+        "TypeOperators"
+    ],
+    "formatting": {
+        "op": {
+            "default": {
+                "force-linebreak": false,
+                "spaces": "both",
+                "linebreaks": "before"
+            },
+            ",": {
+                "force-linebreak": false,
+                "spaces": "after",
+                "linebreaks": "before"
+            },
+            "=": {
+                "force-linebreak": false,
+                "spaces": "both",
+                "linebreaks": "after"
+            },
+            "@": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "none"
+            },
+            ". in expression": {
+                "force-linebreak": false,
+                "spaces": "both",
+                "linebreaks": "before"
+            },
+            ": in pattern": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "none"
+            },
+            "-> in expression": {
+                "force-linebreak": false,
+                "spaces": "both",
+                "linebreaks": "after"
+            },
+            ". in type": {
+                "force-linebreak": false,
+                "spaces": "after",
+                "linebreaks": "after"
+            },
+            "$": {
+                "force-linebreak": false,
+                "spaces": "both",
+                "linebreaks": "after"
+            },
+            "$$": {
+                "force-linebreak": false,
+                "spaces": "before",
+                "linebreaks": "none"
+            },
+            "record in pattern": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "none"
+            },
+            "record": {
+                "force-linebreak": false,
+                "spaces": "after",
+                "linebreaks": "none"
+            },
+            "<: in expression": {
+                "force-linebreak": true,
+                "spaces": "after",
+                "linebreaks": "before"
+            },
+            "<* in expression": {
+                "force-linebreak": true,
+                "spaces": "both",
+                "linebreaks": "before"
+            },
+            "<$> in expression": {
+                "force-linebreak": true,
+                "spaces": "both",
+                "linebreaks": "before"
+            },
+            "<*> in expression": {
+                "force-linebreak": true,
+                "spaces": "both",
+                "linebreaks": "before"
+            }
+        },
+        "group": {
+            "default": {
+                "force-linebreak": false,
+                "spaces": "both",
+                "linebreaks": "after"
+            },
+            "$(": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "none"
+            },
+            "[ in pattern": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "after"
+            },
+            "(# in pattern": {
+                "force-linebreak": false,
+                "spaces": "both",
+                "linebreaks": "after"
+            },
+            "( in other": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "after"
+            },
+            "(# in expression": {
+                "force-linebreak": false,
+                "spaces": "both",
+                "linebreaks": "after"
+            },
+            "* in type": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "after"
+            },
+            "* in pattern": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "after"
+            },
+            "(": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "after"
+            },
+            "[": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "after"
+            },
+            "[|": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "none"
+            },
+            "[p|": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "none"
+            },
+            "[d|": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "none"
+            },
+            "[t|": {
+                "force-linebreak": false,
+                "spaces": "none",
+                "linebreaks": "none"
+            }
+        },
+        "layout": {
+            "infix-app": "flex",
+            "if": "flex",
+            "import-spec-list": "flex",
+            "con-decls": "vertical",
+            "typesig": "try-oneline",
+            "declaration": "flex",
+            "app": "try-oneline",
+            "let": "flex",
+            "record": "try-oneline",
+            "export-spec-list": "vertical",
+            "list-comp": "try-oneline"
+        },
+        "penalty": {
+            "overfull": 10,
+            "indent": 1,
+            "overfull-once": 200,
+            "max-line-length": 100,
+            "linebreak": 100
+        },
+        "indent": {
+            "deriving": 2,
+            "if": "align-or-indent-by 2",
+            "let-binds": "align-or-indent-by 2",
+            "import-spec-list": "align-or-indent-by 7",
+            "onside": 2,
+            "where": 2,
+            "do": "indent-by 2",
+            "app": "align",
+            "case": "indent-by 2",
+            "let-in": "indent-by 2",
+            "where-binds": "indent-by 2",
+            "let": "align-or-indent-by 2",
+            "export-spec-list": "indent-by 2",
+            "multi-if": "indent-by 2",
+            "class": "indent-by 2"
+        },
+        "align": {
+            "let-binds": false,
+            "where": true,
+            "limits": [
+                10,
+                25
+            ],
+            "case": true,
+            "import-module": true,
+            "import-spec": true,
+            "class": false,
+            "record-fields": true
+        },
+        "options": {
+            "sort-pragmas": true,
+            "split-language-pragmas": true,
+            "sort-import-lists": true,
+            "preserve-vertical-space": true,
+            "sort-imports": true
+        }
+    },
+    "language": "Haskell2010"
 }
