@@ -1,42 +1,50 @@
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
+module Main where
 
-module Main
-  ( main
-  ) where
+import           Control.Monad.IO.Class
+import           GHC.Compiler.Notes.App
+import           GHC.Compiler.Notes.Config
+import           Options.Applicative       hiding ( Parser )
+import qualified Options.Applicative       as Options
+import           RIO
+import qualified System.FilePath.Glob      as Glob
+import           System.FilePath
+import qualified Data.Text.IO as Text
+import           GHC.Compiler.Notes.Parser
+import           GHC.Compiler.Notes.FormatRstDoc
+import           System.Directory
 
-import Conduit
 
-import GHC.Compiler.Notes
+data CommentOption = CommentOption
+  { optConfigPath :: FilePath
+  }
+  deriving (Eq, Show)
 
-import Path
-import Path.IO
-
-import RIO
-import qualified RIO.List
-import qualified RIO.Text
+commentOption :: Options.Parser CommentOption
+commentOption = CommentOption
+  <$> argument str (metavar "FILE")
 
 main :: IO ()
 main = do
-  let targetDir = "submodules/ghc"
-  runConduitRes $ sourceDirectoryDeep False targetDir .| awaitForever getCommentC
-  return ()
+  opt <- execParser $ info (commentOption <**> helper)
+    $  header "GHC Compiler Notes"
+    <> progDesc "Output GHC compiler notes"
+    <> fullDesc
+  ctx <- defaultAppContext
+  runAppT (app opt) ctx
 
-getCommentC :: MonadIO m => FilePath -> ConduitT FilePath o m ()
-getCommentC fp
-  | ".hs" `RIO.List.isSuffixOf` fp && not (skipDir `RIO.List.isPrefixOf` fp) =
-    liftIO $ getComment fp
-  | otherwise = return ()
-  where
-    skipDir = "submodules/ghc/testsuite"
-
-getComment :: FilePath -> IO ()
-getComment fp = readComments fp >>= \case
-  Nothing -> putStrLn (show fp ++ ": invalid token")
-  Just ts -> do
-    dir <- parent
-      <$> parseRelFile fp
-    let outDir = $(mkRelDir "output") </> dir
-    ensureDir outDir
-    writeFileUtf8 ("output/" ++ fp) $ RIO.Text.unlines ts
+app :: CommentOption -> AppT IO ()
+app opt = do
+  config <- (liftIO $ parseConfigFromFile $ optConfigPath opt) >>= \case
+    Right conf -> pure conf
+    Left err   -> throwM err
+  files <- fmap join $ liftIO $ Glob.globDir (confTargets config) "output/ghc"
+  -- TODO: catch GhcExceptions and continue
+  forM_ files \fn -> do
+    let outputFn = "output/doc" </> (joinPath $ drop 2 $ splitPath fn) <> ".rst"
+    r <- parseCollectedNotesFromHsFile fn
+    case r of
+      Left lf  -> liftIO $ print lf
+      Right ns -> do
+        let d = formatRstDoc ns
+        liftIO $ createDirectoryIfMissing True $ takeDirectory outputFn
+        liftIO $ Text.writeFile outputFn d
