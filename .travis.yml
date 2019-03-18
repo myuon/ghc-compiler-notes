@@ -20,29 +20,28 @@ matrix:
       ghc: "8.6.3"
 
     - env: BUILD=cabal
-      ghc: "8.4.4"
+      ghc: "8.6.4"
 
-      # --system-ghc is used to take advantage of language: haskell and save build time. If the stack resolver ghc and system-ghc become different, stack will download the right ghc
-    - env: BUILD=stack ARGS="--resolver lts-12 --system-ghc"
-      ghc: "8.4.4"
+    - env: BUILD=stack ARGS="--resolver lts-13.11 --system-ghc"
+      ghc: "8.6.3"
 
     - env: BUILD=stack ARGS="--resolver lts-13 --system-ghc"
-      ghc: "8.6.3"
+      ghc: "8.6.4"
+
+    - env: BUILD=style
+      ghc: "8.6.4"
 
       # nightly build
     - env: BUILD=stack ARGS="--resolver nightly --system-ghc"
-      ghc: "8.6.3"
-
-    - env: BUILD=style
-      ghc: "8.6.3"
+      ghc: "8.6.4"
 
       # pedantic
     - env: BUILD=pedantic ARGS="--resolver lts-13 --system-ghc"
-      ghc: "8.6.3"
+      ghc: "8.6.4"
 
   allow_failures:
-    - env: BUILD=stack ARGS="--resolver nightly --system-ghc"
     - env: BUILD=style
+    - env: BUILD=stack ARGS="--resolver nightly --system-ghc"
     - env: BUILD=pedantic ARGS="--resolver lts-13 --system-ghc"
 
 git:
@@ -72,7 +71,6 @@ install:
       mkdir -p $HOME/.cabal/bin
 
       cabal new-update
-      cabal new-install tasty-discover
 
       cabal --numeric-version
       ghc --version
@@ -83,8 +81,6 @@ install:
       travis_retry curl -sL https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
       stack upgrade --binary-version=$STACK_VERSION
-
-      stack install tasty-discover
 
       stack --numeric-version
       stack --hpack-numeric-version
@@ -100,6 +96,7 @@ script:
     style)
       curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s app
       curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s src
+      curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s test
       ;;
     cabal)
       cabal new-test --enable-tests -fdev
