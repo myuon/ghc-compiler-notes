@@ -15,6 +15,7 @@ import           GHC.LanguageExtensions (Extension)
 import           Control.Monad
 import           Control.Monad.Trans.State
 import qualified Packages
+import           Data.Kind
 
 
 data AppContext = AppContext
@@ -75,15 +76,16 @@ defaultAppContext = appContext $ AppContextCommon
   }
 
 
-newtype AppT m a = AppT
+newtype AppT (m :: Type -> Type) a = AppT
   { runAppT :: AppContext -> m a
   }
-
-deriving via (ReaderT AppContext m) instance Functor m => Functor (AppT m)
-deriving via (ReaderT AppContext m) instance Applicative m => Applicative (AppT m)
-deriving via (ReaderT AppContext m) instance Monad m => Monad (AppT m)
-deriving via (ReaderT AppContext m) instance MonadIO m => MonadIO (AppT m)
-deriving via (ReaderT AppContext m) instance MonadThrow m => MonadThrow (AppT m)
+  deriving
+    ( Functor
+    , Applicative
+    , Monad
+    , MonadIO
+    , MonadThrow
+    ) via (ReaderT AppContext m)
 
 deriving
   via (Field "envDynFlags" "ctx" (MonadReader (ReaderT AppContext m)))
