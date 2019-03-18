@@ -1,5 +1,11 @@
-format:
-	find src/ -type f -name "*hs" | xargs floskell
-	find tests/ -type f -name "*hs" -not -path 'tests/resources/*' | xargs floskell
-	find app/ -type f -name "*hs" | xargs floskell
+.PHONY: build
+build:
+	cabal new-build
+
 .PHONY: format
+format:
+	find app src test -type f \( -name "*.hs" -or -name "*.lhs" \) | xargs -I{} sh -c "floskell {} || true"
+
+.PHONY: test
+test:
+	cabal new-test

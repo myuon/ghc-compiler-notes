@@ -1,6 +1,6 @@
-resolver: lts-13.2
+resolver: lts-13.13
 packages:
 - .
 extra-deps:
-- github: waddlaw/ghc-syntax-highlighter
-  commit: 342d0a681c6bce22d7968dc83a516c21cdf34857
+- capability-0.1.0.0@sha256:59fb5c11627d56be3df9f726c920ca12e76a8a4652057ddb6d20bb3c890a9da5
+- generic-lens-1.0.0.2@sha256:67d2c24fc5bc616af69ea30e4412d75455bbcbeff49cff03823691f789ce7a8a
