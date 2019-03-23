@@ -40,7 +40,7 @@ app opt = do
   files <- fmap join $ liftIO $ Glob.globDir (confTargets config) "output/ghc"
   -- TODO: catch GhcExceptions and continue
   forM_ files \fn -> do
-    let outputFn = "output/doc" </> (joinPath $ drop 2 $ splitPath fn) <> ".rst"
+    let outputFn = confOutDir config </> (joinPath $ drop 2 $ splitPath fn) <> ".rst"
     r <- parseCollectedNotesFromHsFile fn
     case r of
       Left lf  -> liftIO $ print lf

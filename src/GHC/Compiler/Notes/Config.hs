@@ -9,6 +9,7 @@ import qualified System.FilePath.Glob as Glob
 
 data NoteConfig = NoteConfig
   { confResource :: NoteConfigResource
+  , confOutDir :: String
   , confTargets :: [Glob.Pattern]
   }
   deriving (Eq, Show)
@@ -16,6 +17,7 @@ data NoteConfig = NoteConfig
 instance FromJSON NoteConfig where
   parseJSON = withObject "NoteConfig" $ \v -> NoteConfig
     <$> v .: "resource"
+    <*> v .: "outDir"
     <*> (fmap Glob.compile <$> v .: "targets")
 
 
