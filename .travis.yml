@@ -39,14 +39,20 @@ matrix:
     - env: BUILD=pedantic ARGS="--resolver lts-13 --system-ghc"
       ghc: "8.6.4"
 
-    - language: python
+    - stage: deploy
+      language: python
       python: 3.6
+      if: branch = master
       before_script:
         - pip3 install -U Sphinx
       script:
-        - cd sphinx-docs/
-        - make html
-        - git subtree push --prefix build/html "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git" gh-pages >/dev/null 2>&1
+        - cabal new-exec -- ghc-compiler-notes conf/ghc-8.6.4.yml
+        - cd sphinx-docs/ && make html && cd -
+        - git checkout gh-pages
+        - ls | egrep -v '^sphinx-docs$' | xargs rm -rf
+        - mv sphinx-docs/build/html/* .
+        - rm -rf sphinx-docs
+        - git add . && git commit -m 'build' && git push --force --quiet "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git" gh-pages >/dev/null 2&>1
 
   allow_failures:
     - env: BUILD=style
