@@ -9,7 +9,9 @@ Welcome to ghc-compiler-notes's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   :glob:
 
+   notes/**/*
 
 
 Indices and tables
