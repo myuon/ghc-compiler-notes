@@ -2,7 +2,7 @@ resource:
   type: official-gitlab
   identifier: ghc-8.6.4-release
 
-outDir: docs
+outDir: sphinx-docs/source/notes
 
 targets:
   - compiler/**/*.hs
