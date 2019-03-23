@@ -1,6 +1,7 @@
 # ghc-docs-book
 
-[![Join the chat at https://gitter.im/ghc-compiler-notes/community](https://badges.gitter.im/ghc-compiler-notes/community.svg)](https://gitter.im/ghc-compiler-notes/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/myuon/ghc-compiler-notes.svg?branch=master)](https://travis-ci.org/myuon/ghc-compiler-notes)
+[![Join the chat at https://gitter.im/ghc-compiler-notes/community](https://badges.gitter.im/ghc-compiler-notes/community.svg)](https://gitter.im/ghc-compiler-notes/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/myuon/ghc-compiler-notes.svg?branch=master)](https://travis-ci.org/myuon/ghc-compiler-notes) [![Documentation Status](https://readthedocs.org/projects/ghc-compiler-notes/badge/?version=latest)](https://ghc-compiler-notes.readthedocs.io/en/latest/?badge=latest)
+
 
 ## Installation
 
