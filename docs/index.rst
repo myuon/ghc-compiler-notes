@@ -11,7 +11,7 @@ Welcome to ghc-compiler-notes's documentation!
    :caption: Contents:
    :glob:
 
-   notes/**/*
+   notes/**/index
 
 
 Indices and tables

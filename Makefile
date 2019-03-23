@@ -10,17 +10,7 @@ format:
 test:
 	cabal new-test
 
-.PHONY: exec
-exec:
-	cabal new-build && cabal new-exec -- ghc-compiler-notes conf/ghc-8.6.4.yml
-
 .PHONY: generate
-generate: exec
-	cd sphinx-docs/ && make html BUILDDIR=../docs && cd -
-	git add . && git commit -m 'build html'
-
-.PHONY: clean
-clean:
-	rm -rf docs/
-	mkdir docs/
-	rm -rf sphinx-docs/source/notes
+generate:
+	rm -rf docs/notes
+	cabal new-build && cabal new-exec -- ghc-compiler-notes conf/ghc-8.6.4.yml

@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import           Control.Monad.IO.Class
@@ -48,5 +49,20 @@ app opt = do
       Right ns -> do
         let d = formatRstDoc ns
         when (Text.length (Text.strip d) /= 0) $ do
-          liftIO $ createDirectoryIfMissing True $ takeDirectory outputFn
+          -- Create a directory and place an index.rst
+          directoryExists <- liftIO $ doesDirectoryExist $ takeDirectory outputFn
+          when (not directoryExists) $ do
+            liftIO $ createDirectoryIfMissing True $ takeDirectory outputFn
+            liftIO $ Text.writeFile (takeDirectory outputFn </> "index.rst") $ Text.unlines [
+              Text.pack (takeDirectory outputFn),
+              "=================================",
+              "",
+              ".. toctree::",
+              "    :maxdepth: 2",
+              "    :caption: Contents:",
+              "    :glob:",
+              "",
+              "    *"
+              ]
+
           liftIO $ Text.writeFile outputFn d
