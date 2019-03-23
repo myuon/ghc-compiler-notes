@@ -54,7 +54,7 @@ app opt = do
           when (not directoryExists) $ do
             liftIO $ createDirectoryIfMissing True $ takeDirectory outputFn
             liftIO $ Text.writeFile (takeDirectory outputFn </> "index.rst") $ Text.unlines [
-              Text.pack (takeDirectory outputFn),
+              (\(Just x) -> x) $ Text.stripPrefix "docs/notes/" $ Text.pack (takeDirectory outputFn),
               "=================================",
               "",
               ".. toctree::",
