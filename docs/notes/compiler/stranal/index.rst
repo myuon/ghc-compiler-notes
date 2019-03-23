@@ -1,4 +1,4 @@
-docs/notes/compiler/stranal
+compiler/stranal
 =================================
 
 .. toctree::

@@ -1,4 +1,4 @@
-docs/notes/compiler/nativeGen
+compiler/nativeGen
 =================================
 
 .. toctree::

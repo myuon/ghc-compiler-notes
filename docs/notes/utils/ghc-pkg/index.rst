@@ -1,4 +1,4 @@
-docs/notes/utils/ghc-pkg
+utils/ghc-pkg
 =================================
 
 .. toctree::

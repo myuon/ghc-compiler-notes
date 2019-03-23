@@ -1,4 +1,4 @@
-docs/notes/compiler/simplStg/StgLiftLams
+compiler/simplStg/StgLiftLams
 =================================
 
 .. toctree::

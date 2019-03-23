@@ -1,4 +1,4 @@
-docs/notes/compiler/simplStg
+compiler/simplStg
 =================================
 
 .. toctree::

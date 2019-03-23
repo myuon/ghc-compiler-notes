@@ -1,4 +1,4 @@
-docs/notes/libraries/base/Foreign
+libraries/base/Foreign
 =================================
 
 .. toctree::

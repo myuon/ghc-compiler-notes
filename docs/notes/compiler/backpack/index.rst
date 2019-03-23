@@ -1,4 +1,4 @@
-docs/notes/compiler/backpack
+compiler/backpack
 =================================
 
 .. toctree::

@@ -1,4 +1,4 @@
-docs/notes/compiler/simplCore
+compiler/simplCore
 =================================
 
 .. toctree::

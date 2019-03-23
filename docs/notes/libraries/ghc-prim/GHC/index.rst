@@ -1,4 +1,4 @@
-docs/notes/libraries/ghc-prim/GHC
+libraries/ghc-prim/GHC
 =================================
 
 .. toctree::

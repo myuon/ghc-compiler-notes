@@ -1,4 +1,4 @@
-docs/notes/libraries/template-haskell/Language/Haskell/TH
+libraries/template-haskell/Language/Haskell/TH
 =================================
 
 .. toctree::

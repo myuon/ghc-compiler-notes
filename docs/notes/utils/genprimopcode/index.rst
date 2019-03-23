@@ -1,4 +1,4 @@
-docs/notes/utils/genprimopcode
+utils/genprimopcode
 =================================
 
 .. toctree::

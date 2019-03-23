@@ -1,4 +1,4 @@
-docs/notes/compiler/stgSyn
+compiler/stgSyn
 =================================
 
 .. toctree::
