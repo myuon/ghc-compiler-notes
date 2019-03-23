@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs>`_
+
 Note [The big picture]
 ~~~~~~~~~~~~~~~~~~~~~~
 The general shape of the simplifier is this:
@@ -1293,3 +1295,4 @@ cases where he really, really wanted a RULE for a recursive function
 to apply in that function's own right-hand side.
 
 See Note [Forming Rec groups] in OccurAnal
+

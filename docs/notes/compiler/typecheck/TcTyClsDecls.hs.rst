@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs>`_
+
 Note [Grouping of type and class declarations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tcTyAndClassDecls is called on a list of `TyClGroup`s. Each group is a strongly
@@ -1339,4 +1341,5 @@ The warning can be suppressed by prefixing the field-name with an underscore.
 For example:
 
   data T a = A { m1 :: a, _m2 :: a } | B { m1 :: a }
+
 

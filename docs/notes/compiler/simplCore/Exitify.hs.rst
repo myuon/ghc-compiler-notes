@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs>`_
+
 Note [Exitification]
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -261,4 +263,5 @@ We do not just `filter (`elemVarSet` fvs) captured`, as there might be
 shadowing, and `captured` may contain multiple variables with the same Unique. I
 these cases we want to abstract only over the last occurence, hence the `foldr`
 (with emphasis on the `r`). This is #15110.
+
 

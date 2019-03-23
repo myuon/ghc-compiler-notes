@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs>`_
+
 Note [Overall plumbing for rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * After the desugarer:
@@ -353,5 +355,6 @@ at all.
 
 That is why the 'lookupRnInScope' call in the (Var v2) case of 'match'
 is so important.
+
 
 

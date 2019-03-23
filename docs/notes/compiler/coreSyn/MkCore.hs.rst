@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/MkCore.hs>`_
+
 Note [Flattening one-tuples]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This family of functions creates a tuple of variables/expressions/types.
@@ -117,3 +119,4 @@ It might seem a bit surprising that seq on absentError is simply erased
 
 but that should be okay; since there's no pattern match we can't really
 be relying on anything from it.
+

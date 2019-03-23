@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Module.hs>`_
+
 Note [The identifier lexicon]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Unit IDs, installed package IDs, ABI hashes, package names,
@@ -163,3 +165,4 @@ turning the env to a list.
 See Note [Unique Determinism] for more information about the source of
 nondeterminismand and Note [Deterministic UniqFM] for explanation of why
 it matters for maps.
+

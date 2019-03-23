@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Bits.hs>`_
+
 Note [toIntegralSized optimization]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The code in 'toIntegralSized' relies on GHC optimizing away statically
@@ -22,3 +24,4 @@ are translated into the following (simplified) /GHC Core/ language:
 >       ; True -> Just (W16# (narrow16Word# (int2Word# b1)))
 >       }
 >   }
+

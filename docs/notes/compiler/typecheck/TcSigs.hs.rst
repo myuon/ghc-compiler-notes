@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSigs.hs>`_
+
 Note [Scoped tyvars]
 ~~~~~~~~~~~~~~~~~~~~
 The -XScopedTypeVariables flag brings lexically-scoped type variables
@@ -80,3 +82,4 @@ See Note [Signature skolems] in TcType
 
 None of this applies to a function binding with a complete
 signature, which doesn't use tcInstSig.  See TcBinds.tcPolyCheck.
+

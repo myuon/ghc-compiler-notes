@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Lexeme.hs>`_
+
 Note [Classification of generated names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -6,3 +8,4 @@ e.g.  when using -ddump-simpl. These generated names start with a $
 but should still be pretty-printed using prefix notation. We make sure
 this is the case in isLexVarSym by only classifying a name as a symbol
 if all its characters are symbols, not just its first one.
+

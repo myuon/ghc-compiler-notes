@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcEvidence.hs>`_
+
 Note [TcCoercions]
 ~~~~~~~~~~~~~~~~~~
 | TcCoercions are a hack used by the typechecker. Normally,
@@ -224,4 +226,5 @@ can just squeeze by.  Here's how.
 * So we can track usage via the processing for that implication,
   (see Note [Tracking redundant constraints] in TcSimplify).
   We can ignore usage from the EvFun altogether.
+
 

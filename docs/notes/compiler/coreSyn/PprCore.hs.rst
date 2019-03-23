@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/PprCore.hs>`_
+
 Note [Print case as let]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 Single-branch case expressions are very common:
@@ -29,3 +31,4 @@ without a type and without their unfolding.
 Furthermore, a dead case-binder is completely ignored, while otherwise, dead
 binders are printed as "_".
 These instances are sadly orphans
+

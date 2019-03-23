@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs>`_
+
 Note [FloatOut inside INLINE]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @InlineCtxt@ very similar to @Level 0 0@, but is used for one purpose:
@@ -540,3 +542,4 @@ Here v is strict; but if we float v to top level, it isn't any more.
 
 Similarly, if we're floating a join point, it won't be one anymore, so we zap
 join point information as well.
+

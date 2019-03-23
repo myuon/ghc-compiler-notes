@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTypeable.hs>`_
+
 Note [Grand plan for Typeable]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The overall plan is this:
@@ -148,3 +150,4 @@ polymorphic types.  So instead
                  | KindRepApp KindRep KindRep
                  | KindRepFun KindRep KindRep
                  ...
+

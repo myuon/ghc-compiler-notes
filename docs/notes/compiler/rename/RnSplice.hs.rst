@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSplice.hs>`_
+
 Note [Free variables of typed splices]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider renaming this:
@@ -246,3 +248,4 @@ Examples:
   \y. [| \x. $(f 'y) |] -- Not ok (bind =1, use = 1)
 
   [| \x. $(f 'x) |]     -- OK (bind = 2, use = 1)
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysWiredIn.hs>`_
+
 Note [Wiring in RuntimeRep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The RuntimeRep type (and friends) in GHC.Types has a bunch of constructors,

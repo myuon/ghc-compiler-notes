@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsPat.hs>`_
+
 Note [DotDot fields]
 ~~~~~~~~~~~~~~~~~~~~
 The rec_dotdot field means this:
@@ -87,3 +89,4 @@ minimum unboxed sum arity is 2.
 Failing to mark unboxed sum patterns as non-irrefutable would cause the Just'
 case in foo to be unreachable, as GHC would mistakenly believe that Nothing'
 is the only thing that could possibly be matched!
+

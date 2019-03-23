@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmProcPoint.hs>`_
+
 Note [Proc-point analysis]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -46,3 +48,4 @@ And when c == c' and ress == ress', this also:
   L: CopyIn c' ress'                   L: CopyIn c' ress' ;
 
 In both cases the goal is to eliminate k.
+

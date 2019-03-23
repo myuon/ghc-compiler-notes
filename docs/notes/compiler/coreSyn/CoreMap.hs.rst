@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreMap.hs>`_
+
 Note [Binders]
 ~~~~~~~~~~~~~~
  * In general we check binders as late as possible because types are
@@ -34,3 +36,4 @@ Note [Binders]
 ~~~~~~~~~~~~~~
 We need to use 'BndrMap' for 'Coercion', 'CoreExpr' AND 'Type', since all
 of these data types have binding forms.
+

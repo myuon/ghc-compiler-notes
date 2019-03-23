@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs>`_
+
 Note [Type bindings]
 ~~~~~~~~~~~~~~~~~~~~
 Core does allow type bindings, although such bindings are
@@ -717,5 +719,6 @@ to the rule that
 we can eta-reduce    \x. f x  ===>  f
 
 This turned up in #7542.
+
 
 

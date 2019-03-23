@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs>`_
+
 Note [coreView vs tcView]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 So far as the typechecker is concerned, 'Constraint' and 'TYPE
@@ -404,3 +406,4 @@ prefer doing inner expansions first.  For example,
 We have
   occCheckExpand b (F (G b)) = Just (F Char)
 even though we could also expand F to get rid of b.
+

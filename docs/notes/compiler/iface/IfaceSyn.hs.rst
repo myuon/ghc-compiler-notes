@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs>`_
+
 Note [Versioning of instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 See [http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance#Instances]
@@ -122,3 +124,4 @@ of the type constructor or class itself. So deserializing them lazily
 would be more involved. Similar comments apply to the other
 constructors of IfaceDecl with the additional point that they probably
 represent a small proportion of all declarations.
+

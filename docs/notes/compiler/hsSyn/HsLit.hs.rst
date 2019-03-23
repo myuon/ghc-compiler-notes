@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsLit.hs>`_
+
 Note [ol_rebindable]
 ~~~~~~~~~~~~~~~~~~~~
 The ol_rebindable field is True if this literal is actually
@@ -29,3 +31,4 @@ The PostTcType in each branch records the type the overload literal is
 found to have.
 Comparison operations are needed when grouping literals
 for compiling pattern-matching (module MatchLit)
+

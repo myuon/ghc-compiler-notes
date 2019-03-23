@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs>`_
+
 Note [Reboxing]
 ~~~~~~~~~~~~~~~
 We must be careful not to allocate the same constructor twice.  Consider
@@ -933,3 +935,4 @@ differ only in their type arguments!  Not only is it utterly useless,
 but it also means that (with polymorphic recursion) we can generate
 an infinite number of specialisations. Example is Data.Sequence.adjustTree,
 I think.
+

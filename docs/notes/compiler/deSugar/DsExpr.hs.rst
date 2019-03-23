@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsExpr.hs>`_
+
 Note [Desugaring vars]
 ~~~~~~~~~~~~~~~~~~~~~~
 In one situation we can get a *coercion* variable in a HsVar, namely
@@ -130,4 +132,5 @@ without a wrapper, then that is surely problem and we can reject.
 We thus have a parameter to `dsExpr` that tracks whether or not we are
 directly in an HsWrap. If we find a levity-polymorphic hasNoBinding Id when
 we're not directly in an HsWrap, reject.
+
 

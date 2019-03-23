@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/PprBase.hs>`_
+
 Note [Embedding large binary blobs]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -48,3 +50,4 @@ used instead, only print section type.
 For string literals, additional flags are specified to enable merging of
 identical strings in the linker. With -split-sections each string also gets
 a unique section to allow strings from unused code to be GC'd.
+

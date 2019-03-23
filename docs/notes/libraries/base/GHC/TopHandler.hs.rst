@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/TopHandler.hs>`_
+
 Note [rts_setMainThread must be called unsafely]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -36,3 +38,4 @@ calling the RTS, without iconv at all.
 try to flush stdout/stderr, but don't worry if we fail
 (these handles might have errors, and we don't want to go into
 an infinite loop).
+

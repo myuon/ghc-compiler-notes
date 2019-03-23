@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/backpack/RnModIface.hs>`_
+
 Note [rnIfaceNeverExported]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For the high-level overview, see
@@ -29,3 +31,4 @@ Unfortunately, this strategy is not enough in the presence of promotion
 reference to their coercions.  It's not altogether clear how to
 fix this case, but it is definitely a bug!
 PILES AND PILES OF BOILERPLATE
+

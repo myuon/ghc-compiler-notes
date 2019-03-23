@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs>`_
+
 Note [tcMatchTy vs tcMatchTyKi]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This module offers two variants of matching: with kinds and without.
@@ -457,3 +459,4 @@ These two TyConApps have the same TyCon at the front but they
 are surelyApart, so we can report that without looking any
 further (see #15704).
 ------------ unify_ty: the main workhorse -----------
+

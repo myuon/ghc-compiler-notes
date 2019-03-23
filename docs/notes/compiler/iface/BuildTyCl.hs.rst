@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/BuildTyCl.hs>`_
+
 Note [Class newtypes and equality predicates]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
@@ -13,3 +15,4 @@ Moreover,
 Here we can't use a newtype either, even though there is only
 one field, because equality predicates are unboxed, and classes
 are boxed.
+

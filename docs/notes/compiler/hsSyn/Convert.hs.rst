@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/Convert.hs>`_
+
 Note [Dropping constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When we drop constructors from the input (for instance, when we encounter @TupE [e]@)
@@ -161,4 +163,5 @@ in cases (a) and (c) to make it clear which of the two forall
 quantifiers and/or constraint contexts are specified, and which are
 not. See GHC's user's guide on pattern synonyms for more information
 about pattern synonym type signatures.
+
 

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs>`_
+
 Note [Updating flag description in the User's Guide]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -166,3 +168,4 @@ combination when parsing flags, we also need to check when we update
 the flags; this is because API clients may parse flags but update the
 DynFlags afterwords, before finally running code inside a session (see
 T10052 and #10052).
+

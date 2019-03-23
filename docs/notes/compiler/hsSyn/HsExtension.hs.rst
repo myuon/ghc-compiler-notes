@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExtension.hs>`_
+
 Note [Trees that grow]
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -40,3 +42,4 @@ will correctly deduce Outputable for (GhcPass p), but
   type instance XIPBinds       GhcTc = TcEvBinds
 
 will not.
+

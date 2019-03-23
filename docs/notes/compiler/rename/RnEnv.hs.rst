@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnEnv.hs>`_
+
 Note [Signature lazy interface loading]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -436,3 +438,4 @@ the list type constructor.
 
 Note that setRdrNameSpace on an Exact name requires the Name to be External,
 which it always is for built in syntax.
+

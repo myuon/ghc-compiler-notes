@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRules.hs>`_
+
 Note [Typechecking rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 We *infer* the typ of the LHS, and use that type to *check* the type of
@@ -162,4 +164,5 @@ We use a clone of the real constraint. If we don't do this,
 then RHS coercion-hole constraints get filled in, only to get filled
 in *again* when solving the implications emitted from tcRule. That's
 terrible, so we avoid the problem by cloning the constraints.
+
 

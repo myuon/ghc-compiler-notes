@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs>`_
+
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
 We have to be careful about shadowing.
@@ -361,5 +363,6 @@ to be doing, which is why I put it here.
 
 I acutally saw some examples in the wild, where some inlining made e1 too
 big for cheapEqExpr to catch it.
+
 
 

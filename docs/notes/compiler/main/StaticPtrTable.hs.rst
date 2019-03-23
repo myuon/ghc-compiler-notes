@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/StaticPtrTable.hs>`_
+
 Note [Grand plan for static forms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Static forms go through the compilation phases as follows.
@@ -67,3 +69,4 @@ Here is a running example:
   the SPT entries (recorded in CgGuts' cg_spt_entries field) to the interpreter
   process' SPT table using the addSptEntry interpreter message. This happens
   in upsweep after we have compiled the module (see GhcMake.upsweep').
+

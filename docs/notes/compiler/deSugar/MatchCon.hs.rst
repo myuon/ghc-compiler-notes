@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/MatchCon.hs>`_
+
 Note [Record patterns]
 ~~~~~~~~~~~~~~~~~~~~~~
 Consider
@@ -58,4 +60,5 @@ Originally I tried to use
         (\b -> let e = d in expr2) a
 to do this substitution.  While this is "correct" in a way, it fails
 Lint, because e::Ord b but d::Ord a.
+
 

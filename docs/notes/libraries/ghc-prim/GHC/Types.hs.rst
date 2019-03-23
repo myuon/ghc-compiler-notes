@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/ghc-prim/GHC/Types.hs>`_
+
 Note [Kind-changing of (~) and Coercible]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -82,3 +84,4 @@ type lets us use the TrNameS constructor when allocating static data;
 but we also need TrNameD for the case where we are deserialising a TyCon
 or Module (for example when deserialising a TypeRep), in which case we
 can't conveniently come up with an Addr#.
+

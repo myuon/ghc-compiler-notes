@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmBind.hs>`_
+
 Note [Selectors]
 ~~~~~~~~~~~~~~~~
 We look at the body of the closure to see if it's a selector---turgid,
@@ -41,3 +43,4 @@ the original value of R1. This way R1 may get modified but loopification will
 not care.
 A function closure pointer may be tagged, so we
 must take it into account when accessing the free variables.
+

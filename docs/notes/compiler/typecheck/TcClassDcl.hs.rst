@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcClassDcl.hs>`_
+
 Note [Polymorphic methods]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
@@ -25,5 +27,6 @@ otherwise the "$dm" stuff comes out error messages.  But we want the
 and wrap it in a let, thus
           $dmop2 = let op2 = e in op2
 This makes the error messages right.
+
 
 

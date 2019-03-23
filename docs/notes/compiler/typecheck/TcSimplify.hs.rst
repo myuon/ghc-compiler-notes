@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs>`_
+
 Note [Fail fast if there are insoluble kind equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Rather like in simplifyInfer, fail fast if there is an insoluble
@@ -1129,3 +1131,4 @@ Note that if we change the above instance ("instance A Integer") to
 
 This is because the first defaulted type (Integer) has successfully satisfied
 its single-parameter constraints (in this case Num).
+

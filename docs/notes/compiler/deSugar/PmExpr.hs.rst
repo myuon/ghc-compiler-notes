@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/PmExpr.hs>`_
+
 Note [PmExprOther in PmExpr]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Since there is no plan to extend the (currently pretty naive) term oracle in
@@ -73,3 +75,4 @@ impact of this is the following:
     2. Pattern matcing on literals can never be considered exhaustive unless we
        have a catch-all clause. Hence, this assumption affects mainly the
        appearance of the warnings and is, in practice safe.
+

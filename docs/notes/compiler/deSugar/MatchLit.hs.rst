@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/MatchLit.hs>`_
+
 Note [Literal short cut]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 The type checker tries to do this short-cutting as early as possible, but
@@ -17,3 +19,4 @@ it'll parse as (negate 128), and overflow.  In this case, suggest NegativeLitera
 We get an erroneous suggestion for
   x = 128
 but perhaps that does not matter too much.
+

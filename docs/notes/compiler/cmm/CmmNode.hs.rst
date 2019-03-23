@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmNode.hs>`_
+
 Note [Foreign calls]
 ~~~~~~~~~~~~~~~~~~~~~~~
 A CmmUnsafeForeignCall is used for *unsafe* foreign calls;
@@ -135,3 +137,4 @@ safe foreign call has the same semantics as unsafe foreign call. To prevent
 this we need to treat safe foreign call as if was normal call.
 ---------------------------------
  mapping Expr in CmmNode
+

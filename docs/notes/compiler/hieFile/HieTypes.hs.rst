@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hieFile/HieTypes.hs>`_
+
 Note [Efficient serialization of redundant type info]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -26,3 +28,4 @@ Types in the final AST are stored in an 'A.Array TypeIndex (HieType TypeIndex)',
 where the 'TypeIndex's in the 'HieType' are references to other elements of the
 array. Types recovered from GHC are deduplicated and stored in this compressed
 form with sharing of subtrees.
+

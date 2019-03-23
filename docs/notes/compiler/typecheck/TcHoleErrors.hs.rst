@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHoleErrors.hs>`_
+
 Note [Valid hole fits include ...]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `findValidHoleFits` returns the "Valid hole fits include ..." message.
@@ -331,4 +333,5 @@ actual source. However, As evidenced by #15321, #15007 and #15202, this can
 cause bewildering error messages. The solution here is simple: if a candidate
 would cause the type checker to error, it is not a valid hole fit, and thus it
 is discarded.
+
 

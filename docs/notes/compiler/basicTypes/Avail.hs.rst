@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Avail.hs>`_
+
 Note [Representing fields in AvailInfo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When -XDuplicateRecordFields is disabled (the normal case), a
@@ -45,3 +47,4 @@ them from the same module (even with `-XDuplicateRecordfields`
 enabled), because they would be represented identically.  The
 workaround here is to enable `-XDuplicateRecordFields` on the defining
 modules.
+

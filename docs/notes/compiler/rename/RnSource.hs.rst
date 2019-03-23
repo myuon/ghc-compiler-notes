@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs>`_
+
 Note [Wildcards in family instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Wild cards can be used in type/data family instance declarations to indicate
@@ -218,3 +220,4 @@ There is no reason not to allow the stupid theta if there are no data
 constructors.  It's still stupid, but does no harm, and I don't want
 to cause programs to break unnecessarily (notably HList).  So if there
 are no data constructors we allow h98_style = True
+

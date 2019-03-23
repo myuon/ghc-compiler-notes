@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/GhcMake.hs>`_
+
 Note [Missing home modules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Sometimes user doesn't want GHC to pick up modules, not explicitly listed
@@ -85,3 +87,4 @@ be: we're *just* generating interface files.  In this case, we
 want to check if the interface file is new, in lieu of the object
 file.  See also #9243.
 Filter modules in the HPT
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsBinds.hs>`_
+
 Note [Desugaring AbsBinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 In the general AbsBinds case we desugar the binding to this:
@@ -488,5 +490,6 @@ Furthermore, Ben Gamari and Reid Barton are considering trying to
 detect the presence of "static data" that the simplifier doesn't
 need to traverse at all. Such rules do not play well with that.
 So for now, we ban them altogether as requested by #13290. See also #7398.
+
 
 

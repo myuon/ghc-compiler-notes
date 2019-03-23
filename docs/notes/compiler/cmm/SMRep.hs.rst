@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/SMRep.hs>`_
+
 Note [static constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -38,5 +40,6 @@ for Just, for the two cases where the argument was Caffy or non-Caffy.
 
 Currently we don't do this; instead we treat nullary constructors
 as non-Caffy, and the others as potentially Caffy.
+
 
 

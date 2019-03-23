@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcBinds.hs>`_
+
 Note [Polymorphic recursion]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The game plan for polymorphic recursion in the code above is
@@ -350,5 +352,6 @@ Example for (E2), we generate
      q :: beta:1, with constraint (forall:3 a. Integral a => Int ~ beta)
 The beta is untouchable, but floats out of the constraint and can
 be solved absolutely fine.
+
 
 

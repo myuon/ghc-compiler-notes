@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrimOp.hs>`_
+
 Note [PrimOp can_fail and has_side_effects]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Both can_fail and has_side_effects mean that the primop has
@@ -157,3 +159,4 @@ WARNING), we just borrow some other predicates for a
 what-should-be-good-enough test.  "Cheap" means willing to call it more
 than once, and/or push it inside a lambda.  The latter could change the
 behaviour of 'seq' for primops that can fail, so we don't treat them as cheap.
+

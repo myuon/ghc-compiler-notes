@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenFunctor.hs>`_
+
 Note [Deriving null]
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -358,3 +360,4 @@ or
 
 We choose the first one to be consistent with what foldMapDefault does for
 a derived Traversable instance.
+

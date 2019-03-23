@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs>`_
+
 Note [SimplEnv invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 seInScope:
@@ -230,3 +232,4 @@ Note [Robust OccInfo]
 It's important that we *do* retain the loop-breaker OccInfo, because
 that's what stops the Id getting inlined infinitely, in the body of
 the letrec.
+

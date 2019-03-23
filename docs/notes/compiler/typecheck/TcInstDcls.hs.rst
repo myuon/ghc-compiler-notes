@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs>`_
+
 Note [How instance declarations are translated]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here is how we translate instance declarations into Core
@@ -959,3 +961,4 @@ Note that
   * We want to specialise the RHS of both $dfIxPair and $crangePair,
     but the SAME HsWrapper will do for both!  We can call tcSpecPrag
     just once, and pass the result (in spec_inst_info) to tcMethods.
+

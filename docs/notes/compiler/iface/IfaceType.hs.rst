@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceType.hs>`_
+
 Note [Free tyvars in IfaceType]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Nowadays (since Nov 16, 2016) we pretty-print a Type by converting to
@@ -331,3 +333,4 @@ This would be bad, because the '[' looks like a character literal.
 Solution: in type-level lists and tuples, add a leading space
 if the first type is itself promoted.  See pprSpaceIfPromotedTyCon.
 -----------------
+

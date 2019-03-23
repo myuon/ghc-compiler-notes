@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs>`_
+
 Note [exprArity invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 exprArity has the following invariant:
@@ -502,4 +504,5 @@ which we want to lead to code like
 
 This means that we need to look through type applications and be ready
 to re-add floats on the top.
+
 

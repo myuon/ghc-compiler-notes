@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs>`_
+
 Note [Type synonym families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Type synonym families, also known as "type functions", map directly
@@ -612,3 +614,4 @@ Skolem abstractness can apply to "non-abstract" data as well):
 
 This is why the test is on the original name of the TyCon,
 not whether it is abstract or not.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/llvmGen/LlvmCodeGen/CodeGen.hs>`_
+
 Note [Literals and branch conditions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -45,4 +47,5 @@ particular was #define'd. So we must be sure to properly narrow the
 literal in this case to i1 as it won't be eliminated beforehand.
 
 For a real example of this, see ./rts/StgStdThunks.cmm
+
 

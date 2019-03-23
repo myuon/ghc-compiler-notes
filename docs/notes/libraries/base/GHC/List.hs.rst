@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/List.hs>`_
+
 Note [Inline FB functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 After fusion rules successfully fire, we are usually left with one or more calls
@@ -104,3 +106,4 @@ NB: Zips for larger tuples are in the List module.
 
   Ditto rule "zipWithList".
 --------------------------------------------
+

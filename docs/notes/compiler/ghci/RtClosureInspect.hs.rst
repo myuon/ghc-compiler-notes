@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/RtClosureInspect.hs>`_
+
 Note [Constructor arg types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider a GADT (cf #7386)
@@ -133,4 +135,5 @@ If that is not the case, then we consider two conditions.
   check2 [Maybe Int] (t Int) = True
   check2 (Maybe [a])   (m [Int]) = False
   check2 (Maybe [Int]) (m [Int]) = True
+
 

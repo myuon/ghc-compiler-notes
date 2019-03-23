@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs>`_
+
 Note [The flattening story]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * A CFunEqCan is either of form
@@ -645,3 +647,4 @@ unsolved constraints.  The flat form will be
     fmv1 ~ fmv2    (CTyEqCan)
 
 Flatten using the fun-eqs first.
+

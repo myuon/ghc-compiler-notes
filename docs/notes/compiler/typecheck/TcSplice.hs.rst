@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSplice.hs>`_
+
 Note [How top-level splices are handled]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Top-level splices (those not inside a [| .. |] quotation bracket) are handled
@@ -346,3 +348,4 @@ trying to reify it again, may fail with an ambiguity error if there are multiple
 such fields defined in the module (see the test case
 overloadedrecflds/should_fail/T11103.hs).  The "proper" fix requires changes to
 the TH AST to make it able to represent duplicate record fields.
+

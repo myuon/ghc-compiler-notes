@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs>`_
+
 Note [Herald for matchExpectedFunTys]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The 'herald' always looks like:
@@ -774,4 +776,5 @@ kind had instead been
   (alpha :: kappa)
 then this kind equality would rightly complain about unifying kappa
 with (forall k. k->*)
+
 

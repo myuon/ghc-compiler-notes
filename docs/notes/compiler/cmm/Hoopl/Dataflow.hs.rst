@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/Hoopl/Dataflow.hs>`_
+
 Note [Unreachable blocks]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 A block that is not in the domain of tfb_fbase is "currently unreachable".
@@ -33,3 +35,4 @@ we'll propagate (x=4) to L4, and nuke the otherwise-good rewriting of L4.
 ---------------------------------------------------------------------------
   Pieces that are shared by fixpoint and fixpoint_anal
 ---------------------------------------------------------------------------
+

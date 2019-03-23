@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/Inst.hs>`_
+
 Note [Deep skolemisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 deeplySkolemise decomposes and skolemises a type, returning a type
@@ -80,4 +82,5 @@ instances (sigof02m):
 See also Note [Signature lazy interface loading].  We can't
 rely on this, however, since sometimes we'll have spurious
 type class instances in the EPS, see #9422 (sigof02dm)
+
 

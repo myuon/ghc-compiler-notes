@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs>`_
+
 Note [The ambiguity check for type signatures]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 checkAmbiguity is a check on *user-supplied type signatures*.  It is
@@ -1025,3 +1027,4 @@ those cases of ambiguity, yet anyway.  The worst that can happen
 is ambiguity at the call sites.
 
 Historical note: this test used to be called reportFloatingKvs.
+

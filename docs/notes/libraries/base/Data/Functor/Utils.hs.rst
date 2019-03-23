@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Functor/Utils.hs>`_
+
 Note [Function coercion]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -22,3 +24,4 @@ That is, we just *pretend* that f has the right type, and thanks to the safety
 of coerce, the type checker guarantees that nothing really goes wrong. We still
 have to be a bit careful, though: remember that #. completely ignores the
 *value* of its left operand.
+

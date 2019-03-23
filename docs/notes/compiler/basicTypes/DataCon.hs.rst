@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs>`_
+
 Note [Data Constructor Naming]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Each data constructor C has two, and possibly up to four, Names associated with it:
@@ -354,6 +356,7 @@ Here
 but the rep type is
         Trep :: Int# -> a -> T a
 Actually, the unboxed part isn't implemented yet!
+
 
 
 

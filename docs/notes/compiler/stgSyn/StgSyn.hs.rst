@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/StgSyn.hs>`_
+
 Note [CAF consistency]
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -10,3 +12,4 @@ Specifically, if the RHS mentions any Id that itself is marked
 `Id` for the binding should be marked `MayHaveCafRefs`. The potential trouble
 is that `TidyPgm` computed the CAF info on the `Id` but some transformations
 have taken place since then.
+

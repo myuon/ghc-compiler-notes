@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/TrieMap.hs>`_
+
 Note [foldTM determinism]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 We want foldTM to be deterministic, which is why we have an instance of
@@ -87,3 +89,4 @@ TrieMap structure!
 
 Compressed triemaps are heavily used by CoreMap. So we have to mark some things
 as INLINEABLE to permit specialization.
+

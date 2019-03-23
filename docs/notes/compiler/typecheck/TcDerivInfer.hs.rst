@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDerivInfer.hs>`_
+
 Note [Inferring the instance context]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There are two sorts of 'deriving', as represented by the two constructors
@@ -440,3 +442,4 @@ and so on.  Instead we want to complain of no instance for (Show (Succ a)).
 The bottom line
 ~~~~~~~~~~~~~~~
 Allow constraints which consist only of type variables, with no repeats.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnExpr.hs>`_
+
 Note [Deterministic ApplicativeDo and RecursiveDo desugaring]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Both ApplicativeDo and RecursiveDo need to create tuples not
@@ -123,3 +125,4 @@ So, in this case, we synthesize the function
 
 (rather than plain 'fail') for the 'fail' operation. This is done in
 'getMonadFailOp'.
+

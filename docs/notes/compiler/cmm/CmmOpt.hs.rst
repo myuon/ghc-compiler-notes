@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmOpt.hs>`_
+
 Note [Comparison operators]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If we have
@@ -8,3 +10,4 @@ we really want to convert to
 That's what the constant-folding operations on comparison operators do above.
 -----------------------------------------------------------------------------
 Utils
+

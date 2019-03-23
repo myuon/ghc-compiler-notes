@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs>`_
+
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
 While various passes attempt to rename on-the-fly in a manner that
@@ -667,3 +669,4 @@ a list of CoreBind
    chunks.
 If you edit this type, you may need to update the GHC formalism
 See Note [GHC Formalism] in coreSyn/CoreLint.hs
+

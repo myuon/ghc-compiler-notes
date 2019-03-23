@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/OptCoercion.hs>`_
+
 Note [Optimising coercion optimisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Looking up a coercion's role or kind is linear in the size of the
@@ -219,4 +221,5 @@ because if g is well-kinded then
   kind (s1 t2) = kind (s2 t2)
 and these two imply
   kind s1 = kind s2
+
 

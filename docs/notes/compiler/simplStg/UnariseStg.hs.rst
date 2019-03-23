@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/UnariseStg.hs>`_
+
 Note [Unarisation]
 ~~~~~~~~~~~~~~~~~~
 The idea of this pass is to translate away *all* unboxed-tuple and unboxed-sum
@@ -195,3 +197,4 @@ STG programs after unarisation have these invariants:
     `StgCmmEnv.NonVoid`, for example.
 
   * Alt binders (binders in patterns) are always non-void.
+

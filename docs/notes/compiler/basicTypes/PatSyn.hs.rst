@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/PatSyn.hs>`_
+
 Note [Pattern synonym signature contexts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In a pattern synonym signature we write
@@ -194,5 +196,6 @@ We cannot in general represent this by a value of type Type:
  - if req is empty, then univ_tvs and ex_tvs cannot be distinguished
    from each other, and moreover, prov is seen as the "required" context
    (as it is the only context)
+
 
 

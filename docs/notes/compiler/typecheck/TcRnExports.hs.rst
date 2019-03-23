@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnExports.hs>`_
+
 Note [Exports of data families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose you see (#5306)
@@ -110,4 +112,5 @@ identifier might be in (`choosePossibleNameSpaces`).
 Then for each namespace in turn, tries to find the correct identifier
 there returning the first positive result or the first terminating
 error.
+
 

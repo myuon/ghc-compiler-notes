@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs>`_
+
 Note [Dead bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~
 At a literal we won't usually have any floated bindings; the
@@ -245,3 +247,4 @@ situations like
 
 If the thing is used in all RHSs there is nothing gained,
 so we don't duplicate then.
+

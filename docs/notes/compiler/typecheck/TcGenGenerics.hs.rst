@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenGenerics.hs>`_
+
 Note [Requirements for deriving Generic and Rep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -235,3 +237,4 @@ factor it out reduce the typechecker's burden:
 
 A simple change, but one that pays off, since it goes turns an O(n) amount of
 coercions to an O(1) amount.
+

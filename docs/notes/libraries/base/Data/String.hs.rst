@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/String.hs>`_
+
 Note [IsString String]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Previously, the IsString instance that covered String was a flexible
@@ -35,3 +37,4 @@ would be, and it certainly hasn't been implemented.
 
 A test case (should_run/overloadedstringsrun01.hs) has been added to
 ensure the good behavior of the above example remains in the future.
+

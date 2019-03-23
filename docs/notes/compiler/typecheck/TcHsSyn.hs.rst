@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsSyn.hs>`_
+
 Note [The ZonkEnv]
 ~~~~~~~~~~~~~~~~~~~~~
 * ze_flexi :: ZonkFlexi says what to do with a
@@ -194,3 +196,4 @@ We do this in two stages.
 Quantifying here is awkward because (a) the data type is big and (b)
 finding the free type vars of an expression is necessarily monadic
 operation. (consider /\a -> f @ b, where b is side-effected to a)
+

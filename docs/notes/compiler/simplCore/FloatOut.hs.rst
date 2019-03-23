@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatOut.hs>`_
+
 Note [Join points]
 ~~~~~~~~~~~~~~~~~~
 Every occurrence of a join point must be a tail call (see Note [Invariants on
@@ -192,3 +194,4 @@ That is why MajorEnv is represented as a finite map.
 We keep the bindings destined for the *top* level separate, because
 we float them out even if they don't escape a *value* lambda; see
 partitionByMajorLevel.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs>`_
+
 Note [Plugin rules]
 ~~~~~~~~~~~~~~~~~~~~~~
 Conal Elliott (#11651) built a GHC plugin that added some
@@ -1279,5 +1281,6 @@ unravels; so ignoring INLINE pragmas on recursive things isn't good
 either.
 
 See Invariant 2a of Note [Invariants on join points] in CoreSyn
+
 
 

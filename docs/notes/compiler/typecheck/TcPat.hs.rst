@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPat.hs>`_
+
 Note [Subsumption check at pattern variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When we come across a variable with a type signature, we need to do a
@@ -144,3 +146,4 @@ The pe_lazy field of PatEnv says whether we are inside a lazy
 pattern (perhaps deeply)
 
 See also Note [Typechecking pattern bindings] in TcBinds
+

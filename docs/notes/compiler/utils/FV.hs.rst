@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/FV.hs>`_
+
 Note [Deterministic FV]
 ~~~~~~~~~~~~~~~~~~~~~~~
 When computing free variables, the order in which you get them affects
@@ -71,3 +73,4 @@ information and has to be more conservative here.
 
 Hence functions that get exported and return FV need to be manually
 eta-expanded. See also #11146.
+

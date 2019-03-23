@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/PprTyThing.hs>`_
+
 Note [Pretty printing via IfaceSyn]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Our general plan for prett-printing
@@ -62,3 +64,4 @@ Consequences:
 - See Note [Free tyvars in IfaceType] in IfaceType
 
 See #7730, #8776 for details   ------------------
+

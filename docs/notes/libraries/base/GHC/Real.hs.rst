@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Real.hs>`_
+
 Note [Numeric Stability of Enumerating Floating Numbers]
 -----------------------------------------------------------
 When enumerate floating numbers, we could add the increment to the last number
@@ -55,3 +57,4 @@ were not inlined the rules would not fire. The rules would also not
 fire if calls to quotInteger and so on were inlined, but this does not
 happen because they are all marked with NOINLINE pragma - see documentation
 of integer-gmp or integer-simple.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcBackpack.hs>`_
+
 Note [Error reporting bad reexport]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 NB: You want to be a bit careful about what location you report on reexports.
@@ -72,3 +74,4 @@ we need to watch out for:
 The root cause for all of these complications is the fact that these
 logically "implicit" entities are defined indirectly in an interface
 file.  #13151 gives a proposal to make these *truly* implicit.
+

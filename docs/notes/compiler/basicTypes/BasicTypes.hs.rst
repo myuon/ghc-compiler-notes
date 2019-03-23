@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs>`_
+
 Note [Precedence in types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Many pretty-printing functions have type
@@ -220,3 +222,4 @@ It's too conservative to ensure that the two are never simultaneously
 active.  For example, a rule might be always active, and an inlining
 might switch on in phase 2.  We could switch off the rule, but it does
 no harm.
+

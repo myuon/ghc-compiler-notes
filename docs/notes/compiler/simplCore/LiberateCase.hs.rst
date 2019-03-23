@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs>`_
+
 Note [Scrutinee with cast]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this:
@@ -134,5 +136,6 @@ an occurrence of 'g', we want to check that there's a scruted-var v st
 
    a) v's binding site is *outside* g
    b) v's scrutinisation site is *inside* g
+
 
 

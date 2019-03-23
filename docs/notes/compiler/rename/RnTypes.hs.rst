@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs>`_
+
 Note [Renaming named wild cards]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Identifiers starting with an underscore are always parsed as type variables.
@@ -315,3 +317,4 @@ See Note [Kind and type-variable binders]
 These lists are guaranteed to preserve left-to-right ordering of
 the types the variables were extracted from. See also
 Note [Ordering of implicit variables].
+

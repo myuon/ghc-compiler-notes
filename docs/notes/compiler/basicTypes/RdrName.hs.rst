@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs>`_
+
 Note [Local bindings with Exact Names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 With Template Haskell we can make local bindings that have Exact Names.
@@ -285,3 +287,4 @@ But the rules are not perfect; consider
    foo = M.x + M.y
 
 The M.x will use import #2, but M.y can only use import #1.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/ToIface.hs>`_
+
 Note [Inlining and hs-boot files]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this example (#10083, #12789):
@@ -65,4 +67,5 @@ for RSR (if it exists).  Doing so makes the bootstrapped GHC itself
 slower by 8% overall (on #9872a-d, and T1969: the reason
 is that these NOINLINE'd functions now can't be profitably inlined
 outside of the hs-boot loop.
+
 

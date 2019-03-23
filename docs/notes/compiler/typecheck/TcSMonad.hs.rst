@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs>`_
+
 Note [WorkList priorities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A WorkList contains canonical and non-canonical items (of all flavors).
@@ -865,3 +867,4 @@ current worklist.  Specifically, when canonicalising
 from which we get the implication
    (forall a. t1 ~ t2)
 See TcSMonad.deferTcSForAllEq
+

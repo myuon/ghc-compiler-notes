@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs>`_
+
 Note [The Naming story]
 ~~~~~~~~~~~~~~~~~~~~~~~
 Here is the story about the implicit names that go with type, class,
@@ -419,3 +421,4 @@ type patterns with binders in a surrounding HsImplicitBndrs, we use raw type
 variables (LHsQTyVars) in the feqn_pats field of FamEqn.
 
 c.f. Note [TyVar binders for associated declarations]
+

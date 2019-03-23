@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CLabel.hs>`_
+
 Note [ticky for LNE]
 ~~~~~~~~~~~~~~~~~~~~~
 Until 14 Feb 2013, every ticky counter was associated with a
@@ -68,3 +70,4 @@ the fact that it was derived from a block ID in `IdLabelInfo` as
 
 The info table label and the local block label are both local labels
 and are not externally visible.
+

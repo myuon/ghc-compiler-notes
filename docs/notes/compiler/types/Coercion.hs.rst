@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs>`_
+
 Note [Function coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Remember that
@@ -465,3 +467,4 @@ Whew.
 
 This is shared between the flattener and the normaliser in FamInstEnv.
 See Note [simplifyArgsWorker]
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Arr.hs>`_
+
 Note [Inlining index]
 ~~~~~~~~~~~~~~~~~~~~~
 We inline the 'index' operation,
@@ -70,3 +72,4 @@ There are two problems:
 See Breitner, Eisenberg, Peyton Jones, and Weirich, "Safe Zero-cost
 Coercions for Haskell", section 6.5:
   http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/coercible.pdf
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelNames.hs>`_
+
 Note [Known-key names]
 ~~~~~~~~~~~~~~~~~~~~~~
 It is *very* important that the compiler gives wired-in things and
@@ -107,3 +109,4 @@ When GHC reads the package data base, it (internally only) pretends it has UnitI
 `integer-wired-in` instead of the actual UnitId (which includes the version
 number); just like for `base` and other packages, as described in
 Note [Wired-in packages] in Module. This is done in Packages.findWiredInPackages.
+

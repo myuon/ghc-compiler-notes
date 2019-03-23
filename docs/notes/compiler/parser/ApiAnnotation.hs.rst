@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/parser/ApiAnnotation.hs>`_
+
 Note [Api annotations]
 ~~~~~~~~~~~~~~~~~~~~~~
 Given a parse tree of a Haskell module, how can we reconstruct
@@ -104,3 +106,4 @@ https://ghc.haskell.org/trac/ghc/wiki/ApiAnnotations
 
 ---------------------------------------------------------------------
 If you update this, update the Note [Api annotations] above
+

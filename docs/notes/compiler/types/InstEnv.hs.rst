@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs>`_
+
 Note [ClsInst laziness and the rough-match fields]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we load 'instance A.C B.T' from A.hi, but suppose that the type B.T is
@@ -428,3 +430,4 @@ We do this only for isOverlappableTyVar skolems.  For example we reject
         g :: forall a => [a] -> Int
         g x = op x
 on the grounds that the correct instance depends on the instantiation of 'a'
+

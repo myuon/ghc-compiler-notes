@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs>`_
+
 Note [GHC Formalism]
 ~~~~~~~~~~~~~~~~~~~~
 This file implements the type-checking algorithm for System FC, the "official"
@@ -363,3 +365,4 @@ we behave as follows (#15057, #T15664):
 * If lf_report_unsat_syns is on, expand the synonym application and
   lint the result.  Reason: want to check that synonyms are saturated
   when the type is expanded.
+

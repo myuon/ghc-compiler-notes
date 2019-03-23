@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/parser/RdrHsSyn.hs>`_
+
 Note [Parsing data constructors is hard]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -575,4 +577,5 @@ For clarity, we introduce the notion of a parser-validator: a parser that does
 not consume any input, but may fail or use other effects. Thus we have:
 
   abParser :: P (PV A, PV B)
+
 

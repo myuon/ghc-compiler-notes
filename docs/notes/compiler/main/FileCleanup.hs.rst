@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/FileCleanup.hs>`_
+
 Note [Deterministic base name]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -8,3 +10,4 @@ the temporary file no longer contains random information (it used to contain
 the process id).
 
 This is ok, as the temporary directory used contains the pid (see getTempDir).
+

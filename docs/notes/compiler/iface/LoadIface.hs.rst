@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/LoadIface.hs>`_
+
 Note [Loading instances for wired-in things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We need to make sure that we have at least *read* the interface files
@@ -103,3 +105,4 @@ all names that don't originate in the current module. In order to keep visual
 noise as low as possible, we keep local names unqualified.
 
 For some background on this choice see trac #15269.
+

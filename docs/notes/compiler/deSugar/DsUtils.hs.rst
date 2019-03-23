@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsUtils.hs>`_
+
 Note [Localise pattern binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider     module M where
@@ -224,3 +226,4 @@ Specifically:
    !pat    => !pat   -- always
    pat     => !pat   -- when -XStrict
    pat     => pat    -- otherwise
+

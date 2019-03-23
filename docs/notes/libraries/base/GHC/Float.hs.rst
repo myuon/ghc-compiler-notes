@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Float.hs>`_
+
 Note [realToFrac int-to-float]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Don found that the RULES for realToFrac/Int->Double and simliarly
@@ -57,3 +59,4 @@ that requires a unique implementation for all supported archetectures. The next
 best solution is to write the value from the source register to memory and then
 read it from memory into the destination register and the best way to do that
 is using CMM.
+

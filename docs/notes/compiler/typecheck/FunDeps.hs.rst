@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FunDeps.hs>`_
+
 Note [Coverage condition]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Example
@@ -146,3 +148,4 @@ But knowing (G c d) fixes only {d}, because G is only injective
 in its second parameter.
 
 Hence the tyCoVarsOfTypes/injTyVarsOfTypes dance in tv_fds.
+

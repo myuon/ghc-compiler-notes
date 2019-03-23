@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs>`_
+
 Note [hsc_type_env_var hack]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 hsc_type_env_var is used to initialize tcg_type_env_var, and
@@ -295,3 +297,4 @@ dsGetCompleteMatches in DsMeta accomplishes this lookup.
 Also see Note [Typechecking Complete Matches] in TcBinds for a more detailed
 explanation for how GHC ensures that all the conlikes in a COMPLETE set are
 consistent.
+

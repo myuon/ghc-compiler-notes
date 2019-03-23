@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs>`_
+
 Note [Deferring coercion errors to runtime]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 While developing, sometimes it is desirable to allow compilation to succeed even
@@ -654,4 +656,5 @@ Note [Runtime skolems]
 We want to give a reasonably helpful error message for ambiguity
 arising from *runtime* skolems in the debugger.  These
 are created by in RtClosureInspect.zonkRTTIType.
+
 

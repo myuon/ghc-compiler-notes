@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMeta.hs>`_
+
 Note [Scoped type variables in bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
@@ -86,4 +88,5 @@ Usually, the culprit behind these bugs is taking implicitly quantified type
 variables (often from the hsib_vars field of HsImplicitBinders) and putting
 them into a `ForallT` or `ForallC`. Doing so caused #13018 and #13123.
 represent associated family instances
+
 

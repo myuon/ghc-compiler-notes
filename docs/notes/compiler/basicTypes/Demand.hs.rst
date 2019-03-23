@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs>`_
+
 Note [Exceptions and strictness]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We used to smart about catching exceptions, but we aren't anymore.
@@ -515,5 +517,6 @@ the demand signature, because we still want to know about the demand on things. 
 The signature of f should be <S(SL),1*U(1*U(U),A)><S,1*U>m. If we were not
 distinguishing the uses on x and y in the True case, we could either not figure
 out how deeply we can unpack x, or that we do not have to pass y.
+
 
 

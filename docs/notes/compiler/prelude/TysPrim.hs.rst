@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysPrim.hs>`_
+
 Note [TYPE and RuntimeRep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 All types that classify values have a kind of the form (TYPE rr), where
@@ -255,3 +257,4 @@ keep different state threads separate.  It is represented by nothing at all.
 The type parameter to State# is intended to keep separate threads separate.
 Even though this parameter is not used in the definition of State#, it is
 given role Nominal to enforce its intended use.
+

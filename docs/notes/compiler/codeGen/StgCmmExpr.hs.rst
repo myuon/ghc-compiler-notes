@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs>`_
+
 Note [Compiling case expressions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 It is quite interesting to decide whether to put a heap-check at the
@@ -369,4 +371,5 @@ We would like to compile the call to foo as a local jump instead of a call
 an arity of 2 while we apply it to 3 arguments, one of them being of void
 type. Thus, we mustn't count arguments of void type when checking whether
 we can turn a call into a self-recursive jump.
+
 

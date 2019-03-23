@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/Encoding.hs>`_
+
 Note [Base 62 encoding 128-bit integers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Instead of base-62 encoding a single 128-bit integer
@@ -8,3 +10,4 @@ characters!
  Base 62
  The base-62 code is based off of 'locators'
  ((c) Operational Dynamics Consulting, BSD3 licensed)
+

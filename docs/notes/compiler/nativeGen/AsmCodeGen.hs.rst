@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/AsmCodeGen.hs>`_
+
 Note [Unwinding information in the NCG]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -20,3 +22,4 @@ procedure, containing a list of unwinding points (e.g. a label and an associated
 unwinding table).
 
 See also Note [What is this unwinding business?] in Debug.
+

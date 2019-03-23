@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/CoreToStg.hs>`_
+
 Note [Live vs free]
 ~~~~~~~~~~~~~~~~~~~
 
@@ -156,3 +158,4 @@ Note [Collect args]
 
 This big-lambda case occurred following a rather obscure eta expansion.
 It all seems a bit yukky to me.
+

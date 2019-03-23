@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplCore.hs>`_
+
 Note [Inline in InitialPhase]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In GHC 8 and earlier we did not inline anything in the InitialPhase. But that is
@@ -180,3 +182,4 @@ Overwriting, rather than merging, seems to work ok.
 We also zap the InlinePragma on the lcl_id. It might originally
 have had a NOINLINE, which we have now transferred; and we really
 want the lcl_id to inline now that its RHS is trivial!
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs>`_
+
 Note [StaticEnv invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We pair up an InExpr or InAlts with a StaticEnv, which establishes the
@@ -899,3 +901,4 @@ without getting changed to c1=I# c2.
 
 I don't think this is worth fixing, even if I knew how. It'll
 all come out in the next pass anyway.
+

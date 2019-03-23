@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/OldList.hs>`_
+
 Note [Inline @unzipN@ functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -9,4 +11,5 @@ are defined has an opportunity to fuse.
 As such, since there are not any differences between 2/3-ary 'unzip' and its
 n-ary counterparts below aside from the number of arguments, the `INLINE`
 pragma should be replicated in the @unzipN@ functions below as well.
+
 

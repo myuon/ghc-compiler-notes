@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/ByteCodeGen.hs>`_
+
 Note [Implementing tagToEnum#]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 (implement_tagToId arg names) compiles code which takes an argument
@@ -32,3 +34,4 @@ tested.  This is very weird, but it's the way it is right now.  See
 Interpreter.c.  We don't acutally need an info-table here; we just
 need to have the argument to be one-from-top on the stack, hence pushing
 a 1-word null. See #8383.
+

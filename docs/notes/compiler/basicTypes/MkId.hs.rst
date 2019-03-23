@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/MkId.hs>`_
+
 Note [Wired-in Ids]
 ~~~~~~~~~~~~~~~~~~~
 A "wired-in" Id can be referred to directly in GHC (e.g. 'voidPrimId')
@@ -634,3 +636,4 @@ The evaldUnfolding makes it look that some primitive value is
 evaluated, which in turn makes Simplify.interestingArg return True,
 which in turn makes INLINE things applied to said value likely to be
 inlined.
+

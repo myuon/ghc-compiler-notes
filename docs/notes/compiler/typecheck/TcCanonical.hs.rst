@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs>`_
+
 Note [Canonicalization]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -965,3 +967,4 @@ type, perhaps fruitlessly), unifyWanted traverses the common structure, and
 bales out when it finds a difference by creating a new Wanted constraint.
 But where it succeeds in finding common structure, it just builds a coercion
 to reflect it.
+

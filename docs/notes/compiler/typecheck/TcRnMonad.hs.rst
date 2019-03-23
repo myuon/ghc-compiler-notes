@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnMonad.hs>`_
+
 Note [Default types]
 ~~~~~~~~~~~~~~~~~~~~~~~
 The Integer type is simply not available in package ghc-prim (it is
@@ -81,3 +83,4 @@ asynchronous exception as a synchronous exception, and the exception will end
 up as the value of the unsafeInterleaveIO thunk (see #8006 for a detailed
 discussion).  We don't currently know a general solution to this problem, but
 we can use uninterruptibleMask_ to avoid the situation.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/NameCache.hs>`_
+
 Note [The Name Cache]
 ~~~~~~~~~~~~~~~~~~~~~
 The Name Cache makes sure that, during any invocation of GHC, each
@@ -45,4 +47,5 @@ are two reasons why we might look up an Orig RdrName for built-in syntax,
     (DsMeta.globalVar), and parses a NameG into an Orig RdrName
     (Convert.thRdrName).  So, e.g. $(do { reify '(,); ... }) will
     go this route (#8954).
+
 

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmPipeline.hs>`_
+
 Note [Sinking after stack layout]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -156,4 +158,5 @@ The control-flow optimiser sometimes leaves unreachable blocks behind
 containing junk code.  These aren't necessarily a problem, but
 removing them is good because it might save time in the native code
 generator later.
+
 

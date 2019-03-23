@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs>`_
+
 Note [Shortcut solving: overlap]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we have
@@ -232,3 +234,4 @@ encounter a HasField constraint where the field is not a literal
 string, or does not belong to the type, then we fall back on the
 normal constraint solver behaviour.
 See Note [HasField instances]
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/SrcLoc.hs>`_
+
 Note [HasSrcSpan Typeclass]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -10,3 +12,4 @@ For most syntactic entities, the source location spans are stored in
 a syntactic entity by a wapper constuctor (introduced by TTG's
 new constructor extension), e.g., by `NewPat (WrapperPat sp pat)`
 for a source location span `sp` and a pattern `pat`.
+

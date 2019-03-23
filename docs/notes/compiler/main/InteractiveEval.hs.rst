@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/InteractiveEval.hs>`_
+
 Note [What to show to users]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We don't want to display internally-generated bindings to users.
@@ -6,3 +8,4 @@ OccNames that users can't write, to avoid the possibility of name
 clashes (in linker symbols).  That gives a convenient way to suppress
 them. The relevant predicate is OccName.isDerivedOccName.
 See #11051 for more background and examples.
+

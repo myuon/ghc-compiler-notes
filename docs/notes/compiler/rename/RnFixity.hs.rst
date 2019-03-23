@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnFixity.hs>`_
+
 Note [Fixity signature lookup]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A fixity declaration like
@@ -18,3 +20,4 @@ well as the original namespace.
 The extended lookup is also used in other places, like resolution of
 deprecation declarations, and lookup of names in GHCi.
 ------------------------------
+

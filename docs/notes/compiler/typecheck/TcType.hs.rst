@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs>`_
+
 Note [TcTyVars and TyVars in the typechecker]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The typechecker uses a lot of type variables with special properties,
@@ -467,3 +469,4 @@ this actually is. There are two main tricks:
 NB: we don't want to detect PredTypes in sizeType (and then call
 sizePred on them), or we might get an infinite loop if that PredType
 is irreducible. See #5581.
+

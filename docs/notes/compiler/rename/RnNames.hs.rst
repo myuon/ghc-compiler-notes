@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs>`_
+
 Note [Tracking Trust Transitively]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When we import a package as well as checking that the direct imports are safe
@@ -298,5 +300,6 @@ then the minimal import for module B must be
     import A ( T(foo) )
 because when DuplicateRecordFields is enabled, field selectors are
 not in scope without their enclosing datatype.
+
 
 

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IORef.hs>`_
+
 Note [atomicModifyIORef' definition]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -41,3 +43,4 @@ A clearer version, in my opinion (but one quite incompatible with
 the traditional one) would only force the new IORef value and not
 the result. This version would have been relatively inefficient
 to implement using atomicModifyMutVar#, but is just fine now.
+

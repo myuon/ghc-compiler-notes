@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs>`_
+
 Note [Stamp out space leaks in demand analysis]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The demand analysis pass outputs a new copy of the Core program in
@@ -688,3 +690,4 @@ relied upon, as the simplifier tends to be very careful about not
 duplicating actual function calls.
 
 Also see #11731.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Class.hs>`_
+
 Note [Associated type defaults]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following is an example of associated type defaults:
@@ -51,5 +53,6 @@ header.
 
 Having the same variables for class and tycon is also used in checkValidRoles
 (in TcTyClsDecls) when checking a class's roles.
+
 
 

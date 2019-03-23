@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelInfo.hs>`_
+
 Note [About wired-in things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Wired-in things are Ids\/TyCons that are completely known to the compiler.
@@ -16,3 +18,4 @@ Note [About wired-in things]
 
 * MkIface prunes out wired-in things before putting them in an interface file.
   So interface files never contain wired-in things.
+

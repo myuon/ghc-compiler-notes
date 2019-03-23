@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/Bitmap.hs>`_
+
 Note [Strictness when building Bitmaps]
 ========================================
 
@@ -12,4 +14,5 @@ itself with the result. This resulted in large numbers of subtraction thunks
 being built up. Here we take care to avoid passing new thunks to the recursive
 call. Instead we pass the unmodified tail along with an explicit position
 accumulator, which get subtracted in the fold when we compute the Word.
+
 

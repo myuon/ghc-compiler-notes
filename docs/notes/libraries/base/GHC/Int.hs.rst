@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Int.hs>`_
+
 Note [Order of tests]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 (See #3065, #5161.) Suppose we had a definition like:
@@ -119,3 +121,4 @@ However, constant denominators are more common than constant numerators,
 so the
     y == (-1) && x == minBound
 order gives us better code in the common case.
+

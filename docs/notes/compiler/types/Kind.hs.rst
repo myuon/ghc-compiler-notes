@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Kind.hs>`_
+
 Note [Kind Constraint and kind Type]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The kind Constraint is the kind of classes and other type constraints.
@@ -21,3 +23,4 @@ See #7451.
 Bottom line: although 'Type' and 'Constraint' are distinct TyCons, with
 distinct uniques, they are treated as equal at all times except
 during type inference.
+

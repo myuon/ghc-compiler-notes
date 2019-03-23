@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs>`_
+
 Note [The Type-related module hierarchy]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   Class
@@ -1655,3 +1657,4 @@ remember to parenthesise the operator, thus
    (~>) a b -> b
 
 See #2766.
+

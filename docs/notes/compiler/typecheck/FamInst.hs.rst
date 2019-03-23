@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FamInst.hs>`_
+
 Note [The type family instance consistency story]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -203,3 +205,4 @@ Check that the proposed new instance is OK,
 and then add it to the home inst env
 This must be lazy in the fam_inst arguments, see Note [Lazy axiom match]
 in FamInstEnv.hs
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs>`_
+
 Note [HsBSig binder lists]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider a binder (or pattern) decorated with a type or kind,
@@ -340,3 +342,4 @@ rather than converting to KindedTyVars as before.
 and the problem doesn't show up; but having the flag on a KindedTyVar
 seems like the Right Thing anyway.)
 Printing works more-or-less as for Types
+

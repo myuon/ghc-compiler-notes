@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreTidy.hs>`_
+
 Note [Tidy IdInfo]
 ~~~~~~~~~~~~~~~~~~
 All nested Ids now have the same IdInfo, namely vanillaIdInfo, which
@@ -44,3 +46,4 @@ optimisation pipeline, leaving only the OneShotInfo on the lambda. Hence we
 must preserve this info in inlinings. See Note [The oneShot function] in MkId.
 
 This applies to lambda binders only, hence it is stored in IfaceLamBndr.
+

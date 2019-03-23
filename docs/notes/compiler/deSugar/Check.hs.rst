@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Check.hs>`_
+
 Note [Recovering from unsatisfiable pattern-matching constraints]
 ~~~~~~~~~~~~~~~~
 Consider the following code (see #12957 and #15450):
@@ -792,3 +794,4 @@ If instead we allow constraints of the form (e ~ e),
 The performance improvement becomes even more important when more arguments are
 involved.
 Debugging Infrastructre
+

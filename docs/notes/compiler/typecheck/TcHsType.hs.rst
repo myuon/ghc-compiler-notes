@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs>`_
+
 Note [Wildcards in visible type application]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -776,5 +778,6 @@ For RULE binders, though, things are a bit different (yuk).
 Here this really is the binding site of the type variable so we'd like
 to use a skolem, so that we get a complaint if we unify two of them
 together.  Hence the new_tv function in tcHsPatSigType.
+
 
 

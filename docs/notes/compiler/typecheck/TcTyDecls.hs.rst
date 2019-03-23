@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs>`_
+
 Note [Superclass cycle check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The superclass cycle check for C decides if we can statically
@@ -289,4 +291,5 @@ The selector we want for fld looks like this:
 
 The scrutinee of the case has type :R7T (Maybe b), which can be
 gotten by appying the eq_spec to the univ_tvs of the data con.
+
 

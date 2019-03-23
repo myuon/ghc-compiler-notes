@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IO/Encoding/Failure.hs>`_
+
 Note [Roundtripping]
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -33,3 +35,4 @@ to do the inverse process.
 The user of String would never see these lone surrogates, but it
 ensured that iconv will throw an error when encountering them.  We
 used lone surrogates in the range 0xDC00 to 0xDCFF for this purpose.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs>`_
+
 Note [CmdSyntaxtable]
 ~~~~~~~~~~~~~~~~~~~~~
 Used only for arrow-syntax stuff (HsCmdTop), the CmdSyntaxTable keeps
@@ -451,3 +453,4 @@ e.g., in a type error message, we *do not* want to print out the pending
 splices. In contrast, when pretty printing the output of the type checker, we
 *do* want to print the pending splices. So splitting them up seems to make
 sense, although I hate to add another constructor to HsExpr.
+

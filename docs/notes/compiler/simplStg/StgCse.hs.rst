@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/StgCse.hs>`_
+
 Note [All alternatives are the binder]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -57,3 +59,4 @@ then the list of free variables would be wrong, so for now, we do not CSE
 across such a closure, simply because I (Joachim) was not sure about possible
 knock-on effects. If deemed safe and worth the slight code complication of
 re-calculating this list during or after this pass, this can surely be done.
+

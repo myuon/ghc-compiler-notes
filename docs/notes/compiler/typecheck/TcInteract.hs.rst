@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInteract.hs>`_
+
 Note [Basic Simplifier Plan]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 1. Pick an element from the WorkList if there exists one with depth
@@ -1175,3 +1177,4 @@ get it from the Eq a context, without worrying that there are
 lots of top-level instances that unify with [W] Eq a!  We'll use
 those instances to build evidence to pass to f. That's just the
 nullary case of what's happening here.
+

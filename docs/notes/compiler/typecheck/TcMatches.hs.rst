@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMatches.hs>`_
+
 Note [Polymorphic expected type for tcMatchesFun]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tcMatchesFun may be given a *sigma* (polymorphic) type
@@ -90,4 +92,5 @@ Now, we say that:
 
 To achieve this, we just typecheck each 'argi' separately, bring all
 the variables they bind into scope, and typecheck the thing_inside.
+
 

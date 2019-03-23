@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTypeNats.hs>`_
+
 Note [Type-level literals]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 There are currently two forms of type-level literals: natural numbers, and
@@ -106,3 +108,4 @@ which fails.
 So, for the time being, we only add an improvement when the RHS is a constant,
 which happens to work OK for the moment, although clearly we need to do
 something more general.
+

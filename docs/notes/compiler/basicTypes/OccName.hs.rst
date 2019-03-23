@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/OccName.hs>`_
+
 Note [Suppressing uniques in OccNames]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is a hack to de-wobblify the OccNames that contain uniques from
@@ -84,4 +86,5 @@ This prepared TidyEnv can then be used with tidyOccName. See tidyTyCoVarBndrs
 for an example where this is used.
 
 This is #12382.
+
 

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs>`_
+
 Note [Constant folding]
 ~~~~~~~~~~~~~~~~~~~~~~~
 primOpRules generates a rewrite rule for each primop
@@ -378,3 +380,4 @@ Hence caseRules returns (AltCon -> Maybe AltCon), with Nothing indicating
 an alternative that is unreachable.
 
 You may wonder how this can happen: check out #15436.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Control/Monad.hs>`_
+
 Note [Worker/wrapper transform on replicateM/replicateM_]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -16,3 +18,4 @@ specialising for the particular action.
 
 For further information, see this issue comment, which includes side-by-side
 Core: https://gitlab.haskell.org/ghc/ghc/issues/11795#note_118976
+

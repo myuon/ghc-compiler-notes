@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IO/Unsafe.hs>`_
+
 Note [unsafeDupableInterleaveIO should not be inlined]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -18,3 +20,4 @@ time 'ans' was demanded we got a deadlock.  We could fix this with
 a readMVar, but it seems wrong for unsafeInterleaveIO to sometimes
 share and sometimes not (plus it probably breaks the noDuplicate).
 So now, we do not inline unsafeDupableInterleaveIO.
+

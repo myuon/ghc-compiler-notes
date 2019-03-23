@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/PlaceHolder.hs>`_
+
 Note [Pass sensitive types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Since the same AST types are re-used through parsing,renaming and type
@@ -27,3 +29,4 @@ TcId and Var are synonyms for Id
 Unfortunately the type checker termination checking conditions fail for the
 DataId constraint type based on this, so even though it is safe the
 UndecidableInstances pragma is required where this is used.
+

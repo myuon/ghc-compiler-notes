@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs>`_
+
 Note [ExpType]
 ~~~~~~~~~~~~~~
 
@@ -496,3 +498,4 @@ But c.f Note [Sharing when zonking to Type] in TcHsSyn.
                  Tidying
 *                                                                      *
 ************************************************************************
+

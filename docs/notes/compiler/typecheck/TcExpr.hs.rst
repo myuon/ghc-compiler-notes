@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs>`_
+
 Note [Type-checking overloaded labels]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Recall that we have
@@ -633,4 +635,5 @@ type. Thus, the "reason" is a path from @n@ to this offending node.
 
 When @n@ is not closed, we traverse the graph reachable from @n@ to build
 the reason.
+
 

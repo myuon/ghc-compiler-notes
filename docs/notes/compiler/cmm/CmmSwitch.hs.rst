@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSwitch.hs>`_
+
 Note [Cmm Switches, the general plan]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -155,3 +157,4 @@ for these reasons:
    for more parallelism when building GHC.
  * The interaction between the modules is very explicit and easy to
    understand, due to the small and simple interface.
+

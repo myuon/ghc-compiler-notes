@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSink.hs>`_
+
 Note [dependent assignments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -105,3 +107,4 @@ definition here.
 Some CallishMachOp imply a memory barrier e.g. AtomicRMW and
 therefore we should never float any memory operations across one of
 these calls.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs>`_
+
 Note [DFun impedance matching]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We return a list of "impedance-matching" bindings for the dfuns
@@ -231,4 +233,5 @@ We want to get `k -> Type`, not `Any -> Type`, which is what we would
 get without kind-generalisation. Note that `:k SameKind` is OK, as
 GHC will not instantiate SameKind here, and so we see its full kind
 of `forall k. k -> k -> Type`.
+
 

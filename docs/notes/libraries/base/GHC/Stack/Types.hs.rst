@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Stack/Types.hs>`_
+
 Note [Definition of CallStack]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 CallStack is defined very early in base because it is
@@ -12,3 +14,4 @@ between three modules:
 1. GHC.Stack.Types: defines the type and *simple* functions
 2. GHC.Exception: defines the pretty-printer
 3. GHC.Stack: exports everything and acts as the main access point
+

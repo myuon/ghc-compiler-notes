@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmContFlowOpt.hs>`_
+
 Note [What is shortcutting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -108,3 +110,4 @@ L4 reduces the number of proc points.  Unfortunately recursive
 let-no-escapes won't generate very good code with proc-point
 splitting on - we should probably compile them to explicitly use
 the native calling convention instead.
+

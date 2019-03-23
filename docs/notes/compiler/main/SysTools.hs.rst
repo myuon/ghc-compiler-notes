@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/SysTools.hs>`_
+
 Note [How GHC finds toolchain utilities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -65,3 +67,4 @@ Unregisterised compiler can't evade R_*_COPY relocations easily thus we disable
 -Bsymbolic linking there.
 
 See related tickets: #4210, #15338
+

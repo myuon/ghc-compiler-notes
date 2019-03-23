@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmClosure.hs>`_
+
 Note [Data constructor dynamic tags]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -124,3 +126,4 @@ A and B,
      updated.
 
 To avoid this sort of condition we never black-hole non-updatable thunks.
+

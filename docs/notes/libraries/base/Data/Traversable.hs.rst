@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Traversable.hs>`_
+
 Note [Inline default methods]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
@@ -38,3 +40,4 @@ Solution: add an INLINE pragma on the default method:
        {-# INLINE mapM #-}     -- VERY IMPORTANT!
        mapM = traverse
 instances for Prelude types
+

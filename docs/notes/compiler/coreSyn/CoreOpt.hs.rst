@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreOpt.hs>`_
+
 Note [The simple optimiser]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The simple optimiser is a lightweight, pure (non-monadic) function
@@ -204,3 +206,4 @@ We just look for coercions of form
    <type> -> blah
 (and similarly for foralls) to keep this function simple.  We could do
 more elaborate stuff, but it'd involve substitution etc.
+

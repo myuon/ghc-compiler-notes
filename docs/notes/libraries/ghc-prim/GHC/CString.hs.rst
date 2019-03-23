@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/ghc-prim/GHC/CString.hs>`_
+
 Note [Inlining unpackCString#]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There's really no point in ever inlining things like unpackCString# as the loop
@@ -32,3 +34,4 @@ Moreover, we want to make it CONLIKE, so that:
      ...(case x of algs)...
 
 All of this goes for unpackCStringUtf8# too.
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SAT.hs>`_
+
 Note [Shadow binding]
 ~~~~~~~~~~~~~~~~~~~~~
 The calls to the inner map inside body[map] should get inlined
@@ -60,3 +62,4 @@ GHC.Base.until =
 Where sat_shadow has captured the type variables of x_a6X etc as it has a a_aiK
 type argument. This is bad because it means the application sat_worker_s1aU x_a6X
 is not well typed.
+

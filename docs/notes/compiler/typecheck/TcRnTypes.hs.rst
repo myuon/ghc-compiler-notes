@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs>`_
+
 Note [Identity versus semantic module]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When typechecking an hsig file, it is convenient to keep track
@@ -868,5 +870,6 @@ in the right place.  So we proceed as follows:
 * Typically a'' will have a nice pretty name like "a", but the point is
   that the foral-bound variables of the signature we report line up with
   the instantiated skolems lying  around in other types.
+
 
 

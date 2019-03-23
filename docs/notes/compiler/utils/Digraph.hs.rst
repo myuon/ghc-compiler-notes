@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/Digraph.hs>`_
+
 Note [Nodes, keys, vertices]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * A 'node' is a big blob of client-stuff
@@ -39,3 +41,4 @@ ordered list of strongly connected components, where the list of vertices
 in an SCC is also deterministically ordered.
 Note that the order of edges doesn't need to be deterministic for this to work.
 We use the order of nodes to normalize the order of edges.
+

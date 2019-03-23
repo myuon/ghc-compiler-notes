@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs>`_
+
 Note [Wrap bindings returned by specImports]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 'specImports' returns a set of specialized bindings. However, these are lacking
@@ -623,3 +625,4 @@ time, because cloned variables don't have unfoldings. But makes a
 massive difference in a few cases, eg #5113. For nofib as a
 whole it's only a small win: 2.2% improvement in allocation for ansi,
 1.2% for bspt, but mostly 0.0!  Average 0.1% increase in binary size.
+

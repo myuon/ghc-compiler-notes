@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Id.hs>`_
+
 Note [Free type variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 At one time we cached the free type variables of the type of an Id
@@ -132,3 +134,4 @@ arity and strictness info before transferring it.  E.g.
       g' = \y. \x. e
       + substitute (g' y) for g
 Notice that g' has an arity one more than the original g
+

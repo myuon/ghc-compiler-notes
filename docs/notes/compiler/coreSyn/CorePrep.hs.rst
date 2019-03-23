@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs>`_
+
 Note [CorePrep invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here is the syntax of the Core produced by CorePrep:
@@ -457,3 +459,4 @@ see Note [Preserve evaluatedness] in CoreTidy.
  Cloning ccall Ids; each must have a unique name,
  to give the code generator a handle to hang it on
  ---------------------------------------------------------------------------
+

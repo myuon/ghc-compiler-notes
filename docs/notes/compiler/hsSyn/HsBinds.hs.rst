@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsBinds.hs>`_
+
 Note [AbsBinds]
 ~~~~~~~~~~~~~~~
 The AbsBinds constructor is used in the output of the type checker, to
@@ -236,3 +238,4 @@ Specifically,
 
   * Before renaming, and after typechecking, the field is unused;
     it's just an error thunk
+

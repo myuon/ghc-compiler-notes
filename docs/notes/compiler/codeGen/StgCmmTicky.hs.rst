@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmTicky.hs>`_
+
 Note [Ticky for slow calls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Terminology is unfortunately a bit mixed up for these calls. codeGen
@@ -15,3 +17,4 @@ bad for both space and time).
 
 -----------------------------------------------------------------------------
 Ticky allocation
+

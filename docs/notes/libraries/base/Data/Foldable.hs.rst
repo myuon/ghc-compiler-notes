@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Foldable.hs>`_
+
 Note [List fusion and continuations in 'c']
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we define
@@ -94,3 +96,4 @@ maximumBy and minimumBy (see
 https://gitlab.haskell.org/ghc/ghc/issues/10830#note_129843 for a further
 discussion). But using foldl1 is at least always better than using foldr1, so
 GHC has chosen to adopt that approach for now.
+

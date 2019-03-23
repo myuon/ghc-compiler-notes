@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/MkIface.hs>`_
+
 Note [Fingerprinting IfaceDecls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -68,5 +70,6 @@ Names too: see Note [Binders in Template Haskell] in Convert, and
   - Such Names are always for locally-defined things, for which we
     don't gather usage info, so we can just ignore them in ent_map
   - They are always System Names, hence the assert, just as a double check.
+
 
 

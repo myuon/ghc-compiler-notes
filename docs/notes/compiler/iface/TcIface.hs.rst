@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/TcIface.hs>`_
+
 Note [Knot-tying typecheckIface]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we are typechecking an interface A.hi, and we come across
@@ -158,3 +160,4 @@ added it into the type environment, we should go ahead and use that
 type. But what if we haven't typechecked it yet?
 
 For the longest time, GHC adopted the policy that this was
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs>`_
+
 Note [Generating Ord instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose constructors are K1..Kn, and some are nullary.
@@ -323,3 +325,4 @@ To make the symbol names short we take a base62 hash of the full name.
 
 In the past we used the *unique* from the parent, but that's not stable across
 recompilations as uniques are nondeterministic.
+

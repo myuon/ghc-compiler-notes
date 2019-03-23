@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs>`_
+
 Note [Call Arity: The goal]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -417,3 +419,4 @@ annotation on join points is not actually used. As it would be equally valid
 (though less efficient) to eta-expand join points, this is the simplifier's
 choice, and hence Call Arity sets the call arity for join points as well.
 Main entry point
+

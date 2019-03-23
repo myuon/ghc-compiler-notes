@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/Debug.hs>`_
+
 Note [What is this unwinding business?]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -218,3 +220,4 @@ For a sequence of CmmNodes like:
 the unwind statement reflects the state after A has executed, but before B
 has executed. If you consult the Note [Debugging DWARF unwinding info], the
 LOC this information will end up in is Y.
+

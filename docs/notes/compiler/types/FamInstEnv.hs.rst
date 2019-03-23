@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs>`_
+
 Note [FamInsts and CoAxioms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * CoAxioms and FamInsts are just like
@@ -509,3 +511,4 @@ case that (F blah blah) can reduce to Double, no matter what (blah)
 is!  Flattening as done below ensures this.
 
 flattenTys is defined here because of module dependencies.
+

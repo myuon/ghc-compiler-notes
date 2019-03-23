@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs>`_
+
 Note [Don't w/w INLINE things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 It's very important to refrain from w/w-ing an INLINE function (ie one
@@ -429,3 +431,4 @@ several binders, and if the binders are lifted
 E.g.     x = e
     -->  x = let x = e in
              case x of (a,b) -> let x = (a,b)  in x
+

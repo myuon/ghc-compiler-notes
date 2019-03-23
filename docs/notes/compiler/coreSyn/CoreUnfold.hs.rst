@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs>`_
+
 Note [Top-level flag on inline rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Slight hack: note that mk_inline_rules conservatively sets the
@@ -653,5 +655,6 @@ This kind of thing can occur if you have
         foo = let x = e in (x,x)
 
 which Roman did.
+
 
 

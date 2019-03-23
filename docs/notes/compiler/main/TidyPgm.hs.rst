@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs>`_
+
 Note [Choosing external Ids]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 See also the section "Interface stability" in the
@@ -304,3 +306,4 @@ mustExposeTyCon no_trim_types exports tc
     data_cons = tyConDataCons tc
     exported_con con = any (`elemNameSet` exports)
                            (dataConName con : dataConFieldLabels con)
+

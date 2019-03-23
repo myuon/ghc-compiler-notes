@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs>`_
+
 Note [Data decl contexts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
@@ -807,4 +809,5 @@ the only way to go. We don't bother throwing this error if an explicit 'stock'
 or 'newtype' keyword is used, since both options have their own perfectly
 sensible error messages in the case of the above code (as C1 isn't a stock
 derivable class, and C2 isn't a newtype).
+
 

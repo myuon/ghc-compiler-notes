@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMonad.hs>`_
+
 Note [Levity polymorphism checking]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 According to the "Levity Polymorphism" paper (PLDI '17), levity
@@ -37,3 +39,4 @@ have one central place for all this, but that doesn't seem possible while
 still reporting nice error messages.
 
 Make a new Id with the same print name, but different type, and new unique
+

@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnBinds.hs>`_
+
 Note [Pattern bindings that bind no variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Generally, we want to warn about pattern bindings like
@@ -122,3 +124,4 @@ pragmas that could be relevant to this pattern match.
 
 For now we simply disallow orphan COMPLETE pragmas, as the added
 complexity of supporting them properly doesn't seem worthwhile.
+

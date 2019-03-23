@@ -1,3 +1,5 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcArrows.hs>`_
+
 Note [Arrow overview]
 ~~~~~~~~~~~~~~~~~~~~~
 Here's a summary of arrows and how they typecheck.  First, here's
@@ -29,5 +31,6 @@ Note that
 
  * The arrow-tail operator (e1 -< e2) means
        (| e1 <<< arr snd |) e2
+
 
 
