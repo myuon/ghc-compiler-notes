@@ -16,7 +16,7 @@ exec:
 
 .PHONY: generate
 generate: exec
-	cd sphinx-docs/ && make html BUILDIDR=../docs && cd -
+	cd sphinx-docs/ && make html BUILDDIR=../docs && cd -
 	git add . && git commit -m 'build html'
 
 .PHONY: clean
