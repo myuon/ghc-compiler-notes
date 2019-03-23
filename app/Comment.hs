@@ -8,6 +8,7 @@ import qualified Options.Applicative       as Options
 import           RIO
 import qualified System.FilePath.Glob      as Glob
 import           System.FilePath
+import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import           GHC.Compiler.Notes.Parser
 import           GHC.Compiler.Notes.FormatRstDoc
@@ -46,5 +47,6 @@ app opt = do
       Left lf  -> liftIO $ print lf
       Right ns -> do
         let d = formatRstDoc ns
-        liftIO $ createDirectoryIfMissing True $ takeDirectory outputFn
-        liftIO $ Text.writeFile outputFn d
+        when (Text.length (Text.strip d) /= 0) $ do
+          liftIO $ createDirectoryIfMissing True $ takeDirectory outputFn
+          liftIO $ Text.writeFile outputFn d
