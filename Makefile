@@ -23,4 +23,5 @@ generate: exec
 .PHONY: clean
 clean:
 	rm -rf docs/
+	mkdir docs/
 	rm -rf sphinx-docs/source/notes
