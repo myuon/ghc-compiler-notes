@@ -39,6 +39,15 @@ matrix:
     - env: BUILD=pedantic ARGS="--resolver lts-13 --system-ghc"
       ghc: "8.6.4"
 
+    - language: python
+      python: 3.6
+      before_script:
+        - pip3 install -U Sphinx
+      script:
+        - cd sphinx-docs/
+        - make html
+        - git subtree push --prefix build/html "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git" gh-pages >/dev/null 2>&1
+
   allow_failures:
     - env: BUILD=style
     - env: BUILD=stack ARGS="--resolver nightly --system-ghc"
