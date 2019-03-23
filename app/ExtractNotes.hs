@@ -1,17 +1,17 @@
 module Main where
 
 import           Control.Monad.IO.Class
+
 import qualified Data.Text.IO                    as Text
+
 import           GHC.Compiler.Notes.App
 import           GHC.Compiler.Notes.FormatRstDoc
 import           GHC.Compiler.Notes.Parser
-import           Options.Applicative             hiding ( Parser )
+
+import           Options.Applicative             hiding (Parser)
 import qualified Options.Applicative             as Options
 
-
-data ExtractNotesOption = ExtractNotesOption
-  { optHsSrcPath :: FilePath
-  }
+data ExtractNotesOption = ExtractNotesOption { optHsSrcPath :: FilePath }
   deriving (Eq, Show)
 
 extractNotesOption :: Options.Parser ExtractNotesOption
@@ -20,10 +20,8 @@ extractNotesOption = ExtractNotesOption
 
 main :: IO ()
 main = do
-  opt <- execParser $ info (extractNotesOption <**> helper)
-    $  header "Extractor of GHC Compiler Notes"
-    <> progDesc "Extract GHC compiler notes"
-    <> fullDesc
+  opt <- execParser $ info (extractNotesOption <**> helper) $
+    header "Extractor of GHC Compiler Notes" <> progDesc "Extract GHC compiler notes" <> fullDesc
   ctx <- defaultAppContext
   runAppT (app opt) ctx
 

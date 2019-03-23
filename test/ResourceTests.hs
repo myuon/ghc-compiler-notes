@@ -1,11 +1,10 @@
 module ResourceTests where
 
-import Test.Tasty.Hspec
+import           GHC.Compiler.Notes.App
+import           GHC.Compiler.Notes.Parser
+import           GHC.Compiler.Notes.Types
 
-import GHC.Compiler.Notes.App
-import GHC.Compiler.Notes.Parser
-import GHC.Compiler.Notes.Types
-
+import           Test.Tasty.Hspec
 
 spec_prelude :: Spec
 spec_prelude = do
