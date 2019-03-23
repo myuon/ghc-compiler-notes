@@ -48,11 +48,8 @@ matrix:
       script:
         - cabal new-exec -- ghc-compiler-notes conf/ghc-8.6.4.yml
         - cd sphinx-docs/ && make html && cd -
-        - git checkout gh-pages
-        - ls | egrep -v '^sphinx-docs$' | xargs rm -rf
-        - mv sphinx-docs/build/html/* .
-        - rm -rf sphinx-docs
-        - git add . && git commit -m 'build' && git push --force --quiet "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git" gh-pages >/dev/null 2&>1
+        - mv sphinx-docs/build/html docs/
+        - git add . && git commit -m 'build html' && git push --force --quiet "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git" gh-pages >/dev/null 2&>1
 
   allow_failures:
     - env: BUILD=style
