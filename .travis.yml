@@ -39,6 +39,19 @@ matrix:
     - env: BUILD=pedantic ARGS="--resolver lts-13 --system-ghc"
       ghc: "8.6.4"
 
+    - stage: deploy
+      language: python
+      python: 3.6
+      if: branch = master
+      before_script:
+        - pip3 install -U Sphinx
+      script:
+        - git clone --depth 1 https://gitlab.haskell.org/ghc/ghc.git output/ghc
+        - cabal new-build && cabal new-exec -- ghc-compiler-notes conf/ghc-8.6.4.yml
+        - cd sphinx-docs/ && make html && cd -
+        - mv sphinx-docs/build/html docs/
+        - git add . && git commit -m 'build html' && git push --force --quiet "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git" master >/dev/null 2>&1
+
   allow_failures:
     - env: BUILD=style
     - env: BUILD=stack ARGS="--resolver nightly --system-ghc"
