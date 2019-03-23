@@ -46,6 +46,7 @@ matrix:
       before_script:
         - pip3 install -U Sphinx
       script:
+        - git clone --depth 1 https://gitlab.haskell.org/ghc/ghc.git output/ghc
         - cabal new-build && cabal new-exec -- ghc-compiler-notes conf/ghc-8.6.4.yml
         - cd sphinx-docs/ && make html && cd -
         - mv sphinx-docs/build/html docs/
