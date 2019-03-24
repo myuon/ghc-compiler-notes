@@ -44,6 +44,8 @@ alleged performance benefits. Item 2 of that ticket finally found out that it
 was entirely due to 'catchException's new (since #11555) definition, which
 was simply
 
+.. code-block:: haskell
+
     catchException !io handler = catch io handler
 
 While 'catchException' is arguably the saner semantics for 'catch', it is an
@@ -55,6 +57,8 @@ Remove the bang and you find the regressions we originally wanted to avoid with
 So history keeps telling us that the only possibly correct strictness annotation
 for the first argument of 'catch#' is 'lazyApply1Dmd', because 'catch#' really
 is not strict in its argument: Just try this in GHCi
+
+.. code-block:: haskell
 
   :set -XScopedTypeVariables
   import Control.Exception
@@ -73,6 +77,8 @@ Forgetting (b) led directly to #10148.
 
 Example. Source code:
   f x@(p,_) = if p then foo x else True
+
+.. code-block:: haskell
 
   foo (p,True) = True
   foo (p,q)    = foo (q,p)
@@ -133,6 +139,8 @@ Example is in the Buffer argument of GHC.IO.Handle.Internals.writeCharBuffer
 Baseline: (A) Not making Used win (UProd wins)
 Compare with: (B) making Used win for lub and both
 
+.. code-block:: haskell
+
             Min          -0.3%     -5.6%    -10.7%    -11.0%    -33.3%
             Max          +0.3%    +45.6%    +11.5%    +11.5%     +6.9%
  Geometric Mean          -0.0%     +0.5%     +0.3%     +0.2%     -0.8%
@@ -183,6 +191,8 @@ should be: <L,C(U(AU))>m
 Note [Trimming a demand to a type]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this:
+
+.. code-block:: haskell
 
   f :: a -> Bool
   f x = case ... of
@@ -416,6 +426,8 @@ There are several wrinkles:
 * We *do* want to analyse the expression regardless.
   Reason: Note [Always analyse in virgin pass]
 
+.. code-block:: haskell
+
   But we can post-process the results to ignore all the usage
   demands coming back. This is done by postProcessDmdType.
 
@@ -428,18 +440,26 @@ There are several wrinkles:
           -- I.e. calls k, but discards first component of result
      f k = case k () of (# _, r #) -> r
 
+.. code-block:: haskell
+
      g :: Int -> ()
      g y = f (\n -> (# case y of I# y2 -> y2, n #))
+
+.. code-block:: haskell
 
   Here f's strictness signature says (correctly) that it calls its
   argument function and ignores the first component of its result.
   This is correct in the sense that it'd be fine to (say) modify the
   function so that always returned 0# in the first component.
 
+.. code-block:: haskell
+
   But in function g, we *will* evaluate the 'case y of ...', because
   it has type Int#.  So 'y' will be evaluated.  So we must record this
   usage of 'y', else 'g' will say 'y' is absent, and will w/w so that
   'y' is bound to an aBSENT_ERROR thunk.
+
+.. code-block:: haskell
 
   However, the argument of toCleanDmd always satisfies the let/app
   invariant; so if it is unlifted it is also okForSpeculation, and so
@@ -510,6 +530,8 @@ Note [HyperStr and Use demands]
 
 The information "HyperStr" needs to be in the strictness signature, and not in
 the demand signature, because we still want to know about the demand on things. Consider
+
+.. code-block:: haskell
 
     f (x,y) True  = error (show x)
     f (x,y) False = x+1

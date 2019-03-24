@@ -12,6 +12,8 @@ Id's Activation allows it.
 This is a surprisingly big deal. Compiler performance improved a lot
 when I made this change:
 
+.. code-block:: haskell
+
    perf/compiler/T5837.run            T5837 [stat too good] (normal)
    perf/compiler/parsing001.run       parsing001 [stat too good] (normal)
    perf/compiler/T12234.run           T12234 [stat too good] (optasm)
@@ -55,13 +57,19 @@ We must be careful about discarding (obviously) or even merging the
 RULES on the exported Id. The example that went bad on me at one stage
 was this one:
 
+.. code-block:: haskell
+
     iterate :: (a -> a) -> a -> [a]
         [Exported]
     iterate = iterateList
 
+.. code-block:: haskell
+
     iterateFB c f x = x `c` iterateFB c f (f x)
     iterateList f x =  x : iterateList f (f x)
         [Not exported]
+
+.. code-block:: haskell
 
     {-# RULES
     "iterate"   forall f x.     iterate f x = build (\c _n -> iterateFB c f x)
@@ -70,11 +78,17 @@ was this one:
 
 This got shorted out to:
 
+.. code-block:: haskell
+
     iterateList :: (a -> a) -> a -> [a]
     iterateList = iterate
 
+.. code-block:: haskell
+
     iterateFB c f x = x `c` iterateFB c f (f x)
     iterate f x =  x : iterate f (f x)
+
+.. code-block:: haskell
 
     {-# RULES
     "iterate"   forall f x.     iterate f x = build (\c _n -> iterateFB c f x)
@@ -149,10 +163,14 @@ Note [Indirection zapping and ticks]
 Unfortunately this is another place where we need a special case for
 ticks. The following happens quite regularly:
 
+.. code-block:: haskell
+
         x_local = <expression>
         x_exported = tick<x> x_local
 
 Which we want to become:
+
+.. code-block:: haskell
 
         x_exported =  tick<x> <expression>
 

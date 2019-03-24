@@ -37,6 +37,8 @@ InstCo g1 g2 : t1'[tv |-> s1] ~ t2'[tv |-> s2]
 
 We thus want some coercion proving this:
 
+.. code-block:: haskell
+
   (t1[tv |-> s1]) ~ (t2[tv |-> s2 |> sym h])
 
 If we substitute the *type* tv for the *coercion*
@@ -66,6 +68,8 @@ h2 : t3 ~r t4
 InstCo g1 g2 : t1'[cv |-> h1] ~ t2'[cv |-> h2]
 
 We thus want some coercion proving this:
+
+.. code-block:: haskell
 
   t1'[cv |-> h1] ~ t2'[cv |-> n1 ; h2; sym n2]
 
@@ -149,30 +153,46 @@ like to rewrite this to (co1a ; co2a) (co1b ; co2b). The problem is that
 the resultant coercions might not be well kinded. Here is an example (things
 labeled with x don't matter in this example):
 
+.. code-block:: haskell
+
   k1 :: Type
   k2 :: Type
+
+.. code-block:: haskell
 
   a :: k1 -> Type
   b :: k1
 
+.. code-block:: haskell
+
   h :: k1 ~ k2
+
+.. code-block:: haskell
 
   co1a :: x1 ~ (a |> (h -> <Type>)
   co1b :: x2 ~ (b |> h)
+
+.. code-block:: haskell
 
   co2a :: a ~ x3
   co2b :: b ~ x4
 
 First, convince yourself of the following:
 
+.. code-block:: haskell
+
   co1a co1b :: x1 x2 ~ (a |> (h -> <Type>)) (b |> h)
   co2a co2b :: a b   ~ x3 x4
+
+.. code-block:: haskell
 
   (a |> (h -> <Type>)) (b |> h) `eqType` a b
 
 That last fact is due to Note [Non-trivial definitional equality] in TyCoRep,
 where we ignore coercions in types as long as two types' kinds are the same.
 In our case, we meet this last condition, because
+
+.. code-block:: haskell
 
   (a |> (h -> <Type>)) (b |> h) :: Type
     and
@@ -184,6 +204,8 @@ kinds don't match up.
 
 The solution here is to twiddle the kinds in the output coercions. First, we
 need to find coercions
+
+.. code-block:: haskell
 
   ak :: kind(a |> (h -> <Type>)) ~ kind(a)
   bk :: kind(b |> h)             ~ kind(b)

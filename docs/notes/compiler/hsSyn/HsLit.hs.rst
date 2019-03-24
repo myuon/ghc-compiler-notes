@@ -5,6 +5,8 @@ Note [ol_rebindable]
 The ol_rebindable field is True if this literal is actually
 using rebindable syntax.  Specifically:
 
+.. code-block:: haskell
+
   False iff ol_witness is the standard one
   True  iff ol_witness is non-standard
 

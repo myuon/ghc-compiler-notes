@@ -9,6 +9,8 @@ call-sites that are not in recursive functions.
 
 Example:
 
+.. code-block:: haskell
+
   let t = foo bar
   joinrec go 0     x y = t (x*x)
           go (n-1) x y = jump go (n-1) (x+y)
@@ -24,6 +26,8 @@ function is an exit path if it does not contain a recursive call. We can bind
 this expression outside the recursive function, as a join-point.
 
 Example result:
+
+.. code-block:: haskell
 
   let t = foo bar
   join exit x = t (x*x)
@@ -93,6 +97,8 @@ non-exported variables (z in the following example):
 The join point itself can be interesting, even if none if its
 arguments have free variables free in the joinrec.  For example
 
+.. code-block:: haskell
+
   join j p = case p of (x,y) -> x+y
   joinrec go 0     x y = jump j (x,y)
           go (n-1) x y = jump go (n-1) (x+y) y
@@ -101,6 +107,8 @@ arguments have free variables free in the joinrec.  For example
 Here, `j` would not be inlined because we do not inline something that looks
 like an exit join point (see Note [Do not inline exit join points]). But
 if we exitify the 'jump j (x,y)' we get
+
+.. code-block:: haskell
 
   join j p = case p of (x,y) -> x+y
   join exit x y = jump j (x,y)
@@ -112,6 +120,8 @@ and now 'j' can inline, and we get rid of the pair. Here's another
 example (assume `g` to be an imported function that, on its own,
 does not make this interesting):
 
+.. code-block:: haskell
+
   join j y = map f y
   joinrec go 0     x y = jump j (map g x)
           go (n-1) x y = jump go (n-1) (x+y)
@@ -121,6 +131,8 @@ Again, `j` would not be inlined because we do not inline something that looks
 like an exit join point (see Note [Do not inline exit join points]).
 
 But after exitification we have
+
+.. code-block:: haskell
 
   join j y = map f y
   join exit x = jump j (map g x)
@@ -163,6 +175,8 @@ Note [Calculating free variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We have two options where to annotate the tree with free variables:
 
+.. code-block:: haskell
+
  A) The whole tree.
  B) Each individual joinrec as we come across it.
 
@@ -181,6 +195,8 @@ We therefore choose B, and calculate the free variables in `exitify`.
 Note [Do not inline exit join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When we have
+
+.. code-block:: haskell
 
   let t = foo bar
   join exit x = t (x*x)
@@ -202,6 +218,8 @@ because the lambdas of a non-recursive join point are not considered for
 `occ_in_lam`.  For example, in the following code, `j1` is /not/ marked
 occ_in_lam, because `j2` is called only once.
 
+.. code-block:: haskell
+
   join j1 x = x+1
   join j2 y = join j1 (y+2)
 
@@ -216,6 +234,8 @@ Note [Placement of the exitification pass]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 I (Joachim) experimented with multiple positions for the Exitification pass in
 the Core2Core pipeline:
+
+.. code-block:: haskell
 
  A) Before the `simpl_phases`
  B) Between the `simpl_phases` and the "main" simplifier pass

@@ -7,6 +7,8 @@ The goal of this analysis is to find out if we can eta-expand a local function,
 based on how it is being called. The motivating example is this code,
 which comes up when we implement foldl using foldr, and do list fusion:
 
+.. code-block:: haskell
+
     let go = \x -> let d = case ... of
                               False -> go (x+1)
                               True  -> id
@@ -27,6 +29,8 @@ the `calledArity` field of the `IdInfo` of `go`, which the next simplifier
 phase will eta-expand.
 
 The specification of the `calledArity` field is:
+
+.. code-block:: haskell
 
     No work will be lost if you eta-expand me to the arity in `calledArity`.
 
@@ -49,9 +53,13 @@ What we want to know from an expression
 In order to obtain that information for variables, we analyze expression and
 obtain bits of information:
 
+.. code-block:: haskell
+
  I.  The arity analysis:
      For every variable, whether it is absent, or called,
      and if called, which what arity.
+
+.. code-block:: haskell
 
  II. The Co-Called analysis:
      For every two variables, whether there is a possibility that both are being
@@ -174,16 +182,26 @@ If the variable is a thunk we must be careful: Eta-Expansion will prevent
 sharing of work, so this is only safe if there is at most one call to the
 function. Therefore, we check whether {v,v} ∈ G.
 
+.. code-block:: haskell
+
     Example:
+
+.. code-block:: haskell
 
         let n = case .. of .. -- A thunk!
         in n 0 + n 1
 
+.. code-block:: haskell
+
     vs.
+
+.. code-block:: haskell
 
         let n = case .. of ..
         in case .. of T -> n 0
                       F -> n 1
+
+.. code-block:: haskell
 
     We are only allowed to eta-expand `n` if it is going to be called at most
     once in the body of the outer let. So we need to know, for each variable
@@ -196,6 +214,8 @@ Why the co-call graph?
 Why is it not sufficient to simply remember which variables are called once and
 which are called multiple times? It would be in the previous example, but consider
 
+.. code-block:: haskell
+
         let n = case .. of ..
         in case .. of
             True -> let go = \y -> case .. of
@@ -205,6 +225,8 @@ which are called multiple times? It would be in the previous example, but consid
             False -> n
 
 vs.
+
+.. code-block:: haskell
 
         let n = case .. of ..
         in case .. of
@@ -228,18 +250,28 @@ Although for eta-expansion we need the information only for thunks, we still
 need to know whether functions are being called once or multiple times, and
 together with what other functions.
 
+.. code-block:: haskell
+
     Example:
+
+.. code-block:: haskell
 
         let n = case .. of ..
             f x = n (x+1)
         in f 1 + f 2
 
+.. code-block:: haskell
+
     vs.
+
+.. code-block:: haskell
 
         let n = case .. of ..
             f x = n (x+1)
         in case .. of T -> f 0
                       F -> f 1
+
+.. code-block:: haskell
 
     Here, the body of f calls n exactly once, but f itself is being called
     multiple times, so eta-expansion is not allowed.
@@ -253,6 +285,8 @@ Note [Analysis type signature]
 The work-hourse of the analysis is the function `callArityAnal`, with the
 following type:
 
+.. code-block:: haskell
+
     type CallArityRes = (UnVarGraph, VarEnv Arity)
     callArityAnal ::
         Arity ->  -- The arity this expression is called with
@@ -262,7 +296,11 @@ following type:
 
 and the following specification:
 
+.. code-block:: haskell
+
   ((coCalls, callArityEnv), expr') = callArityEnv arity interestingIds expr
+
+.. code-block:: haskell
 
                             <=>
 
@@ -339,6 +377,8 @@ part of a recursive group, then it will be called multiple times.
 This is not necessarily true, e.g.  it would be safe to eta-expand t2 (but not
 t1) in the following code:
 
+.. code-block:: haskell
+
   let go x = t1
       t1 = if ... then t2 else ...
       t2 = if ... then go 1 else ...
@@ -371,6 +411,8 @@ the case for Core!
       callArity e <= typeArity (exprType e)
     for the same reasons that exprArity needs this invariant (see Note
     [exprArity invariant] in CoreArity).
+
+.. code-block:: haskell
 
     If we are not doing that, a too-high arity annotation will be stored with
     the id, confusing the simplifier later on.

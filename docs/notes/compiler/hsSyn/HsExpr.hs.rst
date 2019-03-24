@@ -40,15 +40,25 @@ Note [OutOfScope and GlobalRdrEnv]
 To understand why we bundle a GlobalRdrEnv with an out-of-scope variable,
 consider the following module:
 
+.. code-block:: haskell
+
     module A where
+
+.. code-block:: haskell
 
     foo :: ()
     foo = bar
 
+.. code-block:: haskell
+
     bat :: [Double]
     bat = [1.2, 3.4]
 
+.. code-block:: haskell
+
     $(return [])
+
+.. code-block:: haskell
 
     bar = ()
     bad = False
@@ -58,6 +68,8 @@ declaration of `foo` (since `bar` is declared in the following inter-splice
 group).  Once it has finished typechecking the entire module, the typechecker
 then generates the associated error message, which specifies both the type of
 `bar` and a list of possible in-scope alternatives:
+
+.. code-block:: haskell
 
     A.hs:6:7: error:
         • Variable not in scope: bar :: ()
@@ -78,7 +90,11 @@ location information is not always sufficient for this task.  This is most
 apparent when dealing with the TH function addTopDecls, which adds its
 declarations to the FOLLOWING inter-splice group.  Consider these declarations:
 
+.. code-block:: haskell
+
     ex9 = cat               -- cat is NOT in scope here
+
+.. code-block:: haskell
 
     $(do -------------------------------------------------------------
         ds <- [d| f = cab   -- cat and cap are both in scope here
@@ -89,9 +105,15 @@ declarations to the FOLLOWING inter-splice group.  Consider these declarations:
             cap = True
           |])
 
+.. code-block:: haskell
+
     ex10 = cat              -- cat is NOT in scope here
 
+.. code-block:: haskell
+
     $(return []) -----------------------------------------------------
+
+.. code-block:: haskell
 
     ex11 = cat              -- cat is in scope
 
@@ -210,6 +232,8 @@ the Match, when it originates from a FunBind.
 
 Example infix function definition requiring individual API Annotations
 
+.. code-block:: haskell
+
     (&&&  ) [] [] =  []
     xs    &&&   [] =  xs
     (  &&&  ) [] ys =  ys
@@ -291,11 +315,15 @@ Note [How RecStmt works]
 Example:
    HsDo [ BindStmt x ex
 
+.. code-block:: haskell
+
         , RecStmt { recS_rec_ids   = [a, c]
                   , recS_stmts     = [ BindStmt b (return (a,c))
                                      , LetStmt a = ...b...
                                      , BindStmt c ec ]
                   , recS_later_ids = [a, b]
+
+.. code-block:: haskell
 
         , return (a b) ]
 
@@ -308,6 +336,8 @@ Why do we need *both* rec_ids and later_ids?  For monads they could be
 combined into a single set of variables, but not for arrows.  That
 follows from the types of the respective feedback operators:
 
+.. code-block:: haskell
+
         mfix :: MonadFix m => (a -> m a) -> m a
         loop :: ArrowLoop a => a (b,d) (c,d) -> a b c
 
@@ -319,6 +349,8 @@ follows from the types of the respective feedback operators:
 Note [Typing a RecStmt]
 ~~~~~~~~~~~~~~~~~~~~~~~
 A (RecStmt stmts) types as if you had written
+
+.. code-block:: haskell
 
   (v1,..,vn, _, ..., _) <- mfix (\~(_, ..., _, r1, ..., rm) ->
                                  do { stmts
@@ -336,12 +368,16 @@ Monad comprehensions require separate functions like 'return' and
 used in monad comprehensions. For example, the 'return' of the 'LastStmt'
 expression is used to lift the body of the monad comprehension:
 
+.. code-block:: haskell
+
   [ body | stmts ]
    =>
   stmts >>= \bndrs -> return body
 
 In transform and grouping statements ('then ..' and 'then group ..') the
 'return' function is required for nested monad comprehensions, for example:
+
+.. code-block:: haskell
 
   [ body | stmts, then f, rest ]
    =>
@@ -350,11 +386,15 @@ In transform and grouping statements ('then ..' and 'then group ..') the
 BodyStmts require the 'Control.Monad.guard' function for boolean
 expressions:
 
+.. code-block:: haskell
+
   [ body | exp, stmts ]
    =>
   guard exp >> [ body | stmts ]
 
 Parallel statements require the 'Control.Monad.Zip.mzip' function:
+
+.. code-block:: haskell
 
   [ body | stmts1 | stmts2 | .. ]
    =>
@@ -369,6 +409,8 @@ Note [Applicative BodyStmt]
 (#12143) For the purposes of ApplicativeDo, we treat any BodyStmt
 as if it was a BindStmt with a wildcard pattern.  For example,
 
+.. code-block:: haskell
+
   do
     x <- A
     B
@@ -376,12 +418,16 @@ as if it was a BindStmt with a wildcard pattern.  For example,
 
 is transformed as if it were
 
+.. code-block:: haskell
+
   do
     x <- A
     _ <- B
     return x
 
 so it transforms to
+
+.. code-block:: haskell
 
   (\(x,_) -> x) <$> A <*> B
 
@@ -401,9 +447,13 @@ bracket code.  So for example
     [| f $(g x) |]
 looks like
 
+.. code-block:: haskell
+
     HsBracket (HsApp (HsVar "f") (HsSpliceE _ (g x)))
 
 which the renamer rewrites to
+
+.. code-block:: haskell
 
     HsRnBracketOut (HsApp (HsVar f) (HsSpliceE sn (g x)))
                    [PendingRnSplice UntypedExpSplice sn (g x)]

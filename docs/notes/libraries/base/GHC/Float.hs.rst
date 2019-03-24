@@ -6,9 +6,15 @@ Don found that the RULES for realToFrac/Int->Double and simliarly
 Float made a huge difference to some stream-fusion programs.  Here's
 an example
 
+.. code-block:: haskell
+
       import Data.Array.Vector
 
+.. code-block:: haskell
+
       n = 40000000
+
+.. code-block:: haskell
 
       main = do
             let c = replicateU n (2::Double)
@@ -16,6 +22,8 @@ an example
             print (sumU (zipWithU (*) c a))
 
 Without the RULE we get this loop body:
+
+.. code-block:: haskell
 
       case $wtoRational sc_sY4 of ww_aM7 { (# ww1_aM9, ww2_aMa #) ->
       case $wfromRat ww1_aM9 ww2_aMa of tpl_X1P { D# ipv_sW3 ->
@@ -25,6 +33,8 @@ Without the RULE we get this loop body:
         (+## sc2_sY6 (*## 2.0 ipv_sW3))
 
 And with the rule:
+
+.. code-block:: haskell
 
      Main.$s$wfold
         (+# sc_sXT 1)
@@ -44,6 +54,8 @@ Note [Casting from integral to floating point types]
 To implement something like `reinterpret_cast` from C++ to go from a
 floating-point type to an integral type one might niavely think that the
 following should work:
+
+.. code-block:: haskell
 
       cast :: Float -> Word32
       cast (F# f#) = W32# (unsafeCoerce# f#)

@@ -4,10 +4,14 @@ Note [Inline default methods]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
 
+.. code-block:: haskell
+
    class ... => Traversable t where
        ...
        mapM :: Monad m => (a -> m b) -> t a -> m (t b)
        mapM = traverse   -- Default method
+
+.. code-block:: haskell
 
    instance Traversable [] where
        {-# INLINE traverse #-}
@@ -15,12 +19,16 @@ Consider
 
 This gives rise to a list-instance of mapM looking like this
 
+.. code-block:: haskell
+
   $fTraversable[]_$ctraverse = ...code for traverse on lists...
        {-# INLINE $fTraversable[]_$ctraverse #-}
   $fTraversable[]_$cmapM    = $fTraversable[]_$ctraverse
 
 Now the $ctraverse obediently inlines into the RHS of $cmapM, /but/
 that's all!  We get
+
+.. code-block:: haskell
 
   $fTraversable[]_$cmapM = ...code for traverse on lists...
 

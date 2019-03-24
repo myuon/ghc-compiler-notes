@@ -4,6 +4,8 @@ Note [Always false stack check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We can optimise stack checks of the form
 
+.. code-block:: haskell
+
   if ((Sp + x) - y < SpLim) then .. else ..
 
 where are non-negative integer byte offsets.  Since we know that

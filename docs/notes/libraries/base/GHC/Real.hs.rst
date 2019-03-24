@@ -5,6 +5,8 @@ Note [Numeric Stability of Enumerating Floating Numbers]
 When enumerate floating numbers, we could add the increment to the last number
 at every run (as what we did previously):
 
+.. code-block:: haskell
+
     numericEnumFrom n =  n `seq` (n : numericEnumFrom (n + 1))
 
 This approach is concise and really fast, only needs an addition operation.
@@ -32,6 +34,8 @@ Furthermore, we use the type of the enumerated number, `Fractional a => a`,
 as the type of multiplier. In rare situations, the multiplier could be very
 large and will lead to the enumeration to infinite loop, too, which should
 be very rare. Consider the following example:
+
+.. code-block:: haskell
 
     [1..9007199254740994]
 

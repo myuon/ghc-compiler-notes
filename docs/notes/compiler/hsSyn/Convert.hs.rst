@@ -6,10 +6,14 @@ When we drop constructors from the input (for instance, when we encounter @TupE 
 we must insert parentheses around the argument. Otherwise, @UInfix@ constructors in @e@
 could meet @UInfix@ constructors containing the @TupE [e]@. For example:
 
+.. code-block:: haskell
+
   UInfixE x * (TupE [UInfixE y + z])
 
 If we drop the singleton tuple but don't insert parentheses, the @UInfixE@s would meet
 and the above expression would be reassociated to
+
+.. code-block:: haskell
 
   OpApp (OpApp x * y) + z
 
@@ -21,6 +25,8 @@ Note [Converting UInfix]
 When converting @UInfixE@, @UInfixP@, and @UInfixT@ values, we want to readjust
 the trees to reflect the fixities of the underlying operators:
 
+.. code-block:: haskell
+
   UInfixE x * (UInfixE y + z) ---> (x * y) + z
 
 This is done by the renamer (see @mkOppAppRn@, @mkConOppPatRn@, and
@@ -30,12 +36,16 @@ trees of @UInfixP@ and @UInfixE@ and right-bias the trees of @UInfixT@.
 
 Sample input:
 
+.. code-block:: haskell
+
   UInfixE
    (UInfixE x op1 y)
    op2
    (UInfixE z op3 w)
 
 Sample output:
+
+.. code-block:: haskell
 
   OpApp
     (OpApp
@@ -64,8 +74,12 @@ Consider this TH term construction:
      ; x2 <- TH.newName "x"   -- Builds a NameU
      ; x3 <- TH.newName "x"
 
+.. code-block:: haskell
+
      ; let x = mkName "x"     -- mkName :: String -> TH.Name
                               -- Builds a NameS
+
+.. code-block:: haskell
 
      ; return (LamE (..pattern [x1,x2]..) $
                LamE (VarPat x3) $
@@ -116,9 +130,13 @@ Note [Pattern synonym type signatures and Template Haskell]
 
 In general, the type signature of a pattern synonym
 
+.. code-block:: haskell
+
   pattern P x1 x2 .. xn = <some-pattern>
 
 is of the form
+
+.. code-block:: haskell
 
    forall univs. reqs => forall exis. provs => t1 -> t2 -> ... -> tn -> t
 
@@ -137,23 +155,37 @@ which might be empty), pattern synonym type signatures are treated
 specially in `deSugar/DsMeta.hs`, `hsSyn/Convert.hs`, and
 `typecheck/TcSplice.hs`:
 
+.. code-block:: haskell
+
    (a) When desugaring a pattern synonym from HsSyn to TH.Dec in
        `deSugar/DsMeta.hs`, we represent its *full* type signature in TH, i.e.:
 
+.. code-block:: haskell
+
            ForallT univs reqs (ForallT exis provs ty)
               (where ty is the AST representation of t1 -> t2 -> ... -> tn -> t)
+
+.. code-block:: haskell
 
    (b) When converting pattern synonyms from TH.Dec to HsSyn in
        `hsSyn/Convert.hs`, we convert their TH type signatures back to an
        appropriate Haskell pattern synonym type of the form
 
+.. code-block:: haskell
+
          forall univs. reqs => forall exis. provs => t1 -> t2 -> ... -> tn -> t
+
+.. code-block:: haskell
 
        where initial empty `univs` type variables or an empty `reqs`
        constraint context are represented *explicitly* as `() =>`.
 
+.. code-block:: haskell
+
    (c) When reifying a pattern synonym in `typecheck/TcSplice.hs`, we always
        return its *full* type, i.e.:
+
+.. code-block:: haskell
 
            ForallT univs reqs (ForallT exis provs ty)
               (where ty is the AST representation of t1 -> t2 -> ... -> tn -> t)

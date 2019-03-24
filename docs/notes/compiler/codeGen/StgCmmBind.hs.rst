@@ -16,6 +16,8 @@ Note [Ap thunks]
 ~~~~~~~~~~~~~~~~
 A more generic AP thunk of the form
 
+.. code-block:: haskell
+
         x = [ x_1...x_n ] \.. [] -> x_1 ... x_n
 
 A set of these is compiled statically into the RTS, so we just use

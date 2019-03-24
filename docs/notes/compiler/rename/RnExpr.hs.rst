@@ -7,9 +7,13 @@ present in the source text.
 
 For ApplicativeDo we create:
 
+.. code-block:: haskell
+
   (a,b,c) <- (\c b a -> (a,b,c)) <$>
 
 For RecursiveDo we create:
+
+.. code-block:: haskell
 
   mfix (\ ~(a,b,c) -> do ...; return (a',b',c'))
 
@@ -47,7 +51,11 @@ Note that
       rename each group of Stmts with a thing_inside whose FreeVars
       include at least {a,c}
 
+.. code-block:: haskell
+
   (b) We want to report that 'a' is illegally bound in both branches
+
+.. code-block:: haskell
 
   (c) The 'bs' in the second group must obviously not be captured by
       the binding in the first group

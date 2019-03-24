@@ -71,6 +71,8 @@ Note [AnonArgFlag vs. ForallVisFlag]
 The AnonArgFlag and ForallVisFlag data types are quite similar at a first
 glance:
 
+.. code-block:: haskell
+
   data AnonArgFlag   = VisArg    | InvisArg
   data ForallVisFlag = ForallVis | ForallInvis
 

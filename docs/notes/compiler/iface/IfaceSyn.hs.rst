@@ -59,6 +59,8 @@ Consider
 
 The IfaceDecl actually looks like
 
+.. code-block:: haskell
+
    data TPr p q where
       T1 :: forall p q. forall c. (p~Int,q~Maybe c) => TPr p q
       T2 :: forall p q. (p~Bool) => TPr p q
@@ -82,9 +84,13 @@ in the free names, because its type will probably show up in
 the free names of 'e'.  But in rare circumstances this may
 not happen.   Here's the one that bit me:
 
+.. code-block:: haskell
+
    module DynFlags where
      import {-# SOURCE #-} Packages( PackageState )
      data DynFlags = DF ... PackageState ...
+
+.. code-block:: haskell
 
    module Packages where
      import DynFlags

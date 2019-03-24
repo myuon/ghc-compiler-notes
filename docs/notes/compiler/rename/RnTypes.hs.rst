@@ -41,13 +41,19 @@ Note [QualTy in kinds]
 I was wondering whether QualTy could occur only at TypeLevel.  But no,
 we can have a qualified type in a kind too. Here is an example:
 
+.. code-block:: haskell
+
   type family F a where
     F Bool = Nat
     F Nat  = Type
 
+.. code-block:: haskell
+
   type family G a where
     G Type = Type -> Type
     G ()   = Nat
+
+.. code-block:: haskell
 
   data X :: forall k1 k2. (F k1 ~ G k2) => k1 -> k2 -> Type where
     MkX :: X 'True '()
@@ -55,6 +61,8 @@ we can have a qualified type in a kind too. Here is an example:
 See that k1 becomes Bool and k2 becomes (), so the equality is
 satisfied. If I write MkX :: X 'True 'False, compilation fails with a
 suitable message:
+
+.. code-block:: haskell
 
   MkX :: X 'True '()
     • Couldn't match kind ‘G Bool’ with ‘Nat’
@@ -75,11 +83,17 @@ Then:
   hs_tv_bndrs = [k, a::k1, b::k], the explicitly-bound variables
   bndrs       = [k,a,b]
 
+.. code-block:: haskell
+
   bndr_kv_occs = [k,k1], kind variables free in kind signatures
                          of hs_tv_bndrs
 
+.. code-block:: haskell
+
   body_kv_occs = [k2,k1], kind variables free in the
                           result kind signature
+
+.. code-block:: haskell
 
   implicit_kvs = [k1,k2], kind variables free in kind signatures
                           of hs_tv_bndrs, and not bound by bndrs
@@ -120,6 +134,8 @@ and a distinct, shadowing explicit k that follows, something like
 
 So the rule is:
 
+.. code-block:: haskell
+
    the implicit binders never include any
    of the explicit binders in the group
 
@@ -151,12 +167,16 @@ Note [Variables used as both types and kinds]
 We bind the type variables tvs, and kvs is the set of free variables of the
 kinds in the scope of the binding. Here is one typical example:
 
+.. code-block:: haskell
+
    forall a b. a -> (b::k) -> (c::a)
 
 Here, tvs will be {a,b}, and kvs {k,a}.
 
 We must make sure that kvs includes all of variables in the kinds of type
 variable bindings. For instance:
+
+.. code-block:: haskell
 
    forall k (a :: k). Proxy a
 
@@ -203,11 +223,17 @@ of implicit variable quantification. Specifically, we offer that implicitly
 quantified variables (such as those in const :: a -> b -> a, without a `forall`)
 will occur in left-to-right order of first occurrence. Here are a few examples:
 
+.. code-block:: haskell
+
   const :: a -> b -> a       -- forall a b. ...
   f :: Eq a => b -> a -> a   -- forall a b. ...  contexts are included
 
+.. code-block:: haskell
+
   type a <-< b = b -> a
   g :: a <-< b               -- forall a b. ...  type synonyms matter
+
+.. code-block:: haskell
 
   class Functor f where
     fmap :: (a -> b) -> f a -> f b   -- forall f a b. ...
@@ -215,6 +241,8 @@ will occur in left-to-right order of first occurrence. Here are a few examples:
 
 This simple story is complicated by the possibility of dependency: all variables
 must come after any variables mentioned in their kinds.
+
+.. code-block:: haskell
 
   typeRep :: Typeable a => TypeRep (a :: k)   -- forall k a. ...
 
@@ -235,6 +263,8 @@ Note [Implicit quantification in type synonyms]
 We typically bind type/kind variables implicitly when they are in a kind
 annotation on the LHS, for example:
 
+.. code-block:: haskell
+
   data Proxy (a :: k) = Proxy
   type KindOf (a :: k) = k
 
@@ -244,6 +274,8 @@ variables from the kind signature. That's what we do in extract_hs_tv_bndrs_kvs
 
 By contrast, on the RHS we can't simply collect *all* free variables. Which of
 the following are allowed?
+
+.. code-block:: haskell
 
   type TySyn1 = a :: Type
   type TySyn2 = 'Nothing :: Maybe a
@@ -271,6 +303,8 @@ synonyms and type family instances.
 This is something of a stopgap solution until we can explicitly bind invisible
 type/kind variables:
 
+.. code-block:: haskell
+
   type TySyn3 :: forall a. Maybe a
   type TySyn3 @a = 'Just ('Nothing :: Maybe a)
 
@@ -283,6 +317,8 @@ Alternative I: No quantification
 --------------------------------
 We could offer no implicit quantification on the RHS, accepting none of the
 TySyn<N> examples. The user would have to bind the variables explicitly:
+
+.. code-block:: haskell
 
   type TySyn1 a = a :: Type
   type TySyn2 a = 'Nothing :: Maybe a
@@ -297,6 +333,8 @@ Alternative II: Indiscriminate quantification
 We could implicitly quantify over all free variables on the RHS just like we do
 on the LHS. Then we would infer the following kinds:
 
+.. code-block:: haskell
+
   TySyn1 :: forall {a}. Type
   TySyn2 :: forall {a}. Maybe a
   TySyn3 :: forall {a}. Maybe (Maybe a)
@@ -309,6 +347,8 @@ Alternative III: reportFloatingKvs
 ----------------------------------
 We could augment Alternative II by hunting down free-floating variables during
 type checking. While viable, this would mean we'd end up accepting this:
+
+.. code-block:: haskell
 
   data Prox k (a :: k)
   type T = Prox k

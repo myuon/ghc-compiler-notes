@@ -45,6 +45,8 @@ PostInlineUnconditionally
                B -> ...x...y... }
   Current postinlineUnconditinaly will inline y, and then x; sigh.
 
+.. code-block:: haskell
+
   But PostInlineUnconditionally might also unlock subsequent
   transformations for the same reason as PreInlineUnconditionally,
   so it's probably not innocuous anyway.

@@ -6,6 +6,8 @@ Note [Efficient serialization of redundant type info]
 The type information in .hie files is highly repetitive and redundant. For
 example, consider the expression
 
+.. code-block:: haskell
+
     const True 'a'
 
 There is a lot of shared structure between the types of subterms:
@@ -18,9 +20,13 @@ Since all 3 of these types need to be stored in the .hie file, it is worth
 making an effort to deduplicate this shared structure. The trick is to define
 a new data type that is a flattened version of 'Type':
 
+.. code-block:: haskell
+
     data HieType a = HAppTy a a  -- data Type = AppTy Type Type
                    | HFunTy a a  --           | FunTy Type Type
                    | ...
+
+.. code-block:: haskell
 
     type TypeIndex = Int
 

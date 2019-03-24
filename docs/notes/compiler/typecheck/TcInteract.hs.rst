@@ -41,14 +41,20 @@ to float. This means that
        type instance F True a b = a
        type instance F False a b = b
 
+.. code-block:: haskell
+
        [w] F c a b ~ gamma
        (c ~ True) => a ~ gamma
        (c ~ False) => b ~ gamma
+
+.. code-block:: haskell
 
    Obviously this is soluble with gamma := F c a b, and unflattening
    will do exactly that after solving the simple constraints and before
    attempting the implications.  Before, when we were not unflattening,
    we had to push Wanted funeqs in as new givens.  Yuk!
+
+.. code-block:: haskell
 
    Another example that becomes easy: indexed_types/should_fail/T7786
       [W] BuriedUnder sub k Empty ~ fsk
@@ -94,6 +100,8 @@ Note [The Solver Invariant]
 We always add Givens first.  So you might think that the solver has
 the invariant
 
+.. code-block:: haskell
+
    If the work-item is Given,
    then the inert item must Given
 
@@ -138,10 +146,14 @@ we keep?  More subtle than you might think!
 
   * Constraints coming from the same level (i.e. same implication)
 
+.. code-block:: haskell
+
        (a) Always get rid of InstSC ones if possible, since they are less
            useful for solving.  If both are InstSC, choose the one with
            the smallest TypeSize
            See Note [Solving superclass constraints] in TcInstDcls
+
+.. code-block:: haskell
 
        (b) Keep the one that has a non-trivial evidence binding.
               Example:  f :: (Eq a, Ord a) => blah
@@ -151,6 +163,8 @@ we keep?  More subtle than you might think!
             We want to discard d2 in favour of the superclass selection from
             the Ord dictionary.
             Why? See Note [Tracking redundant constraints] in TcSimplify again.
+
+.. code-block:: haskell
 
        (c) But don't do (b) if the evidence binding depends transitively on the
            one without a binding.  Example (with RecursiveSuperClasses)
@@ -170,7 +184,11 @@ we keep?  More subtle than you might think!
 Doing the depth-check for implicit parameters, rather than making the work item
 always override, is important.  Consider
 
+.. code-block:: haskell
+
     data T a where { T1 :: (?x::Int) => T Int; T2 :: T a }
+
+.. code-block:: haskell
 
     f :: (?x::a) => T a -> Int
     f T1 = ?x
@@ -244,14 +262,20 @@ it is only used if the program has a type error anyway.
 
 Example of (b): assume a top-level class and instance declaration:
 
+.. code-block:: haskell
+
   class D a b | a -> b
   instance D [a] [a]
 
 Assume we have started with an implication:
 
+.. code-block:: haskell
+
   forall c. Eq c => { wc_simple = D [c] c [W] }
 
 which we have simplified to:
+
+.. code-block:: haskell
 
   forall c. Eq c => { wc_simple = D [c] c [W]
                                   (c ~ [c]) [D] }
@@ -261,10 +285,14 @@ we might try to re-solve this implication. If we do not do a
 dropDerivedWC, then we will end up trying to solve the following
 constraints the second time:
 
+.. code-block:: haskell
+
   (D [c] c) [W]
   (c ~ [c]) [D]
 
 which will result in two Deriveds to end up in the insoluble set:
+
+.. code-block:: haskell
 
   wc_simple   = D [c] c [W]
                (c ~ [c]) [D], (c ~ [c]) [D]
@@ -276,9 +304,15 @@ When we interact a [W] constraint with a [G] constraint that solves it, there is
 a possibility that we could produce better code if instead we solved from a
 top-level instance declaration (See #12791, #5835). For example:
 
+.. code-block:: haskell
+
     class M a b where m :: a -> b
 
+.. code-block:: haskell
+
     type C a b = (Num a, M a b)
+
+.. code-block:: haskell
 
     f :: C Int b => b -> Int -> Int
     f _ x = x + 1
@@ -287,6 +321,8 @@ The body of `f` requires a [W] `Num Int` instance. We could solve this
 constraint from the givens because we have `C Int b` and that provides us a
 solution for `Num Int`. This would let us produce core like the following
 (with -O2):
+
+.. code-block:: haskell
 
     f :: forall b. C Int b => b -> Int -> Int
     f = \ (@ b) ($d(%,%) :: C Int b) _ (eta1 :: Int) ->
@@ -297,6 +333,8 @@ solution for `Num Int`. This would let us produce core like the following
 
 This is bad! We could do /much/ better if we solved [W] `Num Int` directly
 from the instance that we have in scope:
+
+.. code-block:: haskell
 
     f :: forall b. C Int b => b -> Int -> Int
     f = \ (@ b) _ _ (x :: Int) ->
@@ -312,6 +350,8 @@ There is a reason why the solver does not simply try to solve such
 constraints with top-level instances. If the solver finds a relevant
 instance declaration in scope, that instance may require a context
 that can't be solved for. A good example of this is:
+
+.. code-block:: haskell
 
     f :: Ord [a] => ...
     f x = ..Need Eq [a]...
@@ -330,14 +370,20 @@ solvable from instances.
 
 An example that succeeds:
 
+.. code-block:: haskell
+
     class Eq a => C a b | b -> a where
       m :: b -> a
+
+.. code-block:: haskell
 
     f :: C [Int] b => b -> Bool
     f x = m x == []
 
 We solve for `Eq [Int]`, which requires `Eq Int`, which we also have. This
 produces the following core:
+
+.. code-block:: haskell
 
     f :: forall b. C [Int] b => b -> Bool
     f = \ (@ b) ($dC :: C [Int] b) (x :: b) ->
@@ -346,13 +392,19 @@ produces the following core:
 
 An example that fails:
 
+.. code-block:: haskell
+
     class Eq a => C a b | b -> a where
       m :: b -> a
+
+.. code-block:: haskell
 
     f :: C [a] b => b -> Bool
     f x = m x == []
 
 Which, because solving `Eq [a]` demands `Eq a` which we cannot solve, produces:
+
+.. code-block:: haskell
 
     f :: forall a b. C [a] b => b -> Bool
     f = \ (@ a) (@ b) ($dC :: C [a] b) (eta :: b) ->
@@ -397,8 +449,12 @@ on whether we apply this optimization when IncoherentInstances is in effect:
     {-# LANGUAGE MultiParamTypeClasses #-}
     module A where
 
+.. code-block:: haskell
+
     class A a where
       int :: a -> Int
+
+.. code-block:: haskell
 
     class A a => C a b where
       m :: b -> a -> a
@@ -407,10 +463,16 @@ on whether we apply this optimization when IncoherentInstances is in effect:
     {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
     module B where
 
+.. code-block:: haskell
+
     import A
+
+.. code-block:: haskell
 
     instance A a where
       int _ = 1
+
+.. code-block:: haskell
 
     instance C a [b] where
       m _ = id
@@ -420,13 +482,21 @@ on whether we apply this optimization when IncoherentInstances is in effect:
     {-# LANGUAGE IncoherentInstances #-}
     module C where
 
+.. code-block:: haskell
+
     import A
+
+.. code-block:: haskell
 
     instance A Int where
       int _ = 2
 
+.. code-block:: haskell
+
     instance C Int [Int] where
       m _ = id
+
+.. code-block:: haskell
 
     intC :: C Int a => a -> Int -> Int
     intC _ x = int x
@@ -434,9 +504,13 @@ on whether we apply this optimization when IncoherentInstances is in effect:
 #########
     module Main where
 
+.. code-block:: haskell
+
     import A
     import B
     import C
+
+.. code-block:: haskell
 
     main :: IO ()
     main = print (intC [] (0::Int))
@@ -463,6 +537,8 @@ Note that:
 * The (EvBindMap, DictMap CtEvidence) is an accumulating purely-functional
   state that allows try_solve_from_instance to augmennt the evidence
   bindings and inert_solved_dicts as it goes.
+
+.. code-block:: haskell
 
   If it succeeds, we commit all these bindings and solved dicts to the
   main TcS InertSet.  If not, we abandon it all entirely.
@@ -506,6 +582,8 @@ givens for the same implicit parameter.
 
 Similarly, consider
    f :: (?x::a) => Bool -> a
+
+.. code-block:: haskell
 
    g v = let ?x::Int = 3
          in (f v, let ?x::Bool = True in f v)
@@ -603,6 +681,8 @@ will set
 and what is g? Well it would ideally be a new goal of type (F a ~ beta2) but
 remember that we have this in our solved cache, and it is ... g2! In short we
 created the evidence loop:
+
+.. code-block:: haskell
 
         g2 := g1 ; g3
         g3 := refl
@@ -715,11 +795,15 @@ Currently, our story of interacting two dictionaries (or a dictionary
 and top-level instances) for functional dependencies, and implicit
 parameters, is that we simply produce new Derived equalities.  So for example
 
+.. code-block:: haskell
+
         class D a b | a -> b where ...
     Inert:
         d1 :g D Int Bool
     WorkItem:
         d2 :w D Int alpha
+
+.. code-block:: haskell
 
     We generate the extra work item
         cv :d alpha ~ Bool
@@ -736,6 +820,8 @@ evidence and derived do not carry evidence.
 
 If that were the case with the same inert set and work item we might dischard
 d2 directly:
+
+.. code-block:: haskell
 
         cv :w alpha ~ Bool
         d2 := d1 |> D Int cv
@@ -762,6 +848,8 @@ Note [Weird fundeps]
 ~~~~~~~~~~~~~~~~~~~~
 Consider   class Het a b | a -> b where
               het :: m (f c) -> a -> m b
+
+.. code-block:: haskell
 
            class GHet (a :: * -> *) (b :: * -> *) | a -> b
            instance            GHet (K a) (K [a])
@@ -804,11 +892,15 @@ Here is what we do, in four cases:
     (work item) [W]        x : F tys ~ fmv
     instantiate axiom: ax_co : F tys ~ rhs
 
+.. code-block:: haskell
+
    Then:
       Discharge   fmv := rhs
       Discharge   x := ax_co ; sym x2
    This is *the* way that fmv's get unified; even though they are
    "untouchable".
+
+.. code-block:: haskell
 
    NB: Given Note [FunEq occurs-check principle], fmv does not appear
    in tys, and hence does not appear in the instantiated RHS.  So
@@ -829,6 +921,8 @@ Here is what we do, in four cases:
 * Givens: general firing rule
       (work item)        [G] g : F tys ~ fsk
       instantiate axiom: ax_co : F tys ~ rhs
+
+.. code-block:: haskell
 
    Now add non-canonical given (since rhs is not flat)
       [G] (sym g ; ax_co) : fsk ~ rhs  (Non-canonical)
@@ -857,7 +951,11 @@ hard to find examples where it is useful, and easy to find examples
 where we fall into an infinite reduction loop.  A rule that works
 very well is this:
 
+.. code-block:: haskell
+
   *** FunEq occurs-check principle ***
+
+.. code-block:: haskell
 
       Do not reduce a CFunEqCan
           F tys ~ fsk
@@ -904,10 +1002,14 @@ arising from injectivity improvement (#12522).  Suppse we have
   type instance F (a, Int) = (Int, G a)
 where G is injective; and wanted constraints
 
+.. code-block:: haskell
+
   [W] TF (alpha, beta) ~ fuv
   [W] fuv ~ (Int, <some type>)
 
 The injectivity will give rise to derived constraints
+
+.. code-block:: haskell
 
   [D] gamma1 ~ alpha
   [D] Int ~ beta
@@ -949,6 +1051,8 @@ We don't do improvements (injectivity etc) for Givens. Why?
   InertCans (after solving Givens) are used for each iteration, that
   massively confused the unflattening step (TcFlatten.unflatten).
 
+.. code-block:: haskell
+
   In fact it led to some infinite loops:
      indexed-types/should_compile/T10806
      indexed-types/should_compile/T10507
@@ -961,6 +1065,8 @@ Note [Reduction for Derived CFunEqCans]
 You may wonder if it's important to use top-level instances to
 simplify [D] CFunEqCan's.  But it is.  Here's an example (T10226).
 
+.. code-block:: haskell
+
    type instance F    Int = Int
    type instance FInv Int = Int
 
@@ -968,11 +1074,15 @@ Suppose we have to solve
     [WD] FInv (F alpha) ~ alpha
     [WD] F alpha ~ Int
 
+.. code-block:: haskell
+
   --> flatten
     [WD] F alpha ~ fuv0
     [WD] FInv fuv0 ~ fuv1  -- (A)
     [WD] fuv1 ~ alpha
     [WD] fuv0 ~ Int        -- (B)
+
+.. code-block:: haskell
 
   --> Rewwrite (A) with (B), splitting it
     [WD] F alpha ~ fuv0
@@ -980,6 +1090,8 @@ Suppose we have to solve
     [D] FInv Int ~ fuv1    -- (C)
     [WD] fuv1 ~ alpha
     [WD] fuv0 ~ Int
+
+.. code-block:: haskell
 
   --> Reduce (C) with top-level instance
       **** This is the key step ***
@@ -989,12 +1101,16 @@ Suppose we have to solve
     [WD] fuv1 ~ alpha     -- (E)
     [WD] fuv0 ~ Int
 
+.. code-block:: haskell
+
   --> Rewrite (D) with (E)
     [WD] F alpha ~ fuv0
     [W] FInv fuv0 ~ fuv1
     [D] alpha ~ Int       -- (F)
     [WD] fuv1 ~ alpha
     [WD] fuv0 ~ Int
+
+.. code-block:: haskell
 
   --> unify (F)  alpha := Int, and that solves it
 
@@ -1027,7 +1143,11 @@ Example, from the OutsideIn(X) paper:
        instance P x => Q [x]
        instance (x ~ y) => R y [x]
 
+.. code-block:: haskell
+
        wob :: forall a b. (Q [b], R b a) => a -> Int
+
+.. code-block:: haskell
 
        g :: forall a. Q [a] => [a] -> Int
        g x = wob x
@@ -1044,6 +1164,8 @@ The partial solution is that:
   In matchClassInst (and thus in topReact), we return a matching
   instance only when there is no Given in the inerts which is
   unifiable to this particular dictionary.
+
+.. code-block:: haskell
 
   We treat any meta-tyvar as "unifiable" for this purpose,
   *including* untouchable ones.  But not skolems like 'a' in
@@ -1084,9 +1206,13 @@ Other notes:
   the top-level overlapping checks. There we are interested in
   validating the following principle:
 
+.. code-block:: haskell
+
       If we inline a function f at a site where the same global
       instance environment is available as the instance environment at
       the definition site of f then we should get the same behaviour.
+
+.. code-block:: haskell
 
   But for the Given Overlap check our goal is just related to completeness of
   constraint solving.

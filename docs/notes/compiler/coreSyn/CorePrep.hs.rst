@@ -4,13 +4,19 @@ Note [CorePrep invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here is the syntax of the Core produced by CorePrep:
 
+.. code-block:: haskell
+
     Trivial expressions
        arg ::= lit |  var
               | arg ty  |  /\a. arg
               | truv co  |  /\c. arg  |  arg |> co
 
+.. code-block:: haskell
+
     Applications
        app ::= lit  |  var  |  app arg  |  app ty  | app co | app |> co
+
+.. code-block:: haskell
 
     Expressions
        body ::= app
@@ -18,6 +24,8 @@ Here is the syntax of the Core produced by CorePrep:
               | case body of pat -> body
               | /\a. body | /\c. body
               | body |> co
+
+.. code-block:: haskell
 
     Right hand sides (only place where value lambdas can occur)
        rhs ::= /\a.rhs  |  \x.rhs  |  body
@@ -66,8 +74,12 @@ b) The top-level binding is marked NoCafRefs.  This really happens
       sat [NoCafRefs] = \xy. retry x y
       $fApplicativeSTM [NoCafRefs] = D:Alternative sat ...blah...
 
+.. code-block:: haskell
+
    So, gruesomely, we must set the NoCafRefs flag on the sat bindings,
    *and* substitute the modified 'sat' into the old RHS.
+
+.. code-block:: haskell
 
    It should be the case that 'sat' is itself [NoCafRefs] (a value, no
    cafs) else the original top-level binding would not itself have been
@@ -83,6 +95,8 @@ Meanwhile this horrible hack works.
 Note [Join points and floating]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Join points can float out of other join points but not out of value bindings:
+
+.. code-block:: haskell
 
   let z =
     let  w = ... in -- can float
@@ -111,6 +125,8 @@ Note [Data constructor workers]
 Create any necessary "implicit" bindings for data con workers.  We
 create the rather strange (non-recursive!) binding
 
+.. code-block:: haskell
+
         $wC = \x y -> $wC x y
 
 i.e. a curried constructor that allocates.  This means that we can
@@ -130,6 +146,8 @@ Note [Dead code in CorePrep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Imagine that we got an input program like this (see #4962):
 
+.. code-block:: haskell
+
   f :: Show b => Int -> (Int, b -> Maybe Int -> Int)
   f x = (g True (Just x) + g () (Just x), g)
     where
@@ -138,6 +156,8 @@ Imagine that we got an input program like this (see #4962):
       g y (Just z) = if z > 100 then g y (Just (z + length (show y))) else g y unknown
 
 After specialisation and SpecConstr, we would get something like this:
+
+.. code-block:: haskell
 
   f :: Show b => Int -> (Int, b -> Maybe Int -> Int)
   f x = (g$Bool_True_Just x + g$Unit_Unit_Just x, g)
@@ -177,11 +197,15 @@ don't show up in the free variables any longer. So if you run the
 occurrence analyser on the output of CoreTidy (or later) you e.g. turn
 this program:
 
+.. code-block:: haskell
+
   Rec {
   f = ... f ...
   }
 
 Into this one:
+
+.. code-block:: haskell
 
   f = ... f ...
 
@@ -214,6 +238,8 @@ However, for code gen purposes, its arity must be exactly the number of value
 arguments it will be called with, and it must have exactly that many value
 lambdas. Hence if there are extra lambdas we must let-bind the body of the RHS:
 
+.. code-block:: haskell
+
   join j x y z = \w -> ... in ...
     =>
   join j x y z = (let f = \w -> ... in f) in ...
@@ -241,11 +267,15 @@ Note [runRW magic]
 Some definitions, for instance @runST@, must have careful control over float out
 of the bindings in their body. Consider this use of @runST@,
 
+.. code-block:: haskell
+
     f x = runST ( \ s -> let (a, s')  = newArray# 100 [] s
                              (_, s'') = fill_in_array_or_something a x s'
                          in freezeArray# a s'' )
 
 If we inline @runST@, we'll get:
+
+.. code-block:: haskell
 
     f x = let (a, s')  = newArray# 100 [] realWorld#{-NB-}
               (_, s'') = fill_in_array_or_something a x s'
@@ -253,6 +283,8 @@ If we inline @runST@, we'll get:
 
 And now if we allow the @newArray#@ binding to float out to become a CAF,
 we end up with a result that is totally and utterly wrong:
+
+.. code-block:: haskell
 
     f = let (a, s')  = newArray# 100 [] realWorld#{-NB-} -- YIKES!!!
         in \ x ->
@@ -269,6 +301,8 @@ no further floating will occur. This allows us to safely inline things like
 
 'runRW' is defined (for historical reasons) in GHC.Magic, with a NOINLINE
 pragma.  It is levity-polymorphic.
+
+.. code-block:: haskell
 
     runRW# :: forall (r1 :: RuntimeRep). (o :: TYPE r)
            => (State# RealWorld -> (# State# RealWorld, o #))
@@ -288,12 +322,18 @@ Note [ANF-ising literal string arguments]
 
 Consider a program like,
 
+.. code-block:: haskell
+
     data Foo = Foo Addr#
+
+.. code-block:: haskell
 
     foo = Foo "turtle"#
 
 When we go to ANFise this we might think that we want to float the string
 literal like we do any other non-trivial argument. This would look like,
+
+.. code-block:: haskell
 
     foo = u\ [] case "turtle"# of s { __DEFAULT__ -> Foo s }
 
@@ -301,6 +341,8 @@ However, this 1) isn't necessary since strings are in a sense "trivial"; and 2)
 wreaks havoc on the CAF annotations that we produce here since we the result
 above is caffy since it is updateable. Ideally at some point in the future we
 would like to just float the literal to the top level as suggested in #11312,
+
+.. code-block:: haskell
 
     s = "turtle"#
     foo = Foo s
@@ -316,6 +358,8 @@ Consider    C (let v* = expensive in v)
 where the "*" indicates "will be demanded".  Usually v will have been
 inlined by now, but let's suppose it hasn't (see #2756).  Then we
 do *not* want to get
+
+.. code-block:: haskell
 
      let v* = expensive in C v
 
@@ -381,6 +425,8 @@ There is a subtle but important invariant that must be upheld in the output
 of CorePrep: there are no "trivial" updatable thunks.  Thus, this Core
 is impermissible:
 
+.. code-block:: haskell
+
      let x :: ()
          x = y
 
@@ -395,6 +441,8 @@ In general, the inliner is good at eliminating these let-bindings.  However,
 there is one case where these trivial updatable thunks can arise: when
 we are optimizing away 'lazy' (see Note [lazyId magic], and also
 'cpeRhsE'.)  Then, we could have started with:
+
+.. code-block:: haskell
 
      let x :: ()
          x = lazy @ () y
@@ -428,6 +476,8 @@ IdEnv Id?  Naively, we might conjecture that trivial updatable thunks
 as per Note [Inlining in CorePrep] always have the form
 'lazy @ SomeType gbl_id'.  But this is not true: the following is
 perfectly reasonable Core:
+
+.. code-block:: haskell
 
      let x :: ()
          x = lazy @ (forall a. a) y @ Bool

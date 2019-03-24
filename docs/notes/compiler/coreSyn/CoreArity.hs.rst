@@ -4,15 +4,25 @@ Note [exprArity invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 exprArity has the following invariant:
 
+.. code-block:: haskell
+
   (1) If typeArity (exprType e) = n,
       then manifestArity (etaExpand e n) = n
+
+.. code-block:: haskell
 
       That is, etaExpand can always expand as much as typeArity says
       So the case analysis in etaExpand and in typeArity must match
 
+.. code-block:: haskell
+
   (2) exprArity e <= typeArity (exprType e)
 
+.. code-block:: haskell
+
   (3) Hence if (exprArity e) = n, then manifestArity (etaExpand e n) = n
+
+.. code-block:: haskell
 
       That is, if exprArity says "the arity is n" then etaExpand really
       can get "n" manifest lambdas to the top.
@@ -41,16 +51,24 @@ We have to be careful when eta-expanding through newtypes.  In general
 it's a good idea, but annoyingly it interacts badly with the class-op
 rule mechanism.  Consider
 
+.. code-block:: haskell
+
    class C a where { op :: a -> a }
    instance C b => C [b] where
      op x = ...
 
 These translate to
 
+.. code-block:: haskell
+
    co :: forall a. (a->a) ~ C a
+
+.. code-block:: haskell
 
    $copList :: C b -> [b] -> [b]
    $copList d x = ...
+
+.. code-block:: haskell
 
    $dfList :: C b -> C [b]
    {-# DFunUnfolding = [$copList] #-}
@@ -58,7 +76,11 @@ These translate to
 
 Now suppose we have:
 
+.. code-block:: haskell
+
    dCInt :: C Int
+
+.. code-block:: haskell
 
    blah :: [Int] -> [Int]
    blah = op ($dfList dCInt)
@@ -68,6 +90,8 @@ Now we want the built-in op/$dfList rule will fire to give
 
 But with eta-expansion 'blah' might (and in #3772, which is
 slightly more complicated, does) turn into
+
+.. code-block:: haskell
 
    blah = op (\eta. ($dfList dCInt |> sym co) eta)
 
@@ -108,6 +132,8 @@ The "arity" of an expression 'e' is n if
 
 Or, to put it another way
 
+.. code-block:: haskell
+
    there is no work lost in duplicating the partial
    application (e x1 .. x(n-1))
 
@@ -115,6 +141,8 @@ In the divegent case, no work is lost by duplicating because if the thing
 is evaluated once, that's the end of the program.
 
 Or, to put it another way, in any context C
+
+.. code-block:: haskell
 
    C[ (\x1 .. xn. e x1 .. xn) ]
          is as efficient as
@@ -135,6 +163,8 @@ We want this to have arity 1 if the \y-abstraction is a 1-shot lambda.
 Note [Dealing with bottom]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 A Big Deal with computing arities is expressions like
+
+.. code-block:: haskell
 
    f = \x -> case x of
                True  -> \s -> e1
@@ -168,9 +198,13 @@ So these two transformations aren't always the Right Thing, and we
 have several tickets reporting unexpected behaviour resulting from
 this transformation.  So we try to limit it as much as possible:
 
+.. code-block:: haskell
+
  (1) Do NOT move a lambda outside a known-bottom case expression
        case undefined of { (a,b) -> \y -> e }
      This showed up in #5557
+
+.. code-block:: haskell
 
  (2) Do NOT move a lambda outside a case if all the branches of
      the case are known to return bottom.
@@ -178,6 +212,8 @@ this transformation.  So we try to limit it as much as possible:
      This case is less important, but the idea is that if the fn is
      going to diverge eventually anyway then getting the best arity
      isn't an issue, so we might as well play safe
+
+.. code-block:: haskell
 
  (3) Do NOT move a lambda outside a case unless
      (a) The scrutinee is ok-for-speculation, or
@@ -191,6 +227,8 @@ Of course both (1) and (2) are readily defeated by disguising the bottoms.
 Non-recursive newtypes are transparent, and should not get in the way.
 We do (currently) eta-expand recursive newtypes too.  So if we have, say
 
+.. code-block:: haskell
+
         newtype T = MkT ([T] -> Int)
 
 Suppose we have
@@ -200,6 +238,8 @@ that is, etaExpandArity looks through the coerce.
 
 When we eta-expand e to arity 1: eta_expand 1 e T
 we want to get:                  coerce T (\x::[T] -> (coerce ([T]->Int) e) x)
+
+.. code-block:: haskell
 
   HOWEVER, note that if you use coerce bogusly you can ge
         coerce Int negate
@@ -235,10 +275,14 @@ Note [State hack and bottoming functions]
 It's a terrible idea to use the state hack on a bottoming function.
 Here's what happens (#2861):
 
+.. code-block:: haskell
+
   f :: String -> IO T
   f = \p. error "..."
 
 Eta-expand, using the state hack:
+
+.. code-block:: haskell
 
   f = \p. (\s. ((error "...") |> g1) s) |> g2
   g1 :: IO T ~ (S -> (S,T))
@@ -246,15 +290,21 @@ Eta-expand, using the state hack:
 
 Extrude the g2
 
+.. code-block:: haskell
+
   f' = \p. \s. ((error "...") |> g1) s
   f = f' |> (String -> g2)
 
 Discard args for bottomming function
 
+.. code-block:: haskell
+
   f' = \p. \s. ((error "...") |> g1 |> g3
   g3 :: (S -> (S,T)) ~ (S,T)
 
 Extrude g1.g3
+
+.. code-block:: haskell
 
   f'' = \p. \s. (error "...")
   f' = f'' |> (String -> S -> g1.g3)
@@ -264,14 +314,20 @@ state hack to a function which then swallows the argument.
 
 This arose in another guise in #3959.  Here we had
 
+.. code-block:: haskell
+
      catch# (throw exn >> return ())
 
 Note that (throw :: forall a e. Exn e => e -> a) is called with [a = IO ()].
 After inlining (>>) we get
 
+.. code-block:: haskell
+
      catch# (\_. throw {IO ()} exn)
 
 We must *not* eta-expand to
+
+.. code-block:: haskell
 
      catch# (\_ _. throw {...} exn)
 
@@ -296,6 +352,8 @@ ArityType 'at', then
  * If at = ABot n, then (f x1..xn) definitely diverges. Partial
    applications to fewer than n args may *or may not* diverge.
 
+.. code-block:: haskell
+
    We allow ourselves to eta-expand bottoming functions, even
    if doing so may lose some `seq` sharing,
        let x = <expensive> in \y. error (g x y)
@@ -305,6 +363,8 @@ ArityType 'at', then
    then expanding 'f' to (\x1..xn. f x1 .. xn) loses no sharing,
    assuming the calls of f respect the one-shot-ness of
    its definition.
+
+.. code-block:: haskell
 
    NB 'f' is an arbitrary expression, eg (f = g e1 e2).  This 'f'
    can have ArityType as ATop, with length as > 0, only if e1 e2 are
@@ -337,6 +397,8 @@ See Note [ArityType]
 Note [Arity analysis]
 ~~~~~~~~~~~~~~~~~~~~~
 The motivating example for arity analysis is this:
+
+.. code-block:: haskell
 
   f = \x. let g = f (x+1)
           in \y. ...g...
@@ -374,6 +436,8 @@ can thereby lose opportunities for fusion.  Example:
         foo :: Ord a => a -> ...
      foo = /\a \(d:Ord a). let d' = ...d... in \(x:a). ....
         -- So foo has arity 1
+
+.. code-block:: haskell
 
      f = \x. foo dInt $ bar x
 
@@ -496,9 +560,13 @@ CorePrep puts floatable ticks outside of value applications, but not
 type applications. As a result we might be trying to eta-expand an
 expression like
 
+.. code-block:: haskell
+
   (src<...> v) @a
 
 which we want to lead to code like
+
+.. code-block:: haskell
 
   \x -> src<...> v @a x
 

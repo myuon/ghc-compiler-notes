@@ -10,8 +10,12 @@ The overall plan is this:
        M.$trModule = Module "p" "M"
    ("tr" is short for "type representation"; see GHC.Types)
 
+.. code-block:: haskell
+
    We might want to add the filename too.
    This can be used for the lightweight stack-tracing stuff too
+
+.. code-block:: haskell
 
    Record the Name M.$trModule in the tcg_tr_module field of TcGblEnv
 
@@ -23,14 +27,22 @@ The overall plan is this:
                       0#
                       kind_rep
 
+.. code-block:: haskell
+
    Here 0# is the number of arguments expected by the tycon to fully determine
    its kind. kind_rep is a value of type GHC.Types.KindRep, which gives a
    recipe for computing the kind of an instantiation of the tycon (see
    Note [Representing TyCon kinds: KindRep] later in this file for details).
 
+.. code-block:: haskell
+
    We define (in TyCon)
 
+.. code-block:: haskell
+
         type TyConRepName = Name
+
+.. code-block:: haskell
 
    to use for these M.$tcT "tycon rep names". Note that these must be
    treated as "never exported" names by Backpack (see
@@ -39,6 +51,8 @@ The overall plan is this:
 
 3. Record the TyConRepName in T's TyCon, including for promoted
    data and type constructors, and kinds like * and #.
+
+.. code-block:: haskell
 
    The TyConRepName is not an "implicit Id".  It's more like a record
    selector: the TyCon knows its name but you have to go to the
@@ -86,6 +100,8 @@ There are many wrinkles:
   N promoted datacons, each with a KindRep whose size also scales with N.
   Consequently we currently simply don't allow sums to be Typeable.
 
+.. code-block:: haskell
+
   In general we might consider moving some or all of this generation logic back
   to the solver since the performance hit we take in doing this at
   type-definition time is non-trivial and Typeable isn't very widely used. This
@@ -97,18 +113,26 @@ Note [Representing TyCon kinds: KindRep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 One of the operations supported by Typeable is typeRepKind,
 
+.. code-block:: haskell
+
     typeRepKind :: TypeRep (a :: k) -> TypeRep k
 
 Implementing this is a bit tricky for poly-kinded types like
+
+.. code-block:: haskell
 
     data Proxy (a :: k) :: Type
     -- Proxy :: forall k. k -> Type
 
 The TypeRep encoding of `Proxy Type Int` looks like this:
 
+.. code-block:: haskell
+
     $tcProxy :: GHC.Types.TyCon
     $trInt   :: TypeRep Int
     TrType   :: TypeRep Type
+
+.. code-block:: haskell
 
     $trProxyType :: TypeRep (Proxy Type :: Type -> Type)
     $trProxyType = TrTyCon $tcProxy
@@ -116,8 +140,12 @@ The TypeRep encoding of `Proxy Type Int` looks like this:
                            (tyConKind $tcProxy [TrType]) -- The TypeRep of
                                                          -- Type -> Type
 
+.. code-block:: haskell
+
     $trProxy :: TypeRep (Proxy Type Int)
     $trProxy = TrApp $trProxyType $trInt TrType
+
+.. code-block:: haskell
 
     $tkProxy :: GHC.Types.KindRep
     $tkProxy = KindRepFun (KindRepVar 0)
@@ -138,12 +166,18 @@ polymorphic types.  So instead
    argument kinds, using Data.Typeable.Internal.tyConKind and
    store in the relevant 'TypeRep' constructor.
 
+.. code-block:: haskell
+
    Data.Typeable.Internal.typeRepKind looks up the stored kinds.
 
  * In a KindRep, the kind variables are represented by 0-indexed
    de Bruijn numbers:
 
+.. code-block:: haskell
+
     type KindBndr = Int   -- de Bruijn index
+
+.. code-block:: haskell
 
     data KindRep = KindRepTyConApp TyCon [KindRep]
                  | KindRepVar !KindBndr

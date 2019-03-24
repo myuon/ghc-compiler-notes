@@ -152,6 +152,8 @@ Note [Looking up family names in family instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
 
+.. code-block:: haskell
+
   module M where
     type family T a :: *
     type instance M.T Int = Bool
@@ -206,6 +208,8 @@ although we never look up data constructors.
 Note [Children for duplicate record fields]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider the module
+
+.. code-block:: haskell
 
     {-# LANGUAGE DuplicateRecordFields #-}
     module M (F(foo, MkFInt, MkFBool)) where
@@ -266,9 +270,13 @@ Note [Partial export]
 ~~~~~~~~~~~~~~~~~~~~~
 Suppose we have
 
+.. code-block:: haskell
+
    module A( op ) where
      class C a where
        op :: a -> a
+
+.. code-block:: haskell
 
    module B where
    import A
@@ -288,9 +296,13 @@ Note [Overloaded field import]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 On the other hand, if we have
 
+.. code-block:: haskell
+
     {-# LANGUAGE DuplicateRecordFields #-}
     module A where
       data T = MkT { foo :: Int }
+
+.. code-block:: haskell
 
     module B where
       import A

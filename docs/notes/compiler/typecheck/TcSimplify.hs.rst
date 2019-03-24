@@ -184,6 +184,8 @@ How is this implemented? It's complicated! So we'll step through it all:
      compilation should fail. These are handled as normal constraint resolution
      failures from here-on (see step 6).
 
+.. code-block:: haskell
+
      Otherwise, we may be inferring safety (or using `-Wunsafe`), and
      compilation should succeed, but print warnings and/or mark the compiled module
      as `-XUnsafe`. In this case, we call `insertSafeOverlapFailureTcS` which adds
@@ -371,8 +373,12 @@ If the monomorphism restriction does not apply, then we quantify as follows:
           beta, because alpha fixes beta, and beta is effectively free in
           the environment too
 
+.. code-block:: haskell
+
   We also account for the monomorphism restriction; if it applies,
   add the free vars of all the constraints.
+
+.. code-block:: haskell
 
   Result is mono_tvs; we will not quantify over these.
 
@@ -380,11 +386,15 @@ If the monomorphism restriction does not apply, then we quantify as follows:
   not going to become further constrained), and re-simplify the
   candidate constraints.
 
+.. code-block:: haskell
+
   Motivation for re-simplification (#7857): imagine we have a
   constraint (C (a->b)), where 'a :: TYPE l1' and 'b :: TYPE l2' are
   not free in the envt, and instance forall (a::*) (b::*). (C a) => C
   (a -> b) The instance doesn't match while l1,l2 are polymorphic, but
   it will match when we default them to LiftedRep.
+
+.. code-block:: haskell
 
   This is all very tiresome.
 
@@ -396,6 +406,8 @@ If the monomorphism restriction does not apply, then we quantify as follows:
   - Use quantifyTyVars to quantify over (tau_tvs_plus - mono_tvs), being
     careful to close over kinds, and to skolemise the quantified tyvars.
     (This actually unifies each quantifies meta-tyvar with a fresh skolem.)
+
+.. code-block:: haskell
 
   Result is qtvs.
 
@@ -464,6 +476,8 @@ sure to quantify over them.  This leads to several wrinkles:
      f :: Eq alpha => Int -> Int
   which isn't ambiguous but is still very wrong.
 
+.. code-block:: haskell
+
   Bottom line: Try to quantify over any variable free in psig_theta,
   just like the tau-part of the type.
 
@@ -480,6 +494,8 @@ sure to quantify over them.  This leads to several wrinkles:
       where
         g :: forall b. Num b => _ -> b
         g y = xxx + y
+
+.. code-block:: haskell
 
   In the signature for 'g', we cannot quantify over 'b' because it turns out to
   get unified with 'a', which is free in g's environment.  So we carefully
@@ -600,6 +616,8 @@ try to avoid unnecessarily simplifying class constraints.
 Doing so aids sharing, but it also helps with delicate
 situations like
 
+.. code-block:: haskell
+
    instance C t => C [t] where ..
 
    f :: C [t] => ....
@@ -639,6 +657,8 @@ code, but:
  * Simply generating all those extra superclasses can generate lots of
    code that has to be zonked, only to be discarded later.  Better not
    to generate it in the first place.
+
+.. code-block:: haskell
 
    Moreover, if we simplify this implication more than once
    (e.g. because we can't solve it completely on the first iteration
@@ -740,6 +760,8 @@ works:
         - TcBinds.tcSpecPrag
         - TcBinds.tcTySig
 
+.. code-block:: haskell
+
   This decision is taken in setImplicationStatus, rather than TcErrors
   so that we can discard implication constraints that we don't need.
   So ics_dead consists only of the *reportable* redundant givens.
@@ -806,7 +828,11 @@ There is one caveat:
          TInt :: T Int
          MkT :: T a
 
+.. code-block:: haskell
+
        f TInt = 3::Int
+
+.. code-block:: haskell
 
     We get the implication (a ~ Int => res ~ Int), where so far we've decided
       f :: T a -> res
@@ -815,6 +841,8 @@ There is one caveat:
     which is only on of the possible types. (GHC 7.6 accidentally *did*
     float out of such implications, which meant it would happily infer
     non-principal types.)
+
+.. code-block:: haskell
 
    HOWEVER (#12797) in findDefaultableGroups we are not worried about
    the most-general type; and we /do/ want to float out of equalities.
@@ -832,6 +860,8 @@ There used to be a second caveat, driven by #8155
           Can't solve  F a ~ Integer
       rather than
           Can't solve  Integral (F a)
+
+.. code-block:: haskell
 
       Moreover, floating out these "contaminated" constraints doesn't help
       when generalising either. If we generalise over (Integral b), we still
@@ -855,6 +885,8 @@ defaultTyVar is used on any un-instantiated meta type variables to
 default any RuntimeRep variables to LiftedRep.  This is important
 to ensure that instance declarations match.  For example consider
 
+.. code-block:: haskell
+
      instance Show (a->b)
      foo x = show (\_ -> True)
 
@@ -877,9 +909,13 @@ Note [Promote _and_ default when inferring]
 When we are inferring a type, we simplify the constraint, and then use
 approximateWC to produce a list of candidate constraints.  Then we MUST
 
+.. code-block:: haskell
+
   a) Promote any meta-tyvars that have been floated out by
      approximateWC, to restore invariant (WantedInv) described in
      Note [TcLevel and untouchable type variables] in TcType.
+
+.. code-block:: haskell
 
   b) Default the kind of any meta-tyvars that are not mentioned in
      in the environment.
@@ -903,8 +939,12 @@ TcType.  for the leftover implication.
 This is absolutely necessary. Consider the following example. We start
 with two implications and a class with a functional dependency.
 
+.. code-block:: haskell
+
     class C x y | x -> y
     instance C [a] [a]
+
+.. code-block:: haskell
 
     (I1)      [untch=beta]forall b. 0 => F Int ~ [beta]
     (I2)      [untch=beta]forall c. 0 => F Int ~ [[alpha]] /\ C beta [c]
@@ -915,18 +955,30 @@ the leftover of I2 to get (C [alpha] [a]) which, using the FunDep, will mean tha
 (alpha := a). In the end we will have the skolem 'b' escaping in the untouchable
 beta! Concrete example is in indexed_types/should_fail/ExtraTcsUntch.hs:
 
+.. code-block:: haskell
+
     class C x y | x -> y where
      op :: x -> y -> ()
 
+.. code-block:: haskell
+
     instance C [a] [a]
 
+.. code-block:: haskell
+
     type family F a :: *
+
+.. code-block:: haskell
 
     h :: F Int -> ()
     h = undefined
 
+.. code-block:: haskell
+
     data TEx where
       TEx :: a -> TEx
+
+.. code-block:: haskell
 
     f (x::beta) =
         let g1 :: forall b. b -> ()
@@ -953,12 +1005,18 @@ longer untouchable, to solve the implication!
 But we cannot float equalities out of implications whose givens may
 yield or contain equalities:
 
+.. code-block:: haskell
+
       data T a where
         T1 :: T Int
         T2 :: T Bool
         T3 :: T a
 
+.. code-block:: haskell
+
       h :: T a -> a -> Int
+
+.. code-block:: haskell
 
       f x y = case x of
                 T1 -> y::Int
@@ -1027,6 +1085,8 @@ happen.  In particular, float out equalities that are:
   If we float out a hetero equality, then it will spit out the same
   derived kind equality again, which might create duplicate error
   messages.
+
+.. code-block:: haskell
 
   Instead, we do float out the kind equality (if it's worth floating
   out, as above). If/when we solve it, we'll be able to rewrite the
@@ -1115,17 +1175,27 @@ constraints, but do not exclude from defaulting any type variables which also
 appear in multi-variable constraints. This means that the following will
 default properly:
 
+.. code-block:: haskell
+
    default (Integer, Double)
+
+.. code-block:: haskell
 
    class A b (c :: Symbol) where
       a :: b -> Proxy c
 
+.. code-block:: haskell
+
    instance A Integer c where a _ = Proxy
+
+.. code-block:: haskell
 
    main = print (a 5 :: Proxy "5")
 
 Note that if we change the above instance ("instance A Integer") to
 "instance A Double", we get an error:
+
+.. code-block:: haskell
 
    No instance for (A Integer "5")
 

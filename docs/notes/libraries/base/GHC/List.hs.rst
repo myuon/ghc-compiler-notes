@@ -90,6 +90,8 @@ NB: Zips for larger tuples are in the List module.
     zip xs ys = build (\c n -> foldr2 (zipFB c) n xs ys)
   See also Note [Inline FB functions]
 
+.. code-block:: haskell
+
   Ditto rule "zipWith".
 
 * To give this rule a chance to fire, we give zip a NOLINLINE[1]

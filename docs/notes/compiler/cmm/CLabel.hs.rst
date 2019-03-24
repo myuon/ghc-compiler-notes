@@ -40,6 +40,8 @@ For a data constructor (such as Just or Nothing), we have:
                       Just = \x -> Just x
     Just_closure:  The closure for this worker
 
+.. code-block:: haskell
+
     Nothing_closure: a statically allocated closure for Nothing
     Nothing_static_info: info table for Nothing_closure
 

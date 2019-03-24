@@ -101,6 +101,8 @@ The interactively issued declarations, statements, as well as the modules
 loaded into GHCi, are not affected. That means, for declaration, you could
 have
 
+.. code-block:: haskell
+
     Prelude> :set -fdefer-type-errors
     Prelude> x :: IO (); x = putStrLn True
     <interactive>:14:26: warning: [-Wdeferred-type-errors]
@@ -113,6 +115,8 @@ have
 
 But for naked expressions, you will have
 
+.. code-block:: haskell
+
     Prelude> :set -fdefer-type-errors
     Prelude> putStrLn True
     <interactive>:2:10: error:
@@ -122,6 +126,8 @@ But for naked expressions, you will have
         ? In the first argument of ‘putStrLn’, namely ‘True’
           In the expression: putStrLn True
           In an equation for ‘it’: it = putStrLn True
+
+.. code-block:: haskell
 
     Prelude> let x = putStrLn True
     <interactive>:2:18: warning: [-Wdeferred-type-errors]
@@ -159,18 +165,26 @@ How should we infer a type when a user asks for the type of an expression e
 at the GHCi prompt? We offer 3 different possibilities, described below. Each
 considers this example, with -fprint-explicit-foralls enabled:
 
+.. code-block:: haskell
+
   foo :: forall a f b. (Show a, Num b, Foldable f) => a -> f b -> String
   :type{,-spec,-def} foo @Int
 
 :type / TM_Inst
+
+.. code-block:: haskell
 
   In this mode, we report the type that would be inferred if a variable
   were assigned to expression e, without applying the monomorphism restriction.
   This means we deeply instantiate the type and then regeneralize, as discussed
   in #11376.
 
+.. code-block:: haskell
+
   > :type foo @Int
   forall {b} {f :: * -> *}. (Foldable f, Num b) => Int -> f b -> String
+
+.. code-block:: haskell
 
   Note that the variables and constraints are reordered here, because this
   is possible during regeneralization. Also note that the variables are
@@ -178,17 +192,25 @@ considers this example, with -fprint-explicit-foralls enabled:
 
 :type +v / TM_NoInst
 
+.. code-block:: haskell
+
   This mode is for the benefit of users using TypeApplications. It does no
   instantiation whatsoever, sometimes meaning that class constraints are not
   solved.
 
+.. code-block:: haskell
+
   > :type +v foo @Int
   forall f b. (Show Int, Num b, Foldable f) => Int -> f b -> String
+
+.. code-block:: haskell
 
   Note that Show Int is still reported, because the solver never got a chance
   to see it.
 
 :type +d / TM_Default
+
+.. code-block:: haskell
 
   This mode is for the benefit of users who wish to see instantiations of
   generalized types, and in particular to instantiate Foldable and Traversable.
@@ -196,15 +218,23 @@ considers this example, with -fprint-explicit-foralls enabled:
   GHCi uses -XExtendedDefaultRules, this means that Foldable and Traversable are
   defaulted.
 
+.. code-block:: haskell
+
   > :type +d foo @Int
   Int -> [Integer] -> String
+
+.. code-block:: haskell
 
   Note that this mode can sometimes lead to a type error, if a type variable is
   used with a defaultable class but cannot actually be defaulted:
 
+.. code-block:: haskell
+
   bar :: (Num a, Monoid a) => a -> a
   > :type +d bar
   ** error **
+
+.. code-block:: haskell
 
   The error arises because GHC tries to default a but cannot find a concrete
   type in the defaulting list that is both Num and Monoid. (If this list is

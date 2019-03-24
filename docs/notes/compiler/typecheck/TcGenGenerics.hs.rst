@@ -9,11 +9,17 @@ expressions.
 (Generic T) and (Rep T) are derivable for some type expression T if the
 following constraints are satisfied.
 
+.. code-block:: haskell
+
   (a) D is a type constructor *value*. In other words, D is either a type
       constructor or it is equivalent to the head of a data family instance (up to
       alpha-renaming).
 
+.. code-block:: haskell
+
   (b) D cannot have a "stupid context".
+
+.. code-block:: haskell
 
   (c) The right-hand side of D cannot include existential types, universally
       quantified types, or "exotic" unlifted types. An exotic unlifted type
@@ -21,22 +27,36 @@ following constraints are satisfied.
       (i.e., one for which we have no representation type).
       See Note [Generics and unlifted types]
 
+.. code-block:: haskell
+
   (d) T :: *.
 
 (Generic1 T) and (Rep1 T) are derivable for some type expression T if the
 following constraints are satisfied.
 
+.. code-block:: haskell
+
   (a),(b),(c) As above.
 
+.. code-block:: haskell
+
   (d) T must expect arguments, and its last parameter must have kind *.
+
+.. code-block:: haskell
 
       We use `a' to denote the parameter of D that corresponds to the last
       parameter of T.
 
+.. code-block:: haskell
+
   (e) For any type-level application (Tfun Targ) in the right-hand side of D
       where the head of Tfun is not a tuple constructor:
 
+.. code-block:: haskell
+
       (b1) `a' must not occur in Tfun.
+
+.. code-block:: haskell
 
       (b2) If `a' occurs in Targ, then Tfun :: * -> *.
 
@@ -52,6 +72,8 @@ of functions and polytypes, but we do *not* use those.
 
 The key issue is that Generic1 deriving currently offers no sophisticated
 support for functions. For example, we cannot handle
+
+.. code-block:: haskell
 
   data F a = F ((a -> Int) -> Int)
 
@@ -91,6 +113,8 @@ Note [Generating a correctly typed Rep instance]
 tc_mkRepTy derives the RHS of the Rep(1) type family instance when deriving
 Generic(1). That is, it derives the ellipsis in the following:
 
+.. code-block:: haskell
+
     instance Generic Foo where
       type Rep Foo = ...
 
@@ -101,6 +125,8 @@ the type variables it learns from the TyCon (i.e., it uses tyConTyVars). This
 can cause problems when the instance has instantiated type variables
 (see #11732). As an example:
 
+.. code-block:: haskell
+
     data T a = MkT a
     deriving instance Generic (T Int)
     ==>
@@ -110,6 +136,8 @@ can cause problems when the instance has instantiated type variables
 -XStandaloneDeriving is one way for the type variables to become instantiated.
 Another way is when Generic1 is being derived for a datatype with a visible
 kind binder, e.g.,
+
+.. code-block:: haskell
 
    data P k (a :: k) = MkP k deriving Generic1
    ==>
@@ -128,10 +156,14 @@ A wrinkle in all of this: when forming the type variable substitution for
 Generic1 instances, we map the last type variable of the tycon to Any. Why?
 It's because of wily data types like this one (#15012):
 
+.. code-block:: haskell
+
    data T a = MkT (FakeOut a)
    type FakeOut a = Int
 
 If we ignore a, then we'll produce the following Rep1 instance:
+
+.. code-block:: haskell
 
    instance Generic1 T where
      type Rep1 T = ... (Rec0 (FakeOut a))
@@ -139,6 +171,8 @@ If we ignore a, then we'll produce the following Rep1 instance:
 
 Oh no! Now we have `a` on the RHS, but it's completely unbound. Instead, we
 ensure that `a` is mapped to Any:
+
+.. code-block:: haskell
 
    instance Generic1 T where
      type Rep1 T = ... (Rec0 (FakeOut Any))
@@ -159,10 +193,14 @@ be kind-polymorphic as well. As a result, tc_mkRepTy must explicitly apply
 the kind of the instance being derived to all the representation type
 constructors. For instance, if you have
 
+.. code-block:: haskell
+
     data Empty (a :: k) = Empty deriving Generic1
 
 Then the generated code is now approximately (with -fprint-explicit-kinds
 syntax):
+
+.. code-block:: haskell
 
     instance Generic1 k (Empty k) where
       type Rep1 k (Empty k) = U1 k
@@ -170,6 +208,8 @@ syntax):
 Most representation types have only one kind variable, making them easy to deal
 with. The only non-trivial case is (:.:), which is only used in Generic1
 instances:
+
+.. code-block:: haskell
 
     newtype (:.:) (f :: k2 -> *) (g :: k1 -> k2) (p :: k1) =
         Comp1 { unComp1 :: f (g p) }
@@ -192,17 +232,25 @@ deriving Generic(1) for large datatypes (see #5642).
 To ease the pain, there is a trick one can play when generating definitions for
 to(1) and from(1). If you have a datatype like:
 
+.. code-block:: haskell
+
   data Letter = A | B | C | D
 
 then a naïve Generic instance for Letter would be:
 
+.. code-block:: haskell
+
   instance Generic Letter where
     type Rep Letter = D1 ('MetaData ...) ...
+
+.. code-block:: haskell
 
     to (M1 (L1 (L1 (M1 U1)))) = A
     to (M1 (L1 (R1 (M1 U1)))) = B
     to (M1 (R1 (L1 (M1 U1)))) = C
     to (M1 (R1 (R1 (M1 U1)))) = D
+
+.. code-block:: haskell
 
     from A = M1 (L1 (L1 (M1 U1)))
     from B = M1 (L1 (R1 (M1 U1)))
@@ -220,14 +268,20 @@ solve, which in turn increases allocations and degrades compilation speed.
 Luckily, since the topmost M1 has the exact same type across every case, we can
 factor it out reduce the typechecker's burden:
 
+.. code-block:: haskell
+
   instance Generic Letter where
     type Rep Letter = D1 ('MetaData ...) ...
+
+.. code-block:: haskell
 
     to (M1 x) = case x of
       L1 (L1 (M1 U1)) -> A
       L1 (R1 (M1 U1)) -> B
       R1 (L1 (M1 U1)) -> C
       R1 (R1 (M1 U1)) -> D
+
+.. code-block:: haskell
 
     from x = M1 (case x of
       A -> L1 (L1 (M1 U1))

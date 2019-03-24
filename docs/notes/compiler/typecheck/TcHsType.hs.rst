@@ -45,6 +45,8 @@ In expressions, whenever we see a polymorphic identifier, say `id`, we are
 free to instantiate it with metavariables, knowing that we can always
 re-generalize with type-lambdas when necessary. For example:
 
+.. code-block:: haskell
+
   rank2 :: (forall a. a -> a) -> ()
   x = rank2 id
 
@@ -116,8 +118,12 @@ Note [The Purely Kinded Type Invariant (PKTI)]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 During type inference, we maintain this invariant
 
+.. code-block:: haskell
+
  (PKTI) It is legal to call 'tcTypeKind' on any Type ty,
         on any sub-term of ty, /without/ zonking ty
+
+.. code-block:: haskell
 
         Moreover, any such returned kind
         will itself satisfy (PKTI)
@@ -173,6 +179,8 @@ mkAppTyM is trying to guaranteed the Purely Kinded Type Invariant
   (ff aa), and /that/ does not satisfy (PKTI).  E.g. perhaps
   (ff :: kappa), where 'kappa' has already been unified with (*->*).
 
+.. code-block:: haskell
+
   We check for nasty case 2 on the final argument of a type synonym.
 
 Notice that in both cases the trickiness only happens if the
@@ -210,6 +218,8 @@ Note [GADT kind self-reference]
 A promoted type cannot be used in the body of that type's declaration.
 #11554 shows this example, which made GHC loop:
 
+.. code-block:: haskell
+
   import Data.Kind
   data P (x :: k) = Q
   data A :: Type where
@@ -239,6 +249,8 @@ kind Constraint.
 
 It's tempting to check that the body kind is either * or #. But this is
 wrong. For example:
+
+.. code-block:: haskell
 
   class C a b
   newtype N = Mk Foo deriving (C a)
@@ -292,6 +304,8 @@ the arguments to give good error messages in
   e.g.  (Maybe, Maybe)
 
 Note that we will still fail to infer the correct kind in this case:
+
+.. code-block:: haskell
 
   type T a = ((a,a), D a)
   type family D :: Constraint -> Constraint
@@ -422,6 +436,8 @@ in the type may have a bumped TcLevel, because explicit foralls
 raise the TcLevel. To avoid these variables from ever being visible
 in the surrounding context, we must obey the following dictum:
 
+.. code-block:: haskell
+
   Every metavariable in a type must either be
     (A) promoted
     (B) generalized, or
@@ -498,17 +514,25 @@ But notice that (#16322 comment:3)
 * The algorithm successfully kind-checks this declaration:
     data T2 ka (a::ka) = MkT2 (T2 Type a)
 
+.. code-block:: haskell
+
   Starting with (getInitialKinds)
     T2 :: (kappa1 :: kappa2 :: *) -> (kappa3 :: kappa4 :: *) -> *
   we get
     kappa4 := kappa1   -- from the (a:ka) kind signature
     kappa1 := Type     -- From application T2 Type
 
+.. code-block:: haskell
+
   These constraints are soluble so generaliseTcTyCon gives
     T2 :: forall (k::Type) -> k -> *
 
+.. code-block:: haskell
+
   But now the /typechecking/ (aka desugaring, tcTyClDecl) phase
   fails, because the call (T2 Type a) in the RHS is ill-kinded.
+
+.. code-block:: haskell
 
   We'd really prefer all errors to show up in the kind checking
   phase.
@@ -544,6 +568,8 @@ Note [Kind variable ordering for associated types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 What should be the kind of `T` in the following example? (#15591)
 
+.. code-block:: haskell
+
   class C (a :: Type) where
     type T (x :: f a)
 
@@ -554,6 +580,8 @@ T alone, since its variable `a` actually occurs /before/ `f` if you consider
 the fact that `a` was previously bound by the parent class `C`. That is to say,
 the kind of `T` should end up being:
 
+.. code-block:: haskell
+
   T :: forall a f. f a -> Type
 
 (It wouldn't necessarily be /wrong/ if the kind ended up being, say,
@@ -563,9 +591,13 @@ visible kind application.)
 In contrast, if `T` were redefined to be a top-level type family, like `T2`
 below:
 
+.. code-block:: haskell
+
   type family T2 (x :: f (a :: Type))
 
 Then `a` first appears /after/ `f`, so the kind of `T2` should be:
+
+.. code-block:: haskell
 
   T2 :: forall f a. f a -> Type
 
@@ -655,6 +687,8 @@ We need to take care to give the TyConBinders
   (a) OccNames that are fresh (because the TyConBinders of a TyCon
       must have distinct OccNames
 
+.. code-block:: haskell
+
   (b) Uniques that are fresh (obviously)
 
 For (a) we need to avoid clashes with the tyvars declared by
@@ -738,8 +772,12 @@ Note [Pattern signature binders]
 See also Note [Type variables in the type environment] in TcRnTypes.
 Consider
 
+.. code-block:: haskell
+
   data T where
     MkT :: forall a. a -> (a -> Int) -> T
+
+.. code-block:: haskell
 
   f :: T -> ...
   f (MkT x (f :: b -> c)) = <blah>

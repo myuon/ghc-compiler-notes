@@ -40,6 +40,8 @@ Note [The flattening story]
   and it would risk wanted/wanted interactions. The only way we
   learn information about fsk is when the CFunEqCan takes a step.
 
+.. code-block:: haskell
+
   However we *do* substitute in the LHS of a CFunEqCan (else it
   would never get to fire!)
 
@@ -53,6 +55,8 @@ Note [The flattening story]
   "owns" a distinct evidence variable x, and flatten-skolem fsk/fmv.
   Why? We make a fresh fsk/fmv when the constraint is born;
   and we never rewrite the RHS of a CFunEqCan.
+
+.. code-block:: haskell
 
   In contrast a [D] CFunEqCan /shares/ its fmv with its partner [W],
   but does not "own" it.  If we reduce a [D] F Int ~ fmv, where
@@ -113,6 +117,8 @@ Why given-fsks, alone, doesn't work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Could we get away with only flatten meta-tyvars, with no flatten-skolems? No.
 
+.. code-block:: haskell
+
   [W] w : alpha ~ [F alpha Int]
 
 ---> flatten
@@ -136,6 +142,8 @@ Why flatten-meta-vars, alone doesn't work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Look at Simple13, with unification-fmvs only
 
+.. code-block:: haskell
+
   [G] g : a ~ [F a]
 
 ---> Flatten given
@@ -151,6 +159,8 @@ Look at Simple13, with unification-fmvs only
 And now we have an evidence cycle between g' and x!
 
 If we used a given instead (ie current story)
+
+.. code-block:: haskell
 
   [G] g : a ~ [F a]
 
@@ -181,6 +191,8 @@ Here we get (F Int ~ Int, F Int ~ Bool), which flattens to
   (fmv ~ Int, fmv ~ Bool)
 But there are really TWO separate errors.
 
+.. code-block:: haskell
+
   ** We must not complain about Int~Bool. **
 
 Moreover these two errors could arise in entirely unrelated parts of
@@ -195,6 +207,8 @@ Look at #10340:
    type family Any :: *   -- No instances
    get :: MonadState s m => m s
    instance MonadState s (State s) where ...
+
+.. code-block:: haskell
 
    foo :: State Any Any
    foo = get
@@ -384,6 +398,8 @@ Because flattening zonks and the returned coercion ("co" above) is also
 zonked, it's possible that (co :: xi ~ ty) isn't quite true. So, instead,
 we can rely on this fact:
 
+.. code-block:: haskell
+
   (F1) tcTypeKind(xi) succeeds and returns a fully zonked kind
 
 Note that the left-hand type of co is *always* precisely xi. The right-hand
@@ -400,6 +416,8 @@ TcCanonical.canEqTyVar).
 
 Flattening is always homogeneous. That is, the kind of the result of flattening is
 always the same as the kind of the input, modulo zonking. More formally:
+
+.. code-block:: haskell
 
   (F2) tcTypeKind(xi) `eqType` zonk(tcTypeKind(ty))
 
@@ -531,9 +549,13 @@ the allocation amounts for the T9872{a,b,c} tests by half.
 
 An example of where the early reduction appears helpful:
 
+.. code-block:: haskell
+
   type family Last x where
     Last '[x]     = x
     Last (h ': t) = Last t
+
+.. code-block:: haskell
 
   workitem: (x ~ Last '[1,2,3,4,5,6])
 
@@ -584,39 +606,55 @@ This is significantly harder to think about. It can save a LOT of work
 in occurs-check cases, but we don't care about them much.  #5837
 is an example; all the constraints here are Givens
 
+.. code-block:: haskell
+
              [G] a ~ TF (a,Int)
     -->
     work     TF (a,Int) ~ fsk
     inert    fsk ~ a
 
+.. code-block:: haskell
+
     --->
     work     fsk ~ (TF a, TF Int)
     inert    fsk ~ a
 
+.. code-block:: haskell
+
     --->
     work     a ~ (TF a, TF Int)
     inert    fsk ~ a
+
+.. code-block:: haskell
 
     ---> (attempting to flatten (TF a) so that it does not mention a
     work     TF a ~ fsk2
     inert    a ~ (fsk2, TF Int)
     inert    fsk ~ (fsk2, TF Int)
 
+.. code-block:: haskell
+
     ---> (substitute for a)
     work     TF (fsk2, TF Int) ~ fsk2
     inert    a ~ (fsk2, TF Int)
     inert    fsk ~ (fsk2, TF Int)
+
+.. code-block:: haskell
 
     ---> (top-level reduction, re-orient)
     work     fsk2 ~ (TF fsk2, TF Int)
     inert    a ~ (fsk2, TF Int)
     inert    fsk ~ (fsk2, TF Int)
 
+.. code-block:: haskell
+
     ---> (attempt to flatten (TF fsk2) to get rid of fsk2
     work     TF fsk2 ~ fsk3
     work     fsk2 ~ (fsk3, TF Int)
     inert    a   ~ (fsk2, TF Int)
     inert    fsk ~ (fsk2, TF Int)
+
+.. code-block:: haskell
 
     --->
     work     TF fsk2 ~ fsk3
@@ -640,6 +678,8 @@ do not want to end up with
     [W] F Int ~ Int
 because that might actually hold!  Better to end up with the two above
 unsolved constraints.  The flat form will be
+
+.. code-block:: haskell
 
     G a ~ fmv1     (CFunEqCan)
     F fmv1 ~ fmv2  (CFunEqCan)

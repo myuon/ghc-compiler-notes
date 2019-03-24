@@ -5,6 +5,8 @@ Note [Subsumption check at pattern variables]
 When we come across a variable with a type signature, we need to do a
 subsumption, not equality, check against the context type.  e.g.
 
+.. code-block:: haskell
+
     data T = MkT (forall a. a->a)
       f :: forall b. [b]->[b]
       MkT f = blah
@@ -34,9 +36,13 @@ Note [NPlusK patterns]
 ~~~~~~~~~~~~~~~~~~~~~~
 From
 
+.. code-block:: haskell
+
   case v of x + 5 -> blah
 
 we get
+
+.. code-block:: haskell
 
   if v >= 5 then (\x -> blah) (v - 5) else ...
 
@@ -101,10 +107,14 @@ Suppose (coi, tys) = matchExpectedConType data_tc pat_ty
               data T7 p q = A p | B q
               axiom coT7 p q :: T (p,q) ~ T7 p q
 
+.. code-block:: haskell
+
        So if pat_ty = T (ty1,ty2), we return (coi, [ty1,ty2]) such that
            coi = coi2 . coi1 : T7 t ~ pat_ty
            coi1 : T (ty1,ty2) ~ pat_ty
            coi2 : T7 ty1 ty2 ~ T (ty1,ty2)
+
+.. code-block:: haskell
 
    For families we do all this matching here, not in the unifier,
    because we never want a whisper of the data_tycon to appear in

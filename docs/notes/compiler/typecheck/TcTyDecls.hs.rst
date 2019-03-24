@@ -187,6 +187,8 @@ Consider this (#4169):
      fromIntegerNum :: a
      fromIntegerNum = ...
 
+.. code-block:: haskell
+
    ast :: Q [Dec]
    ast = [d| instance Numeric Int |]
 
@@ -202,9 +204,13 @@ Note [Polymorphic selectors]
 We take care to build the type of a polymorphic selector in the right
 order, so that visible type application works.
 
+.. code-block:: haskell
+
   data Ord a => T a = MkT { field :: forall b. (Num a, Show b) => (a, b) }
 
 We want
+
+.. code-block:: haskell
 
   field :: forall a. Ord a => T a -> forall b. (Num a, Show b) => (a, b)
 
@@ -272,6 +278,8 @@ Note [Selector running example]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 It's OK to combine GADTs and type families.  Here's a running example:
 
+.. code-block:: haskell
+
         data instance T [a] where
           T1 { fld :: b } :: T [Maybe b]
 
@@ -283,6 +291,8 @@ and there's coercion from the family type to the representation type
         :CoR7T a :: T [a] ~ :R7T a
 
 The selector we want for fld looks like this:
+
+.. code-block:: haskell
 
         fld :: forall b. T [Maybe b] -> b
         fld = /\b. \(d::T [Maybe b]).

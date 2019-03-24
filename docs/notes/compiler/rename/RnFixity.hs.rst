@@ -4,13 +4,19 @@ Note [Fixity signature lookup]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A fixity declaration like
 
+.. code-block:: haskell
+
     infixr 2 ?
 
 can refer to a value-level operator, e.g.:
 
+.. code-block:: haskell
+
     (?) :: String -> String -> String
 
 or a type-level operator, like:
+
+.. code-block:: haskell
 
     data (?) a b = A a | B b
 

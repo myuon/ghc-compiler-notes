@@ -40,9 +40,13 @@ Note [Role merging]
 First, why might it be necessary to do a non-trivial role
 merge?  It may rescue a merge that might otherwise fail:
 
+.. code-block:: haskell
+
      signature A where
          type role T nominal representational
          data T a b
+
+.. code-block:: haskell
 
      signature A where
          type role T representational nominal
@@ -58,9 +62,13 @@ doing this, because role subtyping is *conditional* on
 the supertype being NOT representationally injective, e.g.,
 if we have instead:
 
+.. code-block:: haskell
+
      signature A where
          type role T nominal representational
          data T a b = T a b
+
+.. code-block:: haskell
 
      signature A where
          type role T representational nominal
@@ -146,6 +154,8 @@ of moving parts.  Interested readers should also look at:
      * Note [Knot-tying fallback on boot]
 
 There is also a wiki page on the subject, see:
+
+.. code-block:: haskell
 
      https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/TyingTheKnot
 

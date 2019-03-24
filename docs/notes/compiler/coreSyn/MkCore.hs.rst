@@ -29,6 +29,8 @@ error used in dummy worker functions (see `mkAbsentErrorApp`):
 - `absentSumFieldError` can't be CAFFY because that would mean making some
   non-CAFFY definitions that use unboxed sums CAFFY in unarise.
 
+.. code-block:: haskell
+
   To make `absentSumFieldError` non-CAFFY we get a stable pointer to it in
   RtsStartup.c and mark it as non-CAFFY here.
 
@@ -56,12 +58,18 @@ Note [aBSENT_ERROR_ID]
 ~~~~~~~~~~~~~~~~~~~~~~
 We use aBSENT_ERROR_ID to build dummy values in workers.  E.g.
 
+.. code-block:: haskell
+
    f x = (case x of (a,b) -> b) + 1::Int
 
 The demand analyser figures ot that only the second component of x is
 used, and does a w/w split thus
 
+.. code-block:: haskell
+
    f x = case x of (a,b) -> $wf b
+
+.. code-block:: haskell
 
    $wf b = let a = absentError "blah"
                x = (a,b)
@@ -71,6 +79,8 @@ After some simplification, the (absentError "blah") thunk goes away.
 
 ------ Tricky wrinkle -------
 #14285 had, roughly
+
+.. code-block:: haskell
 
    data T a = MkT a !a
    {-# INLINABLE f #-}
@@ -114,6 +124,8 @@ Seg fault city. Better to throw an exception. (Even though we've said
 it is in HNF :-)
 
 It might seem a bit surprising that seq on absentError is simply erased
+
+.. code-block:: haskell
 
     absentError "foo" `seq` x ==> x
 

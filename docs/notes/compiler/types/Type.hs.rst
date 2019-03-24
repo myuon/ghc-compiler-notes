@@ -30,6 +30,8 @@ this problem seems to make what should be a linear algorithm into a potentially
 exponential one. But it's only going to be bad in the case where there's
 lots of foralls in the kinds of other foralls. Like this:
 
+.. code-block:: haskell
+
   forall a : (forall b : (forall c : ...). ...). ...
 
 This construction seems unlikely. So we'll do the inefficient, easy way
@@ -75,6 +77,8 @@ Note [Representation of function types]
 Functions (e.g. Int -> Char) can be thought of as being applications
 of funTyCon (known in Haskell surface syntax as (->)),
 
+.. code-block:: haskell
+
     (->) :: forall (r1 :: RuntimeRep) (r2 :: RuntimeRep)
                    (a :: TYPE r1) (b :: TYPE r2).
             a -> b -> Type
@@ -82,9 +86,13 @@ of funTyCon (known in Haskell surface syntax as (->)),
 However, for efficiency's sake we represent saturated applications of (->)
 with FunTy. For instance, the type,
 
+.. code-block:: haskell
+
     (->) r1 r2 a b
 
 is equivalent to,
+
+.. code-block:: haskell
 
     FunTy (Anon a) b
 
@@ -142,6 +150,8 @@ Suppose we do w/w on 'foo' in module A, thus (#11272, #6056)
    foo :: Ord a => Int -> blah
    foo a d x = case x of I# x' -> $wfoo @a d x'
 
+.. code-block:: haskell
+
    $wfoo :: Ord a => Int# -> blah
 
 Now in module B we see (foo @Int dOrdInt).  The specialiser will
@@ -185,9 +195,13 @@ occurrence is itself inside an INLINE function!  Until we revise the
 handling of implication constraints, that is.)  This turned out to
 be important in getting good arities in DPH code.  Example:
 
+.. code-block:: haskell
+
     class C a
     class D a where { foo :: a -> a }
     instance C a => D (Maybe a) where { foo x = x }
+
+.. code-block:: haskell
 
     bar :: (C a, C b) => a -> b -> (Maybe a, Maybe b)
     {-# INLINE bar #-}
@@ -207,6 +221,8 @@ ToDo: it would be far easier just to use isPredTy.
 Note [ScopedSort]
 ~~~~~~~~~~~~~~~~~
 Consider
+
+.. code-block:: haskell
 
   foo :: Proxy a -> Proxy (b :: k) -> Proxy (a :: k2) -> ()
 
@@ -251,6 +267,8 @@ same.
 
 For instance, consider:
 
+.. code-block:: haskell
+
   let f :: forall a. a -> Char -> [a]
       f @a x c = ... f @a y 'a' ...
   in ... f @Int 1 'b' ... f @Int 2 'c' ...
@@ -259,11 +277,15 @@ For instance, consider:
 return type is [a], where [a] is bound. But since the type argument is always
 'Int', we can rewrite it as:
 
+.. code-block:: haskell
+
   let f' :: Int -> Char -> [Int]
       f' x c = ... f' y 'a' ...
   in ... f' 1 'b' ... f 2 'c' ...
 
 and now we can make f' a join point:
+
+.. code-block:: haskell
 
   join f' :: Int -> Char -> [Int]
        f' x c = ... jump f' y 'a' ...
@@ -279,6 +301,8 @@ Note [Equality on AppTys]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 In our cast-ignoring equality, we want to say that the following two
 are equal:
+
+.. code-block:: haskell
 
   (Maybe |> co) (Int |> co')   ~?       Maybe Int
 
@@ -317,6 +341,8 @@ Note [Kinding rules for types]
 In typeKind we consider Constraint and (TYPE LiftedRep) to be identical.
 We then have
 
+.. code-block:: haskell
+
          t1 : TYPE rep1
          t2 : TYPE rep2
    (FUN) ----------------
@@ -329,15 +355,21 @@ We then have
 
 In tcTypeKind we consider Constraint and (TYPE LiftedRep) to be distinct:
 
+.. code-block:: haskell
+
           t1 : TYPE rep1
           t2 : TYPE rep2
     (FUN) ----------------
           t1 -> t2 : Type
 
+.. code-block:: haskell
+
           t1 : Constraint
           t2 : TYPE rep
   (PRED1) ----------------
           t1 => t2 : Type
+
+.. code-block:: haskell
 
           t1 : Constraint
           t2 : Constraint
@@ -362,6 +394,8 @@ Note that:
 Note [Phantom type variables in kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
+
+.. code-block:: haskell
 
   type K (r :: RuntimeRep) = Type   -- Note 'r' is unused
   data T r :: K r                   -- T :: forall r -> K r

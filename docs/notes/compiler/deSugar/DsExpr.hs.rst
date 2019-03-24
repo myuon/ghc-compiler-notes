@@ -10,6 +10,8 @@ Then we get
    $dfCT :: forall ab. blah => C (T a) (T b)
    $dfCT ab blah = MkC ($c$p1C a blah) ($cop a blah)
 
+.. code-block:: haskell
+
    $c$p1C :: forall ab. blah => (T a ~ T b)
    $c$p1C ab blah = let ...; g :: T a ~ T b = ... } in g
 
@@ -71,6 +73,8 @@ beneficial. This is a bit of a trade-off,
 
  * when it works, fusion can be a significant win. Allocations are reduced
    by up to 25% in some nofib programs. Specifically,
+
+.. code-block:: haskell
 
         Program           Size    Allocs   Runtime  CompTime
         rewrite          +0.0%    -26.3%      0.02     -1.8%

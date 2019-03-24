@@ -6,6 +6,8 @@ The following is an example of associated type defaults:
    class C a where
      data D a r
 
+.. code-block:: haskell
+
      type F x a b :: *
      type F p q r = (p,q)->r    -- Default
 

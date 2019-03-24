@@ -30,6 +30,8 @@ values when asked to convert to a list.
 
 An alternative would be to have
 
+.. code-block:: haskell
+
   data UniqDFM ele = UDFM (M.IntMap ele) [ele]
 
 where the list determines the order. This makes deletion tricky as we'd

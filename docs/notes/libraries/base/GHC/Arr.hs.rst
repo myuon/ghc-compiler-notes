@@ -18,12 +18,20 @@ Note [Double bounds-checking of index values]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When you index an array, a!x, there are two possible bounds checks we might make:
 
+.. code-block:: haskell
+
   (A) Check that (inRange (bounds a) x) holds.
+
+.. code-block:: haskell
 
       (A) is checked in the method for 'index'
 
+.. code-block:: haskell
+
   (B) Check that (index (bounds a) x) lies in the range 0..n,
       where n is the size of the underlying array
+
+.. code-block:: haskell
 
       (B) is checked in the top-level function (!), in safeIndex.
 
@@ -56,6 +64,8 @@ the guts of the function will be small enough to inline.
 Note [amap]
 ~~~~~~~~~~~~~~
 amap was originally defined like this:
+
+.. code-block:: haskell
 
  amap f arr@(Array l u n _) =
      unsafeArray' (l,u) n [(i, f (unsafeAt arr i)) | i <- [0 .. n - 1]]

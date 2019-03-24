@@ -6,7 +6,11 @@ All nested Ids now have the same IdInfo, namely vanillaIdInfo, which
 should save some space; except that we preserve occurrence info for
 two reasons:
 
+.. code-block:: haskell
+
   (a) To make printing tidy core nicer
+
+.. code-block:: haskell
 
   (b) Because we tidy RULES and InlineRules, which may then propagate
       via --make into the compilation of the next module, and we want

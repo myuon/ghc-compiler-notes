@@ -111,6 +111,8 @@ We define a COMPLETE pragma to be a non-orphan if it includes at least
 one conlike defined in the current module. Why is this sufficient?
 Well if you have a pattern match
 
+.. code-block:: haskell
+
   case expr of
     P1 -> ...
     P2 -> ...

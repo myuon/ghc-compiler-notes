@@ -5,6 +5,8 @@ Note [AbsBinds]
 The AbsBinds constructor is used in the output of the type checker, to
 record *typechecked* and *generalised* bindings.  Specifically
 
+.. code-block:: haskell
+
          AbsBinds { abs_tvs      = tvs
                   , abs_ev_vars  = [d1,d2]
                   , abs_exports  = [ABE { abe_poly = fp, abe_mono = fm
@@ -15,9 +17,13 @@ record *typechecked* and *generalised* bindings.  Specifically
 
 where 'BIND' binds the monomorphic Ids 'fm' and 'gm', means
 
+.. code-block:: haskell
+
         fp = fwrap [/\ tvs. \d1 d2. letrec { DBINDS        ]
                    [                       ; BIND[fm,gm] } ]
                    [                 in fm                 ]
+
+.. code-block:: haskell
 
         gp = ...same again, with gm instead of fm
 
@@ -27,9 +33,13 @@ Note [ABExport wrapper].
 This is a pretty bad translation, because it duplicates all the bindings.
 So the desugarer tries to do a better job:
 
+.. code-block:: haskell
+
         fp = /\ [a,b] -> \ [d1,d2] -> case tp [a,b] [d1,d2] of
                                         (fm,gm) -> fm
         ..ditto for gp..
+
+.. code-block:: haskell
 
         tp = /\ [a,b] -> \ [d1,d2] -> letrec { DBINDS; BIND }
                                       in (fm,gm)
@@ -54,6 +64,8 @@ In Hindley-Milner, a recursive binding is typechecked with the
 *recursive* uses being *monomorphic*.  So after typechecking *and*
 desugaring we will get something like this
 
+.. code-block:: haskell
+
     M.reverse :: forall a. [a] -> [a]
       = /\a. letrec
                 reverse :: [a] -> [a] = \xs -> case xs of
@@ -67,6 +79,8 @@ definition for plain 'reverse' which is *monomorphic*.  The type variable
 
 That's after desugaring.  What about after type checking but before
 desugaring?  That's where AbsBinds comes in.  It looks like this:
+
+.. code-block:: haskell
 
    AbsBinds { abs_tvs     = [a]
             , abs_ev_vars = []
@@ -112,6 +126,8 @@ Note [Polymorphic recursion]
 Consider
    Rec { f x = ...(g ef)...
 
+.. code-block:: haskell
+
        ; g :: forall a. [a] -> [a]
        ; g y = ...(f eg)...  }
 
@@ -152,10 +168,14 @@ Note [The abs_sig field of AbsBinds]
 The abs_sig field supports a couple of special cases for bindings.
 Consider
 
+.. code-block:: haskell
+
   x :: Num a => (# a, a #)
   x = (# 3, 4 #)
 
 The general desugaring for AbsBinds would give
+
+.. code-block:: haskell
 
   x = /\a. \ ($dNum :: Num a) ->
       letrec xm = (# fromInteger $dNum 3, fromInteger $dNum 4 #) in
@@ -164,11 +184,15 @@ The general desugaring for AbsBinds would give
 But that has an illegal let-binding for an unboxed tuple.  In this
 case we'd prefer to generate the (more direct)
 
+.. code-block:: haskell
+
   x = /\ a. \ ($dNum :: Num a) ->
      (# fromInteger $dNum 3, fromInteger $dNum 4 #)
 
 A similar thing happens with representation-polymorphic defns
 (#11405):
+
+.. code-block:: haskell
 
   undef :: forall (r :: RuntimeRep) (a :: TYPE r). HasCallStack => a
   undef = error "undef"
@@ -176,6 +200,8 @@ A similar thing happens with representation-polymorphic defns
 Again, the vanilla desugaring gives a local let-binding for a
 representation-polymorphic (undefm :: a), which is illegal.  But
 again we can desugar without a let:
+
+.. code-block:: haskell
 
   undef = /\ a. \ (d:HasCallStack) -> error a d "undef"
 

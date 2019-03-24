@@ -9,6 +9,8 @@ in SetLevels. For us, the significance is that a binder might be marked to be
 dropped at the nearest boundary between tail calls and non-tail calls. For
 example:
 
+.. code-block:: haskell
+
   (< join j = ... in
      let x = < ... > in
      case < ... > of
@@ -26,6 +28,8 @@ other benefit of floating is making RHSes small, and this can have a significant
 impact. In particular, stream fusion has been known to produce nested loops like
 this:
 
+.. code-block:: haskell
+
   joinrec j1 x1 =
     joinrec j2 x2 =
       joinrec j3 x3 = ... jump j1 (x3 + 1) ... jump j2 (x3 + 1) ...
@@ -38,6 +42,8 @@ this:
 Here j1 and j2 are wholly superfluous---each of them merely forwards its
 argument to j3. Since j3 only refers to x3, we can float j2 and j3 to make
 everything one big mutual recursion:
+
+.. code-block:: haskell
 
   joinrec j1 x1 = jump j2 x1
           j2 x2 = jump j3 x2
@@ -78,6 +84,8 @@ calls, so we can safely pull them out and keep them non-recursive.
 (Why is something getting floated to <1,0> that doesn't make a recursive call?
 The case that came up in testing was that f *and* the unlifted binding were
 getting floated *to the same place*:
+
+.. code-block:: haskell
 
   \x<2,0> ->
     ... <3,0>
@@ -123,10 +131,14 @@ think this is too restrictive.
 
 Consider the case of an expression scoped over by a breakpoint tick,
 
+.. code-block:: haskell
+
   tick<...> (let x = ... in f x)
 
 In this case it is completely legal to float out x, despite the fact that
 breakpoint ticks are scoped,
+
+.. code-block:: haskell
 
   let x = ... in (tick<...>  f x)
 

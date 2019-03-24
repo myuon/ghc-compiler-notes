@@ -95,9 +95,13 @@ This transfer is used in three places:
 
 Consider the short-distance let-floating:
 
+.. code-block:: haskell
+
    f = /\a. let g = rhs in ...
 
 Then if we float thus
+
+.. code-block:: haskell
 
    g' = /\a. rhs
    f = /\a. ...[g' a/g]....
@@ -111,9 +115,13 @@ we *do not* want to lose g's
 Mostly this is just an optimisation, but it's *vital* to
 transfer the occurrence info.  Consider
 
+.. code-block:: haskell
+
    NonRec { f = /\a. let Rec { g* = ..g.. } in ... }
 
 where the '*' means 'LoopBreaker'.  Then if we float we must get
+
+.. code-block:: haskell
 
    Rec { g'* = /\a. ...(g' a)... }
    NonRec { f = /\a. ...[g' a/g]....}

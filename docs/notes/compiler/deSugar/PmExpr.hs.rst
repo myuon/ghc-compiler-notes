@@ -16,10 +16,14 @@ Note [Undecidable Equality for Overloaded Literals]
 Equality on overloaded literals is undecidable in the general case. Consider
 the following example:
 
+.. code-block:: haskell
+
   instance Num Bool where
     ...
     fromInteger 0 = False -- C-like representation of booleans
     fromInteger _ = True
+
+.. code-block:: haskell
 
     f :: Bool -> ()
     f 1 = ()        -- Clause A
@@ -46,8 +50,12 @@ be anything. This poses difficulties for:
    What should our message for `f` above be? A reasonable approach would be
    to issue:
 
+.. code-block:: haskell
+
      Pattern matches are (potentially) redundant:
        f 2 = ...    under the assumption that 1 == 2
+
+.. code-block:: haskell
 
    but seems to complex and confusing for the user.
 

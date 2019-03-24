@@ -29,6 +29,8 @@ separated.
 ---------------------------------------------------------------------------
  Note [Magic Constants in CmmSwitch]
 
+.. code-block:: haskell
+
  There are a lot of heuristics here that depend on magic values where it is
  hard to determine the "best" value (for whatever that means). These are the
  magic values:
@@ -52,6 +54,8 @@ I.e. instead of
 do
     _u20N:
             jmp *_n20Q(,%r14,8)
+
+.. code-block:: haskell
 
     _n20Q:
             .quad   0

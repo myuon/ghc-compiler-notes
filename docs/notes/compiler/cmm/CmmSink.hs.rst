@@ -5,6 +5,8 @@ Note [dependent assignments]
 
 If our assignment list looks like
 
+.. code-block:: haskell
+
    [ y = e,  x = ... y ... ]
 
 We cannot inline x.  Remember this list is really in reverse order,
@@ -22,6 +24,8 @@ everything inside UniqSM.
 
 One more variant of this (#7366):
 
+.. code-block:: haskell
+
   [ y = e, y = z ]
 
 If we don't want to inline y = e, because y is used many times, we
@@ -34,6 +38,8 @@ Note [discard during inlining]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Opportunities to discard assignments sometimes appear after we've
 done some inlining.  Here's an example:
+
+.. code-block:: haskell
 
      x = R1;
      y = P64[x + 7];
@@ -55,14 +61,20 @@ and unsafe foreign (CmmUnsafeForeignCall). We perform sinking pass after
 stack layout (see Note [Sinking after stack layout]) which leads to two
 invariants related to calls:
 
+.. code-block:: haskell
+
   a) during stack layout phase all safe foreign calls are turned into
      unsafe foreign calls (see Note [Lower safe foreign calls]). This
      means that we will never encounter CmmForeignCall node when running
      sinking after stack layout
 
+.. code-block:: haskell
+
   b) stack layout saves all variables live across a call on the stack
      just before making a call (remember we are not sinking assignments to
      stack):
+
+.. code-block:: haskell
 
       L1:
          x = R1
@@ -71,6 +83,8 @@ invariants related to calls:
          Sp = Sp - 16
          call f() returns L2
       L2:
+
+.. code-block:: haskell
 
      We will attempt to sink { x = R1 } but we will detect conflict with
      { P64[Sp - 8]  = x } and hence we will drop { x = R1 } without even

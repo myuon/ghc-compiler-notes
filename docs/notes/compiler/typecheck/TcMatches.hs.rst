@@ -11,6 +11,8 @@ Note [Case branches must never infer a non-tau type]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
 
+.. code-block:: haskell
+
   case ... of
     ... -> \(x :: forall a. a -> a) -> x
     ... -> \y -> y
@@ -25,6 +27,8 @@ tau-type.
 
 An even trickier case looks like
 
+.. code-block:: haskell
+
   f x True  = x undefined
   f x False = x ()
 
@@ -32,6 +36,8 @@ Here, we see that the arguments must also be non-Infer. Thus, we must
 use expTypeToType on the output of matchExpectedFunTys, not the input.
 
 But we make a special case for a one-branch case. This is so that
+
+.. code-block:: haskell
 
   f = \(x :: forall a. a -> a) -> x
 
@@ -72,6 +78,8 @@ An applicative-do is supposed to take place in parallel, so
 constraints bound in one arm can't possibly be available in another
 (#13242).  Our current rule is this (more details and discussion
 on the ticket). Consider
+
+.. code-block:: haskell
 
    ...stmts...
    ApplicativeStmts [arg1, arg2, ... argN]

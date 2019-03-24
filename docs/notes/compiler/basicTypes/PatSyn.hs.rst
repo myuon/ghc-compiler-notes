@@ -17,6 +17,8 @@ Example 1:
       pattern P1 :: (Num a, Eq a) => b -> Maybe (a,b)
       pattern P1 x = Just (3,x)
 
+.. code-block:: haskell
+
   We require (Num a, Eq a) to match the 3; there is no provided
   context.
 
@@ -24,14 +26,20 @@ Example 2:
       data T2 where
         MkT2 :: (Num a, Eq a) => a -> a -> T2
 
+.. code-block:: haskell
+
       pattern P2 :: () => (Num a, Eq a) => a -> T2
       pattern P2 x = MkT2 3 x
+
+.. code-block:: haskell
 
   When we match against P2 we get a Num dictionary provided.
   We can use that to check the match against 3.
 
 Example 3:
       pattern P3 :: Eq a => a -> b -> T3 b
+
+.. code-block:: haskell
 
    This signature is illegal because the (Eq a) is a required
    constraint, but it mentions the existentially-bound variable 'a'.
@@ -45,16 +53,22 @@ Note [Pattern synonym result type]
 Consider
    data T a b = MkT b a
 
+.. code-block:: haskell
+
    pattern P :: a -> T [a] Bool
    pattern P x = MkT True [x]
 
 P's psResultTy is (T a Bool), and it really only matches values of
 type (T [a] Bool).  For example, this is ill-typed
 
+.. code-block:: haskell
+
    f :: T p q -> String
    f (P x) = "urk"
 
 This is different to the situation with GADTs:
+
+.. code-block:: haskell
 
    data S a where
      MkS :: Int -> S Bool
@@ -63,6 +77,8 @@ Now MkS (and pattern synonyms coming from MkS) can match a
 value of type (S a), not just (S Bool); we get type refinement.
 
 That in turn means that if you have a pattern
+
+.. code-block:: haskell
 
    P x :: T [ty] Bool
 
@@ -83,6 +99,8 @@ Note [Pattern synonym representation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider the following pattern synonym declaration
 
+.. code-block:: haskell
+
         pattern P x = MkT [x] (Just 42)
 
 where
@@ -91,18 +109,26 @@ where
 
 so pattern P has type
 
+.. code-block:: haskell
+
         b -> T (Maybe t)
 
 with the following typeclass constraints:
+
+.. code-block:: haskell
 
         requires: (Eq t, Num t)
         provides: (Show (Maybe t), Ord b)
 
 In this case, the fields of MkPatSyn will be set as follows:
 
+.. code-block:: haskell
+
   psArgs       = [b]
   psArity      = 1
   psInfix      = False
+
+.. code-block:: haskell
 
   psUnivTyVars = [t]
   psExTyVars   = [b]
@@ -124,6 +150,8 @@ For each pattern synonym P, we generate
 
 For the above example, the matcher function has type:
 
+.. code-block:: haskell
+
         $mP :: forall (r :: ?) t. (Eq t, Num t)
             => T (Maybe t)
             -> (forall b. (Show (Maybe t), Ord b) => b -> r)
@@ -131,6 +159,8 @@ For the above example, the matcher function has type:
             -> r
 
 with the following implementation:
+
+.. code-block:: haskell
 
         $mP @r @t $dEq $dNum scrut cont fail
           = case scrut of
@@ -150,6 +180,8 @@ argument is added to the success continuation as well.
 For *bidirectional* pattern synonyms, we also generate a "builder"
 function which implements the pattern synonym in an expression
 context. For our running example, it will be:
+
+.. code-block:: haskell
 
         $bP :: forall t b. (Eq t, Num t, Show (Maybe t), Ord b)
             => b -> T (Maybe t)
@@ -171,7 +203,11 @@ For bidirectional pattern synonyms that have no arguments and have an
 unboxed type, we add an extra Void# argument to the builder, else it
 would be a top-level declaration with an unboxed type.
 
+.. code-block:: haskell
+
         pattern P = 0#
+
+.. code-block:: haskell
 
         $bP :: Void# -> Int#
         $bP _ = 0#
@@ -186,6 +222,8 @@ Note [Pattern synonyms and the data type Type]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The type of a pattern synonym is of the form (See Note
 [Pattern synonym signatures] in TcSigs):
+
+.. code-block:: haskell
 
     forall univ_tvs. req => forall ex_tvs. prov => ...
 

@@ -51,6 +51,8 @@ If we have done specialisation the we check that there are
 
 Outstanding issues:
 
+.. code-block:: haskell
+
     -- Things are *not* OK if:
     --
     --  * Unsaturated type app before specialisation has been done;
@@ -96,6 +98,8 @@ For discussion see https://ghc.haskell.org/trac/ghc/wiki/BadUnsafeCoercions
 Linter introduces additional rules that checks improper coercion between
 different types, called bad coercions. Following coercions are forbidden:
 
+.. code-block:: haskell
+
   (a) coercions between boxed and unboxed values;
   (b) coercions between unlifted values of the different sizes, here
       active size is checked, i.e. size of the actual value but not
@@ -116,6 +120,8 @@ We check the rules listed in Note [Invariants on join points] in CoreSyn. The
 only one that causes any difficulty is the first: All occurrences must be tail
 calls. To this end, along with the in-scope set, we remember in le_joins the
 subset of in-scope Ids that are valid join ids. For example:
+
+.. code-block:: haskell
 
   join j x = ... in
   case e of
@@ -173,19 +179,29 @@ either. Getting the checks right turns out to be somewhat complicated.
 
 For example, suppose we have (comment 8)
 
+.. code-block:: haskell
+
   data T a where
     TInt :: T Int
+
+.. code-block:: haskell
 
   absurdTBool :: T Bool -> a
   absurdTBool v = case v of
 
+.. code-block:: haskell
+
   data Foo = Foo !(T Bool)
+
+.. code-block:: haskell
 
   absurdFoo :: Foo -> a
   absurdFoo (Foo x) = absurdTBool x
 
 GHC initially accepts the empty case because of the GADT conditions. But then
 we inline absurdTBool, getting
+
+.. code-block:: haskell
 
   absurdFoo (Foo x) = case x of
 
@@ -203,6 +219,8 @@ much fuss when that happens.
 Note [Beta redexes]
 ~~~~~~~~~~~~~~~~~~~
 Consider:
+
+.. code-block:: haskell
 
   join j @x y z = ... in
   (\@x y z -> jump j @x y z) @t e1 e2
@@ -252,6 +270,8 @@ variables (ru_bndrs) that /is/ mentioned on the RHS becomes
 not-mentioned in the LHS (ru_args).  How can that happen?  Well, in
 #10602, SpecConstr stupidly constructed a rule like
 
+.. code-block:: haskell
+
   forall x,c1,c2.
      f (x |> c1 |> c2) = ....
 
@@ -279,6 +299,8 @@ Note [Rules for join points]
 A join point cannot be partially applied. However, the left-hand side of a rule
 for a join point is effectively a *pattern*, not a piece of code, so there's an
 argument to be made for allowing a situation like this:
+
+.. code-block:: haskell
 
   join $sj :: Int -> Int -> String
        $sj n m = ...
@@ -346,6 +368,8 @@ we behave as follows (#15057, #T15664):
 
 * Switch off lf_report_unsat_syns, and lint ty1 .. tyn.
 
+.. code-block:: haskell
+
   Reason: catch out of scope variables or other ill-kinded gubbins,
   even if S discards that argument entirely. E.g. (#15012):
      type FakeOut a = Int
@@ -353,6 +377,8 @@ we behave as follows (#15057, #T15664):
      type instance TF Int = FakeOut a
   Here 'a' is out of scope; but if we expand FakeOut, we conceal
   that out-of-scope error.
+
+.. code-block:: haskell
 
   Reason for switching off lf_report_unsat_syns: with
   LiberalTypeSynonyms, GHC allows unsaturated synonyms provided they

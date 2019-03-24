@@ -15,11 +15,15 @@ Note [The ZonkEnv]
   occurrences of the Id point to a single zonked copy, built at the
   binding site.
 
+.. code-block:: haskell
+
   Unlike ze_tv_env, it is knot-tied: see extendIdZonkEnvRec.
   In a mutually recusive group
      rec { f = ...g...; g = ...f... }
   we want the occurrence of g to point to the one zonked Id for g,
   and the same for f.
+
+.. code-block:: haskell
 
   Because it is knot-tied, we must be careful to consult it lazily.
   Specifically, zonkIdOcc is not monadic.
@@ -54,7 +58,11 @@ There are three possibilities:
   variables floating around: after typecheck is complete, every
   type variable occurrence must have a bindign site.
 
+.. code-block:: haskell
+
   So we default it to 'Any' of the right kind.
+
+.. code-block:: haskell
 
   All this works for both type and kind variables (indeed
   the two are the same thign).
@@ -71,6 +79,8 @@ There are three possibilities:
 Note [Skolems in zonkSyntaxExpr]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider rebindable syntax with something like
+
+.. code-block:: haskell
 
   (>>=) :: (forall x. blah) -> (forall y. blah') -> blah''
 
@@ -110,10 +120,14 @@ Note [Sharing when zonking to Type]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Problem:
 
+.. code-block:: haskell
+
     In TcMType.zonkTcTyVar, we short-circuit (Indirect ty) to
     (Indirect zty), see Note [Sharing in zonking] in TcMType. But we
     /can't/ do this when zonking a TcType to a Type (#15552, esp
     comment:3).  Suppose we have
+
+.. code-block:: haskell
 
        alpha -> alpha
          where
@@ -121,20 +135,28 @@ Problem:
              alpha := T{tc-tycon} Int -> Int
          and T is knot-tied
 
+.. code-block:: haskell
+
     By "knot-tied" I mean that the occurrence of T is currently a TcTyCon,
     but the global env contains a mapping "T" :-> T{knot-tied-tc}. See
     Note [Type checking recursive type and class declarations] in
     TcTyClsDecls.
+
+.. code-block:: haskell
 
     Now we call zonkTcTypeToType on that (alpha -> alpha). If we follow
     the same path as Note [Sharing in zonking] in TcMType, we'll
     update alpha to
        alpha := T{knot-tied-tc} Int -> Int
 
+.. code-block:: haskell
+
     But alas, if we encounter alpha for a /second/ time, we end up
     looking at T{knot-tied-tc} and fall into a black hole. The whole
     point of zonkTcTypeToType is that it produces a type full of
     knot-tied tycons, and you must not look at the result!!
+
+.. code-block:: haskell
 
     To put it another way (zonkTcTypeToType . zonkTcTypeToType) is not
     the same as zonkTcTypeToType. (If we distinguished TcType from
@@ -142,9 +164,13 @@ Problem:
 
 Solution: (see #15552 for other variants)
 
+.. code-block:: haskell
+
     One possible solution is simply not to do the short-circuiting.
     That has less sharing, but maybe sharing is rare. And indeed,
     that turns out to be viable from a perf point of view
+
+.. code-block:: haskell
 
     But the code implements something a bit better
 
@@ -160,6 +186,8 @@ Solution: (see #15552 for other variants)
       the treatment of lexically-scoped variables in ze_tv_env and
       ze_id_env.)
 
+.. code-block:: haskell
+
     Is the extra work worth it?  Some non-sytematic perf measurements
     suggest that compiler allocation is reduced overall (by 0.5% or so)
     but compile time really doesn't change.
@@ -173,8 +201,12 @@ We need to gather the type variables mentioned on the LHS so we can
 quantify over them.  Example:
   data T a = C
 
+.. code-block:: haskell
+
   foo :: T a -> Int
   foo C = 1
+
+.. code-block:: haskell
 
   {-# RULES "myrule"  foo C = 1 #-}
 

@@ -27,8 +27,12 @@ specUnfolding to specialise its unfolding.  Some important points:
   enough to inline at a call site. This happens with Control.Monad.liftM3,
   and can cause a lot more allocation as a result (nofib n-body shows this).
 
+.. code-block:: haskell
+
   Moreover, keeping the INLINABLE thing isn't much help, because
   the specialised function (probaby) isn't overloaded any more.
+
+.. code-block:: haskell
 
   Conclusion: drop the INLINEALE pragma.  In practice what this means is:
      if a stable unfolding has UnfoldingGuidance of UnfWhen,
@@ -42,12 +46,18 @@ Note [Honour INLINE on 0-ary bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
 
+.. code-block:: haskell
+
    x = <expensive>
    {-# INLINE x #-}
+
+.. code-block:: haskell
 
    f y = ...x...
 
 The semantics of an INLINE pragma is
+
+.. code-block:: haskell
 
   inline x at every call site, provided it is saturated;
   that is, applied to at least as many arguments as appear
@@ -136,11 +146,15 @@ The binder swap can temporarily violate Core Lint, by assinging
 a LocalId binding to a GlobalId. For example, if A.foo{r872}
 is a GlobalId with unique r872, then
 
+.. code-block:: haskell
+
  case A.foo{r872} of bar {
    K x -> ...(A.foo{r872})...
  }
 
 gets transformed to
+
+.. code-block:: haskell
 
   case A.foo{r872} of bar {
     K x -> let foo{r872} = bar
@@ -148,6 +162,8 @@ gets transformed to
 
 This is usually not a problem, because the simplifier will transform
 this to:
+
+.. code-block:: haskell
 
   case A.foo{r872} of bar {
     K x -> ...(bar)...
@@ -255,6 +271,8 @@ Things to note:
       x     --> g 3               -- NO
       x     --> Just v            -- NO
 
+.. code-block:: haskell
+
     It's very important not to unconditionally replace a variable by
     a non-atomic term.
 
@@ -282,6 +300,8 @@ Things to note:
     single instruction, but we do not want to unconditionally replace
     every occurrence of x with (y +# z).  So we only do the
     unconditional-inline thing for *trivial* expressions.
+
+.. code-block:: haskell
 
     NB: you might think that PostInlineUnconditionally would do this
     but it doesn't fire for top-level things; see SimplUtils
@@ -472,17 +492,23 @@ When a call is not saturated, we *still* inline if one of the
 arguments has interesting structure.  That's sometimes very important.
 A good example is the Ord instance for Bool in Base:
 
+.. code-block:: haskell
+
  Rec {
     $fOrdBool =GHC.Classes.D:Ord
                  @ Bool
                  ...
                  $cmin_ajX
 
+.. code-block:: haskell
+
     $cmin_ajX [Occ=LoopBreaker] :: Bool -> Bool -> Bool
     $cmin_ajX = GHC.Classes.$dmmin @ Bool $fOrdBool
   }
 
 But the defn of GHC.Classes.$dmmin is:
+
+.. code-block:: haskell
 
   $dmmin :: forall a. GHC.Classes.Ord a => a -> a -> a
     {- Arity: 3, HasNoCafRefs, Strictness: SLL,
@@ -615,6 +641,8 @@ However, watch out:
    important: in the NDP project, 'bar' generates a closure data
    structure rather than a list.
 
+.. code-block:: haskell
+
    So the non-inlining of lone_variables should only apply if the
    unfolding is regarded as cheap; because that is when exprIsConApp_maybe
    looks through the unfolding.  Hence the "&& is_wf" in the
@@ -624,6 +652,8 @@ However, watch out:
    Consider
         case $fMonadST @ RealWorld of { :DMonad a b c -> c }
    We had better inline that sucker!  The case won't see through it.
+
+.. code-block:: haskell
 
    For now, I'm treating treating a variable applied to types
    in a *lazy* context "lone". The motivating example was
@@ -650,6 +680,8 @@ rather than is_wf, which was utterly wrong, because the above
 expression responds True to exprIsHNF, which is what sets is_value.
 
 This kind of thing can occur if you have
+
+.. code-block:: haskell
 
         {-# INLINE foo #-}
         foo = let x = e in (x,x)

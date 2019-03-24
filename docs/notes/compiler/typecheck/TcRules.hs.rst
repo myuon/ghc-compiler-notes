@@ -6,11 +6,17 @@ We *infer* the typ of the LHS, and use that type to *check* the type of
 the RHS.  That means that higher-rank rules work reasonably well. Here's
 an example (test simplCore/should_compile/rule2.hs) produced by Roman:
 
+.. code-block:: haskell
+
    foo :: (forall m. m a -> m b) -> m a -> m b
    foo f = ...
 
+.. code-block:: haskell
+
    bar :: (forall m. m a -> m a) -> m a -> m a
    bar f = ...
+
+.. code-block:: haskell
 
    {-# RULES "foo/bar" foo = bar #-}
 
@@ -105,6 +111,8 @@ Consider
    f :: Int -> T Int
    type instance T Int = Bool
 
+.. code-block:: haskell
+
    RULE f 3 = True
 
 From the RULE we get
@@ -114,9 +122,13 @@ where 'alpha' is the type that connects the two.  If we glom them
 all together, and solve the RHS constraint first, we might solve
 with alpha := Bool.  But then we'd end up with a RULE like
 
+.. code-block:: haskell
+
     RULE: f 3 |> (co :: T Int ~ Bool) = True
 
 which is terrible.  We want
+
+.. code-block:: haskell
 
     RULE: f 3 = True |> (sym co :: Bool ~ T Int)
 

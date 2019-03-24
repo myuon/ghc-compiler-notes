@@ -4,16 +4,22 @@ Note [Inlining and hs-boot files]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this example (#10083, #12789):
 
+.. code-block:: haskell
+
     ---------- RSR.hs-boot ------------
     module RSR where
       data RSR
       eqRSR :: RSR -> RSR -> Bool
+
+.. code-block:: haskell
 
     ---------- SR.hs ------------
     module SR where
       import {-# SOURCE #-} RSR
       data SR = MkSR RSR
       eqSR (MkSR r1) (MkSR r2) = eqRSR r1 r2
+
+.. code-block:: haskell
 
     ---------- RSR.hs ------------
     module RSR where
@@ -24,11 +30,15 @@ Consider this example (#10083, #12789):
 
 When compiling RSR we get this code
 
+.. code-block:: haskell
+
     RSR.eqRSR :: RSR -> RSR -> Bool
     RSR.eqRSR = \ (ds1 :: RSR.RSR) (ds2 :: RSR.RSR) ->
                 case ds1 of _ { RSR.MkRSR s1 ->
                 case ds2 of _ { RSR.MkRSR s2 ->
                 SR.eqSR s1 s2 }}
+
+.. code-block:: haskell
 
     RSR.foo :: RSR -> RSR -> Bool
     RSR.foo = \ (x :: RSR) (y :: RSR) -> not (RSR.eqRSR x y)

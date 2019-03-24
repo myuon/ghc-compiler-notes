@@ -20,6 +20,8 @@ This is accomplished through a combination of mechanisms:
      use. For example, when we parse a [] in a type we can just insert
      an Exact RdrName Name with the listTyConKey.
 
+.. code-block:: haskell
+
      Currently, I believe this is just an optimisation: it would be
      equally valid to just output Orig RdrNames that correctly record
      the module etc we expect the final Name to come from. However,
@@ -33,6 +35,8 @@ This is accomplished through a combination of mechanisms:
      or renamer (both of which use IfaceEnv) look up an original name
      (i.e. a pair of a Module and an OccName) for a known-key name
      they get the correct Unique.
+
+.. code-block:: haskell
 
      This is the most important mechanism for ensuring that known-key
      stuff gets the right Unique, and is why it is so important to
@@ -58,8 +62,12 @@ doesn't sound familiar see Note [Known-key names] above).
 We instead handle tuples and sums separately from the "vanilla" known-key
 things,
 
+.. code-block:: haskell
+
   a) The parser recognises them specially and generates an Exact Name (hence not
      looked up in the orig-name cache)
+
+.. code-block:: haskell
 
   b) The known infinite families of names are specially serialised by
      BinIface.putName, with that special treatment detected when we read back to
@@ -72,9 +80,13 @@ suffice to ensure that they always have the right Unique. In particular,
 implicit param TyCon names, constraint tuples and Any TyCons cannot be mentioned
 by the user. For those things that *can* appear in source programs,
 
+.. code-block:: haskell
+
   c) IfaceEnv.lookupOrigNameCache uses isBuiltInOcc_maybe to map built-in syntax
      directly onto the corresponding name, rather than trying to find it in the
      original-name cache.
+
+.. code-block:: haskell
 
      See also Note [Built-in syntax and the OrigNameCache]
 

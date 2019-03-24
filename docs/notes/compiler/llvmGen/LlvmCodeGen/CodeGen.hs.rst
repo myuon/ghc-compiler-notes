@@ -12,6 +12,8 @@ responsible for this, in the case of literal integers.
 
 Often, we won't see direct statements like:
 
+.. code-block:: haskell
+
     if(1) {
       ...
     } else {
@@ -25,19 +27,27 @@ which will eliminate the expression entirely.
 However, it's certainly possible and reasonable for this to occur in
 hand-written C-- code. Consider something like:
 
+.. code-block:: haskell
+
     #if !defined(SOME_CONDITIONAL)
     #define CHECK_THING(x) 1
     #else
     #define CHECK_THING(x) some_operation((x))
     #endif
 
+.. code-block:: haskell
+
     f() {
+
+.. code-block:: haskell
 
       if (CHECK_THING(xyz)) {
         ...
       } else {
         ...
       }
+
+.. code-block:: haskell
 
     }
 

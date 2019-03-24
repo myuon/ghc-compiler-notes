@@ -11,9 +11,13 @@ The code we generate is this:
                 push arg
                 push bogus-word
 
+.. code-block:: haskell
+
                 TESTEQ_I 0 L1
                   PUSH_G <lbl for first data con>
                   JMP L_Exit
+
+.. code-block:: haskell
 
         L1:     TESTEQ_I 1 L2
                   PUSH_G <lbl for second data con>
@@ -23,7 +27,11 @@ The code we generate is this:
                   PUSH_G <lbl for last data con>
                   JMP L_Exit
 
+.. code-block:: haskell
+
         L_fail: CASEFAIL
+
+.. code-block:: haskell
 
         L_exit: SLIDE 1 n
                 ENTER

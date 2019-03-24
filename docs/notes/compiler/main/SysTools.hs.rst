@@ -10,11 +10,15 @@ file containing variables whose value is figured out by the build system.
 
 Config.hs contains two sorts of things
 
+.. code-block:: haskell
+
   cGCC,         The *names* of the programs
   cCPP            e.g.  cGCC = gcc
   cUNLIT                cCPP = gcc -E
   etc           They do *not* include paths
 
+
+.. code-block:: haskell
 
   cUNLIT_DIR   The *path* to the directory containing unlit, split etc
   cSPLIT_DIR   *relative* to the root of the build tree,

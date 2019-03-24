@@ -13,8 +13,12 @@ For the coverage condition, we check
 The liberal version  ensures the self-consistency of the instance, but
 it does not guarantee termination. Example:
 
+.. code-block:: haskell
+
    class Mul a b c | a b -> c where
         (.*.) :: a -> b -> c
+
+.. code-block:: haskell
 
    instance Mul Int Int Int where (.*.) = (*)
    instance Mul Int Float Float where x .*. y = fromIntegral x * y
@@ -41,10 +45,14 @@ Example (#8391), using liberal coverage
       class Bar a b | a -> b
       instance Bar a (Foo a)
 
+.. code-block:: haskell
+
     In the instance decl, (a:k) does fix (Foo k a), but only if we notice
     that (a:k) fixes k.  #10109 is another example.
 
 Here is a more subtle example, from HList-0.4.0.0 (#10564)
+
+.. code-block:: haskell
 
   class HasFieldM (l :: k) r (v :: Maybe *)
         | l r -> v where ...
@@ -53,8 +61,12 @@ Here is a more subtle example, from HList-0.4.0.0 (#10564)
   class HMemberM (e1 :: k) (l :: [k]) (r :: Maybe [k])
         | e1 l -> r
 
+.. code-block:: haskell
+
   data Label :: k -> *
   type family LabelsOf (a :: [*]) ::  *
+
+.. code-block:: haskell
 
   instance (HMemberM (Label {k} (l::k)) (LabelsOf xs) b,
             HasFieldM1 b l (r xs) v)
@@ -78,6 +90,8 @@ Is the instance OK? Does {l,r,xs} determine v?  Well:
 
 However, we must closeOverKinds whenever augmenting the seed set
 in oclose!  Consider #10109:
+
+.. code-block:: haskell
 
   data Succ a   -- Succ :: forall k. k -> *
   class Add (a :: k1) (b :: k2) (ab :: k3) | a b -> ab

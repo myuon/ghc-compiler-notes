@@ -5,8 +5,12 @@ Note [Role of TExp]
 TExp's argument must have a nominal role, not phantom as would
 be inferred (#8459).  Consider
 
+.. code-block:: haskell
+
   e :: TExp Age
   e = MkAge 3
+
+.. code-block:: haskell
 
   foo = $(coerce e) + 4::Int
 
@@ -25,9 +29,13 @@ Class Data was originally intended for algebraic data types.  But
 it is possible to use it for abstract types too.  For example, in
 package `text` we find
 
+.. code-block:: haskell
+
   instance Data Text where
     ...
     toConstr _ = packConstr
+
+.. code-block:: haskell
 
   packConstr :: Constr
   packConstr = mkConstr textDataType "pack" [] Prefix
@@ -45,6 +53,7 @@ function.  Two complications
   But nothing enforces that; #12596 shows what goes wrong if
   "pack" is defined in a different module than the data type "Text".
   
+
 
 Note [Unresolved infix]
 ~~~~~~~~~~~~~~~~~~~~~~~

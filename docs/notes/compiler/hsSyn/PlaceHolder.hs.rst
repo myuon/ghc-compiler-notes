@@ -8,6 +8,8 @@ any meaningful value prior to the pass they are assigned a value.
 
 Historically these have been filled in with place holder values of the form
 
+.. code-block:: haskell
+
   panic "error message"
 
 This has meant the AST is difficult to traverse using standard generic
@@ -18,8 +20,12 @@ with a PlaceHolder value when they do not yet have meaning.
 
 In terms of actual usage, we have the following
 
+.. code-block:: haskell
+
   PostTc id Kind
   PostTc id Type
+
+.. code-block:: haskell
 
   PostRn id Fixity
   PostRn id NameSet

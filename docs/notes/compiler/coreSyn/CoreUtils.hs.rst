@@ -52,6 +52,8 @@ Note [Unreachable code]
 It is possible (although unusual) for GHC to find a case expression
 that cannot match.  For example:
 
+.. code-block:: haskell
+
      data Col = Red | Green | Blue
      x = Red
      f v = case x of
@@ -62,6 +64,8 @@ Suppose that for some silly reason, x isn't substituted in the case
 expression.  (Perhaps there's a NOINLINE on it, or profiling SCC stuff
 gets in the way; cf #3118.)  Then the full-lazines pass might produce
 this
+
+.. code-block:: haskell
 
      x = Red
      lvl = case x of { Green -> e1; Blue -> e2 })
@@ -84,6 +88,8 @@ If several alternatives are identical, merge them into a single
 DEFAULT alternative.  I've occasionally seen this making a big
 difference:
 
+.. code-block:: haskell
+
      case e of               =====>     case e of
        C _ -> f x                         D v -> ....v....
        D v -> ....v....                   DEFAULT -> f x
@@ -99,11 +105,15 @@ alternative; this picks up the common cases
 The case where Combine Identical Alternatives transformation showed up
 was like this (base/Foreign/C/Err/Error.hs):
 
+.. code-block:: haskell
+
         x | p `is` 1 -> e1
           | p `is` 2 -> e2
         ...etc...
 
 where @is@ was something like
+
+.. code-block:: haskell
 
         p `is` n = p /= (-1) && p == n
 
@@ -128,6 +138,8 @@ Note [Care with impossible-constructors when combining alternatives]
 Suppose we have (#10538)
    data T = A | B | C | D
 
+.. code-block:: haskell
+
       case x::T of   (Imposs-default-cons {A,B})
          DEFAULT -> e1
          A -> e2
@@ -137,6 +149,8 @@ When calling combineIdentialAlts, we'll have computed that the
 "impossible constructors" for the DEFAULT alt is {A,B}, since if x is
 A or B we'll take the other alternatives.  But suppose we combine B
 into the DEFAULT, to get
+
+.. code-block:: haskell
 
       case x::T of   (Imposs-default-cons {A})
          DEFAULT -> e1
@@ -148,12 +162,16 @@ else we risk compiling 'e1' wrong!
 Not only that, but we take care when there is no DEFAULT beforehand,
 because we are introducing one.  Consider
 
+.. code-block:: haskell
+
    case x of   (Imposs-default-cons {A,B,C})
      A -> e1
      B -> e2
      C -> e1
 
 Then when combining the A and C alternatives we get
+
+.. code-block:: haskell
 
    case x of   (Imposs-default-cons {B})
      DEFAULT -> e1
@@ -220,8 +238,12 @@ Note [exprIsDupable]
                 cost in code size.  This will only happen in different case
                 branches, so there's no issue about duplicating work.
 
+.. code-block:: haskell
+
                 That is, exprIsDupable returns True of (f x) even if
                 f is very very expensive to call.
+
+.. code-block:: haskell
 
                 Its only purpose is to avoid fruitless let-binding
                 and then inlining of case join points
@@ -239,6 +261,8 @@ duplicate a primop (#5623):
 Previously we were a bit more liberal, which led to the primop-duplicating
 problem.  However, being more conservative did lead to a big regression in
 one nofib benchmark, wheel-sieve1.  The situation looks like this:
+
+.. code-block:: haskell
 
    let noFactor_sZ3 :: GHC.Types.Int -> GHC.Types.Bool
        noFactor_sZ3 = case s_adJ of _ { GHC.Types.I# x_aRs ->
@@ -396,9 +420,13 @@ It's important that isExpandableApp does not respond True to bottoming
 functions.  Recall  undefined :: HasCallStack => a
 Suppose isExpandableApp responded True to (undefined d), and we had:
 
+.. code-block:: haskell
+
   x = undefined <dict-expr>
 
 Then Simplify.prepareRhs would ANF the RHS:
+
+.. code-block:: haskell
 
   d = <dict-expr>
   x = undefined d
@@ -460,6 +488,8 @@ But we restrict it sharply:
                                                ; False -> e2 }
                        in ...) ...
 
+.. code-block:: haskell
+
   Does the RHS of v satisfy the let/app invariant?  Previously we said
   yes, on the grounds that y is evaluated.  But the binder-swap done
   by SetLevels would transform the inner alternative to
@@ -482,6 +512,8 @@ But we restrict it sharply:
   evaluated, but the alternatives are incomplete so we should not
   evaluate it strictly.
 
+.. code-block:: haskell
+
   Now, all this is for lifted types, but it'd be the same for any
   finite unlifted type. We don't have many of them, but we might
   add unlifted algebraic types in due course.
@@ -491,6 +523,8 @@ But we restrict it sharply:
   Previously SetLevels used exprOkForSpeculation to guide
   floating of single-alternative cases; it now uses exprIsHNF
   Note [Floating single-alternative cases].
+
+.. code-block:: haskell
 
   But in those days, consider
     case e of x { DEAFULT ->
@@ -638,6 +672,8 @@ There are some particularly delicate points here:
         h y = case (case y of { True -> f `seq` True; False -> False }) of
                 True -> ...; False -> ...
 
+.. code-block:: haskell
+
   If we (unsoundly) eta-reduce f to get f=f, the strictness analyser
   says f=bottom, and replaces the (f `seq` True) with just
   (f `cast` unsafe-co).  BUT, as thing stand, 'f' got arity 1, and it
@@ -645,6 +681,8 @@ There are some particularly delicate points here:
   the definition again, so that it does not termninate after all.
   Result: seg-fault because the boolean case actually gets a function value.
   See #1947.
+
+.. code-block:: haskell
 
   So it's important to do the right thing.
 
@@ -658,6 +696,8 @@ There are some particularly delicate points here:
       f = f
   Which might change a terminating program (think (f `seq` e)) to a
   non-terminating one.  So we check for being a loop breaker first.
+
+.. code-block:: haskell
 
   However for GlobalIds we can look at the arity; and for primops we
   must, since they have no unfolding.
@@ -688,6 +728,8 @@ Consider
     f :: t1 -> t2
     g :: t3 ~ t1
 This should be eta-reduced to
+
+.. code-block:: haskell
 
     f |> (sym g -> t2)
 

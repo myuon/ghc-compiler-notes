@@ -43,9 +43,13 @@ So
 
 would result in the AST element
 
+.. code-block:: haskell
+
   L span (HsLet (binds for x = 1) (2 * x))
 
 and the annotations
+
+.. code-block:: haskell
 
   (span,AnnLet) having the location of the 'let' keyword
   (span,AnnEqual) having the location of the '=' sign

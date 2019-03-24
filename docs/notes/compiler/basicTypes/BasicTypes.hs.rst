@@ -20,6 +20,8 @@ Note [Type operator precedence]
 We don't keep the fixity of type operators in the operator. So the
 pretty printer follows the following precedence order:
 
+.. code-block:: haskell
+
    TyConPrec         Type constructor application
    TyOpPrec/FunPrec  Operator application and function arrow
 
@@ -40,6 +42,8 @@ Note [LoopBreaker OccInfo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
    IAmALoopBreaker True  <=> A "weak" or rules-only loop breaker
                              Do not preInlineUnconditionally
+
+.. code-block:: haskell
 
    IAmALoopBreaker False <=> A "strong" loop breaker
                              Do not inline at all
@@ -67,6 +71,8 @@ being tail-called would mean that the variable could only appear once per branch
 (thus getting a `OneOcc { occ_one_br = True }` occurrence info), but a join
 point can also be invoked from other join points, not just from case branches:
 
+.. code-block:: haskell
+
   let j1 x = ...
       j2 y = ... j1 z {- tail call -} ...
   in case w of
@@ -86,6 +92,8 @@ accepting both UK and US spelling variants.
 
 So
 
+.. code-block:: haskell
+
   {-# SPECIALISE #-}
   {-# SPECIALIZE #-}
   {-# Specialize #-}
@@ -97,6 +105,8 @@ source text for the token needs to be preserved, hence the
 `SourceText` field.
 
 So the lexer will then generate
+
+.. code-block:: haskell
 
   ITspec_prag "{ -# SPECIALISE"
   ITspec_prag "{ -# SPECIALIZE"
@@ -117,6 +127,8 @@ text is stored in literals where this can occur.
 
 Motivating examples for HsLit
 
+.. code-block:: haskell
+
   HsChar          '\n'       == '\x20`
   HsCharPrim      '\x41`#    == `A`
   HsString        "\x20\x41" == " A"
@@ -129,6 +141,8 @@ Motivating examples for HsLit
   HsInteger       006        == 6
 
 For OverLitVal
+
+.. code-block:: haskell
 
   HsIntegral      003      == 0x003
   HsIsString      "\x41nd" == "And"

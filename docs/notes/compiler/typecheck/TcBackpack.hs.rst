@@ -54,10 +54,14 @@ we need to watch out for:
    non-exported DFunId.  In this case, 'checkBootDeclM' directly compares the
    embedded 'DFunId' in 'is_dfun'.
 
+.. code-block:: haskell
+
    For this to work at all, we must ensure that pointers in 'is_dfun' refer
    to DISTINCT 'DFunId's, even though the 'Name's (may) be the same.
    Unfortunately, this is the OPPOSITE of how we treat most other references
    to 'Name's, so this case needs to be handled specially.
+
+.. code-block:: haskell
 
    The details are in the documentation for 'typecheckIfacesForMerging'.
    and the Note [Resolving never-exported Names in TcIface].
@@ -68,6 +72,8 @@ we need to watch out for:
    entities.  Fortunately, we only need to rename these entities
    *consistently*, so that 'typecheckIfacesForMerging' can wire them
    up as needed.
+
+.. code-block:: haskell
 
    The details are in Note [rnIfaceNeverExported] in 'RnModIface'.
 

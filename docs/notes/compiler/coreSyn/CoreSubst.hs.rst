@@ -16,6 +16,8 @@ In consequence:
 * If all subst envs are empty, substExpr would be a
   no-op, so substExprSC ("short cut") does nothing.
 
+.. code-block:: haskell
+
   However, substExpr still goes ahead and substitutes.  Reason: we may
   want to replace existing Ids with new ones from the in-scope set, to
   avoid space leaks.

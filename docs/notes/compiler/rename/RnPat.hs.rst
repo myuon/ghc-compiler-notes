@@ -5,9 +5,13 @@ Note [CpsRn monad]
 The CpsRn monad uses continuation-passing style to support this
 style of programming:
 
+.. code-block:: haskell
+
         do { ...
            ; ns <- bindNames rs
            ; ...blah... }
+
+.. code-block:: haskell
 
    where rs::[RdrName], ns::[Name]
 
@@ -28,8 +32,12 @@ Consider
   module Foo( f, g ) where
   data T = T1 | T2
 
+.. code-block:: haskell
+
   f T1 = True
   f T2 = False
+
+.. code-block:: haskell
 
   g _ = T1
 
@@ -38,6 +46,8 @@ pattern, because it never occurs in a constructed position.  See
 #7336.
 However, implementing this in the face of pattern synonyms would be
 less straightforward, since given two pattern synonyms
+
+.. code-block:: haskell
 
   pattern P1 <- P2
   pattern P2 <- ()

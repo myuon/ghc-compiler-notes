@@ -33,9 +33,13 @@ case where the cases are listed separately.
 
 So
 
+.. code-block:: haskell
+
   type instance XXHsIPBinds    (GhcPass p) = NoExt
 
 will correctly deduce Outputable for (GhcPass p), but
+
+.. code-block:: haskell
 
   type instance XIPBinds       GhcPs = NoExt
   type instance XIPBinds       GhcRn = NoExt

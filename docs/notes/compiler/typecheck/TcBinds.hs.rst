@@ -11,10 +11,14 @@ The game plan for polymorphic recursion in the code above is
 This fine, but if you aren't a bit careful you end up with a horrendous
 amount of partial application and (worse) a huge space leak. For example:
 
+.. code-block:: haskell
+
         f :: Eq a => [a] -> [a]
         f xs = ...f...
 
 If we don't take care, after typechecking we get
+
+.. code-block:: haskell
 
         f = /\a -> \d::Eq a -> let f' = f a d
                                in
@@ -26,6 +30,8 @@ polymorphic recursion isn't being used (but that's a very common case).
 This can lead to a massive space leak, from the following top-level defn
 (post-typechecking)
 
+.. code-block:: haskell
+
         ff :: [Int] -> [Int]
         ff = f Int dEqInt
 
@@ -33,9 +39,15 @@ Now (f dEqInt) evaluates to a lambda that has f' as a free variable; but
 f' is another thunk which evaluates to the same thing... and you end
 up with a chain of identical values all hung onto by the CAF ff.
 
+.. code-block:: haskell
+
         ff = f Int dEqInt
 
+.. code-block:: haskell
+
            = let f' = f Int dEqInt in \ys. ...f'...
+
+.. code-block:: haskell
 
            = let f' = let f' = f Int dEqInt in \ys. ...f'...
                       in \ys. ...f'...
@@ -53,6 +65,8 @@ to the "givens" when simplifying constraints.  That's what the "lies_avail"
 is doing.
 
 Then we get
+
+.. code-block:: haskell
 
         f = /\a -> \d::Eq a -> letrec
                                  fm = \ys:[a] -> ...fm...
@@ -77,6 +91,8 @@ untouchable-range idea.
 
 Note [Closed binder groups]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: haskell
 
  A mutually recursive group is "closed" if all of the free variables of
  the bindings are closed. For example
@@ -189,6 +205,8 @@ Consider
    f 0 x = x
    f n x = g [] (not x)
 
+.. code-block:: haskell
+
    g [] y = f 10 y
    g _  y = f 9  y
 
@@ -206,6 +224,8 @@ The types we really want for f and g are
 We can get these by "impedance matching":
    tuple :: forall a b. (Eq a, Num a) => (a -> Bool -> Bool, [b] -> Bool -> Bool)
    tuple a b d1 d1 = let ...bind f_mono, g_mono in (f_mono, g_mono)
+
+.. code-block:: haskell
 
    f a d1 d2 = case tuple a Any d1 d2 of (f, g) -> f
    g b = case tuple Integer b dEqInteger dNumInteger of (f,g) -> g
@@ -233,6 +253,8 @@ But SPECIALISE INLINE *can* make sense for GADTS:
      ArrInt :: !Int -> ByteArray# -> Arr Int
      ArrPair :: !Int -> Arr e1 -> Arr e2 -> Arr (e1, e2)
 
+.. code-block:: haskell
+
    (!:) :: Arr e -> Int -> e
    {-# SPECIALISE INLINE (!:) :: Arr Int -> Int -> Int #-}
    {-# SPECIALISE INLINE (!:) :: Arr (a, b) -> Int -> (a, b) #-}
@@ -251,14 +273,22 @@ Look at:
    - typecheck/should_compile/ExPat
    - #12427, typecheck/should_compile/T12427{a,b}
 
+.. code-block:: haskell
+
   data T where
     MkT :: Integral a => a -> Int -> T
 
 and suppose t :: T.  Which of these pattern bindings are ok?
 
+.. code-block:: haskell
+
   E1. let { MkT p _ = t } in <body>
 
+.. code-block:: haskell
+
   E2. let { MkT _ q = t } in <body>
+
+.. code-block:: haskell
 
   E3. let { MkT (toInteger -> r) _ = t } in <body>
 
@@ -285,6 +315,8 @@ We typecheck pattern bindings as follows.  First tcLhs does this:
      gives us a fresh "mono_id" qm :: instantiate(ty), where qm has
      a fresh name.
 
+.. code-block:: haskell
+
      Any fresh unification variables in instantiate(ty) born here, not
      deep under implications as would happen if we allocated them when
      we encountered q during tcPat.
@@ -305,18 +337,26 @@ We typecheck pattern bindings as follows.  First tcLhs does this:
      - When we come to a binder (TcPat.tcPatBndr), it looks it up
        in the little environment (the pc_sig_fn field of PatCtxt).
 
+.. code-block:: haskell
+
          Success => There was a type signature, so just use it,
                     checking compatibility with the expected type.
+
+.. code-block:: haskell
 
          Failure => No type sigature.
              Infer case: (happens only outside any constructor pattern)
                          use a unification variable
                          at the outer level pc_lvl
 
+.. code-block:: haskell
+
              Check case: use promoteTcType to promote the type
                          to the outer level pc_lvl.  This is the
                          place where we emit a constraint that'll blow
                          up if existential capture takes place
+
+.. code-block:: haskell
 
        Result: the type of the binder is always at pc_lvl. This is
        crucial.

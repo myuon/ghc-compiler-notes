@@ -14,6 +14,8 @@ for DerivContext:
       In this case, mb_wildcard = Just loc, where loc is the location
       of the extra-constraints wildcard.
 
+.. code-block:: haskell
+
     Here we must infer an instance context,
     and generate instance declaration
       instance Eq a => Eq (T a) where ...
@@ -45,12 +47,16 @@ In the functor-like case, we may need to unify some kind variables with * in
 order for the generated instance to be well-kinded. An example from
 #10524:
 
+.. code-block:: haskell
+
   newtype Compose (f :: k2 -> *) (g :: k1 -> k2) (a :: k1)
     = Compose (f (g a)) deriving Functor
 
 Earlier in the deriving pipeline, GHC unifies the kind of Compose f g
 (k1 -> *) with the kind of Functor's argument (* -> *), so k1 := *. But this
 alone isn't enough, since k2 wasn't unified with *:
+
+.. code-block:: haskell
 
   instance (Functor (f :: k2 -> *), Functor (g :: * -> k2)) =>
     Functor (Compose f g) where ...
@@ -95,9 +101,13 @@ redundant; we'll also generate an Ord constraint for each constructor argument,
 and that will probably generate enough constraints to make the Eq (T a) constraint
 be satisfied too.  But not always; consider:
 
+.. code-block:: haskell
+
  data S a = S
  instance Eq (S a)
  instance Ord (S a)
+
+.. code-block:: haskell
 
  data T a = MkT (S a) deriving( Ord )
  instance Num a => Eq (T a)
@@ -116,12 +126,16 @@ Note [Simplifying the instance context]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
 
+.. code-block:: haskell
+
         data T a b = C1 (Foo a) (Bar b)
                    | C2 Int (T b a)
                    | C3 (T a a)
                    deriving (Eq)
 
 We want to come up with an instance declaration of the form
+
+.. code-block:: haskell
 
         instance (Ping a, Pong b, ...) => Eq (T a b) where
                 x == y = ...
@@ -133,10 +147,14 @@ namely Ping, Pong and friends.
 Let's call the context reqd for the T instance of class C at types
 (a,b, ...)  C (T a b).  Thus:
 
+.. code-block:: haskell
+
         Eq (T a b) = (Ping a, Pong b, ...)
 
 Now we can get a (recursive) equation from the data decl.  This part
 is done by inferConstraintsDataConArgs.
+
+.. code-block:: haskell
 
         Eq (T a b) = Eq (Foo a) u Eq (Bar b)    -- From C1
                    u Eq (T b a) u Eq Int        -- From C2
@@ -157,6 +175,8 @@ Let's suppose Eq (Foo a) = Eq a, and Eq (Bar b) = Ping b.
 
 We start with:
 
+.. code-block:: haskell
+
         Eq (T a b) = {}         -- The empty set
 
 Next iteration:
@@ -164,20 +184,28 @@ Next iteration:
                    u Eq (T b a) u Eq Int        -- From C2
                    u Eq (T a a)                 -- From C3
 
+.. code-block:: haskell
+
         After simplification:
                    = Eq a u Ping b u {} u {} u {}
                    = Eq a u Ping b
 
 Next iteration:
 
+.. code-block:: haskell
+
         Eq (T a b) = Eq (Foo a) u Eq (Bar b)    -- From C1
                    u Eq (T b a) u Eq Int        -- From C2
                    u Eq (T a a)                 -- From C3
+
+.. code-block:: haskell
 
         After simplification:
                    = Eq a u Ping b
                    u (Eq b u Ping a)
                    u (Eq a u Ping a)
+
+.. code-block:: haskell
 
                    = Eq a u Ping b u Eq b u Ping a
 
@@ -200,13 +228,19 @@ nondeterministic order.
 
 Consider:
 
+.. code-block:: haskell
+
   data ADT a b = Z a b deriving Eq
 
 The generated code could be either:
 
+.. code-block:: haskell
+
   instance (Eq a, Eq b) => Eq (Z a b) where
 
 Or:
+
+.. code-block:: haskell
 
   instance (Eq b, Eq a) => Eq (Z a b) where
 
@@ -254,10 +288,14 @@ definition at all!
 
 To see why, consider this example of DeriveAnyClass:
 
+.. code-block:: haskell
+
   class Foo a where
     bar :: forall b. Ix b => a -> b -> String
     default bar :: (Show a, Ix c) => a -> c -> String
     bar x y = show x ++ show (range (y,y))
+
+.. code-block:: haskell
 
     baz :: Eq a => a -> a -> Bool
     default baz :: (Ord a, Show a) => a -> a -> Bool
@@ -265,6 +303,8 @@ To see why, consider this example of DeriveAnyClass:
 
 Because 'bar' and 'baz' have default signatures, this generates a top-level
 definition for these generic default methods
+
+.. code-block:: haskell
 
   $gdm_bar :: forall a. Foo a
            => forall c. (Show a, Ix c)
@@ -289,6 +329,8 @@ it would
 
 [STEP DAC BUILD]
 So that's what we do.  We build the constraint (call it C1)
+
+.. code-block:: haskell
 
    forall[2] b. Ix b => (Show (Maybe s), Ix cc,
                         Maybe s -> b -> String
@@ -320,6 +362,8 @@ such as #14933.
 
 Similarly for 'baz', givng the constraint C2
 
+.. code-block:: haskell
+
    forall[2]. Eq (Maybe s) => (Ord a, Show a,
                               Maybe s -> Maybe s -> Bool
                                 ~ Maybe s -> Maybe s -> Bool)
@@ -332,6 +376,8 @@ variables.
 We can combine these two implication constraints into a single
 constraint (C1, C2), and simplify, unifying cc:=b, to get:
 
+.. code-block:: haskell
+
    forall[2] b. Ix b => Show a
    /   forall[2]. Eq (Maybe s) => (Ord a, Show a)
 
@@ -341,9 +387,13 @@ Let's call that (C1', C2').  Now we need to hoist the unsolved
 constraints out of the implications to become our candidate for
 (CX). That is done by approximateWC, which will return:
 
+.. code-block:: haskell
+
   (Show a, Ord a, Show a)
 
 Now we can use mkMinimalBySCs to remove superclasses and duplicates, giving
+
+.. code-block:: haskell
 
   (Show a, Ord a)
 
@@ -352,6 +402,8 @@ And that's what GHC uses for CX.
 [STEP DAC RESIDUAL]
 In this case we have solved all the leftover constraints, but what if
 we don't?  Simple!  We just form the final residual constraint
+
+.. code-block:: haskell
 
    forall[1] s. CX => (C1',C2')
 
@@ -379,9 +431,13 @@ to worse error messages, so we do it directly in simplifyDeriv.
 simplifyDeriv checks for errors in a clever way. If the deriving machinery
 infers the context (Foo a)--that is, if this instance is to be generated:
 
+.. code-block:: haskell
+
   instance Foo a => ...
 
 Then we form an implication of the form:
+
+.. code-block:: haskell
 
   forall a. Foo a => <residual_wanted_constraints>
 

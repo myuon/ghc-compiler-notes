@@ -17,6 +17,8 @@ Note [Constraints and errors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this (#12124):
 
+.. code-block:: haskell
+
   foo :: Maybe Int
   foo = return (case Left 3 of
                   Left -> 1  -- Hard error here!

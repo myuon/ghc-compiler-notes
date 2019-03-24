@@ -5,10 +5,14 @@ Note [IEThingWith]
 
 A definition like
 
+.. code-block:: haskell
+
     module M ( T(MkT, x) ) where
       data T = MkT { x :: Int }
 
 gives rise to
+
+.. code-block:: haskell
 
     IEThingWith T [MkT] [FieldLabel "x" False x)]           (without DuplicateRecordFields)
     IEThingWith T [MkT] [FieldLabel "x" True $sel:x:MkT)]   (with    DuplicateRecordFields)

@@ -9,6 +9,8 @@ trigger GC.
 
 A more interesting situation is this (a Plan-B situation)
 
+.. code-block:: haskell
+
         !P!;
         ...P...
         case x# of
@@ -43,6 +45,8 @@ Against omitting !Q!, !R!
     worst-casing is done, because many many calls to nfib are leaf calls
     which don't need to allocate anything.
 
+.. code-block:: haskell
+
     We can un-allocate, but that costs an instruction
 
 Neither problem hurts us if there is only one alternative.
@@ -71,14 +75,22 @@ single-branch cases, we may have lots of things live
 
 Hence: two basic plans for
 
+.. code-block:: haskell
+
         case e of r { alts }
 
 ------ Plan A: the general case ---------
 
+.. code-block:: haskell
+
         ...save current cost centre...
+
+.. code-block:: haskell
 
         ...code for e,
            with sequel (SetLocals r)
+
+.. code-block:: haskell
 
         ...restore current cost centre...
         ...code for alts...
@@ -89,9 +101,13 @@ Hence: two basic plans for
   (ii) either upstream code performs allocation
        or there is just one alternative
 
+.. code-block:: haskell
+
   Then heap allocation in the (single) case branch
   is absorbed by the upstream check.
   Very common example: primops on unboxed values
+
+.. code-block:: haskell
 
         ...code for e,
            with sequel (SetLocals r)...
@@ -104,6 +120,8 @@ Hence: two basic plans for
 Note [case on bool]
 ~~~~~~~~~~~~~~~~~~~
 This special case handles code like
+
+.. code-block:: haskell
 
   case a <# b of
     True ->
@@ -118,6 +136,8 @@ This special case handles code like
 
 If we let the ordinary case code handle it, we'll get something like
 
+.. code-block:: haskell
+
  tmp1 = a < b
  tmp2 = Bool_closure_tbl[tmp1]
  if (tmp2 & 7 != 0) then ... // normal tagged case
@@ -125,9 +145,13 @@ If we let the ordinary case code handle it, we'll get something like
 but this junk won't optimise away.  What we really want is just an
 inline comparison:
 
+.. code-block:: haskell
+
  if (a < b) then ...
 
 So we add a special case to generate
+
+.. code-block:: haskell
 
  tmp1 = a < b
  if (tmp1 == 0) then ...

@@ -115,11 +115,17 @@ of implicit variable quantification. Specifically, we offer that implicitly
 quantified variables (such as those in const :: a -> b -> a, without a `forall`)
 will occur in left-to-right order of first occurrence. Here are a few examples:
 
+.. code-block:: haskell
+
   const :: a -> b -> a       -- forall a b. ...
   f :: Eq a => b -> a -> a   -- forall a b. ...  contexts are included
 
+.. code-block:: haskell
+
   type a <-< b = b -> a
   g :: a <-< b               -- forall a b. ...  type synonyms matter
+
+.. code-block:: haskell
 
   class Functor f where
     fmap :: (a -> b) -> f a -> f b   -- forall f a b. ...
@@ -127,6 +133,8 @@ will occur in left-to-right order of first occurrence. Here are a few examples:
 
 This simple story is complicated by the possibility of dependency: all variables
 must come after any variables mentioned in their kinds.
+
+.. code-block:: haskell
 
   typeRep :: Typeable a => TypeRep (a :: k)   -- forall k a. ...
 
@@ -228,6 +236,8 @@ HsTyVar: A name in a type or kind.
       Tv: kind variable
       TcCls: kind constructor or promoted type constructor
 
+.. code-block:: haskell
+
   The 'Promoted' field in an HsTyVar captures whether the type was promoted in
   the source code by prefixing an apostrophe.
 
@@ -256,10 +266,14 @@ Notice the difference between
 
 E.g.    f :: [Int]                      HsListTy
 
+.. code-block:: haskell
+
         g3  :: T '[]                   All these use
         g2  :: T '[True]                  HsExplicitListTy
         g1  :: T '[True,False]
         g1a :: T [True,False]             (can omit ' where unambiguous)
+
+.. code-block:: haskell
 
   kind of T :: [Bool] -> *        This kind uses HsListTy!
 
@@ -275,6 +289,8 @@ Note [Distinguishing tuple kinds]
 
 Apart from promotion, tuples can have one of three different kinds:
 
+.. code-block:: haskell
+
         x :: (Int, Bool)                -- Regular boxed tuples
         f :: Int# -> (# Int#, Int# #)   -- Unboxed tuples
         g :: (Eq a, Ord a) => a         -- Constraint tuples
@@ -285,6 +301,8 @@ HsTupleTy, a HsTupleSort). We can tell if a tuple is unboxed while parsing,
 because of the #. However, with -XConstraintKinds we can only distinguish
 between constraint and boxed tuples during type checking, in general. Hence the
 four constructors of HsTupleSort:
+
+.. code-block:: haskell
 
         HsUnboxedTuple                  -> Produced by the parser
         HsBoxedTuple                    -> Certainly a boxed tuple
@@ -305,6 +323,8 @@ second component.
 Due to DuplicateRecordFields, the OccName of the selector function
 may have been mangled, which is why we keep the original field label
 separately.  For example, when DuplicateRecordFields is enabled
+
+.. code-block:: haskell
 
     data T = MkT { x :: Int }
 

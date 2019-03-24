@@ -19,6 +19,8 @@ checking starts.
 Here is a concrete example. Suppose we are running
 "ghc -c A.hs", and we have this file system state:
 
+.. code-block:: haskell
+
  A.hs-boot   A.hi-boot **up to date**
  B.hs        B.hi      **up to date**
  A.hs        A.hi      **stale**
@@ -56,6 +58,8 @@ PrelNames.mkInteractiveModule).
 
 This scheme deals well with shadowing.  For example:
 
+.. code-block:: haskell
+
    ghci> data T = A
    ghci> data T = B
    ghci> :i A
@@ -92,6 +96,8 @@ The details are a bit tricky though:
    call to initTc in initTcInteractive, which in turn get the module
    from it 'icInteractiveModule' field of the interactive context.
 
+.. code-block:: haskell
+
    The 'thisPackage' field stays as 'main' (or whatever -this-unit-id says.
 
  * The main trickiness is that the type environment (tcg_type_env) and
@@ -106,6 +112,8 @@ The details are a bit tricky though:
   of the TcGblEnv, which collect "things defined in this module", all
   refer to stuff define in a single GHCi command, *not* all the commands
   so far.
+
+.. code-block:: haskell
 
   In contrast, tcg_inst_env, tcg_fam_inst_env, have instances from
   all GhciN modules, which makes sense -- they are all "home package"
@@ -122,13 +130,19 @@ The Ids bound by previous Stmts in GHCi are currently
            See Note [The interactive package] above
         c) A tidied type
 
+.. code-block:: haskell
+
  (a) They must be GlobalIds (not LocalIds) otherwise when we come to
      compile an expression using these ids later, the byte code
      generator will consider the occurrences to be free rather than
      global.
 
+.. code-block:: haskell
+
  (b) Having an External Name is important because of Note
      [GlobalRdrEnv shadowing] in RdrName
+
+.. code-block:: haskell
 
  (c) Their types are tidied. This is important, because :info may ask
      to look at them, and :info expects the things it looks up to have
@@ -259,11 +273,15 @@ A COMPLETE signature represents a set of conlikes (i.e., constructors or
 pattern synonyms) such that if they are all pattern-matched against in a
 function, it gives rise to a total function. An example is:
 
+.. code-block:: haskell
+
   newtype Boolean = Boolean Int
   pattern F, T :: Boolean
   pattern F = Boolean 0
   pattern T = Boolean 1
   {-# COMPLETE F, T #-}
+
+.. code-block:: haskell
 
   -- This is a total function
   booleanToInt :: Boolean -> Int
@@ -273,6 +291,8 @@ function, it gives rise to a total function. An example is:
 COMPLETE sets are represented internally in GHC with the CompleteMatch data
 type. For example, {-# COMPLETE F, T #-} would be represented as:
 
+.. code-block:: haskell
+
   CompleteMatch { complateMatchConLikes = [F, T]
                 , completeMatchTyCon    = Boolean }
 
@@ -280,12 +300,16 @@ Note that GHC was able to infer the completeMatchTyCon (Boolean), but for the
 cases in which it's ambiguous, you can also explicitly specify it in the source
 language by writing this:
 
+.. code-block:: haskell
+
   {-# COMPLETE F, T :: Boolean #-}
 
 For efficiency purposes, GHC collects all of the CompleteMatches that it knows
 about into a CompleteMatchMap, which is a map that is keyed by the
 completeMatchTyCon. In other words, you could have a multiple COMPLETE sets
 for the same TyCon:
+
+.. code-block:: haskell
 
   {-# COMPLETE F, T1 :: Boolean #-}
   {-# COMPLETE F, T2 :: Boolean #-}

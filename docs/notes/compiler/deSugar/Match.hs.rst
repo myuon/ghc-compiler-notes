@@ -77,6 +77,8 @@ Note [Don't use Literal for PgN]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Previously we had, as PatGroup constructors
 
+.. code-block:: haskell
+
   | ...
   | PgN   Literal       -- Overloaded literals
   | PgNpK Literal       -- n+k patterns
@@ -128,6 +130,8 @@ swap the Nothing and y!
 Note [Grouping overloaded literal patterns]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 WATCH OUT!  Consider
+
+.. code-block:: haskell
 
         f (n+1) = ...
         f (n+2) = ...

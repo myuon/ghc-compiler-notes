@@ -79,6 +79,8 @@ layout phase. Consider this example of what might go wrong (this is cmm
 code from stablename001 test). Here is code after common block elimination
 (before stack layout):
 
+.. code-block:: haskell
+
  c1q6:
      _s1pf::P64 = R1;
      _c1q8::I64 = performMajorGC;
@@ -92,6 +94,8 @@ code from stablename001 test). Here is code after common block elimination
 
 If we run sinking pass now (still before stack layout) we will get this:
 
+.. code-block:: haskell
+
  c1q6:
      I64[(young<c1q9> + 8)] = c1q9;
      foreign call "ccall" arg hints:  []  result hints:  [] performMajorGC(...)
@@ -104,6 +108,8 @@ If we run sinking pass now (still before stack layout) we will get this:
 
 Notice that _s1pf was sunk past a foreign call. When we run stack layout
 safe call to performMajorGC will be turned into:
+
+.. code-block:: haskell
 
  c1q6:
      _s1pc::P64 = P64[Sp + 8];

@@ -98,6 +98,8 @@ In the case of a CoAxBranch of an associated type-family instance,
 we use the *same* type variables (where possible) as the
 enclosing class or instance.  Consider
 
+.. code-block:: haskell
+
   instance C Int [z] where
      type F Int [z] = ...   -- Second param must be [z]
 
@@ -114,13 +116,19 @@ Note [CoAxBranch roles]
 ~~~~~~~~~~~~~~~~~~~~~~~
 Consider this code:
 
+.. code-block:: haskell
+
   newtype Age = MkAge Int
   newtype Wrap a = MkWrap a
+
+.. code-block:: haskell
 
   convert :: Wrap Age -> Int
   convert (MkWrap (MkAge i)) = i
 
 We want this to compile to:
+
+.. code-block:: haskell
 
   NTCo:Wrap :: forall a. Wrap a ~R a
   NTCo:Age  :: Age ~R Int

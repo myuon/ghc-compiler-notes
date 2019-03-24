@@ -5,21 +5,31 @@ Note [Kind signatures in typeToLHsType]
 There are types that typeToLHsType can produce which require explicit kind
 signatures in order to kind-check. Here is an example from #14579:
 
+.. code-block:: haskell
+
   -- type P :: forall {k} {t :: k}. Proxy t
   type P = 'Proxy
+
+.. code-block:: haskell
 
   -- type Wat :: forall a. Proxy a -> *
   newtype Wat (x :: Proxy (a :: Type)) = MkWat (Maybe a)
     deriving Eq
 
+.. code-block:: haskell
+
   -- type Wat2 :: forall {a}. Proxy a -> *
   type Wat2 = Wat
+
+.. code-block:: haskell
 
   -- type Glurp :: * -> *
   newtype Glurp a = MkGlurp (Wat2 (P :: Proxy a))
     deriving Eq
 
 The derived Eq instance for Glurp (without any kind signatures) would be:
+
+.. code-block:: haskell
 
   instance Eq a => Eq (Glurp a) where
     (==) = coerce @(Wat2 P  -> Wat2 P  -> Bool)
@@ -65,6 +75,8 @@ E.g.
 
 The top-level bindings for f,g are not unlifted (because of the Num a =>),
 but the local, recursive, monomorphic bindings are:
+
+.. code-block:: haskell
 
       t = /\a \(d:Num a).
          letrec fm :: (# a, a #) = ...g...

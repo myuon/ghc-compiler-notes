@@ -34,6 +34,8 @@ It may be worthwhile to attempt the Adams optimization by rewriting
 the graph before the assignment of proc-point protocols.  Here are a
 couple of rules:
 
+.. code-block:: haskell
+
   g() returns to k;                    g() returns to L;
   k: CopyIn c ress; goto L:
    ...                        ==>        ...
@@ -41,6 +43,8 @@ couple of rules:
 
 
 And when c == c' and ress == ress', this also:
+
+.. code-block:: haskell
 
   g() returns to k;                    g() returns to L;
   k: CopyIn c ress; goto L:

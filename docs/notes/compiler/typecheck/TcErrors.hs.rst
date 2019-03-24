@@ -5,10 +5,16 @@ Note [Deferring coercion errors to runtime]
 While developing, sometimes it is desirable to allow compilation to succeed even
 if there are type errors in the code. Consider the following case:
 
+.. code-block:: haskell
+
   module Main where
+
+.. code-block:: haskell
 
   a :: Int
   a = 'a'
+
+.. code-block:: haskell
 
   main = print "b"
 
@@ -20,8 +26,12 @@ we run into a type mismatch in TcUnify, we normally just emit an error. But it
 is always safe to defer the mismatch to the main constraint solver. If we do
 that, `a` will get transformed into
 
+.. code-block:: haskell
+
   co :: Int ~ Char
   co = ...
+
+.. code-block:: haskell
 
   a :: Int
   a = 'a' `cast` co
@@ -88,10 +98,14 @@ evidence, so they aren't errors.  But if a Given constraint is
 insoluble, this code is inaccessible, and we might want to at least
 warn about that.  A classic case is
 
+.. code-block:: haskell
+
    data T a where
      T1 :: T Int
      T2 :: T a
      T3 :: T Bool
+
+.. code-block:: haskell
 
    f :: T Int -> Bool
    f T1 = ...
@@ -165,6 +179,8 @@ We do not want to report these as errors:
   f, namely   f (MkT [True]) :: T Bool, in which b=d.  So we should
   not reject the program.
 
+.. code-block:: haskell
+
   For wanteds, something similar
       data T a where
         MkT :: C Int b => a -> b -> T a
@@ -179,6 +195,8 @@ derived superclasses between iterations of the solver.)
 
 For functional dependencies, here is a real example,
 stripped off from libraries/utf8-string/Codec/Binary/UTF8/Generic.hs
+
+.. code-block:: haskell
 
   class C a b | a -> b
   g :: C a b => a -> b -> ()
@@ -203,10 +221,14 @@ Note [Constraints include ...]
 'givenConstraintsMsg' returns the "Constraints include ..." message enabled by
 -fshow-hole-constraints. For example, the following hole:
 
+.. code-block:: haskell
+
     foo :: (Eq a, Show a) => a -> String
     foo x = _
 
 would generate the message:
+
+.. code-block:: haskell
 
     Constraints include
       Eq a (from foo.hs:1:1-36)
@@ -226,15 +248,23 @@ in a later inter-splice group.  If we find such a match, we report its presence
 (and indirectly, its scope) in the message.  For example, if a module A contains
 the following declarations,
 
+.. code-block:: haskell
+
    foo :: Int
    foo = x
 
+.. code-block:: haskell
+
    $(return [])  -- Empty top-level splice
+
+.. code-block:: haskell
 
    x :: Int
    x = 23
 
 we will issue an error similar to
+
+.. code-block:: haskell
 
    A.hs:6:7: error:
        • Variable not in scope: x :: Int
@@ -258,20 +288,32 @@ where the match to x is NOT in scope.  Why not simply state where the match IS
 in scope?  It most cases, this would be just as easy and perhaps a little
 clearer for the user.  But now consider the following example:
 
+.. code-block:: haskell
+
     {-# LANGUAGE TemplateHaskell #-}
 
+.. code-block:: haskell
+
     module A where
+
+.. code-block:: haskell
 
     import Language.Haskell.TH
     import Language.Haskell.TH.Syntax
 
+.. code-block:: haskell
+
     foo = x
+
+.. code-block:: haskell
 
     $(do -------------------------------------------------
         ds <- [d| ok1 = x
                 |]
         addTopDecls ds
         return [])
+
+.. code-block:: haskell
 
     bar = $(do
             ds <- [d| x = 23
@@ -280,11 +322,17 @@ clearer for the user.  But now consider the following example:
             addTopDecls ds
             litE $ stringL "hello")
 
+.. code-block:: haskell
+
     $(return []) -----------------------------------------
+
+.. code-block:: haskell
 
     ok3 = x
 
 Here, x is out-of-scope in the declaration of foo, and so we report
+
+.. code-block:: haskell
 
     A.hs:8:7: error:
         • Variable not in scope: x
@@ -305,12 +353,16 @@ then x must precede S; otherwise, it would be in scope.  But when dealing with
 addTopDecls, this check serves a practical purpose.  Consider the following
 declarations:
 
+.. code-block:: haskell
+
     $(do
         ds <- [d| ok = x
                   x = 23
                 |]
         addTopDecls ds
         return [])
+
+.. code-block:: haskell
 
     foo = x
 
@@ -328,6 +380,8 @@ Consider
    data T a where
      T1 :: T a
      T2 :: T Bool
+
+.. code-block:: haskell
 
    f :: (a ~ Int) => T a -> Int
    f T1 = 3
@@ -366,6 +420,8 @@ will print out what given constraints are in scope to provide some context to
 the programmer. But we shouldn't print out /every/ given, since some of them
 are not terribly helpful to diagnose type errors. Consider this example:
 
+.. code-block:: haskell
+
   foo :: Int :~: Int -> a :~: b -> a :~: c
   foo Refl Refl = Refl
 
@@ -378,6 +434,8 @@ the `ic_no_eqs` field of the Implication).
 
 But this is not enough to avoid all redundant givens! Consider this example,
 from #15361:
+
+.. code-block:: haskell
 
   goo :: forall (a :: Type) (b :: Type) (c :: Type).
          a :~~: b -> a :~~: c
@@ -433,6 +491,8 @@ only as much as necessary. Given two types t1 and t2:
     same, then it applies the same procedure to arguments of C1 and arguments of
     C2 to make them as similar as possible.
 
+.. code-block:: haskell
+
     Most important thing here is to keep number of synonym expansions at
     minimum. For example, if t1 is `T (T3, T5, Int)` and t2 is `T (T5, T3,
     Bool)` where T5 = T4, T4 = T3, ..., T1 = X, it returns `T (T3, T3, Int)` and
@@ -465,6 +525,8 @@ The OutsideIn algorithm rejects GADT programs that don't have a principal
 type, and indeed some that do.  Example:
    data T a where
      MkT :: Int -> T Int
+
+.. code-block:: haskell
 
    f (MkT n) = n
 
@@ -554,6 +616,8 @@ In most situations we call all enclosing implications "useful". There is one
 exception, and that is when the constraint that causes the error is from the
 "provided" context of a pattern synonym declaration:
 
+.. code-block:: haskell
+
   pattern Pat :: (Num a, Eq a) => Show a   => a -> Maybe a
              --  required      => provided => type
   pattern Pat x <- (Just x, 4)
@@ -584,6 +648,8 @@ possible fix that suggests to add a "provided" constraint to the
 
 For example, without this distinction the above code gives a bad error
 message (showing both problems):
+
+.. code-block:: haskell
 
   error: Could not deduce (Show a) ... from the context: (Eq a)
          ... Possible fix: add (Show a) to the context of
@@ -633,6 +699,8 @@ Note [Kind arguments in error messages]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 It can be terribly confusing to get an error message like (#9171)
 
+.. code-block:: haskell
+
     Couldn't match expected type ‘GetParam Base (GetParam Base Int)’
                 with actual type ‘GetParam Base (GetParam Base Int)’
 
@@ -642,6 +710,8 @@ more useful information, but not when it's as a result of ambiguity.
 To mitigate this, GHC attempts to enable the -fprint-explicit-kinds flag
 whenever any error message arises due to a kind mismatch. This means that
 the above error message would instead be displayed as:
+
+.. code-block:: haskell
 
     Couldn't match expected type
                   ‘GetParam @* @k2 @* Base (GetParam @* @* @k2 Base Int)’

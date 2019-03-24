@@ -13,6 +13,8 @@ longer be shared in the way the programmer was probably expecting,
 but can be performed many times.  In #5943, this broke our
 definition of fixIO, which contains
 
+.. code-block:: haskell
+
    ans <- unsafeInterleaveIO (takeMVar m)
 
 after inlining, we lose the sharing of the takeMVar, so the second

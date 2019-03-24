@@ -7,6 +7,8 @@ The implementations of replicateM and replicateM_ both leverage the
 worker/wrapper transform. The simpler implementation of replicateM_, as an
 example, would be:
 
+.. code-block:: haskell
+
     replicateM_ 0 _ = pure ()
     replicateM_ n f = f *> replicateM_ (n - 1) f
 

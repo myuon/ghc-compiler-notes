@@ -56,12 +56,16 @@ If there's an INLINE/NOINLINE pragma that restricts the phase in
 which the binder can be inlined, we don't inline here; after all,
 we don't know what phase we're in.  Here's an example
 
+.. code-block:: haskell
+
   foo :: Int -> Int -> Int
   {-# INLINE foo #-}
   foo m n = inner m
      where
        {-# INLINE [1] inner #-}
        inner m = m+n
+
+.. code-block:: haskell
 
   bar :: Int -> Int
   bar n = foo n 1
@@ -89,12 +93,18 @@ Note [Getting the map/coerce RULE to work]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We wish to allow the "map/coerce" RULE to fire:
 
+.. code-block:: haskell
+
   {-# RULES "map/coerce" map coerce = coerce #-}
 
 The naive core produced for this is
 
+.. code-block:: haskell
+
   forall a b (dict :: Coercible * a b).
     map @a @b (coerce @a @b @dict) = coerce @[a] @[b] @dict'
+
+.. code-block:: haskell
 
   where dict' :: Coercible [a] [b]
         dict' = ...
@@ -104,6 +114,8 @@ want. We want it to match, say, `map MkAge` (where newtype Age = MkAge Int)
 too. Some of this is addressed by compulsorily unfolding coerce on the LHS,
 yielding
 
+.. code-block:: haskell
+
   forall a b (dict :: Coercible * a b).
     map @a @b (\(x :: a) -> case dict of
       MkCoercible (co :: a ~R# b) -> x |> co) = ...
@@ -111,6 +123,8 @@ yielding
 Getting better. But this isn't exactly what gets produced. This is because
 Coercible essentially has ~R# as a superclass, and superclasses get eagerly
 extracted during solving. So we get this:
+
+.. code-block:: haskell
 
   forall a b (dict :: Coercible * a b).
     case Coercible_SCSel @* @a @b dict of
@@ -121,6 +135,8 @@ Unfortunately, this still abstracts over a Coercible dictionary. We really
 want it to abstract over the ~R# evidence. So, we have Desugar.unfold_coerce,
 which transforms the above to (see also Note [Desugaring coerce as cast] in
 Desugar)
+
+.. code-block:: haskell
 
   forall a b (co :: a ~R# b).
     let dict = MkCoercible @* @a @b co in
@@ -151,10 +167,14 @@ Note [Strictness and join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we have
 
+.. code-block:: haskell
+
    let f = \x.  if x>200 then e1 else e1
 
 and we know that f is strict in x.  Then if we subsequently
 discover that f is an arity-2 join point, we'll eta-expand it to
+
+.. code-block:: haskell
 
    let f = \x y.  if x>200 then e1 else e1
 
@@ -162,6 +182,8 @@ and now it's only strict if applied to two arguments.  So we should
 adjust the strictness info.
 
 A more common case is when
+
+.. code-block:: haskell
 
    f = \x. error ".."
 
@@ -171,6 +193,8 @@ and again its arity increases (#15517)
 Note [Unfolding DFuns]
 ~~~~~~~~~~~~~~~~~~~~~~
 DFuns look like
+
+.. code-block:: haskell
 
   df :: forall a b. (Eq a, Eq b) -> Eq (a,b)
   df a b d_a d_b = MkEqD (a,b) ($c1 a b d_a d_b)

@@ -24,12 +24,16 @@ Note [Built-in syntax and the OrigNameCache]
 Built-in syntax like tuples and unboxed sums are quite ubiquitous. To lower
 their cost we use two tricks,
 
+.. code-block:: haskell
+
   a. We specially encode tuple and sum Names in interface files' symbol tables
      to avoid having to look up their names while loading interface files.
      Namely these names are encoded as by their Uniques. We know how to get from
      a Unique back to the Name which it represents via the mapping defined in
      the SumTupleUniques module. See Note [Symbol table representation of names]
      in BinIface and for details.
+
+.. code-block:: haskell
 
   b. We don't include them in the Orig name cache but instead parse their
      OccNames (in isBuiltInOcc_maybe) to avoid bloating the name cache with

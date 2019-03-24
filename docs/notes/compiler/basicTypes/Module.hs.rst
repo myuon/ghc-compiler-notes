@@ -141,6 +141,8 @@ to existing code.
 
 Instead, we adopted the following encoding scheme:
 
+.. code-block:: haskell
+
      <A>   ===> hole:A
      {A.T} ===> hole:A.T
 

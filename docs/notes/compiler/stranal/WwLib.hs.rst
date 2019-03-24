@@ -24,6 +24,8 @@ if the result produces a wrapper with arity higher than -fmax-worker-args=.
 
 It is a bit all or nothing, consider
 
+.. code-block:: haskell
+
         f (x,y) (a,b,c,d,e ... , z) = rhs
 
 Currently we will remove all w/w ness entirely. But actually we could
@@ -31,6 +33,8 @@ w/w on the (x,y) pair... it's the huge product that is the problem.
 
 Could we instead refrain from w/w on an arg-by-arg basis? Yes, that'd
 solve f. But we can get a lot of args from deeply-nested products:
+
+.. code-block:: haskell
 
         g (a, (b, (c, (d, ...)))) = rhs
 
@@ -62,16 +66,24 @@ Note [Join points and beta-redexes]
 Originally, the worker would invoke the original function by calling it with
 arguments, thus producing a beta-redex for the simplifier to munch away:
 
+.. code-block:: haskell
+
   \x y z -> e => (\x y z -> e) wx wy wz
 
 Now that we have special rules about join points, however, this is Not Good if
 the original function is itself a join point, as then it may contain invocations
 of other join points:
 
+.. code-block:: haskell
+
   join j1 x = ...
   join j2 y = if y == 0 then 0 else j1 y
 
+.. code-block:: haskell
+
   =>
+
+.. code-block:: haskell
 
   join j1 x = ...
   join $wj2 y# = let wy = I# y# in (\y -> if y == 0 then 0 else jump j1 y) wy
@@ -79,6 +91,8 @@ of other join points:
 
 There can't be an intervening lambda between a join point's declaration and its
 occurrences, so $wj2 here is wrong. But of course, this is easy enough to fix:
+
+.. code-block:: haskell
 
   ...
   let join $wj2 y# = let wy = I# y# in let y = wy in if y == 0 then 0 else j1 y
@@ -127,10 +141,14 @@ Note [Freshen WW arguments]
 Wen we do a worker/wrapper split, we must not in-scope names as the arguments
 of the worker, else we'll get name capture.  E.g.
 
+.. code-block:: haskell
+
    -- y1 is in scope from further out
    f x = ..y1..
 
 If we accidentally choose y1 as a worker argument disaster results:
+
+.. code-block:: haskell
 
    fww y1 y2 = let x = (y1,y2) in ...y1...
 
@@ -144,10 +162,14 @@ To avoid this:
   * Because of this cloning we have to substitute in the type/kind of the
     new binders.  That's why we carry the TCvSubst through mkWWargs.
 
+.. code-block:: haskell
+
     So we need a decent in-scope set, just in case that type/kind
     itself has foralls.  We get this from the free vars of the RHS of the
     function since those are the only variables that might be captured.
     It's a lazy thunk, which will only be poked if the type/kind has a forall.
+
+.. code-block:: haskell
 
     Another tricky case was when f :: forall a. a -> forall a. a->a
     (i.e. with shadowing), and then the worker used the same 'a' twice.
@@ -160,18 +182,26 @@ The argument is unpacked in a case if it has a product type and has a
 strict *and* used demand put on it. I.e., arguments, with demands such
 as the following ones:
 
+.. code-block:: haskell
+
    <S,U(U, L)>
    <S(L,S),U>
 
 will be unpacked, but
+
+.. code-block:: haskell
 
    <S,U> or <B,U>
 
 will not, because the pieces aren't used. This is quite important otherwise
 we end up unpacking massive tuples passed to the bottoming function. Example:
 
+.. code-block:: haskell
+
         f :: ((Int,Int) -> String) -> (Int,Int) -> a
         f g pr = error (g pr)
+
+.. code-block:: haskell
 
         main = print (f fst (1, error "no"))
 
@@ -206,14 +236,20 @@ splitting:
    product demand (splitProdDmd_maybe), then unbox it and w/w its
    pieces.  For example
 
+.. code-block:: haskell
+
     f :: (Int, Int) -> Int
     f p = (case p of (a,b) -> a) + 1
   is split to
     f :: (Int, Int) -> Int
     f p = case p of (a,b) -> $wf a
 
+.. code-block:: haskell
+
     $wf :: Int -> Int
     $wf a = a + 1
+
+.. code-block:: haskell
 
   and
     g :: Bool -> (Int, Int) -> Int
@@ -228,10 +264,16 @@ splitting:
    splitProdDmd_maybe returns Nothing.  Otherwise we risk decomposing
    a massive tuple which is barely used.  Example:
 
+.. code-block:: haskell
+
         f :: ((Int,Int) -> String) -> (Int,Int) -> a
         f g pr = error (g pr)
 
+.. code-block:: haskell
+
         main = print (f fst (1, error "no"))
+
+.. code-block:: haskell
 
    Here, f does not take 'pr' apart, and it's stupid to do so.
    Imagine that it had millions of fields. This actually happened
@@ -264,7 +306,11 @@ Note [Add demands for strict constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this program (due to Roman):
 
+.. code-block:: haskell
+
     data X a = X !a
+
+.. code-block:: haskell
 
     foo :: X Int -> Int -> Int
     foo (X a) n = go 0
@@ -274,6 +320,8 @@ Consider this program (due to Roman):
 
 We want the worker for 'foo' too look like this:
 
+.. code-block:: haskell
+
     $wfoo :: Int# -> Int# -> Int#
 
 with the first argument unboxed, so that it is not eval'd each time
@@ -282,6 +330,8 @@ strict in 'a').  It is sound for the wrapper to pass an unboxed arg
 because X is strict, so its argument must be evaluated.  And if we
 *don't* pass an unboxed argument, we can't even repair it by adding a
 `seq` thus:
+
+.. code-block:: haskell
 
     foo (X a) n = a `seq` go 0
 
@@ -318,9 +368,13 @@ argument, and pass an Int to $wfoo!
 
 This works in nested situations like
 
+.. code-block:: haskell
+
     data family Bar a
     data instance Bar (a, b) = BarPair !(Bar a) !(Bar b)
     newtype instance Bar Int = Bar Int
+
+.. code-block:: haskell
 
     foo :: Bar ((Int, Int), Int) -> Int -> Int
     foo f k = case f of BarPair x y ->
@@ -340,9 +394,13 @@ We used to add data-con strictness demands when demand analysing case
 expression. However, it was noticed in #15696 that this misses some cases. For
 instance, consider the program (from T10482)
 
+.. code-block:: haskell
+
     data family Bar a
     data instance Bar (a, b) = BarPair !(Bar a) !(Bar b)
     newtype instance Bar Int = Bar Int
+
+.. code-block:: haskell
 
     foo :: Bar ((Int, Int), Int) -> Int -> Int
     foo f k =
@@ -356,6 +414,8 @@ We really should be able to assume that `p` is already evaluated since it came
 from a strict field of BarPair. This strictness would allow us to produce a
 worker of type:
 
+.. code-block:: haskell
+
     $wfoo :: Int# -> Int# -> Int# -> Int -> Int
     $wfoo p# q# y# = ...
 
@@ -363,6 +423,8 @@ even though the `case x` is only lazily evaluated
 
 Indeed before we fixed #15696 this would happen since we would float the inner
 `case x` through the `case burble` to get:
+
+.. code-block:: haskell
 
     foo f k =
       case f of
@@ -397,7 +459,11 @@ Note [Record evaluated-ness in worker/wrapper]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we have
 
+.. code-block:: haskell
+
    data T = MkT !Int Int
+
+.. code-block:: haskell
 
    f :: T -> T
    f x = e
@@ -405,9 +471,13 @@ Suppose we have
 and f's is strict, and has the CPR property.  The we are going to generate
 this w/w split
 
+.. code-block:: haskell
+
    f x = case x of
            MkT x1 x2 -> case $wf x1 x2 of
                            (# r1, r2 #) -> MkT r1 r2
+
+.. code-block:: haskell
 
    $wfw x1 x2 = let x = MkT x1 x2 in
                 case e of

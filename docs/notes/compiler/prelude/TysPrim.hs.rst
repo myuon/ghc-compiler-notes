@@ -4,6 +4,8 @@ Note [TYPE and RuntimeRep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 All types that classify values have a kind of the form (TYPE rr), where
 
+.. code-block:: haskell
+
     data RuntimeRep     -- Defined in ghc-prim:GHC.Types
       = LiftedRep
       | UnliftedRep
@@ -11,7 +13,11 @@ All types that classify values have a kind of the form (TYPE rr), where
       | FloatRep
       .. etc ..
 
+.. code-block:: haskell
+
     rr :: RuntimeRep
+
+.. code-block:: haskell
 
     TYPE :: RuntimeRep -> TYPE 'LiftedRep  -- Built in
 
@@ -231,8 +237,12 @@ within GHC at all.
 This is the phantom analogue of ~# and it is barely used at all.
 (The solver has no idea about this one.) Here is the motivation:
 
+.. code-block:: haskell
+
     data Phant a = MkPhant
     type role Phant phantom
+
+.. code-block:: haskell
 
     Phant <Int, Bool>_P :: Phant Int ~P# Phant Bool
 

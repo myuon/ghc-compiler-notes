@@ -15,6 +15,8 @@ very straightforwardly:
      e.g for HsType, rename and kind-check
          for HsExpr, rename and type-check
 
+.. code-block:: haskell
+
      (The last step is different for decls, because they can *only* be
       top-level: we return the result of step 2.)
 
@@ -68,8 +70,12 @@ The life cycle of a un-typed bracket:
 In both cases, desugaring happens like this:
   * HsTcBracketOut is desugared by DsMeta.dsBracket.  It
 
+.. code-block:: haskell
+
       a) Extends the ds_meta environment with the PendingSplices
          attached to the bracket
+
+.. code-block:: haskell
 
       b) Converts the quoted (HsExpr Name) to a CoreExpr that, when
          run, will produce a suitable TH expression/type/decl.  This
@@ -90,11 +96,15 @@ Example:
     Source:       f = [| Just $(g 3) |]
       The [| |] part is a HsBracket
 
+.. code-block:: haskell
+
     Typechecked:  f = [| Just ${s7}(g 3) |]{s7 = g Int 3}
       The [| |] part is a HsBracketOut, containing *renamed*
         (not typechecked) expression
       The "s7" is the "splice point"; the (g Int 3) part
         is a typechecked expression
+
+.. code-block:: haskell
 
     Desugared:    f = do { s7 <- g Int 3
                          ; return (ConE "Data.Maybe.Just" s7) }
@@ -107,6 +117,8 @@ Note [Template Haskell state diagram]
 Here are the ThStages, s, their corresponding level numbers
 (the result of (thLevel s)), and their state transitions.
 The top level of the program is stage Comp:
+
+.. code-block:: haskell
 
      Start here
          |
@@ -162,12 +174,18 @@ When a variable is used, we compare
         bind:  binding level, and
         use:   current level at usage site
 
+.. code-block:: haskell
+
   Generally
         bind > use      Always error (bound later than used)
                         [| \x -> $(f x) |]
 
+.. code-block:: haskell
+
         bind = use      Always OK (bound same stage as used)
                         [| \x -> $(f [| x |]) |]
+
+.. code-block:: haskell
 
         bind < use      Inside brackets, it depends
                         Inside splice, OK
@@ -179,7 +197,11 @@ When a variable is used, we compare
     - Non-top-level     Only if there is a liftable instance
                                 h = \(x:Int) -> [| x |]
 
+.. code-block:: haskell
+
   To track top-level-ness we use the ThBindEnv in TcLclEnv
+
+.. code-block:: haskell
 
   For example:
            f = ...
@@ -285,6 +307,8 @@ When displaying the error message contained in an exception originated from TH
 code, we need to make sure that the error message itself does not contain an
 exception.  For example, when executing the following splice:
 
+.. code-block:: haskell
+
     $( error ("foo " ++ error "bar") )
 
 the message for the outer exception is a thunk which will throw the inner
@@ -301,6 +325,8 @@ To call runQ in the Tc monad, we need to make TcM an instance of Quasi:
 Note [Freshen reified GADT constructors' universal tyvars]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose one were to reify this GADT:
+
+.. code-block:: haskell
 
   data a :~: b where
     Refl :: forall a b. (a ~ b) => a :~: b
@@ -329,10 +355,14 @@ When reifying a datatype declared with DuplicateRecordFields enabled, we want
 the reified names of the fields to be labels rather than selector functions.
 That is, we want (reify ''T) and (reify 'foo) to produce
 
+.. code-block:: haskell
+
     data T = MkT { foo :: Int }
     foo :: T -> Int
 
 rather than
+
+.. code-block:: haskell
 
     data T = MkT { $sel:foo:MkT :: Int }
     $sel:foo:MkT :: T -> Int

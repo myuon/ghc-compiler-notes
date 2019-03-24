@@ -9,9 +9,13 @@ seInScope:
         have a correctly-substituted type.  So we use a lookup in this
         set to replace occurrences
 
+.. code-block:: haskell
+
         The Ids in the InScopeSet are replete with their Rules,
         and as we gather info about the unfolding of an Id, we replace
         it in the in-scope set.
+
+.. code-block:: haskell
 
         The in-scope set is actually a mapping OutVar -> OutVar, and
         in case expressions we sometimes bind
@@ -24,6 +28,8 @@ seIdSubst:
         from the substitution, when we decide not to clone a77, but it's quite
         legitimate to put the mapping in the substitution anyway.
 
+.. code-block:: haskell
+
         Furthermore, consider
                 let x = case k of I# x77 -> ... in
                 let y = case k of I# x77 -> ... in ...
@@ -32,11 +38,15 @@ seIdSubst:
         cancel out, mapping x77 to, well, x77!  But one is an in-Id and the
         other is an out-Id.
 
+.. code-block:: haskell
+
         Of course, the substitution *must* applied! Things in its domain
         simply aren't necessarily bound in the result.
 
 * substId adds a binding (DoneId new_id) to the substitution if
         the Id's unique has changed
+
+.. code-block:: haskell
 
   Note, though that the substitution isn't necessarily extended
   if the type of the Id changes.  Why not?  Because of the next point:
@@ -46,6 +56,8 @@ seIdSubst:
   Reason: so that we never finish up with a "old" Id in the result.
   An old Id might point to an old unfolding and so on... which gives a space
   leak.
+
+.. code-block:: haskell
 
   [The DoneEx and DoneVar hits map to "new" stuff.]
 
@@ -78,6 +90,7 @@ inlined (via DoneEx), it never makes it into the in-scope set, and we
 need to know at the occurrence site that the variable is a join point
 so that we know to drop the context. Thus we remember which join
 points we're substituting. 
+
 
 Note [WildCard binders]
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -131,11 +144,17 @@ The LetFloats is a bunch of bindings, classified by a FloatFlag.
 
 Examples
 
+.. code-block:: haskell
+
   NonRec x (y:ys)       FltLifted
   Rec [(x,rhs)]         FltLifted
 
+.. code-block:: haskell
+
   NonRec x* (p:q)       FltOKSpec   -- RHS is WHNF.  Question: why not FltLifted?
   NonRec x# (y +# 3)    FltOkSpec   -- Unboxed, but ok-for-spec'n
+
+.. code-block:: haskell
 
   NonRec x* (f y)       FltCareful  -- Strict binding; might fail or diverge
 
@@ -171,6 +190,8 @@ Note [Return type for join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
 
+.. code-block:: haskell
+
    (join j :: Char -> Int -> Int) 77
    (     j x = \y. y + ord x    )
    (in case v of                )
@@ -179,6 +200,8 @@ Consider
    (     C -> <blah>            )
 
 The simplifier pushes the "apply to 77" continuation inwards to give
+
+.. code-block:: haskell
 
    join j :: Char -> Int
         j x = (\y. y + ord x) 77

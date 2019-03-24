@@ -61,6 +61,7 @@ Known fun (>1 arg), fvs     & yes & yes & registers & node
 When black-holing, single-entry closures could also be entered via node
 (rather than directly) to catch double-entry. 
 
+
 Note [Black-holing non-updatable thunks]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We must not black-hole non-updatable (single-entry) thunks otherwise
@@ -91,9 +92,13 @@ Here is and example due to Reid Barton (#10414):
     x = \u []  concat [[1], []]
 with the following definitions,
 
+.. code-block:: haskell
+
     concat x = case x of
         []       -> []
         (:) x xs -> (++) x (concat xs)
+
+.. code-block:: haskell
 
     (++) xs ys = case xs of
         []         -> ys
@@ -102,6 +107,8 @@ with the following definitions,
 Where we use the syntax @\u []@ to denote an updatable thunk and @\s []@ to
 denote a single-entry (i.e. non-updatable) thunk. After a thread evaluates @x@
 to WHNF and calls @(++)@ the heap will contain the following thunks,
+
+.. code-block:: haskell
 
     x = 1 : y
     y = \u []  (++) [] z

@@ -7,8 +7,12 @@ To preserve type safety we must ensure that for any given module, all
 the type family instances used either in that module or in any module
 it directly or indirectly imports are consistent. For example, consider
 
+.. code-block:: haskell
+
   module F where
     type family F a
+
+.. code-block:: haskell
 
   module A where
     import F( F )
@@ -16,11 +20,15 @@ it directly or indirectly imports are consistent. For example, consider
     f :: F Int -> Bool
     f x = x
 
+.. code-block:: haskell
+
   module B where
     import F( F )
     type instance F Int = Char
     g :: Char -> F Int
     g x = x
+
+.. code-block:: haskell
 
   module Bad where
     import A( f )

@@ -16,6 +16,7 @@ necessarily at the young end of the Old area.
 
 End of note 
 
+
 Note [CmmStackSlot aliasing]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When do two CmmStackSlots alias?
@@ -31,8 +32,12 @@ semantics of stack areas is described below.
 
 e.g. if we had
 
+.. code-block:: haskell
+
     x = Sp[old + 8]
     y = Sp[old + 16]
+
+.. code-block:: haskell
 
     Sp[young(L) + 8]  = L
     Sp[young(L) + 16] = y
@@ -40,6 +45,8 @@ e.g. if we had
     call f() returns to L
 
 if areas semantically do not overlap, then we might optimise this to
+
+.. code-block:: haskell
 
     Sp[young(L) + 8]  = L
     Sp[young(L) + 16] = Sp[old + 8]
@@ -54,6 +61,8 @@ are doomed to use more stack.
 
 so young(L)+8 == old+24 and we get
 
+.. code-block:: haskell
+
     Sp[-8]  = L
     Sp[-16] = Sp[8]
     Sp[-24] = Sp[0]
@@ -65,8 +74,12 @@ semantics, then we cannot commute any loads/stores of old with
 young(L), and we will be able to re-use both old+8 and old+16 for
 young(L).
 
+.. code-block:: haskell
+
     x = Sp[8]
     y = Sp[0]
+
+.. code-block:: haskell
 
     Sp[8] = L
     Sp[0] = y
@@ -75,6 +88,8 @@ young(L).
     call f() returns to L
 
 Now, the assignments of y go away,
+
+.. code-block:: haskell
 
     x = Sp[8]
     Sp[8] = L

@@ -20,9 +20,13 @@ Note [Optimizing isTrue#]
 Current definition of isTrue# is a temporary workaround. We would like to
 have functions isTrue# and isFalse# defined like this:
 
+.. code-block:: haskell
+
     isTrue# :: Int# -> Bool
     isTrue# 1# = True
     isTrue# _  = False
+
+.. code-block:: haskell
 
     isFalse# :: Int# -> Bool
     isFalse# 0# = True

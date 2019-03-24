@@ -68,6 +68,8 @@ Duplicate      YES           NO
   this kind of stuff by hand (#9390).  So we (conservatively)
   never discard a has_side_effects primop.
 
+.. code-block:: haskell
+
   However, it's fine to discard a can_fail primop.  For example
      case (indexIntArray# a i) of _ -> True
   We can discard indexIntArray#; it has can_fail, but not
@@ -76,11 +78,15 @@ Duplicate      YES           NO
   effects) read effect, but we don't care about that here, and
   treat read effects as *not* has_side_effects.
 
+.. code-block:: haskell
+
   Similarly (a `/#` b) can be discarded.  It can seg-fault or
   cause a hardware exception, but not a synchronous Haskell
   exception.
 
 
+
+.. code-block:: haskell
 
   Synchronous Haskell exceptions, e.g. from raiseIO#, are treated
   as has_side_effects and hence are not discarded.
@@ -98,6 +104,8 @@ Duplicate      YES           NO
       case d ># 0# of
         True  -> r +# 1
         False -> 0
+
+.. code-block:: haskell
 
   Nor can you float out a has_side_effects primop.  For example:
        if blah then case writeMutVar# v True s0 of (# s1 #) -> s1
@@ -119,10 +127,14 @@ Duplicate      YES           NO
         s' = case p of (s', r) -> s'
         r  = case p of (s', r) -> r
 
+.. code-block:: haskell
+
   (All these bindings are boxed.)  If we inline p at its two call
   sites, we get a catastrophe: because the read is performed once when
   s' is demanded, and once when 'r' is demanded, which may be much
   later.  Utterly wrong.  #3207 is real example of this happening.
+
+.. code-block:: haskell
 
   However, it's fine to duplicate a can_fail primop.  That is really
   the only difference between can_fail and has_side_effects.

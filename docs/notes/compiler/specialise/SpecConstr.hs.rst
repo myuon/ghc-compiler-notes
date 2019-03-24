@@ -22,6 +22,8 @@ ALTERNATIVE 2: pass both boxed and unboxed versions.  This no longer saves
 allocation, but does perhaps save evals. In the RULE we'd have
 something like
 
+.. code-block:: haskell
+
   f (I# x#) = f' (I# x#) x#
 
 If at the call site the (I# x) was an unfolding, then we'd have to
@@ -59,13 +61,19 @@ So we look for
 
 * EITHER
 
+.. code-block:: haskell
+
    a) At a recursive call, one or more parameters is an explicit
       constructor application
         AND
       That same parameter is scrutinised by a case somewhere in
       the RHS of the function
 
+.. code-block:: haskell
+
   OR
+
+.. code-block:: haskell
 
     b) At a recursive call, one or more parameters has an unfolding
        that is an explicit constructor application
@@ -81,9 +89,13 @@ What to abstract over
 There's a bit of a complication with type arguments.  If the call
 site looks like
 
+.. code-block:: haskell
+
         f p = ...f ((:) [a] x xs)...
 
 then our specialised function look like
+
+.. code-block:: haskell
 
         f_spec x xs = let p = (:) [a] x xs in ....as before....
 
@@ -95,6 +107,8 @@ Actually, (a) may hold for value arguments too, in which case
 we may not want to pass them.  Suppose 'x' is in scope at f's
 defn, but xs is not.  Then we'd like
 
+.. code-block:: haskell
+
         f_spec xs = let p = (:) [a] x xs in ....as before....
 
 Similarly (b) may hold too.  If x is already an argument at the
@@ -102,6 +116,8 @@ call, no need to pass it again.
 
 Finally, if 'a' is not in scope at the call site, we could abstract
 it as we do the term variables:
+
+.. code-block:: haskell
 
         f_spec a x xs = let p = (:) [a] x xs in ...as before...
 
@@ -130,6 +146,8 @@ that are bound between the usage site and the definition site; or (more
 seriously) may be bound to something different at the definition site.
 For example:
 
+.. code-block:: haskell
+
         f x = letrec g y v = let x = ...
                              in ...(g (a,b) x)...
 
@@ -153,17 +171,23 @@ Note [Specialising for constant parameters]
 This one is about specialising on a *constant* (but not necessarily
 constructor) argument
 
+.. code-block:: haskell
+
     foo :: Int -> (Int -> Int) -> Int
     foo 0 f = 0
     foo m f = foo (f m) (+1)
 
 It produces
 
+.. code-block:: haskell
+
     lvl_rmV :: GHC.Base.Int -> GHC.Base.Int
     lvl_rmV =
       \ (ds_dlk :: GHC.Base.Int) ->
         case ds_dlk of wild_alH { GHC.Base.I# x_alG ->
         GHC.Base.I# (GHC.Prim.+# x_alG 1)
+
+.. code-block:: haskell
 
     T.$wfoo :: GHC.Prim.Int# -> (GHC.Base.Int -> GHC.Base.Int) ->
     GHC.Prim.Int#
@@ -187,6 +211,8 @@ When is this worth it?  Call the constant 'lvl'
 - If 'lvl' has an unfolding that is a inlinable function, see if the corresponding
   parameter is applied (...to enough arguments...?)
 
+.. code-block:: haskell
+
   Also do this is if the function has RULES?
 
 Also
@@ -201,6 +227,8 @@ Note [Specialising for lambda parameters]
 
 This is subtly different from the previous one in that we get an
 explicit lambda as the argument:
+
+.. code-block:: haskell
 
     T.$wfoo :: GHC.Prim.Int# -> (GHC.Base.Int -> GHC.Base.Int) ->
     GHC.Prim.Int#
@@ -238,6 +266,8 @@ Consider
     data family T a :: *
     data instance T Int = T Int
 
+.. code-block:: haskell
+
     foo n = ...
        where
          go (T 0) = 0
@@ -255,6 +285,8 @@ Note [Local recursive groups]
 For a *local* recursive group, we can see all the calls to the
 function, so we seed the specialisation loop from the calls in the
 body, not from the calls in the RHS.  Consider:
+
+.. code-block:: haskell
 
   bar m n = foo n (n,n) (n,n) (n,n) (n,n)
    where
@@ -366,9 +398,13 @@ available for things like a cross compiler using stage1.
 Here's a (simplified) example from the `vector` package. You may bring
 the special 'force specialization' type into scope by saying:
 
+.. code-block:: haskell
+
   import GHC.Types (SPEC(..))
 
 or by defining your own type (again, deprecated):
+
+.. code-block:: haskell
 
   data SPEC = SPEC | SPEC2
   {-# ANN type SPEC ForceSpecConstr #-}
@@ -377,6 +413,8 @@ or by defining your own type (again, deprecated):
 without the annotation.)
 
 After that, you say:
+
+.. code-block:: haskell
 
   foldl :: (a -> b -> a) -> a -> Stream b -> a
   {-# INLINE foldl #-}
@@ -527,6 +565,8 @@ Example 1
 ~~~~~~~~~
     data T a = T !a
 
+.. code-block:: haskell
+
     foo :: Int -> T Int -> Int
     foo 0 t = 0
     foo x t | even x    = case t of { T n -> foo (x-n) t }
@@ -534,6 +574,8 @@ Example 1
 
 SpecConstr does no specialisation, because the second recursive call
 looks like a boxed use of the argument.  A pity.
+
+.. code-block:: haskell
 
     $wfoo_sFw :: GHC.Prim.Int# -> T.T GHC.Base.Int -> GHC.Prim.Int#
     $wfoo_sFw =
@@ -554,6 +596,8 @@ Example 2
     data a :*: b = !a :*: !b
     data T a = T !a
 
+.. code-block:: haskell
+
     foo :: (Int :*: T Int) -> Int
     foo (0 :*: t) = 0
     foo (x :*: t) | even x    = case t of { T n -> foo ((x-n) :*: t) }
@@ -561,6 +605,8 @@ Example 2
 
 Very similar to the previous one, except that the parameters are now in
 a strict tuple. Before SpecConstr, we have
+
+.. code-block:: haskell
 
     $wfoo_sG3 :: GHC.Prim.Int# -> T.T GHC.Base.Int -> GHC.Prim.Int#
     $wfoo_sG3 =
@@ -609,6 +655,8 @@ because the x-binding still exists and we've now duplicated (expensive v).
 This seldom happens because let-bound constructor applications are
 ANF-ised, but it can happen as a result of on-the-fly transformations in
 SpecConstr itself.  Here is #7865:
+
+.. code-block:: haskell
 
         let {
           a'_shr =
@@ -662,6 +710,8 @@ is on the cold path.
 
 Another example:
 
+.. code-block:: haskell
+
    f x = ...(g x)....
 
 Here 'x' is not scrutinised in f's body; but if we did specialise 'f'
@@ -699,6 +749,8 @@ The sc_count field of the ScEnv says how many times we are prepared to
 duplicate a single function.  But we must take care with recursive
 specialisations.  Consider
 
+.. code-block:: haskell
+
         let $j1 = let $j2 = let $j3 = ...
                             in
                             ...$j3...
@@ -721,6 +773,8 @@ copies we are making at this level, including the original.
 Note [Local let bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 It is not uncommon to find this
+
+.. code-block:: haskell
 
    let $j = \x. <blah> in ...$j True...$j True...
 
@@ -782,6 +836,8 @@ Note [Transfer strictness]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 We must transfer strictness information from the original function to
 the specialised one.  Suppose, for example
+
+.. code-block:: haskell
 
   f has strictness     SS
         and a RULE     f (a:as) b = f_spec a as b
@@ -868,11 +924,15 @@ Note [SpecConstr and casts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider (#14270) a call like
 
+.. code-block:: haskell
+
     let f = e
     in ... f (K @(a |> co)) ...
 
 where 'co' is a coercion variable not in scope at f's definition site.
 If we aren't caereful we'll get
+
+.. code-block:: haskell
 
     let $sf a co = e (K @(a |> co))
         RULE "SC:f" forall a co.  f (K @(a |> co)) = $sf a co
@@ -900,6 +960,8 @@ where, say,
 Here we definitely do want to specialise for that pair!  We do not
 match on the structre of the coercion; instead we just match on a
 coercion variable, so the RULE looks like
+
+.. code-block:: haskell
 
    forall (x::Int, y::Int, co :: (Int,Int) ~R Foo)
      f ((x,y) |> co) = $sf x y co
