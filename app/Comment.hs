@@ -52,7 +52,17 @@ customFormatRstDoc CollectedNotes{..} = go $ toList $ codeBlocks . noteContent .
         paragraphs = groupBy (\x y -> Text.stripStart x /= "" && Text.stripStart y /= "") . Text.lines
 
         detectBlocks =
-          all (\line -> "  " `Text.isPrefixOf` line && Text.head (Text.stripStart line) `notElem` ("-*123456789" :: String) && Text.length (Text.stripStart line) /= 0)
+          all (\line ->
+            -- A code block should not be an empty line
+            Text.length (Text.stripStart line) /= 0 &&
+            -- A code block should be indented
+            " " `Text.isPrefixOf` line &&
+            -- A code block should not be start with numbers (that's probably an ordered list)
+            Text.head (Text.stripStart line) `notElem` ("123456789" :: String) &&
+            -- A code block should not be start with `* ` nor `- ` (that's probably a list)
+            not (Text.isPrefixOf "* " (Text.stripStart line)) &&
+            not (Text.isPrefixOf "- " (Text.stripStart line))
+            )
 
         insertCodeBlock = (".. code-block:: haskell\n" :)
 
