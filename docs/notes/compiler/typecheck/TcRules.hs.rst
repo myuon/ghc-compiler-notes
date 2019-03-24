@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRules.hs>`_
 
+====================
+compiler/typecheck/TcRules.hs.rst
+====================
+
 Note [Typechecking rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 We *infer* the typ of the LHS, and use that type to *check* the type of

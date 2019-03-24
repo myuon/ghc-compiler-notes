@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExtension.hs>`_
 
+====================
+compiler/hsSyn/HsExtension.hs.rst
+====================
+
 Note [Trees that grow]
 ~~~~~~~~~~~~~~~~~~~~~~
 

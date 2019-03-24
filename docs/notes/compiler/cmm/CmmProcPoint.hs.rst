@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmProcPoint.hs>`_
 
+====================
+compiler/cmm/CmmProcPoint.hs.rst
+====================
+
 Note [Proc-point analysis]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

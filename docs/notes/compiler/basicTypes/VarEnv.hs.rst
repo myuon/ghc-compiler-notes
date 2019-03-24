@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/VarEnv.hs>`_
 
+====================
+compiler/basicTypes/VarEnv.hs.rst
+====================
+
 Note [Eta expansion]
 ~~~~~~~~~~~~~~~~~~~~
 When matching

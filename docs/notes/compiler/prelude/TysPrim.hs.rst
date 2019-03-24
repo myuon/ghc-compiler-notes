@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysPrim.hs>`_
 
+====================
+compiler/prelude/TysPrim.hs.rst
+====================
+
 Note [TYPE and RuntimeRep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 All types that classify values have a kind of the form (TYPE rr), where

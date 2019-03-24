@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs>`_
 
+====================
+compiler/coreSyn/CorePrep.hs.rst
+====================
+
 Note [CorePrep invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here is the syntax of the Core produced by CorePrep:

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs>`_
 
+====================
+compiler/simplCore/LiberateCase.hs.rst
+====================
+
 Note [Scrutinee with cast]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this:

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Foldable.hs>`_
 
+====================
+libraries/base/Data/Foldable.hs.rst
+====================
+
 Note [List fusion and continuations in 'c']
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we define

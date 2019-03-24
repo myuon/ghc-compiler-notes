@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs>`_
 
+====================
+compiler/typecheck/TcGenDeriv.hs.rst
+====================
+
 Note [Generating Ord instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose constructors are K1..Kn, and some are nullary.

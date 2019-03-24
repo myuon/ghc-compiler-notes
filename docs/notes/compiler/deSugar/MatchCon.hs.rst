@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/MatchCon.hs>`_
 
+====================
+compiler/deSugar/MatchCon.hs.rst
+====================
+
 Note [Record patterns]
 ~~~~~~~~~~~~~~~~~~~~~~
 Consider

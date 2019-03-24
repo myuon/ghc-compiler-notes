@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/MatchLit.hs>`_
 
+====================
+compiler/deSugar/MatchLit.hs.rst
+====================
+
 Note [Literal short cut]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 The type checker tries to do this short-cutting as early as possible, but

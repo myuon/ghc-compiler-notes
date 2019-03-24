@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/OldList.hs>`_
 
+====================
+libraries/base/Data/OldList.hs.rst
+====================
+
 Note [Inline @unzipN@ functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

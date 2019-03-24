@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSink.hs>`_
 
+====================
+compiler/cmm/CmmSink.hs.rst
+====================
+
 Note [dependent assignments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

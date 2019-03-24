@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs>`_
 
+====================
+compiler/simplCore/CallArity.hs.rst
+====================
+
 Note [Call Arity: The goal]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

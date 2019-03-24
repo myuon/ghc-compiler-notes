@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs>`_
 
+====================
+compiler/types/Type.hs.rst
+====================
+
 Note [coreView vs tcView]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 So far as the typechecker is concerned, 'Constraint' and 'TYPE

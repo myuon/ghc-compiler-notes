@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcClassDcl.hs>`_
 
+====================
+compiler/typecheck/TcClassDcl.hs.rst
+====================
+
 Note [Polymorphic methods]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider

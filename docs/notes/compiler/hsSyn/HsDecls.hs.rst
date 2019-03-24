@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs>`_
 
+====================
+compiler/hsSyn/HsDecls.hs.rst
+====================
+
 Note [The Naming story]
 ~~~~~~~~~~~~~~~~~~~~~~~
 Here is the story about the implicit names that go with type, class,

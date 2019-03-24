@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs>`_
 
+====================
+compiler/coreSyn/CoreSyn.hs.rst
+====================
+
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
 While various passes attempt to rename on-the-fly in a manner that

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FunDeps.hs>`_
 
+====================
+compiler/typecheck/FunDeps.hs.rst
+====================
+
 Note [Coverage condition]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Example

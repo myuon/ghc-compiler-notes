@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnExports.hs>`_
 
+====================
+compiler/typecheck/TcRnExports.hs.rst
+====================
+
 Note [Exports of data families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose you see (#5306)

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/parser/RdrHsSyn.hs>`_
 
+====================
+compiler/parser/RdrHsSyn.hs.rst
+====================
+
 Note [Parsing data constructors is hard]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

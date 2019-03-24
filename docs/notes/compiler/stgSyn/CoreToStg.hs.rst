@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/CoreToStg.hs>`_
 
+====================
+compiler/stgSyn/CoreToStg.hs.rst
+====================
+
 Note [Live vs free]
 ~~~~~~~~~~~~~~~~~~~
 

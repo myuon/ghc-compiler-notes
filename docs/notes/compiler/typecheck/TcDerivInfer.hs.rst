@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDerivInfer.hs>`_
 
+====================
+compiler/typecheck/TcDerivInfer.hs.rst
+====================
+
 Note [Inferring the instance context]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There are two sorts of 'deriving', as represented by the two constructors

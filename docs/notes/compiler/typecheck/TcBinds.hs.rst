@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcBinds.hs>`_
 
+====================
+compiler/typecheck/TcBinds.hs.rst
+====================
+
 Note [Polymorphic recursion]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The game plan for polymorphic recursion in the code above is

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs>`_
 
+====================
+compiler/main/HscTypes.hs.rst
+====================
+
 Note [hsc_type_env_var hack]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 hsc_type_env_var is used to initialize tcg_type_env_var, and

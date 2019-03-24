@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/LoadIface.hs>`_
 
+====================
+compiler/iface/LoadIface.hs.rst
+====================
+
 Note [Loading instances for wired-in things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We need to make sure that we have at least *read* the interface files

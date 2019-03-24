@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/TopHandler.hs>`_
 
+====================
+libraries/base/GHC/TopHandler.hs.rst
+====================
+
 Note [rts_setMainThread must be called unsafely]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs>`_
 
+====================
+compiler/types/TyCon.hs.rst
+====================
+
 Note [Type synonym families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Type synonym families, also known as "type functions", map directly

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs>`_
 
+====================
+compiler/typecheck/TcErrors.hs.rst
+====================
+
 Note [Deferring coercion errors to runtime]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 While developing, sometimes it is desirable to allow compilation to succeed even

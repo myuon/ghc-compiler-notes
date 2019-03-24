@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcForeign.hs>`_
 
+====================
+compiler/typecheck/TcForeign.hs.rst
+====================
+
 Note [Don't recur in normaliseFfiType']
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 normaliseFfiType' is the workhorse for normalising a type used in a foreign

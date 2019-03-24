@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreFVs.hs>`_
 
+====================
+compiler/coreSyn/CoreFVs.hs.rst
+====================
+
 Note [The FVAnn invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Invariant: a FVAnn, say S, is closed:

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IORef.hs>`_
 
+====================
+libraries/base/GHC/IORef.hs.rst
+====================
+
 Note [atomicModifyIORef' definition]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

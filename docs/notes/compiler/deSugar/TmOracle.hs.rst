@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/TmOracle.hs>`_
 
+====================
+compiler/deSugar/TmOracle.hs.rst
+====================
+
 Note [Deep equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Solving nested equalities is the most difficult part. The general strategy

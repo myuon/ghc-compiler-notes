@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/Linker.hs>`_
 
+====================
+compiler/ghci/Linker.hs.rst
+====================
+
 Note [Crash early load_dyn and locateLib]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If a package is "normal" (exposes it's code from more than zero Haskell

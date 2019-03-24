@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Var.hs>`_
 
+====================
+compiler/basicTypes/Var.hs.rst
+====================
+
 Note [Evidence: EvIds and CoVars]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * An EvId (evidence Id) is a term-level evidence variable

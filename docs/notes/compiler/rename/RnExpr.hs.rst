@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnExpr.hs>`_
 
+====================
+compiler/rename/RnExpr.hs.rst
+====================
+
 Note [Deterministic ApplicativeDo and RecursiveDo desugaring]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Both ApplicativeDo and RecursiveDo need to create tuples not

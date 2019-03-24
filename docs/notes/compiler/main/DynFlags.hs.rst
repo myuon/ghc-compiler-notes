@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs>`_
 
+====================
+compiler/main/DynFlags.hs.rst
+====================
+
 Note [Updating flag description in the User's Guide]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmMonad.hs>`_
 
+====================
+compiler/codeGen/StgCmmMonad.hs.rst
+====================
+
 Note [Virtual and real heap pointers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The code generator can allocate one or more objects contiguously, performing

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSubst.hs>`_
 
+====================
+compiler/coreSyn/CoreSubst.hs.rst
+====================
+
 Note [Extending the Subst]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 For a core Subst, which binds Ids as well, we make a different choice for Ids

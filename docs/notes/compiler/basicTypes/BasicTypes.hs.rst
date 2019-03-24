@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs>`_
 
+====================
+compiler/basicTypes/BasicTypes.hs.rst
+====================
+
 Note [Precedence in types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Many pretty-printing functions have type

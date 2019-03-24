@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmHeap.hs>`_
 
+====================
+compiler/codeGen/StgCmmHeap.hs.rst
+====================
+
 Note [Single stack check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 When compiling a function we can determine how much stack space it

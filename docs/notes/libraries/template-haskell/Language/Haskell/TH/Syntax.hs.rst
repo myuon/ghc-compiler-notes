@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/template-haskell/Language/Haskell/TH/Syntax.hs>`_
 
+====================
+libraries/template-haskell/Language/Haskell/TH/Syntax.hs.rst
+====================
+
 Note [Role of TExp]
 ~~~~~~~~~~~~~~~~~~~~~~
 TExp's argument must have a nominal role, not phantom as would

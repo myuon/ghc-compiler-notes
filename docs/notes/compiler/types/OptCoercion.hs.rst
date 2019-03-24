@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/OptCoercion.hs>`_
 
+====================
+compiler/types/OptCoercion.hs.rst
+====================
+
 Note [Optimising coercion optimisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Looking up a coercion's role or kind is linear in the size of the

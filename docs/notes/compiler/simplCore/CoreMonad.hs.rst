@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CoreMonad.hs>`_
 
+====================
+compiler/simplCore/CoreMonad.hs.rst
+====================
+
 Note [Which transformations are innocuous]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 At one point (Jun 18) I wondered if some transformations (ticks)

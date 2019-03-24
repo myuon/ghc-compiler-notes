@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/UniqDFM.hs>`_
 
+====================
+compiler/utils/UniqDFM.hs.rst
+====================
+
 Note [Deterministic UniqFM]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A @UniqDFM@ is just like @UniqFM@ with the following additional

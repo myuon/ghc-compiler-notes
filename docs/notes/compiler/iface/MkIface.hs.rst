@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/MkIface.hs>`_
 
+====================
+compiler/iface/MkIface.hs.rst
+====================
+
 Note [Fingerprinting IfaceDecls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

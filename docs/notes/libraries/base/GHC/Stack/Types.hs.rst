@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Stack/Types.hs>`_
 
+====================
+libraries/base/GHC/Stack/Types.hs.rst
+====================
+
 Note [Definition of CallStack]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 CallStack is defined very early in base because it is

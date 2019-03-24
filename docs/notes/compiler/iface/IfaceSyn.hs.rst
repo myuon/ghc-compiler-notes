@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs>`_
 
+====================
+compiler/iface/IfaceSyn.hs.rst
+====================
+
 Note [Versioning of instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 See [http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance#Instances]

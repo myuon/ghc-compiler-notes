@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FamInst.hs>`_
 
+====================
+compiler/typecheck/FamInst.hs.rst
+====================
+
 Note [The type family instance consistency story]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

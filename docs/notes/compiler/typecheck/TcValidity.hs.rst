@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs>`_
 
+====================
+compiler/typecheck/TcValidity.hs.rst
+====================
+
 Note [The ambiguity check for type signatures]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 checkAmbiguity is a check on *user-supplied type signatures*.  It is

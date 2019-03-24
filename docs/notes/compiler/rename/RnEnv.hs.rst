@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnEnv.hs>`_
 
+====================
+compiler/rename/RnEnv.hs.rst
+====================
+
 Note [Signature lazy interface loading]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

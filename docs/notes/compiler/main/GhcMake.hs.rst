@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/GhcMake.hs>`_
 
+====================
+compiler/main/GhcMake.hs.rst
+====================
+
 Note [Missing home modules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Sometimes user doesn't want GHC to pick up modules, not explicitly listed

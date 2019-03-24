@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMonad.hs>`_
 
+====================
+compiler/deSugar/DsMonad.hs.rst
+====================
+
 Note [Levity polymorphism checking]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 According to the "Levity Polymorphism" paper (PLDI '17), levity

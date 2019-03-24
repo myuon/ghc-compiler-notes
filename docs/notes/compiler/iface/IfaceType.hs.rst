@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceType.hs>`_
 
+====================
+compiler/iface/IfaceType.hs.rst
+====================
+
 Note [Free tyvars in IfaceType]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Nowadays (since Nov 16, 2016) we pretty-print a Type by converting to

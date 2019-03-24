@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/List.hs>`_
 
+====================
+libraries/base/GHC/List.hs.rst
+====================
+
 Note [Inline FB functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 After fusion rules successfully fire, we are usually left with one or more calls

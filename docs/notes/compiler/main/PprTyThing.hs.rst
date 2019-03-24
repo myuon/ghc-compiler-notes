@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/PprTyThing.hs>`_
 
+====================
+compiler/main/PprTyThing.hs.rst
+====================
+
 Note [Pretty printing via IfaceSyn]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Our general plan for prett-printing

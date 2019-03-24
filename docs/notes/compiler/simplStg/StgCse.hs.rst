@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/StgCse.hs>`_
 
+====================
+compiler/simplStg/StgCse.hs.rst
+====================
+
 Note [All alternatives are the binder]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

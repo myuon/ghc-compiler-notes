@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs>`_
 
+====================
+compiler/prelude/PrelRules.hs.rst
+====================
+
 Note [Constant folding]
 ~~~~~~~~~~~~~~~~~~~~~~~
 primOpRules generates a rewrite rule for each primop

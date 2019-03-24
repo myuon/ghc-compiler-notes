@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs>`_
 
+====================
+compiler/basicTypes/Demand.hs.rst
+====================
+
 Note [Exceptions and strictness]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We used to smart about catching exceptions, but we aren't anymore.

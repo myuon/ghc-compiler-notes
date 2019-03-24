@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Check.hs>`_
 
+====================
+compiler/deSugar/Check.hs.rst
+====================
+
 Note [Recovering from unsatisfiable pattern-matching constraints]
 ~~~~~~~~~~~~~~~~
 Consider the following code (see #12957 and #15450):

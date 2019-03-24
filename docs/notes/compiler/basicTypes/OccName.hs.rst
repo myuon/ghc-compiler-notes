@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/OccName.hs>`_
 
+====================
+compiler/basicTypes/OccName.hs.rst
+====================
+
 Note [Suppressing uniques in OccNames]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is a hack to de-wobblify the OccNames that contain uniques from

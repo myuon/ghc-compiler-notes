@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/ToIface.hs>`_
 
+====================
+compiler/iface/ToIface.hs.rst
+====================
+
 Note [Inlining and hs-boot files]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this example (#10083, #12789):

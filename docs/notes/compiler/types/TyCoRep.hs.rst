@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs>`_
 
+====================
+compiler/types/TyCoRep.hs.rst
+====================
+
 Note [The Type-related module hierarchy]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   Class

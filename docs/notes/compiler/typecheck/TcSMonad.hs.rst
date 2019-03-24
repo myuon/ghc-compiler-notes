@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs>`_
 
+====================
+compiler/typecheck/TcSMonad.hs.rst
+====================
+
 Note [WorkList priorities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A WorkList contains canonical and non-canonical items (of all flavors).

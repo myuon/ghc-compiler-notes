@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/PlaceHolder.hs>`_
 
+====================
+compiler/hsSyn/PlaceHolder.hs.rst
+====================
+
 Note [Pass sensitive types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Since the same AST types are re-used through parsing,renaming and type

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/FileCleanup.hs>`_
 
+====================
+compiler/main/FileCleanup.hs.rst
+====================
+
 Note [Deterministic base name]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

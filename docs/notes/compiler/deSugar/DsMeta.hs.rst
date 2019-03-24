@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMeta.hs>`_
 
+====================
+compiler/deSugar/DsMeta.hs.rst
+====================
+
 Note [Scoped type variables in bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider

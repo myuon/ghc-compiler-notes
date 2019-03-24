@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs>`_
 
+====================
+compiler/rename/RnSource.hs.rst
+====================
+
 Note [Wildcards in family instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Wild cards can be used in type/data family instance declarations to indicate

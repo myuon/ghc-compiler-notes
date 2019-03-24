@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs>`_
 
+====================
+compiler/typecheck/TcCanonical.hs.rst
+====================
+
 Note [Canonicalization]
 ~~~~~~~~~~~~~~~~~~~~~~~
 

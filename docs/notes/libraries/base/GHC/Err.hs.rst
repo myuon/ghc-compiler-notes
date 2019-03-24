@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Err.hs>`_
 
+====================
+libraries/base/GHC/Err.hs.rst
+====================
+
 Note [Errors in base]
 ~~~~~~~~~~~~~~~~~~~~~
 As of base-4.9.0.0, `error` produces a stack trace alongside the

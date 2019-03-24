@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SAT.hs>`_
 
+====================
+compiler/simplCore/SAT.hs.rst
+====================
+
 Note [Shadow binding]
 ~~~~~~~~~~~~~~~~~~~~~
 The calls to the inner map inside body[map] should get inlined

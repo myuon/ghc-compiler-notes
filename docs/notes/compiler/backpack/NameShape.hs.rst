@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/backpack/NameShape.hs>`_
 
+====================
+compiler/backpack/NameShape.hs.rst
+====================
+
 Note [NameShape]
 ~~~~~~~~~~~~~~~~
 When we write a declaration in a signature, e.g., data T, we

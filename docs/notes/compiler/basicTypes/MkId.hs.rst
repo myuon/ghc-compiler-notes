@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/MkId.hs>`_
 
+====================
+compiler/basicTypes/MkId.hs.rst
+====================
+
 Note [Wired-in Ids]
 ~~~~~~~~~~~~~~~~~~~
 A "wired-in" Id can be referred to directly in GHC (e.g. 'voidPrimId')

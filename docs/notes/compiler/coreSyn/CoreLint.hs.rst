@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs>`_
 
+====================
+compiler/coreSyn/CoreLint.hs.rst
+====================
+
 Note [GHC Formalism]
 ~~~~~~~~~~~~~~~~~~~~
 This file implements the type-checking algorithm for System FC, the "official"

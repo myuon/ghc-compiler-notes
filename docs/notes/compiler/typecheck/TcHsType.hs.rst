@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs>`_
 
+====================
+compiler/typecheck/TcHsType.hs.rst
+====================
+
 Note [Wildcards in visible type application]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

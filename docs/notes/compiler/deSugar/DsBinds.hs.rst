@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsBinds.hs>`_
 
+====================
+compiler/deSugar/DsBinds.hs.rst
+====================
+
 Note [Desugaring AbsBinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 In the general AbsBinds case we desugar the binding to this:

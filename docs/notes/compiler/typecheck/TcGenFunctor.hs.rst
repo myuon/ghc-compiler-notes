@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenFunctor.hs>`_
 
+====================
+compiler/typecheck/TcGenFunctor.hs.rst
+====================
+
 Note [Deriving null]
 ~~~~~~~~~~~~~~~~~~~~
 

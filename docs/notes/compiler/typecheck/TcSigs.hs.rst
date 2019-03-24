@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSigs.hs>`_
 
+====================
+compiler/typecheck/TcSigs.hs.rst
+====================
+
 Note [Scoped tyvars]
 ~~~~~~~~~~~~~~~~~~~~
 The -XScopedTypeVariables flag brings lexically-scoped type variables

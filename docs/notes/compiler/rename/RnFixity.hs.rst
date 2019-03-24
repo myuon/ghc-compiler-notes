@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnFixity.hs>`_
 
+====================
+compiler/rename/RnFixity.hs.rst
+====================
+
 Note [Fixity signature lookup]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A fixity declaration like

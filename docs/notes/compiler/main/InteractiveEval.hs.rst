@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/InteractiveEval.hs>`_
 
+====================
+compiler/main/InteractiveEval.hs.rst
+====================
+
 Note [What to show to users]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We don't want to display internally-generated bindings to users.

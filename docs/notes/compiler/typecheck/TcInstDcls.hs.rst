@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs>`_
 
+====================
+compiler/typecheck/TcInstDcls.hs.rst
+====================
+
 Note [How instance declarations are translated]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here is how we translate instance declarations into Core

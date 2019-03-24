@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/ByteCodeGen.hs>`_
 
+====================
+compiler/ghci/ByteCodeGen.hs.rst
+====================
+
 Note [Implementing tagToEnum#]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 (implement_tagToId arg names) compiles code which takes an argument

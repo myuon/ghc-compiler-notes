@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/PprCore.hs>`_
 
+====================
+compiler/coreSyn/PprCore.hs.rst
+====================
+
 Note [Print case as let]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 Single-branch case expressions are very common:

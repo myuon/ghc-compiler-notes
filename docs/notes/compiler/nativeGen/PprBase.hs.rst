@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/PprBase.hs>`_
 
+====================
+compiler/nativeGen/PprBase.hs.rst
+====================
+
 Note [Embedding large binary blobs]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

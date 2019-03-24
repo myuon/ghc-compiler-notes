@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs>`_
 
+====================
+compiler/main/TidyPgm.hs.rst
+====================
+
 Note [Choosing external Ids]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 See also the section "Interface stability" in the

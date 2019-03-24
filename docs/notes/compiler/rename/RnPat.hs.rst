@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnPat.hs>`_
 
+====================
+compiler/rename/RnPat.hs.rst
+====================
+
 Note [CpsRn monad]
 ~~~~~~~~~~~~~~~~~~
 The CpsRn monad uses continuation-passing style to support this

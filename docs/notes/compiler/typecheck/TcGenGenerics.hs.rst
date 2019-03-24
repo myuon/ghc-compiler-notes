@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenGenerics.hs>`_
 
+====================
+compiler/typecheck/TcGenGenerics.hs.rst
+====================
+
 Note [Requirements for deriving Generic and Rep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

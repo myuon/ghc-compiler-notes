@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs>`_
 
+====================
+compiler/typecheck/TcRnDriver.hs.rst
+====================
+
 Note [DFun impedance matching]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We return a list of "impedance-matching" bindings for the dfuns

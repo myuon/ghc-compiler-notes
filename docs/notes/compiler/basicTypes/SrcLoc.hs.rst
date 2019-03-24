@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/SrcLoc.hs>`_
 
+====================
+compiler/basicTypes/SrcLoc.hs.rst
+====================
+
 Note [HasSrcSpan Typeclass]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

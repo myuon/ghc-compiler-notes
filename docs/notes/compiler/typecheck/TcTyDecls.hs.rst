@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs>`_
 
+====================
+compiler/typecheck/TcTyDecls.hs.rst
+====================
+
 Note [Superclass cycle check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The superclass cycle check for C decides if we can statically

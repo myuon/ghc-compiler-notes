@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplCore.hs>`_
 
+====================
+compiler/simplCore/SimplCore.hs.rst
+====================
+
 Note [Inline in InitialPhase]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In GHC 8 and earlier we did not inline anything in the InitialPhase. But that is

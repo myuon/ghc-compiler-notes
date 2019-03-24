@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/llvmGen/LlvmCodeGen/CodeGen.hs>`_
 
+====================
+compiler/llvmGen/LlvmCodeGen/CodeGen.hs.rst
+====================
+
 Note [Literals and branch conditions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

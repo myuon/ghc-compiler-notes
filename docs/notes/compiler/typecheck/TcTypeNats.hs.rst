@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTypeNats.hs>`_
 
+====================
+compiler/typecheck/TcTypeNats.hs.rst
+====================
+
 Note [Type-level literals]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 There are currently two forms of type-level literals: natural numbers, and

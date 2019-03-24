@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/FV.hs>`_
 
+====================
+compiler/utils/FV.hs.rst
+====================
+
 Note [Deterministic FV]
 ~~~~~~~~~~~~~~~~~~~~~~~
 When computing free variables, the order in which you get them affects

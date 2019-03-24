@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hieFile/HieTypes.hs>`_
 
+====================
+compiler/hieFile/HieTypes.hs.rst
+====================
+
 Note [Efficient serialization of redundant type info]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

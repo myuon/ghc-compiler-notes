@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/utils/ghc-pkg/Main.hs>`_
 
+====================
+utils/ghc-pkg/Main.hs.rst
+====================
+
 Note [Recompute abi-depends]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

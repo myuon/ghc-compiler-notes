@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsSyn.hs>`_
 
+====================
+compiler/typecheck/TcHsSyn.hs.rst
+====================
+
 Note [The ZonkEnv]
 ~~~~~~~~~~~~~~~~~~~~~
 * ze_flexi :: ZonkFlexi says what to do with a

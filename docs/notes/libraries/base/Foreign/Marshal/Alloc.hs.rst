@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Foreign/Marshal/Alloc.hs>`_
 
+====================
+libraries/base/Foreign/Marshal/Alloc.hs.rst
+====================
+
 Note [NOINLINE for touch#]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Both allocaBytes and allocaBytesAligned use the touch#, which is notoriously

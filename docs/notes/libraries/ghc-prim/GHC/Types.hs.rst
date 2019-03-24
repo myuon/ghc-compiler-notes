@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/ghc-prim/GHC/Types.hs>`_
 
+====================
+libraries/ghc-prim/GHC/Types.hs.rst
+====================
+
 Note [Kind-changing of (~) and Coercible]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

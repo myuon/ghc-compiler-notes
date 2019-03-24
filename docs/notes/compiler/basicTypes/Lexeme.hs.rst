@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Lexeme.hs>`_
 
+====================
+compiler/basicTypes/Lexeme.hs.rst
+====================
+
 Note [Classification of generated names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

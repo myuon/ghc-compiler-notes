@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/BinIface.hs>`_
 
+====================
+compiler/iface/BinIface.hs.rst
+====================
+
 Note [Symbol table representation of names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

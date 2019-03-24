@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Arr.hs>`_
 
+====================
+libraries/base/GHC/Arr.hs.rst
+====================
+
 Note [Inlining index]
 ~~~~~~~~~~~~~~~~~~~~~
 We inline the 'index' operation,

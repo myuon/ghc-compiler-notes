@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/StaticPtrTable.hs>`_
 
+====================
+compiler/main/StaticPtrTable.hs.rst
+====================
+
 Note [Grand plan for static forms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Static forms go through the compilation phases as follows.

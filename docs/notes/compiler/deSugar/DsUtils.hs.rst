@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsUtils.hs>`_
 
+====================
+compiler/deSugar/DsUtils.hs.rst
+====================
+
 Note [Localise pattern binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider     module M where

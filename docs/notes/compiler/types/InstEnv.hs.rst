@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs>`_
 
+====================
+compiler/types/InstEnv.hs.rst
+====================
+
 Note [ClsInst laziness and the rough-match fields]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we load 'instance A.C B.T' from A.hi, but suppose that the type B.T is

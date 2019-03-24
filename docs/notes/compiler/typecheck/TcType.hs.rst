@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs>`_
 
+====================
+compiler/typecheck/TcType.hs.rst
+====================
+
 Note [TcTyVars and TyVars in the typechecker]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The typechecker uses a lot of type variables with special properties,

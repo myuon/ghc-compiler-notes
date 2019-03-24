@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Module.hs>`_
 
+====================
+compiler/basicTypes/Module.hs.rst
+====================
+
 Note [The identifier lexicon]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Unit IDs, installed package IDs, ABI hashes, package names,

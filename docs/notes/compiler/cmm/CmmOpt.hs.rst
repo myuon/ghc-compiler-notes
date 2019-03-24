@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmOpt.hs>`_
 
+====================
+compiler/cmm/CmmOpt.hs.rst
+====================
+
 Note [Comparison operators]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If we have

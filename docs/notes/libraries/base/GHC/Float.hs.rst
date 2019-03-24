@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Float.hs>`_
 
+====================
+libraries/base/GHC/Float.hs.rst
+====================
+
 Note [realToFrac int-to-float]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Don found that the RULES for realToFrac/Int->Double and simliarly

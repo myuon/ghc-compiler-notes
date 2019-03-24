@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Kind.hs>`_
 
+====================
+compiler/types/Kind.hs.rst
+====================
+
 Note [Kind Constraint and kind Type]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The kind Constraint is the kind of classes and other type constraints.

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMatches.hs>`_
 
+====================
+compiler/typecheck/TcMatches.hs.rst
+====================
+
 Note [Polymorphic expected type for tcMatchesFun]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tcMatchesFun may be given a *sigma* (polymorphic) type

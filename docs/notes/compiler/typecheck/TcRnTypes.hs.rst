@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs>`_
 
+====================
+compiler/typecheck/TcRnTypes.hs.rst
+====================
+
 Note [Identity versus semantic module]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When typechecking an hsig file, it is convenient to keep track

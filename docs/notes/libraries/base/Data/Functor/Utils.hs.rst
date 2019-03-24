@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Functor/Utils.hs>`_
 
+====================
+libraries/base/Data/Functor/Utils.hs.rst
+====================
+
 Note [Function coercion]
 ~~~~~~~~~~~~~~~~~~~~~~~
 

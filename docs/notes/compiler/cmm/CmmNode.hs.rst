@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmNode.hs>`_
 
+====================
+compiler/cmm/CmmNode.hs.rst
+====================
+
 Note [Foreign calls]
 ~~~~~~~~~~~~~~~~~~~~~~~
 A CmmUnsafeForeignCall is used for *unsafe* foreign calls;

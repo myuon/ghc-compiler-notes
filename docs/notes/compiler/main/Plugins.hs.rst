@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/Plugins.hs>`_
 
+====================
+compiler/main/Plugins.hs.rst
+====================
+
 Note [Source plugins]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The `Plugin` datatype have been extended by fields that allow access to the

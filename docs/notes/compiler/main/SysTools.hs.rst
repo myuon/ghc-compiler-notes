@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/SysTools.hs>`_
 
+====================
+compiler/main/SysTools.hs.rst
+====================
+
 Note [How GHC finds toolchain utilities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

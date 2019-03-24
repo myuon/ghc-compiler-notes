@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs>`_
 
+====================
+compiler/coreSyn/CoreArity.hs.rst
+====================
+
 Note [exprArity invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 exprArity has the following invariant:

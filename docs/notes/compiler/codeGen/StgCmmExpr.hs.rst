@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs>`_
 
+====================
+compiler/codeGen/StgCmmExpr.hs.rst
+====================
+
 Note [Compiling case expressions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 It is quite interesting to decide whether to put a heap-check at the

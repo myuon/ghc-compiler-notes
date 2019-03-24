@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/TcIface.hs>`_
 
+====================
+compiler/iface/TcIface.hs.rst
+====================
+
 Note [Knot-tying typecheckIface]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we are typechecking an interface A.hi, and we come across

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs>`_
 
+====================
+compiler/specialise/Specialise.hs.rst
+====================
+
 Note [Wrap bindings returned by specImports]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 'specImports' returns a set of specialized bindings. However, these are lacking

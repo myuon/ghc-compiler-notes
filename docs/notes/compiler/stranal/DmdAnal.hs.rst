@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs>`_
 
+====================
+compiler/stranal/DmdAnal.hs.rst
+====================
+
 Note [Stamp out space leaks in demand analysis]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The demand analysis pass outputs a new copy of the Core program in

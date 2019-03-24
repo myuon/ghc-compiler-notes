@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/parser/ApiAnnotation.hs>`_
 
+====================
+compiler/parser/ApiAnnotation.hs.rst
+====================
+
 Note [Api annotations]
 ~~~~~~~~~~~~~~~~~~~~~~
 Given a parse tree of a Haskell module, how can we reconstruct

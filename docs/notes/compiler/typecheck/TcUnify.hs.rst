@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs>`_
 
+====================
+compiler/typecheck/TcUnify.hs.rst
+====================
+
 Note [Herald for matchExpectedFunTys]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The 'herald' always looks like:

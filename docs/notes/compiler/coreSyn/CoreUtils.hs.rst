@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs>`_
 
+====================
+compiler/coreSyn/CoreUtils.hs.rst
+====================
+
 Note [Type bindings]
 ~~~~~~~~~~~~~~~~~~~~
 Core does allow type bindings, although such bindings are

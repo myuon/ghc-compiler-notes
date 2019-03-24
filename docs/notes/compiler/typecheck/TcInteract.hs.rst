@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInteract.hs>`_
 
+====================
+compiler/typecheck/TcInteract.hs.rst
+====================
+
 Note [Basic Simplifier Plan]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 1. Pick an element from the WorkList if there exists one with depth

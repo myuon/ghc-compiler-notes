@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/Inst.hs>`_
 
+====================
+compiler/typecheck/Inst.hs.rst
+====================
+
 Note [Deep skolemisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 deeplySkolemise decomposes and skolemises a type, returning a type

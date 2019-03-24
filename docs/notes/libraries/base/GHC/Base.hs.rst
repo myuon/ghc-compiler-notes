@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Base.hs>`_
 
+====================
+libraries/base/GHC/Base.hs.rst
+====================
+
 Note [Depend on GHC.Integer]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The Integer type is special because TidyPgm uses

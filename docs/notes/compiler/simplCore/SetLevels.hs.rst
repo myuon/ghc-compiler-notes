@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs>`_
 
+====================
+compiler/simplCore/SetLevels.hs.rst
+====================
+
 Note [FloatOut inside INLINE]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @InlineCtxt@ very similar to @Level 0 0@, but is used for one purpose:

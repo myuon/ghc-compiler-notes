@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Control/Monad.hs>`_
 
+====================
+libraries/base/Control/Monad.hs.rst
+====================
+
 Note [Worker/wrapper transform on replicateM/replicateM_]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

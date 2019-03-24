@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsLit.hs>`_
 
+====================
+compiler/hsSyn/HsLit.hs.rst
+====================
+
 Note [ol_rebindable]
 ~~~~~~~~~~~~~~~~~~~~
 The ol_rebindable field is True if this literal is actually

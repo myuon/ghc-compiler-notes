@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs>`_
 
+====================
+compiler/simplCore/CSE.hs.rst
+====================
+
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
 We have to be careful about shadowing.

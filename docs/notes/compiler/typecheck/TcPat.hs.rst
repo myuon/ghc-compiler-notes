@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPat.hs>`_
 
+====================
+compiler/typecheck/TcPat.hs.rst
+====================
+
 Note [Subsumption check at pattern variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When we come across a variable with a type signature, we need to do a

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs>`_
 
+====================
+compiler/hsSyn/HsExpr.hs.rst
+====================
+
 Note [CmdSyntaxtable]
 ~~~~~~~~~~~~~~~~~~~~~
 Used only for arrow-syntax stuff (HsCmdTop), the CmdSyntaxTable keeps

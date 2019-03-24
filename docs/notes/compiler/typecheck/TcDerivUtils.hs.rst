@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDerivUtils.hs>`_
 
+====================
+compiler/typecheck/TcDerivUtils.hs.rst
+====================
+
 Note [Deriving and unused record selectors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this (see #13919):

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs>`_
 
+====================
+compiler/basicTypes/DataCon.hs.rst
+====================
+
 Note [Data Constructor Naming]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Each data constructor C has two, and possibly up to four, Names associated with it:

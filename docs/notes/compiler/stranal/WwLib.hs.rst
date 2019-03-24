@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs>`_
 
+====================
+compiler/stranal/WwLib.hs.rst
+====================
+
 Note [Always do CPR w/w]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 At one time we refrained from doing CPR w/w for thunks, on the grounds that

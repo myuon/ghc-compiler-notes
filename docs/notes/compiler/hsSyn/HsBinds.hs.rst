@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsBinds.hs>`_
 
+====================
+compiler/hsSyn/HsBinds.hs.rst
+====================
+
 Note [AbsBinds]
 ~~~~~~~~~~~~~~~
 The AbsBinds constructor is used in the output of the type checker, to

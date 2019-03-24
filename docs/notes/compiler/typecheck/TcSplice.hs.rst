@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSplice.hs>`_
 
+====================
+compiler/typecheck/TcSplice.hs.rst
+====================
+
 Note [How top-level splices are handled]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Top-level splices (those not inside a [| .. |] quotation bracket) are handled

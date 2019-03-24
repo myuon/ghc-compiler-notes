@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs>`_
 
+====================
+compiler/simplCore/SimplEnv.hs.rst
+====================
+
 Note [SimplEnv invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 seInScope:

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/backpack/RnModIface.hs>`_
 
+====================
+compiler/backpack/RnModIface.hs.rst
+====================
+
 Note [rnIfaceNeverExported]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For the high-level overview, see

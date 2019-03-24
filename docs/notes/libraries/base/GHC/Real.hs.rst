@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Real.hs>`_
 
+====================
+libraries/base/GHC/Real.hs.rst
+====================
+
 Note [Numeric Stability of Enumerating Floating Numbers]
 -----------------------------------------------------------
 When enumerate floating numbers, we could add the increment to the last number

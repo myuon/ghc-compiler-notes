@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsPat.hs>`_
 
+====================
+compiler/hsSyn/HsPat.hs.rst
+====================
+
 Note [DotDot fields]
 ~~~~~~~~~~~~~~~~~~~~
 The rec_dotdot field means this:

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/BlockId.hs>`_
 
+====================
+compiler/cmm/BlockId.hs.rst
+====================
+
 Note [Unique BlockId]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 Although a 'BlockId' is a local label, for reasons of implementation,

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreOpt.hs>`_
 
+====================
+compiler/coreSyn/CoreOpt.hs.rst
+====================
+
 Note [The simple optimiser]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The simple optimiser is a lightweight, pure (non-monadic) function

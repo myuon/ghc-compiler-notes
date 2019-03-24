@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSwitch.hs>`_
 
+====================
+compiler/cmm/CmmSwitch.hs.rst
+====================
+
 Note [Cmm Switches, the general plan]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/Bitmap.hs>`_
 
+====================
+compiler/cmm/Bitmap.hs.rst
+====================
+
 Note [Strictness when building Bitmaps]
 ========================================
 

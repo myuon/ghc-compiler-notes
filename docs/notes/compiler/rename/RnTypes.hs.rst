@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs>`_
 
+====================
+compiler/rename/RnTypes.hs.rst
+====================
+
 Note [Renaming named wild cards]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Identifiers starting with an underscore are always parsed as type variables.

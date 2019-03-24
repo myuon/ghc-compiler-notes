@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatOut.hs>`_
 
+====================
+compiler/simplCore/FloatOut.hs.rst
+====================
+
 Note [Join points]
 ~~~~~~~~~~~~~~~~~~
 Every occurrence of a join point must be a tail call (see Note [Invariants on

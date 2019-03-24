@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/AsmCodeGen.hs>`_
 
+====================
+compiler/nativeGen/AsmCodeGen.hs.rst
+====================
+
 Note [Unwinding information in the NCG]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

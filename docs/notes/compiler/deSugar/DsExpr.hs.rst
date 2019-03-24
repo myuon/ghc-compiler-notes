@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsExpr.hs>`_
 
+====================
+compiler/deSugar/DsExpr.hs.rst
+====================
+
 Note [Desugaring vars]
 ~~~~~~~~~~~~~~~~~~~~~~
 In one situation we can get a *coercion* variable in a HsVar, namely

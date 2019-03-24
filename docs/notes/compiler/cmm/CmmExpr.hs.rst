@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmExpr.hs>`_
 
+====================
+compiler/cmm/CmmExpr.hs.rst
+====================
+
 Note [Old Area]
 ~~~~~~~~~~~~~~~~~~
 There is a single call area 'Old', allocated at the extreme old

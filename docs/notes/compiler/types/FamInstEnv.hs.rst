@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs>`_
 
+====================
+compiler/types/FamInstEnv.hs.rst
+====================
+
 Note [FamInsts and CoAxioms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * CoAxioms and FamInsts are just like

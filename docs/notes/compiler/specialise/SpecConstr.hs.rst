@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs>`_
 
+====================
+compiler/specialise/SpecConstr.hs.rst
+====================
+
 Note [Reboxing]
 ~~~~~~~~~~~~~~~
 We must be careful not to allocate the same constructor twice.  Consider

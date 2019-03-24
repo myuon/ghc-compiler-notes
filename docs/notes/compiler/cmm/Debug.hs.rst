@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/Debug.hs>`_
 
+====================
+compiler/cmm/Debug.hs.rst
+====================
+
 Note [What is this unwinding business?]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

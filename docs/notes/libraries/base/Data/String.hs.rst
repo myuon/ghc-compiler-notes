@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/String.hs>`_
 
+====================
+libraries/base/Data/String.hs.rst
+====================
+
 Note [IsString String]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Previously, the IsString instance that covered String was a flexible

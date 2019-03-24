@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs>`_
 
+====================
+compiler/coreSyn/CoreUnfold.hs.rst
+====================
+
 Note [Top-level flag on inline rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Slight hack: note that mk_inline_rules conservatively sets the

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Literal.hs>`_
 
+====================
+compiler/basicTypes/Literal.hs.rst
+====================
+
 Note [Integer literals]
 ~~~~~~~~~~~~~~~~~~~~~~~
 An Integer literal is represented using, well, an Integer, to make it

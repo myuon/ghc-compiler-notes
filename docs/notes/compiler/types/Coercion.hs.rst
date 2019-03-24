@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs>`_
 
+====================
+compiler/types/Coercion.hs.rst
+====================
+
 Note [Function coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Remember that

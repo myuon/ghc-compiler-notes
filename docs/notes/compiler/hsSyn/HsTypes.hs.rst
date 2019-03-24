@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs>`_
 
+====================
+compiler/hsSyn/HsTypes.hs.rst
+====================
+
 Note [HsBSig binder lists]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider a binder (or pattern) decorated with a type or kind,

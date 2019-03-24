@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Id.hs>`_
 
+====================
+compiler/basicTypes/Id.hs.rst
+====================
+
 Note [Free type variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 At one time we cached the free type variables of the type of an Id

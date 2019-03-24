@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs>`_
 
+====================
+compiler/simplCore/SimplUtils.hs.rst
+====================
+
 Note [StaticEnv invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We pair up an InExpr or InAlts with a StaticEnv, which establishes the

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs>`_
 
+====================
+compiler/rename/RnNames.hs.rst
+====================
+
 Note [Tracking Trust Transitively]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When we import a package as well as checking that the direct imports are safe

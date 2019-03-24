@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsUtils.hs>`_
 
+====================
+compiler/hsSyn/HsUtils.hs.rst
+====================
+
 Note [Kind signatures in typeToLHsType]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There are types that typeToLHsType can produce which require explicit kind

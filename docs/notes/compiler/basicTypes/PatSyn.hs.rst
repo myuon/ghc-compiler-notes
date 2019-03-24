@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/PatSyn.hs>`_
 
+====================
+compiler/basicTypes/PatSyn.hs.rst
+====================
+
 Note [Pattern synonym signature contexts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In a pattern synonym signature we write

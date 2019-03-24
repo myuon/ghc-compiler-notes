@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrimOp.hs>`_
 
+====================
+compiler/prelude/PrimOp.hs.rst
+====================
+
 Note [PrimOp can_fail and has_side_effects]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Both can_fail and has_side_effects mean that the primop has

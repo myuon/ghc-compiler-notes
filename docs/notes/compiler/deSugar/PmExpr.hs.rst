@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/PmExpr.hs>`_
 
+====================
+compiler/deSugar/PmExpr.hs.rst
+====================
+
 Note [PmExprOther in PmExpr]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Since there is no plan to extend the (currently pretty naive) term oracle in

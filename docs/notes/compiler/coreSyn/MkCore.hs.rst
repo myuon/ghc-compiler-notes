@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/MkCore.hs>`_
 
+====================
+compiler/coreSyn/MkCore.hs.rst
+====================
+
 Note [Flattening one-tuples]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This family of functions creates a tuple of variables/expressions/types.

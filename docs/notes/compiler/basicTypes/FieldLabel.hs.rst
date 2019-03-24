@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/FieldLabel.hs>`_
 
+====================
+compiler/basicTypes/FieldLabel.hs.rst
+====================
+
 Note [Why selector names include data constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

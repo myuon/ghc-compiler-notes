@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CLabel.hs>`_
 
+====================
+compiler/cmm/CLabel.hs.rst
+====================
+
 Note [ticky for LNE]
 ~~~~~~~~~~~~~~~~~~~~~
 Until 14 Feb 2013, every ticky counter was associated with a

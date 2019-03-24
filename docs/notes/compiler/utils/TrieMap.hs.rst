@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/TrieMap.hs>`_
 
+====================
+compiler/utils/TrieMap.hs.rst
+====================
+
 Note [foldTM determinism]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 We want foldTM to be deterministic, which is why we have an instance of

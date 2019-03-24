@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/RtClosureInspect.hs>`_
 
+====================
+compiler/ghci/RtClosureInspect.hs.rst
+====================
+
 Note [Constructor arg types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider a GADT (cf #7386)

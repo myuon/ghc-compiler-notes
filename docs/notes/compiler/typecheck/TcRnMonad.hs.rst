@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnMonad.hs>`_
 
+====================
+compiler/typecheck/TcRnMonad.hs.rst
+====================
+
 Note [Default types]
 ~~~~~~~~~~~~~~~~~~~~~~~
 The Integer type is simply not available in package ghc-prim (it is

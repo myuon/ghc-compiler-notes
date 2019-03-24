@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DriverPipeline.hs>`_
 
+====================
+compiler/main/DriverPipeline.hs.rst
+====================
+
 Note [-Xlinker -rpath vs -Wl,-rpath]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

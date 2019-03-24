@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmPrim.hs>`_
 
+====================
+compiler/codeGen/StgCmmPrim.hs.rst
+====================
+
 Note [Comparing stable names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

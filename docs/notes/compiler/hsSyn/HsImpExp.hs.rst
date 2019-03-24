@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsImpExp.hs>`_
 
+====================
+compiler/hsSyn/HsImpExp.hs.rst
+====================
+
 Note [IEThingWith]
 ~~~~~~~~~~~~~~~~~~
 

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs>`_
 
+====================
+compiler/simplCore/OccurAnal.hs.rst
+====================
+
 Note [Plugin rules]
 ~~~~~~~~~~~~~~~~~~~~~~
 Conal Elliott (#11651) built a GHC plugin that added some

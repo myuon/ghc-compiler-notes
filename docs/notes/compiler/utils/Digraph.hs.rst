@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/Digraph.hs>`_
 
+====================
+compiler/utils/Digraph.hs.rst
+====================
+
 Note [Nodes, keys, vertices]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * A 'node' is a big blob of client-stuff

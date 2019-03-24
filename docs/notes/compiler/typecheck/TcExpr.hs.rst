@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs>`_
 
+====================
+compiler/typecheck/TcExpr.hs.rst
+====================
+
 Note [Type-checking overloaded labels]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Recall that we have

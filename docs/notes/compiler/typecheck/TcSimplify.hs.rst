@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs>`_
 
+====================
+compiler/typecheck/TcSimplify.hs.rst
+====================
+
 Note [Fail fast if there are insoluble kind equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Rather like in simplifyInfer, fail fast if there is an insoluble

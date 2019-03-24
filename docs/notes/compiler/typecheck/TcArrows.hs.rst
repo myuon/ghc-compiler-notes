@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcArrows.hs>`_
 
+====================
+compiler/typecheck/TcArrows.hs.rst
+====================
+
 Note [Arrow overview]
 ~~~~~~~~~~~~~~~~~~~~~
 Here's a summary of arrows and how they typecheck.  First, here's

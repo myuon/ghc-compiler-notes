@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcBackpack.hs>`_
 
+====================
+compiler/typecheck/TcBackpack.hs.rst
+====================
+
 Note [Error reporting bad reexport]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 NB: You want to be a bit careful about what location you report on reexports.

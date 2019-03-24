@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmLayoutStack.hs>`_
 
+====================
+compiler/cmm/CmmLayoutStack.hs.rst
+====================
+
 Note [Always false stack check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We can optimise stack checks of the form

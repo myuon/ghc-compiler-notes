@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmBind.hs>`_
 
+====================
+compiler/codeGen/StgCmmBind.hs.rst
+====================
+
 Note [Selectors]
 ~~~~~~~~~~~~~~~~
 We look at the body of the closure to see if it's a selector---turgid,

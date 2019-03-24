@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/Hoopl/Dataflow.hs>`_
 
+====================
+compiler/cmm/Hoopl/Dataflow.hs.rst
+====================
+
 Note [Unreachable blocks]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 A block that is not in the domain of tfb_fbase is "currently unreachable".

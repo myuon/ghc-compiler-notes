@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/StgFVs.hs>`_
 
+====================
+compiler/stgSyn/StgFVs.hs.rst
+====================
+
 Note [Tracking local binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 'locals' contains non-toplevel, non-imported binders.

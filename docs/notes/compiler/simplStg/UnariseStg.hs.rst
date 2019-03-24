@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/UnariseStg.hs>`_
 
+====================
+compiler/simplStg/UnariseStg.hs.rst
+====================
+
 Note [Unarisation]
 ~~~~~~~~~~~~~~~~~~
 The idea of this pass is to translate away *all* unboxed-tuple and unboxed-sum

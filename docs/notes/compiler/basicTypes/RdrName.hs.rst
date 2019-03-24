@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs>`_
 
+====================
+compiler/basicTypes/RdrName.hs.rst
+====================
+
 Note [Local bindings with Exact Names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 With Template Haskell we can make local bindings that have Exact Names.

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcEvidence.hs>`_
 
+====================
+compiler/typecheck/TcEvidence.hs.rst
+====================
+
 Note [TcCoercions]
 ~~~~~~~~~~~~~~~~~~
 | TcCoercions are a hack used by the typechecker. Normally,

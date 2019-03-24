@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/llvmGen/Llvm/Types.hs>`_
 
+====================
+compiler/llvmGen/Llvm/Types.hs.rst
+====================
+
 Note [LLVM Float Types]
 ~~~~~~~~~~~~~~~~~~~~~~~
 We use 'ppDouble' for both printing Float and Double floating point types. This is

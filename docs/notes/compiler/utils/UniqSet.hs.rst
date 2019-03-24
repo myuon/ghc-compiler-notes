@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/UniqSet.hs>`_
 
+====================
+compiler/utils/UniqSet.hs.rst
+====================
+
 Note [UniqSet invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 UniqSet has the following invariant:

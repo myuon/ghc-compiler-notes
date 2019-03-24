@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmPipeline.hs>`_
 
+====================
+compiler/cmm/CmmPipeline.hs.rst
+====================
+
 Note [Sinking after stack layout]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

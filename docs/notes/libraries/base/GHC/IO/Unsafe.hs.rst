@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IO/Unsafe.hs>`_
 
+====================
+libraries/base/GHC/IO/Unsafe.hs.rst
+====================
+
 Note [unsafeDupableInterleaveIO should not be inlined]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs>`_
 
+====================
+compiler/specialise/Rules.hs.rst
+====================
+
 Note [Overall plumbing for rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * After the desugarer:

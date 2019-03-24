@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/StgSyn.hs>`_
 
+====================
+compiler/stgSyn/StgSyn.hs.rst
+====================
+
 Note [CAF consistency]
 ~~~~~~~~~~~~~~~~~~~~~~
 

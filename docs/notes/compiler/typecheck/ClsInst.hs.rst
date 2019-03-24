@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs>`_
 
+====================
+compiler/typecheck/ClsInst.hs.rst
+====================
+
 Note [Shortcut solving: overlap]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we have

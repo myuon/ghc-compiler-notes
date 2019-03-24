@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Unique.hs>`_
 
+====================
+compiler/basicTypes/Unique.hs.rst
+====================
+
 Note [Unique Determinism]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 The order of allocated @Uniques@ is not stable across rebuilds.

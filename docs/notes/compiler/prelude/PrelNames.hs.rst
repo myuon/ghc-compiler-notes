@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelNames.hs>`_
 
+====================
+compiler/prelude/PrelNames.hs.rst
+====================
+
 Note [Known-key names]
 ~~~~~~~~~~~~~~~~~~~~~~
 It is *very* important that the compiler gives wired-in things and

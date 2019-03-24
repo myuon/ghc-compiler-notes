@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHoleErrors.hs>`_
 
+====================
+compiler/typecheck/TcHoleErrors.hs.rst
+====================
+
 Note [Valid hole fits include ...]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `findValidHoleFits` returns the "Valid hole fits include ..." message.

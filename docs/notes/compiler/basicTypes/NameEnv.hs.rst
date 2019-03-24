@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/NameEnv.hs>`_
 
+====================
+compiler/basicTypes/NameEnv.hs.rst
+====================
+
 Note [depAnal determinism]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 depAnal is deterministic provided it gets the nodes in a deterministic order.

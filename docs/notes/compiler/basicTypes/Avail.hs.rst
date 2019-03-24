@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Avail.hs>`_
 
+====================
+compiler/basicTypes/Avail.hs.rst
+====================
+
 Note [Representing fields in AvailInfo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When -XDuplicateRecordFields is disabled (the normal case), a

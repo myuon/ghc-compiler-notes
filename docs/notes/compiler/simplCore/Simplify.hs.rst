@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs>`_
 
+====================
+compiler/simplCore/Simplify.hs.rst
+====================
+
 Note [The big picture]
 ~~~~~~~~~~~~~~~~~~~~~~
 The general shape of the simplifier is this:

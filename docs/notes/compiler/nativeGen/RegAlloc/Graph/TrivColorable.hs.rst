@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs>`_
 
+====================
+compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs.rst
+====================
+
 Note [accSqueeze]
 ~~~~~~~~~~~~~~~~~~~~
 BL 2007/09

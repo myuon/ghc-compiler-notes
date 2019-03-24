@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/SMRep.hs>`_
 
+====================
+compiler/cmm/SMRep.hs.rst
+====================
+
 Note [static constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

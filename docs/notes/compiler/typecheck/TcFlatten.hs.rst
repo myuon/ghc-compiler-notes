@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs>`_
 
+====================
+compiler/typecheck/TcFlatten.hs.rst
+====================
+
 Note [The flattening story]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * A CFunEqCan is either of form

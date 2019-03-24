@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs>`_
 
+====================
+compiler/simplCore/FloatIn.hs.rst
+====================
+
 Note [Dead bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~
 At a literal we won't usually have any floated bindings; the

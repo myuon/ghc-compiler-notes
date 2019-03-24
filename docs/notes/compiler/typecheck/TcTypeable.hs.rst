@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTypeable.hs>`_
 
+====================
+compiler/typecheck/TcTypeable.hs.rst
+====================
+
 Note [Grand plan for Typeable]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The overall plan is this:

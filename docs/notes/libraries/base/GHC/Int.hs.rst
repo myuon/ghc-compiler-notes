@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Int.hs>`_
 
+====================
+libraries/base/GHC/Int.hs.rst
+====================
+
 Note [Order of tests]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 (See #3065, #5161.) Suppose we had a definition like:

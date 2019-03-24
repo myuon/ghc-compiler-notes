@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Match.hs>`_
 
+====================
+compiler/deSugar/Match.hs.rst
+====================
+
 Note [Match Ids]
 ~~~~~~~~~~~~~~~~
 Most of the matching functions take an Id or [Id] as argument.  This Id

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/MonadUtils.hs>`_
 
+====================
+compiler/utils/MonadUtils.hs.rst
+====================
+
 Note [Inline @zipWithNM@ functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

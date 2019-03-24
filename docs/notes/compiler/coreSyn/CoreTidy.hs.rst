@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreTidy.hs>`_
 
+====================
+compiler/coreSyn/CoreTidy.hs.rst
+====================
+
 Note [Tidy IdInfo]
 ~~~~~~~~~~~~~~~~~~
 All nested Ids now have the same IdInfo, namely vanillaIdInfo, which

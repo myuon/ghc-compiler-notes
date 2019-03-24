@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs>`_
 
+====================
+compiler/types/CoAxiom.hs.rst
+====================
+
 Note [Coercion axiom branches]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In order to allow closed type families, an axiom needs to contain an

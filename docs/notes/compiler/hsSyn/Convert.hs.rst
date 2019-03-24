@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/Convert.hs>`_
 
+====================
+compiler/hsSyn/Convert.hs.rst
+====================
+
 Note [Dropping constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When we drop constructors from the input (for instance, when we encounter @TupE [e]@)

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs>`_
 
+====================
+compiler/types/Unify.hs.rst
+====================
+
 Note [tcMatchTy vs tcMatchTyKi]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This module offers two variants of matching: with kinds and without.

@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Bits.hs>`_
 
+====================
+libraries/base/Data/Bits.hs.rst
+====================
+
 Note [toIntegralSized optimization]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The code in 'toIntegralSized' relies on GHC optimizing away statically

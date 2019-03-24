@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs>`_
 
+====================
+compiler/stranal/WorkWrap.hs.rst
+====================
+
 Note [Don't w/w INLINE things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 It's very important to refrain from w/w-ing an INLINE function (ie one

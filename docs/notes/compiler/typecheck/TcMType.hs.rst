@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs>`_
 
+====================
+compiler/typecheck/TcMType.hs.rst
+====================
+
 Note [ExpType]
 ~~~~~~~~~~~~~~
 

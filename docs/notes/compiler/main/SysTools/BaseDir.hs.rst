@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/SysTools/BaseDir.hs>`_
 
+====================
+compiler/main/SysTools/BaseDir.hs.rst
+====================
+
 Note [topdir: How GHC finds its files]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

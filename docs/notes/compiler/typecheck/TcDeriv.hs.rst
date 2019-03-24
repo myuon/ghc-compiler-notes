@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs>`_
 
+====================
+compiler/typecheck/TcDeriv.hs.rst
+====================
+
 Note [Data decl contexts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider

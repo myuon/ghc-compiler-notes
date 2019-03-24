@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSplice.hs>`_
 
+====================
+compiler/rename/RnSplice.hs.rst
+====================
+
 Note [Free variables of typed splices]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider renaming this:

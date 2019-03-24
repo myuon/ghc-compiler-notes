@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Traversable.hs>`_
 
+====================
+libraries/base/Data/Traversable.hs.rst
+====================
+
 Note [Inline default methods]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider

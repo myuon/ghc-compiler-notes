@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnBinds.hs>`_
 
+====================
+compiler/rename/RnBinds.hs.rst
+====================
+
 Note [Pattern bindings that bind no variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Generally, we want to warn about pattern bindings like

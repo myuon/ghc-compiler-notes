@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcEnv.hs>`_
 
+====================
+compiler/typecheck/TcEnv.hs.rst
+====================
+
 Note [AFamDataCon: not promoting data family constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider

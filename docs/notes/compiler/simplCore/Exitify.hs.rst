@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs>`_
 
+====================
+compiler/simplCore/Exitify.hs.rst
+====================
+
 Note [Exitification]
 ~~~~~~~~~~~~~~~~~~~~
 

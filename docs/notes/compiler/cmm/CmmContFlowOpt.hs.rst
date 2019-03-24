@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmContFlowOpt.hs>`_
 
+====================
+compiler/cmm/CmmContFlowOpt.hs.rst
+====================
+
 Note [What is shortcutting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

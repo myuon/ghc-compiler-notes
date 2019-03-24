@@ -1,5 +1,9 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Desugar.hs>`_
 
+====================
+compiler/deSugar/Desugar.hs.rst
+====================
+
 Note [Top-level evidence]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Top-level evidence bindings may be mutually recursive with the top-level value
