@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module GHC.Compiler.Notes.FormatRstDoc where
+module GHC.Compiler.Notes.FormatRstDoc (
+  formatRstDoc,
+  unLoc,
+) where
 
 import           Data.Foldable
 import qualified Data.Text                as Text

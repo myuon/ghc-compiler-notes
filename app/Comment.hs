@@ -12,8 +12,10 @@ import           System.FilePath
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import           Data.Maybe (fromJust)
+import           Data.List (groupBy)
 import           GHC.Compiler.Notes.Parser
-import           GHC.Compiler.Notes.FormatRstDoc
+import           GHC.Compiler.Notes.FormatRstDoc (unLoc)
+import           GHC.Compiler.Notes.Types
 import           System.Directory
 
 
@@ -35,6 +37,25 @@ main = do
   ctx <- defaultAppContext
   runAppT (app opt) ctx
 
+data LineMode = MayCodeBlock | Paragraph
+  deriving Eq
+
+customFormatRstDoc :: CollectedNotes -> Text.Text
+customFormatRstDoc CollectedNotes{..} = go $ toList $ codeBlocks . noteContent . unLoc <$> notes
+  where
+    go []     = ""
+    go [n]    = n
+    go (n:ns) = n <> "\n\n" <> go ns
+
+    codeBlocks = Text.concat . map Text.unlines . map (\p -> if detectBlocks p then insertCodeBlock p else p) . paragraphs
+      where
+        paragraphs = groupBy (\x y -> Text.stripStart x /= "" && Text.stripStart y /= "") . Text.lines
+
+        detectBlocks =
+          all (\line -> "  " `Text.isPrefixOf` line && Text.head (Text.stripStart line) `notElem` ("-*123456789" :: String) && Text.length (Text.stripStart line) /= 0)
+
+        insertCodeBlock = (".. code-block:: haskell\n" :)
+
 app :: CommentOption -> AppT IO ()
 app opt = do
   config <- (liftIO $ parseConfigFromFile $ optConfigPath opt) >>= \case
@@ -48,7 +69,7 @@ app opt = do
     case r of
       Left lf  -> liftIO $ print lf
       Right ns -> do
-        let d = formatRstDoc ns
+        let d = customFormatRstDoc ns
         when (Text.length (Text.strip d) /= 0) $ do
           -- Create a directory and place an index.rst
           directoryExists <- liftIO $ doesDirectoryExist $ takeDirectory outputFn
