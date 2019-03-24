@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/VarEnv.hs>`_
+
+====================
+compiler/basicTypes/VarEnv.hs.rst
+====================
+
 Note [Eta expansion]
 ~~~~~~~~~~~~~~~~~~~~
 When matching
@@ -11,5 +17,6 @@ the envR with a binding [x' -> x'], to support the occurs check.
 For example, if we don't do this, we can get silly matches like
         forall a.  (\y.a)  ~   v
 succeeding with [a -> v y], which is bogus of course.
+
 
 

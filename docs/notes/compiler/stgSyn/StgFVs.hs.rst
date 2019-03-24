@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/StgFVs.hs>`_
+
+====================
+compiler/stgSyn/StgFVs.hs.rst
+====================
+
 Note [Tracking local binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 'locals' contains non-toplevel, non-imported binders.
@@ -11,3 +17,4 @@ Why do it there rather than in 'binding'? Two reasons:
      prior to analysing the body, but we also need the fvs from the
      body to analyse the RHSs. No way to do this without some
      knot-tying.
+

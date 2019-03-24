@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs>`_
+
+====================
+compiler/coreSyn/CoreSyn.hs.rst
+====================
+
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
 While various passes attempt to rename on-the-fly in a manner that
@@ -74,6 +80,8 @@ top level. This allows us to share string literals earlier in the pipeline and
 crucially allows other optimizations in the Core2Core pipeline to fire.
 Consider,
 
+.. code-block:: haskell
+
   f n = let a::Addr# = "foo"#
         in \x -> blah
 
@@ -127,10 +135,14 @@ The let/app invariant
 This means that the let can be floated around
 without difficulty. For example, this is OK:
 
+.. code-block:: haskell
+
    y::Int# = x +# 1#
 
 But this is not, as it may affect termination if the
 expression is floated out:
+
+.. code-block:: haskell
 
    y::Int# = fac 4#
 
@@ -154,10 +166,14 @@ substitutions until the next run of the simplifier.
 
 * A coercion variable binding must have a RHS of (Coercion co)
 
+.. code-block:: haskell
+
   It is possible to have terms that return a coercion, but we use
   case-binding for those; e.g.
      case (eq_sel d) of (co :: a ~# b) -> blah
   where eq_sel :: (a~b) -> (a~#b)
+
+.. code-block:: haskell
 
   Or even even
       case (df @Int) of (co :: a ~# b) -> blah
@@ -238,16 +254,24 @@ this exhaustive list can be empty!
 * We can use the empty-alternative construct to coerce error values from
   one type to another.  For example
 
+.. code-block:: haskell
+
     f :: Int -> Int
     f n = error "urk"
 
+.. code-block:: haskell
+
     g :: Int -> (# Char, Bool #)
     g x = case f x of { 0 -> ..., n -> ... }
+
+.. code-block:: haskell
 
   Then if we inline f in g's RHS we get
     case (error Int "urk") of (# Char, Bool #) { ... }
   and we can discard the alternatives since the scrutinee is bottom to give
     case (error Int "urk") of (# Char, Bool #) {}
+
+.. code-block:: haskell
 
   This is nicer than using an unsafe coerce between Int ~ (# Char,Bool #),
   if for no other reason that we don't need to instantiate the (~) at an
@@ -287,6 +311,8 @@ The former has join arity 1, while the latter has join arity 0.
 The identifier for a join point is called a join id or a *label.* An invocation
 is called a *jump.* We write a jump using the jump keyword:
 
+.. code-block:: haskell
+
   jump j 3
 
 The words *label* and *jump* are evocative of assembly code (or Cmm) for a
@@ -303,8 +329,12 @@ join arity.
 
 For more details, see the paper:
 
+.. code-block:: haskell
+
   Luke Maurer, Paul Downen, Zena Ariola, and Simon Peyton Jones. "Compiling
   without continuations." Submitted to PLDI'17.
+
+.. code-block:: haskell
 
   https://www.microsoft.com/en-us/research/publication/compiling-without-continuations/
 
@@ -343,6 +373,8 @@ However, join points have simpler invariants in other ways
 
 Examples:
 
+.. code-block:: haskell
+
   join j1  x = 1 + x in jump j (jump j x)  -- Fails 1: non-tail call
   join j1' x = 1 + x in if even a
                           then jump j1 a
@@ -377,6 +409,8 @@ String`. Natural as this may seem, it can be awkward. A join point shouldn't be
 thought to "return" in the same sense a function does---a jump is one-way. This
 is crucial for understanding how case-of-case interacts with join points:
 
+.. code-block:: haskell
+
   case (join
           j :: Int -> Bool -> String
           j x y = ...
@@ -387,6 +421,8 @@ is crucial for understanding how case-of-case interacts with join points:
 
 The simplifier will pull the case into the join point (see Note [Case-of-case
 and join points] in Simplify):
+
+.. code-block:: haskell
 
   join
     j :: Int -> Bool -> Bool -- changed!
@@ -405,6 +441,8 @@ paper, we instead give j the type `Int -> Bool -> forall a. a`. Then each jump
 carries the "return type" as a parameter, exactly the way other non-returning
 functions like `error` work:
 
+.. code-block:: haskell
+
   case (join
           j :: Int -> Bool -> forall a. a
           j x y = ...
@@ -414,6 +452,8 @@ functions like `error` work:
     _  -> False
 
 Now we can move the case inward and we only have to change the jump:
+
+.. code-block:: haskell
 
   join
     j :: Int -> Bool -> forall a. a
@@ -432,11 +472,15 @@ Note [The polymorphism rule of join points]
 Invariant 4 of Note [Invariants on join points] forbids a join point to be
 polymorphic in its return type. That is, if its type is
 
+.. code-block:: haskell
+
   forall a1 ... ak. t1 -> ... -> tn -> r
 
 where its join arity is k+n, none of the type parameters ai may occur free in r.
 
 In some way, this falls out of the fact that given
+
+.. code-block:: haskell
 
   join
      j @a1 ... @ak x1 ... xn = e1
@@ -452,6 +496,8 @@ thus neither can the type of `e1`.
 This unfortunately prevents the `go` in the following code from being a
 join-point:
 
+.. code-block:: haskell
+
   iter :: forall a. Int -> (a -> a) -> a -> a
   iter @a n f x = go @a n f x
     where
@@ -461,6 +507,8 @@ join-point:
 
 In this case, a static argument transformation would fix that (see
 ticket #14620):
+
+.. code-block:: haskell
 
   iter :: forall a. Int -> (a -> a) -> a -> a
   iter @a n f x = go' @a n f x
@@ -475,12 +523,18 @@ Can we simply drop the requirement, and allow `go` to be a join-point? We
 could, and it would work. But we could not longer apply the case-of-join-point
 transformation universally. This transformation would do:
 
+.. code-block:: haskell
+
   case (join go @a n f x = case n of 0 -> x
                                      n -> go @a (n-1) f (f x)
         in go @Bool n neg True) of
     True -> e1; False -> e2
 
+.. code-block:: haskell
+
  ===>
+
+.. code-block:: haskell
 
   join go @a n f x = case n of 0 -> case x of True -> e1; False -> e2
                           n -> go @a (n-1) f (f x)
@@ -517,8 +571,12 @@ has two major consequences
       instance Eq T where ....
    The instance (Eq T) is incorprated as part of T's fingerprint.
 
+.. code-block:: haskell
+
    In contrast, orphans are all fingerprinted together in the
    mi_orph_hash field of the ModIface.
+
+.. code-block:: haskell
 
    See MkIface.addFingerprints.
 
@@ -561,13 +619,19 @@ that the DFun needs to produce a dictionary.  That's not necessarily
 related to the ordinary arity of the dfun Id, esp if the class has
 one method, so the dictionary is represented by a newtype.  Example
 
+.. code-block:: haskell
+
      class C a where { op :: a -> Int }
      instance C a -> C [a] where op xs = op (head xs)
 
 The instance translates to
 
+.. code-block:: haskell
+
      $dfCList :: forall a. C a => C [a]  -- Arity 2!
      $dfCList = /\a.\d. $copList {a} d |> co
+
+.. code-block:: haskell
 
      $copList :: forall a. C a => [a] -> Int  -- Arity 2!
      $copList = /\a.\d.\xs. op {a} d (head xs)
@@ -589,7 +653,11 @@ An unfolding is "fragile" if it mentions free variables (and hence would
 need substitution) or might be affected by optimisation.  The non-fragile
 ones are
 
+.. code-block:: haskell
+
    NoUnfolding, BootUnfolding
+
+.. code-block:: haskell
 
    OtherCon {}    If we know this binder (say a lambda binder) will be
                   bound to an evaluated thing, we want to retain that
@@ -667,3 +735,4 @@ a list of CoreBind
    chunks.
 If you edit this type, you may need to update the GHC formalism
 See Note [GHC Formalism] in coreSyn/CoreLint.hs
+

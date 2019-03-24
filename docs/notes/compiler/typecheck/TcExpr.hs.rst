@@ -1,6 +1,14 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs>`_
+
+====================
+compiler/typecheck/TcExpr.hs.rst
+====================
+
 Note [Type-checking overloaded labels]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Recall that we have
+
+.. code-block:: haskell
 
   module GHC.OverloadedLabels where
     class IsLabel (x :: Symbol) a where
@@ -74,9 +82,13 @@ Note [Type of a record update]
 The main complication with RecordUpd is that we need to explicitly
 handle the *non-updated* fields.  Consider:
 
+.. code-block:: haskell
+
         data T a b c = MkT1 { fa :: a, fb :: (b,c) }
                      | MkT2 { fa :: a, fb :: (b,c), fc :: c -> c }
                      | MkT3 { fd :: a }
+
+.. code-block:: haskell
 
         upd :: T a b c -> (b',c) -> T a b' c
         upd t x = t { fb = x}
@@ -130,6 +142,8 @@ field isn't part of the existential. For example, this should be ok.
 
 The criterion we use is this:
 
+.. code-block:: haskell
+
   The types of the updated fields
   mention only the universally-quantified type variables
   of the data constructor
@@ -182,21 +196,31 @@ Note [Mixed Record Field Updates]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider the following pattern synonym.
 
+.. code-block:: haskell
+
   data MyRec = MyRec { foo :: Int, qux :: String }
+
+.. code-block:: haskell
 
   pattern HisRec{f1, f2} = MyRec{foo = f1, qux=f2}
 
 This allows updates such as the following
+
+.. code-block:: haskell
 
   updater :: MyRec -> MyRec
   updater a = a {f1 = 1 }
 
 It would also make sense to allow the following update (which we reject).
 
+.. code-block:: haskell
+
   updater a = a {f1 = 1, qux = "two" } ==? MyRec 1 "two"
 
 This leads to confusing behaviour when the selectors in fact refer the same
 field.
+
+.. code-block:: haskell
 
   updater a = a {f1 = 1, foo = 2} ==? ???
 
@@ -204,7 +228,11 @@ For this reason, we reject a mixture of pattern synonym and normal record
 selectors in the same update block. Although of course we still allow the
 following.
 
+.. code-block:: haskell
+
   updater a = (a {f1 = 1}) {foo = 2}
+
+.. code-block:: haskell
 
   > updater (MyRec 0 "str")
   MyRec 2 "str"
@@ -234,6 +262,8 @@ which is better than before.
 Note [Required quantifiers in the type of a term]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider (#15859)
+
+.. code-block:: haskell
 
   data A k :: k -> Type      -- A      :: forall k -> k -> Type
   type KindOf (a :: k) = k   -- KindOf :: forall k. k -> Type
@@ -303,11 +333,17 @@ experimenting with putting this first.
 
 Here's an example where it actually makes a real difference
 
+.. code-block:: haskell
+
    class C t a b | t a -> b
    instance C Char a Bool
 
+.. code-block:: haskell
+
    data P t a = forall b. (C t a b) => MkP b
    data Q t   = MkQ (forall a. P t a)
+
+.. code-block:: haskell
 
    f1, f2 :: Q Char;
    f1 = MkQ (MkP True)
@@ -371,6 +407,8 @@ Here's are two cases that should fail
         f :: forall a. a
         f = tagToEnum# 0        -- Can't do tagToEnum# at a type variable
 
+.. code-block:: haskell
+
         g :: Int
         g = tagToEnum# 0        -- Int is not an enumeration
 
@@ -432,6 +470,8 @@ typechecker.  In this case, the `Ambiguous` constructor of
 
 Consider the following definitions:
 
+.. code-block:: haskell
+
         data S = MkS { foo :: Int }
         data T = MkT { foo :: Int, bar :: Int }
         data U = MkU { bar :: Int, baz :: Int }
@@ -444,17 +484,27 @@ For selectors, there are two possible ways to disambiguate:
 1. Check if the pushed-in type is a function whose domain is a
    datatype, for example:
 
+.. code-block:: haskell
+
        f s = (foo :: S -> Int) s
+
+.. code-block:: haskell
 
        g :: T -> Int
        g = foo
+
+.. code-block:: haskell
 
     This is checked by `tcCheckRecSelId` when checking `HsRecFld foo`.
 
 2. Check if the selector is applied to an argument that has a type
    signature, for example:
 
+.. code-block:: haskell
+
        h = foo (s :: S)
+
+.. code-block:: haskell
 
     This is checked by `tcApp`.
 
@@ -464,24 +514,36 @@ function tries to determine the parent datatype in three ways:
 
 1. Check for types that have all the fields being updated. For example:
 
+.. code-block:: haskell
+
         f x = x { foo = 3, bar = 2 }
+
+.. code-block:: haskell
 
    Here `f` must be updating `T` because neither `S` nor `U` have
    both fields. This may also discover that no possible type exists.
    For example the following will be rejected:
+
+.. code-block:: haskell
 
         f' x = x { foo = 3, baz = 3 }
 
 2. Use the type being pushed in, if it is already a TyConApp. The
    following are valid updates to `T`:
 
+.. code-block:: haskell
+
         g :: T -> T
         g x = x { foo = 3 }
+
+.. code-block:: haskell
 
         g' x = x { foo = 3 } :: T
 
 3. Use the type signature of the record expression, if it exists and
    is a TyConApp. Thus this is valid update to `T`:
+
+.. code-block:: haskell
 
         h x = (x :: T) { foo = 3 }
 
@@ -490,11 +552,17 @@ Note that we do not look up the types of variables being updated, and
 no constraint-solving is performed, so for example the following will
 be rejected as ambiguous:
 
+.. code-block:: haskell
+
      let bad (s :: S) = foo s
+
+.. code-block:: haskell
 
      let r :: T
          r = blah
      in r { foo = 3 }
+
+.. code-block:: haskell
 
      \r. (r { foo = 3 },  r :: T )
 
@@ -524,13 +592,19 @@ Previously, GHC computed the number of argument types through tcSplitSigmaTy.
 This is incorrect in the face of nested foralls, however! This caused Trac
 #13311, for instance:
 
+.. code-block:: haskell
+
   f :: forall a. (Monoid a) => forall b. (Monoid b) => Maybe a -> Maybe b
 
 If one uses `f` like so:
 
+.. code-block:: haskell
+
   do { f; putChar 'a' }
 
 Then tcSplitSigmaTy will decompose the type of `f` into:
+
+.. code-block:: haskell
 
   Tyvars: [a]
   Context: (Monoid a)
@@ -540,6 +614,8 @@ Then tcSplitSigmaTy will decompose the type of `f` into:
 That is, it will conclude that there are *no* argument types, and since `f`
 was given no arguments, it won't print a helpful error message. On the other
 hand, tcSplitNestedSigmaTys correctly decomposes `f`'s type down to:
+
+.. code-block:: haskell
 
   Tyvars: [a, b]
   Context: (Monoid a, Monoid b)
@@ -592,6 +668,8 @@ Thus, the following program
 
 produces the error
 
+.. code-block:: haskell
+
    'g' is used in a static form but it is not closed because it
    uses 'h' which uses 'x' which is not let-bound.
 
@@ -610,6 +688,8 @@ And a program like
 >     h = typeOf
 
 produces the error
+
+.. code-block:: haskell
 
    'g' is used in a static form but it is not closed because it
    uses 'h' which has a non-closed type because it contains the
@@ -633,4 +713,5 @@ type. Thus, the "reason" is a path from @n@ to this offending node.
 
 When @n@ is not closed, we traverse the graph reachable from @n@ to build
 the reason.
+
 

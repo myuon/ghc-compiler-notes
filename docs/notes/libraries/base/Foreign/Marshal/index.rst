@@ -1,4 +1,4 @@
-docs/notes/libraries/base/Foreign/Marshal
+libraries/base/Foreign/Marshal
 =================================
 
 .. toctree::

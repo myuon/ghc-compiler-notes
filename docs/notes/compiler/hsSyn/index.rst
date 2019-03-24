@@ -1,4 +1,4 @@
-docs/notes/compiler/hsSyn
+compiler/hsSyn
 =================================
 
 .. toctree::

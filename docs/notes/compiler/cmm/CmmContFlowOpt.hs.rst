@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmContFlowOpt.hs>`_
+
+====================
+compiler/cmm/CmmContFlowOpt.hs.rst
+====================
+
 Note [What is shortcutting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -58,6 +64,8 @@ continuation labels that we have renamed.  This latter mapping is
 important because we might shortcut a CmmCall continuation.  For
 example:
 
+.. code-block:: haskell
+
    Sp[0] = L
    call g returns to L
    L: goto M
@@ -66,6 +74,8 @@ example:
 So when we shortcut the L block, we need to replace not only
 the continuation of the call, but also references to L in the
 code (e.g. the assignment Sp[0] = L):
+
+.. code-block:: haskell
 
    Sp[0] = M
    call g returns to M
@@ -80,6 +90,8 @@ Note [Shortcut call returns and proc-points]
 
 Consider this code that you might get from a recursive
 let-no-escape:
+
+.. code-block:: haskell
 
       goto L1
      L1:
@@ -108,3 +120,4 @@ L4 reduces the number of proc points.  Unfortunately recursive
 let-no-escapes won't generate very good code with proc-point
 splitting on - we should probably compile them to explicitly use
 the native calling convention instead.
+

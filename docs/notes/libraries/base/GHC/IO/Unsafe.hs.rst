@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IO/Unsafe.hs>`_
+
+====================
+libraries/base/GHC/IO/Unsafe.hs.rst
+====================
+
 Note [unsafeDupableInterleaveIO should not be inlined]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -11,6 +17,8 @@ longer be shared in the way the programmer was probably expecting,
 but can be performed many times.  In #5943, this broke our
 definition of fixIO, which contains
 
+.. code-block:: haskell
+
    ans <- unsafeInterleaveIO (takeMVar m)
 
 after inlining, we lose the sharing of the takeMVar, so the second
@@ -18,3 +26,4 @@ time 'ans' was demanded we got a deadlock.  We could fix this with
 a readMVar, but it seems wrong for unsafeInterleaveIO to sometimes
 share and sometimes not (plus it probably breaks the noDuplicate).
 So now, we do not inline unsafeDupableInterleaveIO.
+

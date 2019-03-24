@@ -1,4 +1,4 @@
-docs/notes/libraries/base/GHC
+libraries/base/GHC
 =================================
 
 .. toctree::

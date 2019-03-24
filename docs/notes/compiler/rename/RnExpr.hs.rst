@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnExpr.hs>`_
+
+====================
+compiler/rename/RnExpr.hs.rst
+====================
+
 Note [Deterministic ApplicativeDo and RecursiveDo desugaring]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Both ApplicativeDo and RecursiveDo need to create tuples not
@@ -5,9 +11,13 @@ present in the source text.
 
 For ApplicativeDo we create:
 
+.. code-block:: haskell
+
   (a,b,c) <- (\c b a -> (a,b,c)) <$>
 
 For RecursiveDo we create:
+
+.. code-block:: haskell
 
   mfix (\ ~(a,b,c) -> do ...; return (a',b',c'))
 
@@ -45,7 +55,11 @@ Note that
       rename each group of Stmts with a thing_inside whose FreeVars
       include at least {a,c}
 
+.. code-block:: haskell
+
   (b) We want to report that 'a' is illegally bound in both branches
+
+.. code-block:: haskell
 
   (c) The 'bs' in the second group must obviously not be captured by
       the binding in the first group
@@ -123,3 +137,4 @@ So, in this case, we synthesize the function
 
 (rather than plain 'fail') for the 'fail' operation. This is done in
 'getMonadFailOp'.
+

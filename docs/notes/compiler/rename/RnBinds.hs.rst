@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnBinds.hs>`_
+
+====================
+compiler/rename/RnBinds.hs.rst
+====================
+
 Note [Pattern bindings that bind no variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Generally, we want to warn about pattern bindings like
@@ -109,6 +115,8 @@ We define a COMPLETE pragma to be a non-orphan if it includes at least
 one conlike defined in the current module. Why is this sufficient?
 Well if you have a pattern match
 
+.. code-block:: haskell
+
   case expr of
     P1 -> ...
     P2 -> ...
@@ -122,3 +130,4 @@ pragmas that could be relevant to this pattern match.
 
 For now we simply disallow orphan COMPLETE pragmas, as the added
 complexity of supporting them properly doesn't seem worthwhile.
+

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs>`_
+
+====================
+compiler/simplCore/LiberateCase.hs.rst
+====================
+
 Note [Scrutinee with cast]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this:
@@ -48,9 +54,13 @@ Note [Only functions!]
 ~~~~~~~~~~~~~~~~~~~~~~
 Consider the following code
 
+.. code-block:: haskell
+
        f = g (case v of V a b -> a : t f)
 
 where g is expensive. If we aren't careful, liberate case will turn this into
+
+.. code-block:: haskell
 
        f = g (case v of
                V a b -> a : t (letrec f = g (case v of V a b -> a : f t)
@@ -132,7 +142,10 @@ to 'g' because all the structure in its free variables is already
 visible at the definition site for g.  Hence, when considering specialising
 an occurrence of 'g', we want to check that there's a scruted-var v st
 
+.. code-block:: haskell
+
    a) v's binding site is *outside* g
    b) v's scrutinisation site is *inside* g
+
 
 

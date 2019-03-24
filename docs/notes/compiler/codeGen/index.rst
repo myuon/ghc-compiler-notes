@@ -1,4 +1,4 @@
-docs/notes/compiler/codeGen
+compiler/codeGen
 =================================
 
 .. toctree::

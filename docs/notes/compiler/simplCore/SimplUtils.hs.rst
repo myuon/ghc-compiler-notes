@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs>`_
+
+====================
+compiler/simplCore/SimplUtils.hs.rst
+====================
+
 Note [StaticEnv invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We pair up an InExpr or InAlts with a StaticEnv, which establishes the
@@ -24,6 +30,8 @@ Note [DupFlag invariants]
 In both (ApplyToVal dup _ env k)
    and  (Select dup _ _ env k)
 the following invariants hold
+
+.. code-block:: haskell
 
   (a) if dup = OkToDup, then continuation k is also ok-to-dup
   (b) if dup = OkToDup or Simplified, the subst-env is empty
@@ -53,8 +61,12 @@ Note [Do not expose strictness if sm_inline=False]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #15163 showed a case in which we had
 
+.. code-block:: haskell
+
   {-# INLINE [1] zip #-}
   zip = undefined
+
+.. code-block:: haskell
 
   {-# RULES "foo" forall as bs. stream (zip as bs) = ..blah... #-}
 
@@ -82,6 +94,8 @@ inline, otherwise we don't.
 Previously some_benefit used to return True only if the variable was
 applied to some value arguments.  This didn't work:
 
+.. code-block:: haskell
+
         let x = _coerce_ (T Int) Int (I# 3) in
         case _coerce_ Int (T Int) x of
                 I# y -> ....
@@ -97,6 +111,8 @@ dMonadST = _/\_ t -> :Monad (g1 _@_ t, g2 _@_ t, g3 _@_ t)
 
 we'd really like to inline dMonadST here, but we *don't* want to
 inline if the case expression is just
+
+.. code-block:: haskell
 
         case x of y { DEFAULT -> ... }
 
@@ -173,11 +189,15 @@ Note [No eta expansion in stable unfoldings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If we have a stable unfolding
 
+.. code-block:: haskell
+
   f :: Ord a => a -> IO ()
   -- Unfolding template
   --    = /\a \(d:Ord a) (x:a). bla
 
 we do not want to eta-expand to
+
+.. code-block:: haskell
 
   f :: Ord a => a -> IO ()
   -- Unfolding template
@@ -200,6 +220,8 @@ Something is inlined if
 Example of why (iii) is important:
   {-# INLINE [~1] g #-}
   g = ...
+
+.. code-block:: haskell
 
   {-# INLINE f #-}
   f x = g (g x)
@@ -258,6 +280,8 @@ f's stable unfolding?  Our model is that literally <rhs> is substituted for
 f when it is inlined.  So our conservative plan (implemented by
 updModeForStableUnfoldings) is this:
 
+.. code-block:: haskell
+
   -------------------------------------------------------------
   When simplifying the RHS of a stable unfolding, set the phase
   to the phase in which the stable unfolding first becomes active
@@ -265,9 +289,13 @@ updModeForStableUnfoldings) is this:
 
 That ensures that
 
+.. code-block:: haskell
+
   a) Rules/inlinings that *cease* being active before p will
      not apply to the stable unfolding, consistent with it being
      inlined in its *original* form in phase p.
+
+.. code-block:: haskell
 
   b) Rules/inlinings that only become active *after* p will
      not apply to the stable unfolding, again to be consistent with
@@ -276,6 +304,8 @@ That ensures that
 For example,
         {-# INLINE f #-}
         f x = ...g...
+
+.. code-block:: haskell
 
         {-# NOINLINE [1] g #-}
         g y = ...
@@ -328,12 +358,18 @@ Note [Stable unfoldings and preInlineUnconditionally]
 Surprisingly, do not pre-inline-unconditionally Ids with INLINE pragmas!
 Example
 
+.. code-block:: haskell
+
    {-# INLINE f #-}
    f :: Eq a => a -> a
    f x = ...
 
+.. code-block:: haskell
+
    fInt :: Int -> Int
    fInt = f Int dEqInt
+
+.. code-block:: haskell
 
    ...fInt...fInt...fInt...
 
@@ -385,6 +421,8 @@ ones that are trivial):
     but in *that* simplifier pass we must not do postInlineUnconditionally
     on 'ruggle' because then we'll have an unbound occurrence of 'ruggle'
 
+.. code-block:: haskell
+
     If the rhs is trivial it'll be inlined by callSiteInline, and then
     the binding will be dead and discarded by the next use of OccurAnal
 
@@ -404,17 +442,23 @@ Note [Stable unfoldings and postInlineUnconditionally]
 Do not do postInlineUnconditionally if the Id has a stable unfolding,
 otherwise we lose the unfolding.  Example
 
+.. code-block:: haskell
+
      -- f has stable unfolding with rhs (e |> co)
      --   where 'e' is big
      f = e |> co
 
 Then there's a danger we'll optimise to
 
+.. code-block:: haskell
+
      f' = e
      f = f' |> co
 
 and now postInlineUnconditionally, losing the stable unfolding on f.  Now f'
 won't inline because 'e' is too big.
+
+.. code-block:: haskell
 
     c.f. Note [Stable unfoldings and preInlineUnconditionally]
 
@@ -489,6 +533,8 @@ One useful consequence of not eta-expanding lambdas is this example:
    {-# INLINE genMap #-}
    genMap f xs = ...
 
+.. code-block:: haskell
+
    myMap :: D a => ...
    {-# INLINE myMap #-}
    myMap = genMap
@@ -510,13 +556,19 @@ Similarly to CPR (see Note [Don't CPR join points] in WorkWrap), a join point
 stands well to gain from its outer binding's eta-expansion, and eta-expanding a
 join point is fraught with issues like how to deal with a cast:
 
+.. code-block:: haskell
+
     let join $j1 :: IO ()
              $j1 = ...
              $j2 :: Int -> IO ()
              $j2 n = if n > 0 then $j1
                               else ...
 
+.. code-block:: haskell
+
     =>
+
+.. code-block:: haskell
 
     let join $j1 :: IO ()
              $j1 = (\eta -> ...)
@@ -535,6 +587,8 @@ than try and detect this situation (and whatever other situations crop up!), we
 don't bother; again, any surrounding eta-expansion will improve these join
 points anyway, since an outer cast can *always* be pushed inside. By the time
 CorePrep comes around, the code is very likely to look more like this:
+
+.. code-block:: haskell
 
     let join $j1 :: State# RealWorld -> (# State# RealWorld, ())
              $j1 = (...) eta
@@ -583,7 +637,11 @@ for the usual reasons: we want to inline x rather vigorously.
 You may think that this kind of thing is rare.  But in some programs it is
 common.  For example, if you do closure conversion you might get:
 
+.. code-block:: haskell
+
         data a :-> b = forall e. (e -> a -> b) :$ e
+
+.. code-block:: haskell
 
         f_cc :: forall a. a :-> a
         f_cc = /\a. (\e. id a) :$ ()
@@ -599,6 +657,8 @@ and treat them specially. The real work is done in SimplUtils.abstractFloats,
 but there is quite a bit of plumbing in simplLazyBind as well.
 
 The same transformation is good when there are lets in the body:
+
+.. code-block:: haskell
 
         /\abc -> let(rec) x = e in b
    ==>
@@ -635,6 +695,8 @@ becomes
 Unless the "..." is a WHNF there is really no point in doing this.
 Indeed it can make things worse.  Suppose x1 is used strictly,
 and is of the form
+
+.. code-block:: haskell
 
         x1* = case f y of { (a,b) -> e }
 
@@ -680,6 +742,8 @@ wrt all the type variables if any of them are coercion variables.
 
 
 Historical note: if you use let-bindings instead of a substitution, beware of this:
+
+.. code-block:: haskell
 
                 -- Suppose we start with:
                 --
@@ -741,6 +805,8 @@ Note [Scrutinee Constant Folding]
         ...                        ...
         DEFAULT -> ed              DEFAULT -> ed
 
+.. code-block:: haskell
+
      where (x op# k#) inv_op# k# == x
 
 And similarly for commuted arguments and for some unary operations.
@@ -749,6 +815,8 @@ The purpose of this transformation is not only to avoid an arithmetic
 operation at runtime but to allow other transformations to apply in cascade.
 
 Example with the "Merge Nested Cases" optimization (from #12877):
+
+.. code-block:: haskell
 
       main = case t of t0
          0##     -> ...
@@ -759,6 +827,8 @@ Example with the "Merge Nested Cases" optimization (from #12877):
                DEFAULT -> case t2 `minusWord#` 1## of _
                   0##     -> ...
                   DEFAULT -> ...
+
+.. code-block:: haskell
 
   becomes:
 
@@ -796,6 +866,8 @@ There are some wrinkles
          case e of b'
            DEFAULT -> let b = b' +# 10# in blah...b...
            34#     -> let b = 44# in blah2...b...
+
+.. code-block:: haskell
 
   Note that in the non-DEFAULT cases we know what to bind 'b' to,
   whereas in the DEFAULT case we must reconstruct the original value.
@@ -870,6 +942,8 @@ happens bottom-up
 However here's a tricky case that we still don't catch, and I don't
 see how to catch it in one pass:
 
+.. code-block:: haskell
+
   case x of c1 { I# a1 ->
   case a1 of c2 ->
     0 -> ...
@@ -877,6 +951,8 @@ see how to catch it in one pass:
                case a2 of ...
 
 After occurrence analysis (and its binder-swap) we get this
+
+.. code-block:: haskell
 
   case x of c1 { I# a1 ->
   let x = c1 in         -- Binder-swap addition
@@ -887,6 +963,8 @@ After occurrence analysis (and its binder-swap) we get this
 
 When we simplify the inner case x, we'll see that
 x=c1=I# a1.  So we'll bind a2 to a1, and get
+
+.. code-block:: haskell
 
   case x of c1 { I# a1 ->
   case a1 of c2 ->
@@ -899,3 +977,4 @@ without getting changed to c1=I# c2.
 
 I don't think this is worth fixing, even if I knew how. It'll
 all come out in the next pass anyway.
+

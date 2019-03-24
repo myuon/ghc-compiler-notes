@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs>`_
+
+====================
+compiler/typecheck/TcSMonad.hs.rst
+====================
+
 Note [WorkList priorities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A WorkList contains canonical and non-canonical items (of all flavors).
@@ -110,6 +116,8 @@ Every member of inert_solved_dicts is the result of applying a dictionary
 function, NOT of applying superclass selection to anything.
 Consider
 
+.. code-block:: haskell
+
         class Ord a => C a where
         instance Ord [a] => C [a] where ...
 
@@ -118,6 +126,8 @@ Suppose we are trying to solve
   [W] d2 : C [a]
 
 Then we'll use the instance decl to give
+
+.. code-block:: haskell
 
   [G] d1 : Ord a     Solved: d2 : C [a] = $dfCList d3
   [W] d3 : Ord [a]
@@ -136,12 +146,18 @@ Note [Example of recursive dictionaries]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 --- Example 1
 
+.. code-block:: haskell
+
     data D r = ZeroD | SuccD (r (D r));
+
+.. code-block:: haskell
 
     instance (Eq (r (D r))) => Eq (D r) where
         ZeroD     == ZeroD     = True
         (SuccD a) == (SuccD b) = a == b
         _         == _         = False;
+
+.. code-block:: haskell
 
     equalDC :: D [] -> D [] -> Bool;
     equalDC = (==);
@@ -160,14 +176,22 @@ Now this wanted can interact with our "solved" d1 to get:
 -- Example 2:
 This code arises in the context of "Scrap Your Boilerplate with Class"
 
+.. code-block:: haskell
+
     class Sat a
     class Data ctx a
     instance  Sat (ctx Char)             => Data ctx Char       -- dfunData1
     instance (Sat (ctx [a]), Data ctx a) => Data ctx [a]        -- dfunData2
 
+.. code-block:: haskell
+
     class Data Maybe a => Foo a
 
+.. code-block:: haskell
+
     instance Foo t => Sat (Maybe t)                             -- dfunSat
+
+.. code-block:: haskell
 
     instance Data Maybe a => Foo a                              -- dfunFoo1
     instance Foo a        => Foo [a]                            -- dfunFoo2
@@ -293,6 +317,8 @@ live in three places
   * The inert_flat_cache.  This is used when flattening, to get maximal
     sharing. Everthing in the inert_flat_cache is [G] or [WD]
 
+.. code-block:: haskell
+
     It contains lots of things that are still in the work-list.
     E.g Suppose we have (w1: F (G a) ~ Int), and (w2: H (G a) ~ Int) in the
         work list.  Then we flatten w1, dumping (w3: G a ~ f1) in the work
@@ -323,6 +349,8 @@ Note [inert_eqs: the inert equalities]
 Definition [Can-rewrite relation]
 A "can-rewrite" relation between flavours, written f1 >= f2, is a
 binary relation with the following properties
+
+.. code-block:: haskell
 
   (R1) >= is transitive
   (R2) If f1 >= f, and f2 >= f,
@@ -361,6 +389,8 @@ Notation: repeated application.
 Definition: inert generalised substitution
 A generalised substitution S is "inert" iff
 
+.. code-block:: haskell
+
   (IG1) there is an n such that
         for every f,t, S^n(f,t) = S^(n+1)(f,t)
 
@@ -391,6 +421,8 @@ Main Theorem [Stability under extension]
       (T2) S(fw,t) = t     -- RHS of work-item is a fixpoint of S(fw,_)
       (T3) a not in t      -- No occurs check in the work item
 
+.. code-block:: haskell
+
       AND, for every (b -fs-> s) in S:
            (K0) not (fw >= fs)
                 Reason: suppose we kick out (a -fs-> s),
@@ -398,14 +430,20 @@ Main Theorem [Stability under extension]
                         The latter can't rewrite the former,
                         so the kick-out achieved nothing
 
+.. code-block:: haskell
+
            OR { (K1) not (a = b)
                      Reason: if fw >= fs, WF1 says we can't have both
                              a -fw-> t  and  a -fs-> s
+
+.. code-block:: haskell
 
                 AND (K2): guarantees inertness of the new substitution
                     {  (K2a) not (fs >= fs)
                     OR (K2b) fs >= fw
                     OR (K2d) a not in s }
+
+.. code-block:: haskell
 
                 AND (K3) See Note [K3: completeness of solving]
                     { (K3a) If the role of fs is nominal: s /= a
@@ -465,6 +503,8 @@ The idea is that
     and hence this triple never plays a role in application S(f,a).
     It is always safe to extend S with such a triple.
 
+.. code-block:: haskell
+
     (NB: we could strengten K1) in this way too, but see K3.
 
   - (K2b): If this holds then, by (T2), b is not in t.  So applying the
@@ -477,6 +517,8 @@ The idea is that
 
   - (K2d): if a not in s, we hae no further opportunity to apply the
     work item, similar to (K2b)
+
+.. code-block:: haskell
 
   NB: Dimitrios has a PDF that does this in more detail
 
@@ -497,16 +539,22 @@ But it's not enough for S to be inert; we also want completeness.
 That is, we want to be able to solve all soluble wanted equalities.
 Suppose we have
 
+.. code-block:: haskell
+
    work-item   b -G-> a
    inert-item  a -W-> b
 
 Assuming (G >= W) but not (W >= W), this fulfills all the conditions,
 so we could extend the inerts, thus:
 
+.. code-block:: haskell
+
    inert-items   b -G-> a
                  a -W-> b
 
 But if we kicked-out the inert item, we'd get
+
+.. code-block:: haskell
 
    work-item     a -W-> b
    inert-item    b -G-> a
@@ -522,6 +570,8 @@ So if we kick out one, we should kick out the other.  The orientation
 is somewhat accidental.
 
 When considering roles, we also need the second clause (K3b). Consider
+
+.. code-block:: haskell
 
   work-item    c -G/N-> a
   inert-item   a -W/R-> b c
@@ -567,8 +617,12 @@ as described in Note [inert_eqs: the inert equalities],
 we must be careful to respect all components of a flavour.
 For example, if we have
 
+.. code-block:: haskell
+
   inert set: a -G/R-> Int
              b -G/R-> Bool
+
+.. code-block:: haskell
 
   type role T nominal representational
 
@@ -595,6 +649,8 @@ equalities arising from injectivity.
 Note [Do not add duplicate quantified instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this (#15244):
+
+.. code-block:: haskell
 
   f :: (C g, D g) => ....
   class S g => C g where ...
@@ -623,6 +679,8 @@ new equality, to maintain the inert-set invariants.
     a) the new constraint can rewrite the inert one
     b) 'a' is free in the inert constraint (so that it *will*)
        rewrite it if we kick it out.
+
+.. code-block:: haskell
 
     For (b) we use tyCoVarsOfCt, which returns the type variables /and
     the kind variables/ that are directly visible in the type. Hence
@@ -748,8 +806,12 @@ You might wonder whether the skokem really needs to be bound "in the
 very same implication" as the equuality constraint.
 (c.f. #15009) Consider this:
 
+.. code-block:: haskell
+
   data S a where
     MkS :: (a ~ Int) => S a
+
+.. code-block:: haskell
 
   g :: forall a. S a -> a -> blah
   g x y = let h = \z. ( z :: Int
@@ -760,6 +822,8 @@ very same implication" as the equuality constraint.
 From the type signature for `g`, we get `y::a` .  Then when when we
 encounter the `\z`, we'll assign `z :: alpha[1]`, say.  Next, from the
 body of the lambda we'll get
+
+.. code-block:: haskell
 
   [W] alpha[1] ~ Int                             -- From z::Int
   [W] forall[2]. (a ~ Int) => [W] alpha[1] ~ a   -- From [y,z]
@@ -865,3 +929,4 @@ current worklist.  Specifically, when canonicalising
 from which we get the implication
    (forall a. t1 ~ t2)
 See TcSMonad.deferTcSForAllEq
+

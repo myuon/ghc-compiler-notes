@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/Debug.hs>`_
+
+====================
+compiler/cmm/Debug.hs.rst
+====================
+
 Note [What is this unwinding business?]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -7,6 +13,8 @@ consist of sets of "instructions", one set for every instruction in the program,
 which describe how to reconstruct the state of the machine at the point where
 the current procedure was called. For instance, consider the following annotated
 pseudo-code,
+
+.. code-block:: haskell
 
   a_fun:
     add rsp, 8            -- unwind: rsp = rsp - 8
@@ -29,6 +37,8 @@ are necessary to reconstruct flow-of-execution. On x86_64 this includes $rbp
 
 Let's consider how GHC would annotate a C-- program with unwinding information
 with a typical C-- procedure as would come from the STG-to-Cmm code generator,
+
+.. code-block:: haskell
 
   entry()
      { c2fe:
@@ -58,6 +68,8 @@ value of Sp is no different from what it was at its call site. Therefore we will
 add an `unwind` statement saying this at the beginning of its unwind-annotated
 code,
 
+.. code-block:: haskell
+
   entry()
      { c2fe:
            unwind Sp = Just Sp + 0;
@@ -67,6 +79,8 @@ code,
 After c2fe we may pass to either c2ff or c2fg; let's first consider the
 former. In this case there is nothing in particular that we need to do other
 than reiterate what we already know about Sp,
+
+.. code-block:: haskell
 
        c2ff:
            unwind Sp = Just Sp + 0;
@@ -78,6 +92,8 @@ In contrast, c2fg updates Sp midway through its body. To ensure that unwinding
 can happen correctly after this point we must include an unwind statement there,
 in addition to the usual beginning-of-block statement,
 
+.. code-block:: haskell
+
        c2fg:
            unwind Sp = Just Sp + 0;
            I64[Sp - 8] = c2dD;
@@ -87,6 +103,8 @@ in addition to the usual beginning-of-block statement,
            if (R1 & 7 != 0) goto c2dD; else goto c2dE;
 
 The remaining blocks are simple,
+
+.. code-block:: haskell
 
        c2dE:
            unwind Sp = Just Sp + 8;
@@ -151,11 +169,17 @@ You should get something like this:
 
 and:
 
+.. code-block:: haskell
+
   Contents of the .debug_frame section:
+
+.. code-block:: haskell
 
   00000000 0000000000000014 ffffffff CIE "" cf=1 df=-8 ra=16
      LOC           CFA      rbp   rsp   ra
   0000000000000000 rbp+0    v+0   s     c+0
+
+.. code-block:: haskell
 
   00000018 0000000000000024 00000000 FDE cie=00000000 pc=000000000000000f..0000000000000017
      LOC           CFA      rbp   rsp   ra
@@ -181,12 +205,16 @@ explains how to interpret it.
 Inside gdb there are a couple useful commands for inspecting frames.
 For example:
 
+.. code-block:: haskell
+
   gdb> info frame <num>
 
 It shows the values of registers obtained through unwinding.
 
 Another useful thing to try when debugging the DWARF unwinding is to enable
 extra debugging output in GDB:
+
+.. code-block:: haskell
 
   gdb> set debug frame 1
 
@@ -211,6 +239,8 @@ It's important to understand what ranges of code the unwind pseudo-instruction
 refers to.
 For a sequence of CmmNodes like:
 
+.. code-block:: haskell
+
   A // starts at addr X and ends at addr Y-1
   unwind Sp = Just Sp + 16;
   B // starts at addr Y and ends at addr Z
@@ -218,3 +248,4 @@ For a sequence of CmmNodes like:
 the unwind statement reflects the state after A has executed, but before B
 has executed. If you consult the Note [Debugging DWARF unwinding info], the
 LOC this information will end up in is Y.
+

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcBackpack.hs>`_
+
+====================
+compiler/typecheck/TcBackpack.hs.rst
+====================
+
 Note [Error reporting bad reexport]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 NB: You want to be a bit careful about what location you report on reexports.
@@ -52,10 +58,14 @@ we need to watch out for:
    non-exported DFunId.  In this case, 'checkBootDeclM' directly compares the
    embedded 'DFunId' in 'is_dfun'.
 
+.. code-block:: haskell
+
    For this to work at all, we must ensure that pointers in 'is_dfun' refer
    to DISTINCT 'DFunId's, even though the 'Name's (may) be the same.
    Unfortunately, this is the OPPOSITE of how we treat most other references
    to 'Name's, so this case needs to be handled specially.
+
+.. code-block:: haskell
 
    The details are in the documentation for 'typecheckIfacesForMerging'.
    and the Note [Resolving never-exported Names in TcIface].
@@ -67,8 +77,11 @@ we need to watch out for:
    *consistently*, so that 'typecheckIfacesForMerging' can wire them
    up as needed.
 
+.. code-block:: haskell
+
    The details are in Note [rnIfaceNeverExported] in 'RnModIface'.
 
 The root cause for all of these complications is the fact that these
 logically "implicit" entities are defined indirectly in an interface
 file.  #13151 gives a proposal to make these *truly* implicit.
+

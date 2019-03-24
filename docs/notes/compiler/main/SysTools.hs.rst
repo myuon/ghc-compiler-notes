@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/SysTools.hs>`_
+
+====================
+compiler/main/SysTools.hs.rst
+====================
+
 Note [How GHC finds toolchain utilities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -8,11 +14,15 @@ file containing variables whose value is figured out by the build system.
 
 Config.hs contains two sorts of things
 
+.. code-block:: haskell
+
   cGCC,         The *names* of the programs
   cCPP            e.g.  cGCC = gcc
   cUNLIT                cCPP = gcc -E
   etc           They do *not* include paths
 
+
+.. code-block:: haskell
 
   cUNLIT_DIR   The *path* to the directory containing unlit, split etc
   cSPLIT_DIR   *relative* to the root of the build tree,
@@ -65,3 +75,4 @@ Unregisterised compiler can't evade R_*_COPY relocations easily thus we disable
 -Bsymbolic linking there.
 
 See related tickets: #4210, #15338
+

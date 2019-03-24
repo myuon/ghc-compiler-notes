@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs>`_
+
+====================
+compiler/specialise/Specialise.hs.rst
+====================
+
 Note [Wrap bindings returned by specImports]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 'specImports' returns a set of specialized bindings. However, these are lacking
@@ -201,11 +207,15 @@ Note [From non-recursive to recursive]
 Even in the non-recursive case, if any dict-binds depend on 'fn' we might
 have built a recursive knot
 
+.. code-block:: haskell
+
       f a d x = <blah>
       MkUD { ud_binds = NonRec d7  (MkD ..f..)
            , ud_calls = ...(f T d7)... }
 
 The we generate
+
+.. code-block:: haskell
 
      Rec { fs x = <blah>[T/a, d7/d]
            f a d x = <blah>
@@ -236,12 +246,16 @@ Note [Avoiding loops]
 When specialising /dictionary functions/ we must be very careful to
 avoid building loops. Here is an example that bit us badly: #3591
 
+.. code-block:: haskell
+
      class Eq a => C a
      instance Eq [a] => C [a]
 
 This translates to
      dfun :: Eq [a] -> C [a]
      dfun a d = MkD a d (meth d)
+
+.. code-block:: haskell
 
      d4 :: Eq [T] = <blah>
      d2 ::  C [T] = dfun T d4
@@ -251,11 +265,15 @@ This translates to
 None of these definitions is recursive. What happened was that we
 generated a specialisation:
 
+.. code-block:: haskell
+
      RULE forall d. dfun T d = dT  :: C [T]
      dT = (MkD a d (meth d)) [T/a, d1/d]
         = MkD T d1 (meth d1)
 
 But now we use the RULE on the RHS of d2, to get
+
+.. code-block:: haskell
 
     d2 = dT = MkD d1 (meth d1)
     d1 = $p1 d2
@@ -285,6 +303,8 @@ Specialising call to 'f' gives dict bindings
    $dMonoid_1 :: Monoid [Integer]
    $dMonoid_1 = M.$p1C @ [Integer] $fC[]Integer
 
+.. code-block:: haskell
+
    $dC_1 :: C [Integer] (Node [Integer] Integer)
    $dC_1 = M.$fCvNode @ [Integer] $dMonoid_1
 
@@ -295,6 +315,8 @@ Specialising that call gives
    $dMonoid_2  :: Monoid [Integer]
    $dMonoid_2  = M.$p1C @ [Integer] $dC_1
 
+.. code-block:: haskell
+
    $dC_2 :: C [Integer] (Node [Integer] Integer)
    $dC_2 = M.$fCvNode @ [Integer] $dMonoid_2
 
@@ -304,6 +326,8 @@ Now we have two calls to the imported function
 
 But we must /not/ use the call (M.$fCvNode @ [Integer] $dMonoid_2)
 for specialisation, else we get:
+
+.. code-block:: haskell
 
   $dC_1 = M.$fCvNode @ [Integer] $dMonoid_1
   $dMonoid_2 = M.$p1C @ [Integer] $dC_1
@@ -316,18 +340,28 @@ and we get a loop!
 --------------
 Here's yet another example
 
+.. code-block:: haskell
+
   class C a where { foo,bar :: [a] -> [a] }
+
+.. code-block:: haskell
 
   instance C Int where
      foo x = r_bar x
      bar xs = reverse xs
+
+.. code-block:: haskell
 
   r_bar :: C a => [a] -> [a]
   r_bar xs = bar (xs ++ xs)
 
 That translates to:
 
+.. code-block:: haskell
+
     r_bar a (c::C a) (xs::[a]) = bar a d (xs ++ xs)
+
+.. code-block:: haskell
 
     Rec { $fCInt :: C Int = MkC foo_help reverse
           foo_help (xs::[Int]) = r_bar Int $fCInt xs }
@@ -337,11 +371,17 @@ The call (r_bar $fCInt) mentions $fCInt,
                         which mentions r_bar
 But we DO want to specialise r_bar at Int:
 
+.. code-block:: haskell
+
     Rec { $fCInt :: C Int = MkC foo_help reverse
           foo_help (xs::[Int]) = r_bar Int $fCInt xs
 
+.. code-block:: haskell
+
           r_bar a (c::C a) (xs::[a]) = bar a d (xs ++ xs)
             RULE r_bar Int _ = r_bar_Int
+
+.. code-block:: haskell
 
           r_bar_Int xs = bar Int $fCInt (xs ++ xs)
            }
@@ -411,6 +451,8 @@ Consider:
    g :: Num a => a -> a
    g = ...
 
+.. code-block:: haskell
+
    f :: (Int -> Int) -> Int
    f w = ...
    {-# RULE f g = 0 #-}
@@ -452,8 +494,12 @@ substitute dexp for d, and pick up specialised calls in the body of f.
 This doesn't always work.  One example I came across was this:
         newtype Gen a = MkGen{ unGen :: Int -> a }
 
+.. code-block:: haskell
+
         choose :: Eq a => a -> Gen a
         choose n = MkGen (\r -> n)
+
+.. code-block:: haskell
 
         oneof = choose (1::Int)
 
@@ -515,6 +561,8 @@ all they should be inlined, right?  Two reasons:
       {-# INLINE replicateM_ #-}
       replicateM_ d x ma = case x of I# x' -> $wreplicateM_ d x' ma
 
+.. code-block:: haskell
+
       $wreplicateM_ :: (Monad m) => Int# -> m a -> m ()
       {-# INLINABLE $wreplicateM_ #-}
       $wreplicateM_ = ...
@@ -552,14 +600,22 @@ We float out dictionary bindings for the reasons described under
 "Dictionary floating" above.  But not /just/ dictionary bindings.
 Consider
 
+.. code-block:: haskell
+
    f :: Eq a => blah
    f a d = rhs
+
+.. code-block:: haskell
 
    $c== :: T -> T -> Bool
    $c== x y = ...
 
+.. code-block:: haskell
+
    $df :: Eq T
    $df = Eq $c== ...
+
+.. code-block:: haskell
 
    gurgle = ...(f @T $df)...
 
@@ -623,3 +679,4 @@ time, because cloned variables don't have unfoldings. But makes a
 massive difference in a few cases, eg #5113. For nofib as a
 whole it's only a small win: 2.2% improvement in allocation for ansi,
 1.2% for bspt, but mostly 0.0!  Average 0.1% increase in binary size.
+

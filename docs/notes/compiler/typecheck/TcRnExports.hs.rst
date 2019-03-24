@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnExports.hs>`_
+
+====================
+compiler/typecheck/TcRnExports.hs.rst
+====================
+
 Note [Exports of data families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose you see (#5306)
@@ -31,14 +37,20 @@ Note [Avails of associated data families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose you have (#16077)
 
+.. code-block:: haskell
+
     {-# LANGUAGE TypeFamilies #-}
     module A (module A) where
+
+.. code-block:: haskell
 
     class    C a  where { data T a }
     instance C () where { data T () = D }
 
 Because @A@ is exported explicitly, GHC tries to produce an export list
 from the @GlobalRdrEnv@. In this case, it pulls out the following:
+
+.. code-block:: haskell
 
     [ C defined at A.hs:4:1
     , T parent:C defined at A.hs:4:23
@@ -52,9 +64,15 @@ exported, but it isn't the first entry in the avail!
 We work around this issue by expanding GREs where the parent and child
 are both type constructors into two GRES.
 
+.. code-block:: haskell
+
     T parent:C defined at A.hs:4:23
 
+.. code-block:: haskell
+
       =>
+
+.. code-block:: haskell
 
     [ T parent:C defined at A.hs:4:23
     , T defined at A.hs:4:23 ]
@@ -110,4 +128,5 @@ identifier might be in (`choosePossibleNameSpaces`).
 Then for each namespace in turn, tries to find the correct identifier
 there returning the first positive result or the first terminating
 error.
+
 

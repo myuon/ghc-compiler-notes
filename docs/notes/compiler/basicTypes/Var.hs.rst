@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Var.hs>`_
+
+====================
+compiler/basicTypes/Var.hs.rst
+====================
+
 Note [Evidence: EvIds and CoVars]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * An EvId (evidence Id) is a term-level evidence variable
@@ -69,6 +75,8 @@ Note [AnonArgFlag vs. ForallVisFlag]
 The AnonArgFlag and ForallVisFlag data types are quite similar at a first
 glance:
 
+.. code-block:: haskell
+
   data AnonArgFlag   = VisArg    | InvisArg
   data ForallVisFlag = ForallVis | ForallInvis
 
@@ -82,3 +90,4 @@ into one, but they actually represent distinct concepts. AnonArgFlag reflects a
 property of *Core* types, whereas ForallVisFlag reflects a property of the GHC
 AST. In other words, AnonArgFlag is all about internals, whereas ForallVisFlag
 is all about surface syntax. Therefore, they are kept as separate data types.
+

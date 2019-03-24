@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcEnv.hs>`_
+
+====================
+compiler/typecheck/TcEnv.hs.rst
+====================
+
 Note [AFamDataCon: not promoting data family constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
@@ -82,3 +88,4 @@ But in fact the type checker processes types first, so 'x' won't even be
 in the type envt when we look for it in $(foo x).  So inside splices we
 report something missing from the type env as a staging error.
 See #5752 and #5795.
+

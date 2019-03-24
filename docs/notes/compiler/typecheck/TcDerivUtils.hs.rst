@@ -1,10 +1,22 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDerivUtils.hs>`_
+
+====================
+compiler/typecheck/TcDerivUtils.hs.rst
+====================
+
 Note [Deriving and unused record selectors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this (see #13919):
 
+.. code-block:: haskell
+
   module Main (main) where
 
+.. code-block:: haskell
+
   data Foo = MkFoo {bar :: String} deriving Show
+
+.. code-block:: haskell
 
   main :: IO ()
   main = print (Foo "hello")
@@ -42,12 +54,16 @@ The canonical use case is in combination with GHC.Generics and default method
 signatures. These allow us to have instance declarations being empty, but still
 useful, e.g.
 
+.. code-block:: haskell
+
   data T a = ...blah..blah... deriving( Generic )
   instance C a => C (T a)  -- No 'where' clause
 
 where C is some "random" user-defined class.
 
 This boilerplate code can be replaced by the more compact
+
+.. code-block:: haskell
 
   data T a = ...blah..blah... deriving( Generic, C )
 
@@ -70,6 +86,8 @@ Note [Check that the type variable is truly universal]
 For Functor and Traversable instances, we must check that the *last argument*
 of the type constructor is used truly universally quantified.  Example
 
+.. code-block:: haskell
+
    data T a b where
      T1 :: a -> b -> T a b      -- Fine! Vanilla H-98
      T2 :: b -> c -> T a b      -- Fine! Existential c, but we can still map over 'b'
@@ -82,6 +100,8 @@ Notice that only the first of these constructors is vanilla H-98. We only
 need to take care about the last argument (b in this case).  See #8678.
 Eg. for T1-T3 we can write
 
+.. code-block:: haskell
+
      fmap f (T1 a b) = T1 a (f b)
      fmap f (T2 b c) = T2 (f b) c
      fmap f (T3 x)   = T3 (f x)
@@ -90,6 +110,8 @@ We need not perform these checks for Foldable instances, however, since
 functions in Foldable can only consume existentially quantified type variables,
 rather than produce them (as is the case in Functor and Traversable functions.)
 As a result, T can have a derived Foldable instance:
+
+.. code-block:: haskell
 
     foldr f z (T1 a b) = f b z
     foldr f z (T2 b c) = f b z
@@ -104,6 +126,8 @@ For Functor and Traversable, we must take care not to let type synonyms
 unfairly reject a type for not being truly universally quantified. An
 example of this is:
 
+.. code-block:: haskell
+
     type C (a :: Constraint) b = a
     data T a b = C (Show a) b => MkT b
 
@@ -112,3 +136,4 @@ type variable b. But this is OK, because expanding the type synonym C would
 give us the context (Show a), which doesn't mention b. Therefore, we must make
 sure to expand type synonyms before performing this check. Not doing so led to
 #13813.
+

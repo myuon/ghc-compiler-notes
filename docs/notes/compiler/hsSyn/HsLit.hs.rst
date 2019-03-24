@@ -1,7 +1,15 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsLit.hs>`_
+
+====================
+compiler/hsSyn/HsLit.hs.rst
+====================
+
 Note [ol_rebindable]
 ~~~~~~~~~~~~~~~~~~~~
 The ol_rebindable field is True if this literal is actually
 using rebindable syntax.  Specifically:
+
+.. code-block:: haskell
 
   False iff ol_witness is the standard one
   True  iff ol_witness is non-standard
@@ -29,3 +37,4 @@ The PostTcType in each branch records the type the overload literal is
 found to have.
 Comparison operations are needed when grouping literals
 for compiling pattern-matching (module MatchLit)
+

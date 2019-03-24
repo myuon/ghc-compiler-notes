@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CLabel.hs>`_
+
+====================
+compiler/cmm/CLabel.hs.rst
+====================
+
 Note [ticky for LNE]
 ~~~~~~~~~~~~~~~~~~~~~
 Until 14 Feb 2013, every ticky counter was associated with a
@@ -38,6 +44,8 @@ For a data constructor (such as Just or Nothing), we have:
                       Just = \x -> Just x
     Just_closure:  The closure for this worker
 
+.. code-block:: haskell
+
     Nothing_closure: a statically allocated closure for Nothing
     Nothing_static_info: info table for Nothing_closure
 
@@ -68,3 +76,4 @@ the fact that it was derived from a block ID in `IdLabelInfo` as
 
 The info table label and the local block label are both local labels
 and are not externally visible.
+

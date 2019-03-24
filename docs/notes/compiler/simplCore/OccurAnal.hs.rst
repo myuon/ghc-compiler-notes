@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs>`_
+
+====================
+compiler/simplCore/OccurAnal.hs.rst
+====================
+
 Note [Plugin rules]
 ~~~~~~~~~~~~~~~~~~~~~~
 Conal Elliott (#11651) built a GHC plugin that added some
@@ -20,11 +26,15 @@ we treat it like this (occAnalRecBind):
 1. Occurrence-analyse each right hand side, and build a
    "Details" for each binding to capture the results.
 
+.. code-block:: haskell
+
    Wrap the details in a Node (details, node-id, dep-node-ids),
    where node-id is just the unique of the binder, and
    dep-node-ids lists all binders on which this binding depends.
    We'll call these the "scope edges".
    See Note [Forming the Rec groups].
+
+.. code-block:: haskell
 
    All this is done by makeNode.
 
@@ -42,8 +52,12 @@ we treat it like this (occAnalRecBind):
    have both more and fewer dependencies than the scope edges
    (see Note [Choosing loop breakers])
 
+.. code-block:: haskell
+
    More edges: if f calls g, and g has an active rule that mentions h
                then we add an edge from f -> h
+
+.. code-block:: haskell
 
    Fewer edges: we only include dependencies on active rules, on rule
                 RHSs (not LHSs) and if there is an INLINE pragma only
@@ -63,6 +77,8 @@ Note [Dead code]
 Dropping dead code for a cyclic Strongly Connected Component is done
 in a very simple way:
 
+.. code-block:: haskell
+
         the entire SCC is dropped if none of its binders are mentioned
         in the body; otherwise the whole thing is kept.
 
@@ -71,6 +87,8 @@ dependency analysis: so 'occAnalBind' processes SCCs instead of the
 original term's binding groups.
 
 Thus 'occAnalBind' does indeed drop 'f' in an example like
+
+.. code-block:: haskell
 
         letrec f = ...g...
                g = ...(...g...)...
@@ -110,6 +128,8 @@ always in scope.
     (because it isn't referenced any more), then the children will die
     too (unless they are already referenced directly).
 
+.. code-block:: haskell
+
     To that end, we build a Rec group for each cyclic strongly
     connected component,
         *treating f's rules as extra RHSs for 'f'*.
@@ -118,6 +138,8 @@ always in scope.
         (a) f's rhs
         (b) f's RULES
     These are rec_edges.
+
+.. code-block:: haskell
 
     Under (b) we include variables free in *either* LHS *or* RHS of
     the rule.  The former might seems silly, but see Note [Rule
@@ -143,6 +165,8 @@ always in scope.
     And we'd like them to be visible in other functions in f's Rec
     group.  E.g. in Note [Specialisation rules] we want f' rule
     to be visible in both f's RHS, and fs's RHS.
+
+.. code-block:: haskell
 
     This means that we must simplify the RULEs first, before looking
     at any of the definitions.  This is done by Simplify.simplRecBind,
@@ -219,11 +243,15 @@ That's why we compute
          {-# INLINE [1] tagZeroes #-}
          tagZero xs = pmap (\x -> fromBool (x==0)) xs
 
+.. code-block:: haskell
+
          {-# RULES "tagZero" [~1] forall xs n.
              pmap fromBool <blah blah> = tagZero xs #-}
     So tagZero's RHS mentions pmap, and pmap's RULE mentions tagZero.
     However, tagZero can only be inlined in phase 1 and later, while
     the RULE is only active *before* phase 1.  So there's no problem.
+
+.. code-block:: haskell
 
     To make this work, we look for the RHS free vars only for
     *active* rules. That's the reason for the occ_rule_act field
@@ -233,22 +261,32 @@ That's why we compute
     ~~~~~~~~~~~~~~~~~~~~~~~~~
     There is a last nasty wrinkle.  Suppose we have
 
+.. code-block:: haskell
+
         Rec { f = f_rhs
               RULE f [] = g
+
+.. code-block:: haskell
 
               h = h_rhs
               g = h
               ...more...
         }
 
+.. code-block:: haskell
+
     Remember that we simplify the RULES before any RHS (see Note
     [Rules are visible in their own rec group] above).
+
+.. code-block:: haskell
 
     So we must *not* postInlineUnconditionally 'g', even though
     its RHS turns out to be trivial.  (I'm assuming that 'g' is
     not choosen as a loop breaker.)  Why not?  Because then we
     drop the binding for 'g', which leaves it out of scope in the
     RULE!
+
+.. code-block:: haskell
 
     Here's a somewhat different example of the same thing
         Rec { g = h
@@ -260,22 +298,34 @@ That's why we compute
     might rewrite to     h = ...g...
     So g must remain in scope in the output program!
 
+.. code-block:: haskell
+
     We "solve" this by:
+
+.. code-block:: haskell
 
         Make g a "weak" loop breaker (OccInfo = IAmLoopBreaker True)
         iff g is a "missing free variable" of the Rec group
+
+.. code-block:: haskell
 
     A "missing free variable" x is one that is mentioned in an RHS or
     INLINE or RULE of a binding in the Rec group, but where the
     dependency on x may not show up in the loop_breaker_nodes (see
     note [Choosing loop breakers} above).
 
+.. code-block:: haskell
+
     A normal "strong" loop breaker has IAmLoopBreaker False.  So
+
+.. code-block:: haskell
 
                                     Inline  postInlineUnconditionally
    strong   IAmLoopBreaker False    no      no
    weak     IAmLoopBreaker True     yes     no
             other                   yes     yes
+
+.. code-block:: haskell
 
     The **sole** reason for this kind of loop breaker is so that
     postInlineUnconditionally does not fire.  Ugh.  (Typically it'll
@@ -322,9 +372,13 @@ Note [Preventing loops due to imported functions rules]
 Consider:
   import GHC.Base (foldr)
 
+.. code-block:: haskell
+
   {-# RULES "filterList" forall p. foldr (filterFB (:) p) [] = filter p #-}
   filter p xs = build (\c n -> foldr (filterFB c p) n xs)
   filterFB c p = ...
+
+.. code-block:: haskell
 
   f = filter p xs
 
@@ -341,18 +395,26 @@ mark GHC.List.filter as INLINABLE) is as follows. Say I have this module:
   {-# LANGUAGE RankNTypes #-}
   module GHCList where
 
+.. code-block:: haskell
+
   import Prelude hiding (filter)
   import GHC.Base (build)
+
+.. code-block:: haskell
 
   {-# INLINABLE filter #-}
   filter :: (a -> Bool) -> [a] -> [a]
   filter p [] = []
   filter p (x:xs) = if p x then x : filter p xs else filter p xs
 
+.. code-block:: haskell
+
   {-# NOINLINE [0] filterFB #-}
   filterFB :: (a -> b -> b) -> (a -> Bool) -> a -> b -> b
   filterFB c p x r | p x       = x `c` r
                    | otherwise = r
+
+.. code-block:: haskell
 
   {-# RULES
   "filter"     [~1] forall p xs.  filter p xs = build (\c n -> foldr
@@ -373,6 +435,8 @@ marked as a strong loop breaker. Therefore at a use site in another module:
       case xs of []     -> []
                  (x:xs) -> if p x then x : build (\c n -> foldr (filterFB c p) n xs)
                                   else     build (\c n -> foldr (filterFB c p) n xs)
+
+.. code-block:: haskell
 
   build (\c n -> foldr (filterFB c p) n xs)
     = {inline} foldr (filterFB (:) p) [] xs
@@ -422,6 +486,8 @@ Note [Glomming]
 RULES for imported Ids can make something at the top refer to something at the bottom:
         f = \x -> B.g (q x)
         h = \y -> 3
+
+.. code-block:: haskell
 
         RULE:  B.g (q x) = h x
 
@@ -473,13 +539,19 @@ There is a danger that we'll be sub-optimal if we see this
 where f is recursive, but the INLINE is not. This can just about
 happen with a sufficiently odd set of rules; eg
 
+.. code-block:: haskell
+
         foo :: Int -> Int
         {-# INLINE [1] foo #-}
         foo x = x+1
 
+.. code-block:: haskell
+
         bar :: Int -> Int
         {-# INLINE [1] bar #-}
         bar x = foo x + 1
+
+.. code-block:: haskell
 
         {-# RULES "foo" [~1] forall x. foo x = bar x #-}
 
@@ -500,12 +572,18 @@ Example [eftInt]
 ~~~~~~~~~~~~~~~
 Example (from GHC.Enum):
 
+.. code-block:: haskell
+
   eftInt :: Int# -> Int# -> [Int]
   eftInt x y = ...(non-recursive)...
+
+.. code-block:: haskell
 
   {-# INLINE [0] eftIntFB #-}
   eftIntFB :: (Int -> r -> r) -> r -> Int# -> Int# -> r
   eftIntFB c n x y = ...(non-recursive)...
+
+.. code-block:: haskell
 
   {-# RULES
   "eftInt"  [~1] forall x y. eftInt x y = build (\ c n -> eftIntFB c n x y)
@@ -517,6 +595,8 @@ Example (from GHC.Enum):
 Note [Specialisation rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this group, which is typical of what SpecConstr builds:
+
+.. code-block:: haskell
 
    fs a = ....f (C a)....
    f  x = ....f (C a)....
@@ -559,6 +639,8 @@ Note [Rules and join points]
 
 Things get fiddly with rules. Suppose we have:
 
+.. code-block:: haskell
+
   let j :: Int -> Int
       j y = 2 * y
       k :: Int -> Int -> Int
@@ -570,6 +652,8 @@ Now suppose that both j and k appear only as saturated tail calls in the body.
 Thus we would like to make them both join points. The rule complicates matters,
 though, as its RHS has an unapplied occurrence of j. *However*, if we were to
 eta-expand the rule, all would be well:
+
+.. code-block:: haskell
 
   {-# RULES "SPEC k 0" forall a. k 0 a = j a #-}
 
@@ -595,12 +679,16 @@ Note [Adjusting right-hand sides]
 There's a bit of a dance we need to do after analysing a lambda expression or
 a right-hand side. In particular, we need to
 
+.. code-block:: haskell
+
   a) call 'markAllInsideLam' *unless* the binding is for a thunk, a one-shot
      lambda, or a non-recursive join point; and
   b) call 'markAllNonTailCalled' *unless* the binding is for a join point.
 
 Some examples, with how the free occurrences in e (assumed not to be a value
 lambda) get marked:
+
+.. code-block:: haskell
 
                              inside lam    non-tail-called
   ------------------------------------------------------------
@@ -666,6 +754,8 @@ more likely.  Here's a real example from #1969:
         {-# RULES forall d. $dm Int d  = $s$dm1
                   forall d. $dm Bool d = $s$dm2 #-}
 
+.. code-block:: haskell
+
         dInt = MkD .... opInt ...
         dInt = MkD .... opBool ...
         opInt  = $dm dInt
@@ -694,6 +784,8 @@ and then worker/wrapper it through strictness analysis, we'll get
    Rec { {-# INLINABLE $wf #-}
          $wf p q = let x = (p,q) in ...f...
 
+.. code-block:: haskell
+
          {-# INLINE f #-}
          f x = case x of (p,q) -> $wf p q }
 
@@ -712,6 +804,8 @@ if there's a choice we want the DFun to be the non-loop breaker. Eg
 
 rec { sc = /\ a \$dC. $fBWrap (T a) ($fCT @ a $dC)
 
+.. code-block:: haskell
+
       $fCT :: forall a_afE. (Roman.C a_afE) => Roman.C (Roman.T a_afE)
       {-# DFUN #-}
       $fCT = /\a \$dC. MkD (T a) ((sc @ a $dC) |> blah) ($ctoF @ a $dC)
@@ -726,6 +820,8 @@ Note [Constructor applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 It's really really important to inline dictionaries.  Real
 example (the Enum Ordering instance from GHC.Base):
+
+.. code-block:: haskell
 
      rec     f = \ x -> case d of (p,q,r) -> p x
              g = \ x -> case d of (p,q,r) -> q x
@@ -746,14 +842,24 @@ We treat (\x. C p q) as a high-score candidate in the letrec scoring algorithm.
 The immediate motivation came from the result of a closure-conversion transformation
 which generated code like this:
 
+.. code-block:: haskell
+
     data Clo a b = forall c. Clo (c -> a -> b) c
+
+.. code-block:: haskell
 
     ($:) :: Clo a b -> a -> b
     Clo f env $: x = f env x
 
+.. code-block:: haskell
+
     rec { plus = Clo plus1 ()
 
+.. code-block:: haskell
+
         ; plus1 _ n = Clo plus2 n
+
+.. code-block:: haskell
 
         ; plus2 Zero     n = n
         ; plus2 (Succ m) n = Succ (plus $: m $: n) }
@@ -801,6 +907,8 @@ and pick the one with the best score (according to 'betterLB').
 We need to be jolly careful (#12425, #12234) about the stability
 of this choice. Suppose we have
 
+.. code-block:: haskell
+
     let rec { f = ...g...g...
             ; g = ...f...f... }
     in
@@ -815,6 +923,8 @@ breaker. That means it is free to inline f.
 Suppose that GHC decides to inline f in the branches of the case, but
 (for some reason; eg it is not saturated) in the rhs of g. So we get
 
+.. code-block:: haskell
+
     let rec { f = ...g...g...
             ; g = ...f...f... }
     in
@@ -826,6 +936,8 @@ Now suppose that, for some reason, in the next iteration the occurrence
 analyser chooses f as the loop breaker, so it can freely inline g. And
 again for some reason the simplifier inlines g at its calls in the case
 branches, but not in the RHS of f. Then we get
+
+.. code-block:: haskell
 
     let rec { f = ...g...g...
             ; g = ...f...f... }
@@ -941,24 +1053,40 @@ The occurrence analyser obtains one-shot-lambda information from two sources:
 
 A:  Saturated applications:  eg   f e1 .. en
 
+.. code-block:: haskell
+
     In general, given a call (f e1 .. en) we can propagate one-shot info from
     f's strictness signature into e1 .. en, but /only/ if n is enough to
     saturate the strictness signature. A strictness signature like
 
+.. code-block:: haskell
+
           f :: C1(C1(L))LS
+
+.. code-block:: haskell
 
     means that *if f is applied to three arguments* then it will guarantee to
     call its first argument at most once, and to call the result of that at
     most once. But if f has fewer than three arguments, all bets are off; e.g.
 
+.. code-block:: haskell
+
           map (f (\x y. expensive) e2) xs
+
+.. code-block:: haskell
 
     Here the \x y abstraction may be called many times (once for each element of
     xs) so we should not mark x and y as one-shot. But if it was
 
+.. code-block:: haskell
+
           map (f (\x y. expensive) 3 2) xs
 
+.. code-block:: haskell
+
     then the first argument of f will be called at most once.
+
+.. code-block:: haskell
 
     The one-shot info, derived from f's strictness signature, is
     computed by 'argsOneShots', called in occAnalApp.
@@ -966,14 +1094,20 @@ A:  Saturated applications:  eg   f e1 .. en
 A': Non-obviously saturated applications: eg    build (f (\x y -> expensive))
     where f is as above.
 
+.. code-block:: haskell
+
     In this case, f is only manifestly applied to one argument, so it does not
     look saturated. So by the previous point, we should not use its strictness
     signature to learn about the one-shotness of \x y. But in this case we can:
     build is fully applied, so we may use its strictness signature; and from
     that we learn that build calls its argument with two arguments *at most once*.
 
+.. code-block:: haskell
+
     So there is really only one call to f, and it will have three arguments. In
     that sense, f is saturated, and we may proceed as described above.
+
+.. code-block:: haskell
 
     Hence the computation of 'guaranteed_val_args' in occAnalApp, using
     '(occ_one_shots env)'.  See also #13227, comment:9
@@ -981,8 +1115,12 @@ A': Non-obviously saturated applications: eg    build (f (\x y -> expensive))
 B:  Let-bindings:  eg   let f = \c. let ... in \n -> blah
                         in (build f, build f)
 
+.. code-block:: haskell
+
     Propagate one-shot info from the demanand-info on 'f' to the
     lambdas in its RHS (which may not be syntactically at the top)
+
+.. code-block:: haskell
 
     This information must have come from a previous run of the demanand
     analyser.
@@ -1002,7 +1140,11 @@ and the OneShotInfo indicates whether this application is once or multiple times
 
 Example:
 
+.. code-block:: haskell
+
  Context of f                occ_one_shots when analysing f
+
+.. code-block:: haskell
 
  f 1 2                       [OneShot, OneShot]
  map (f 1)                   [OneShot, NoOneShotInfo]
@@ -1031,9 +1173,13 @@ Note [Binder swap]
 The "binder swap" tranformation swaps occurence of the
 scrutinee of a case for occurrences of the case-binder:
 
+.. code-block:: haskell
+
  (1)  case x of b { pi -> ri }
          ==>
       case x of b { pi -> let x=b in ri }
+
+.. code-block:: haskell
 
  (2)  case (x |> co) of b { pi -> ri }
         ==>
@@ -1064,6 +1210,8 @@ There are two reasons for making this swap:
     and now it is trivial to simplify the inner case:
        case x of b { I# v ->
        ...(let b2 = b in rhs)...
+
+.. code-block:: haskell
 
     The same can happen even if the scrutinee is a variable
     with a cast: see Note [Case of cast]
@@ -1126,10 +1274,14 @@ Note [Binder swap on GlobalId scrutinees]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When the scrutinee is a GlobalId we must take care in two ways
 
+.. code-block:: haskell
+
  i) In order to *know* whether 'x' occurs free in the RHS, we need its
     occurrence info. BUT, we don't gather occurrence info for
     GlobalIds.  That's the reason for the (small) occ_gbl_scrut env in
     OccEnv is for: it says "gather occurrence info for these".
+
+.. code-block:: haskell
 
  ii) We must call localiseId on 'x' first, in case it's a GlobalId, or
      has an External Name. See, for example, SimplEnv Note [Global Ids in
@@ -1171,37 +1323,59 @@ Historical note [Suppressing the case binder-swap]
 This old note describes a problem that is also fixed by doing the
 binder-swap in OccAnal:
 
+.. code-block:: haskell
+
     There is another situation when it might make sense to suppress the
     case-expression binde-swap. If we have
+
+.. code-block:: haskell
 
         case x of w1 { DEFAULT -> case x of w2 { A -> e1; B -> e2 }
                        ...other cases .... }
 
+.. code-block:: haskell
+
     We'll perform the binder-swap for the outer case, giving
+
+.. code-block:: haskell
 
         case x of w1 { DEFAULT -> case w1 of w2 { A -> e1; B -> e2 }
                        ...other cases .... }
+
+.. code-block:: haskell
 
     But there is no point in doing it for the inner case, because w1 can't
     be inlined anyway.  Furthermore, doing the case-swapping involves
     zapping w2's occurrence info (see paragraphs that follow), and that
     forces us to bind w2 when doing case merging.  So we get
 
+.. code-block:: haskell
+
         case x of w1 { A -> let w2 = w1 in e1
                        B -> let w2 = w1 in e2
                        ...other cases .... }
 
+.. code-block:: haskell
+
     This is plain silly in the common case where w2 is dead.
+
+.. code-block:: haskell
 
     Even so, I can't see a good way to implement this idea.  I tried
     not doing the binder-swap if the scrutinee was already evaluated
     but that failed big-time:
 
+.. code-block:: haskell
+
             data T = MkT !Int
+
+.. code-block:: haskell
 
             case v of w  { MkT x ->
             case x of x1 { I# y1 ->
             case x of x2 { I# y2 -> ...
+
+.. code-block:: haskell
 
     Notice that because MkT is strict, x is marked "evaluated".  But to
     eliminate the last case, we must either make sure that x (as well as
@@ -1279,5 +1453,6 @@ unravels; so ignoring INLINE pragmas on recursive things isn't good
 either.
 
 See Invariant 2a of Note [Invariants on join points] in CoreSyn
+
 
 

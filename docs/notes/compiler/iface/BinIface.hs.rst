@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/BinIface.hs>`_
+
+====================
+compiler/iface/BinIface.hs.rst
+====================
+
 Note [Symbol table representation of names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -14,3 +20,4 @@ During serialization we check for known-key things using isKnownKeyName.
 During deserialization we use lookupKnownKeyName to get from the unique back
 to its corresponding Name.
 See Note [Symbol table representation of names]
+

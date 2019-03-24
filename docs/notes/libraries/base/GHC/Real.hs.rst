@@ -1,7 +1,15 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Real.hs>`_
+
+====================
+libraries/base/GHC/Real.hs.rst
+====================
+
 Note [Numeric Stability of Enumerating Floating Numbers]
 -----------------------------------------------------------
 When enumerate floating numbers, we could add the increment to the last number
 at every run (as what we did previously):
+
+.. code-block:: haskell
 
     numericEnumFrom n =  n `seq` (n : numericEnumFrom (n + 1))
 
@@ -31,6 +39,8 @@ as the type of multiplier. In rare situations, the multiplier could be very
 large and will lead to the enumeration to infinite loop, too, which should
 be very rare. Consider the following example:
 
+.. code-block:: haskell
+
     [1..9007199254740994]
 
 We could fix that by using an Integer as multiplier but we don't do that.
@@ -55,3 +65,4 @@ were not inlined the rules would not fire. The rules would also not
 fire if calls to quotInteger and so on were inlined, but this does not
 happen because they are all marked with NOINLINE pragma - see documentation
 of integer-gmp or integer-simple.
+

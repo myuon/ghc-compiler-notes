@@ -1,4 +1,4 @@
-docs/notes/compiler/main/SysTools
+compiler/main/SysTools
 =================================
 
 .. toctree::

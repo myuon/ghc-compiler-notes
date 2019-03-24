@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/parser/ApiAnnotation.hs>`_
+
+====================
+compiler/parser/ApiAnnotation.hs.rst
+====================
+
 Note [Api annotations]
 ~~~~~~~~~~~~~~~~~~~~~~
 Given a parse tree of a Haskell module, how can we reconstruct
@@ -41,9 +47,13 @@ So
 
 would result in the AST element
 
+.. code-block:: haskell
+
   L span (HsLet (binds for x = 1) (2 * x))
 
 and the annotations
+
+.. code-block:: haskell
 
   (span,AnnLet) having the location of the 'let' keyword
   (span,AnnEqual) having the location of the '=' sign
@@ -104,3 +114,4 @@ https://ghc.haskell.org/trac/ghc/wiki/ApiAnnotations
 
 ---------------------------------------------------------------------
 If you update this, update the Note [Api annotations] above
+

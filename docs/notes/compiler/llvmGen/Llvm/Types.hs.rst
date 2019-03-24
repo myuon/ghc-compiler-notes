@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/llvmGen/Llvm/Types.hs>`_
+
+====================
+compiler/llvmGen/Llvm/Types.hs.rst
+====================
+
 Note [LLVM Float Types]
 ~~~~~~~~~~~~~~~~~~~~~~~
 We use 'ppDouble' for both printing Float and Double floating point types. This is
@@ -15,3 +21,4 @@ NOTE: we use float2Double & co directly as GHC likes to optimize away
 successive calls of 'realToFrac', defeating the narrowing. (Bug #7600).
 'realToFrac' has inconsistent behaviour with optimisation as well that can
 also cause issues, these methods don't.
+

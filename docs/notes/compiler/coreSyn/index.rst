@@ -1,4 +1,4 @@
-docs/notes/compiler/coreSyn
+compiler/coreSyn
 =================================
 
 .. toctree::

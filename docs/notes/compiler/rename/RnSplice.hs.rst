@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSplice.hs>`_
+
+====================
+compiler/rename/RnSplice.hs.rst
+====================
+
 Note [Free variables of typed splices]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider renaming this:
@@ -125,6 +131,8 @@ Note [Partial Type Splices]
 Partial Type Signatures are partially supported in TH type splices: only
 anonymous wild cards are allowed.
 
+.. code-block:: haskell
+
   -- ToDo: SLPJ says: I don't understand all this
 
 Normally, named wild cards are collected before renaming a (partial) type
@@ -150,6 +158,8 @@ For more details about renaming wild cards, see RnTypes.rnHsSigWcType
 
 Note that partial type signatures are fully supported in TH declaration
 splices, e.g.:
+
+.. code-block:: haskell
 
      [d| foo :: _ => _
          foo x y = x == y |]
@@ -225,6 +235,8 @@ A quoted name 'n is a bit like a quoted expression [| n |], except that we
 have no cross-stage lifting (c.f. TcExpr.thBrackId).  So, after incrementing
 the use-level to account for the brackets, the cases are:
 
+.. code-block:: haskell
+
         bind > use                      Error
         bind = use+1                    OK
         bind < use
@@ -237,12 +249,21 @@ bracket the level would be use+1.)
 
 Examples:
 
+.. code-block:: haskell
+
   f 'map        -- OK; also for top-level defns of this module
+
+.. code-block:: haskell
 
   \x. f 'x      -- Not ok (bind = 1, use = 1)
                 -- (whereas \x. f [| x |] might have been ok, by
                 --                               cross-stage lifting
 
+.. code-block:: haskell
+
   \y. [| \x. $(f 'y) |] -- Not ok (bind =1, use = 1)
 
+.. code-block:: haskell
+
   [| \x. $(f 'x) |]     -- OK (bind = 2, use = 1)
+

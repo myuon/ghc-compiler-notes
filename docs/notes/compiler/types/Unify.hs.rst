@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs>`_
+
+====================
+compiler/types/Unify.hs.rst
+====================
+
 Note [tcMatchTy vs tcMatchTyKi]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This module offers two variants of matching: with kinds and without.
@@ -18,6 +24,8 @@ How do you choose between them?
    families. Note that the types of the variables in instances can indeed
    mention type families, so instance lookup must use the Ty variant.
 
+.. code-block:: haskell
+
    (Nothing goes terribly wrong -- no panics -- if there might be type
    families in kinds in the TyKi variant. You just might get match
    failure even though a reducing a type family would lead to success.)
@@ -33,8 +41,12 @@ Consider        data T a where
                    T1 :: T Int
                    T2 :: T a
 
+.. code-block:: haskell
+
                 newtype X = MkX Int
                 newtype Y = MkY Char
+
+.. code-block:: haskell
 
                 type family F a
                 type instance F Bool = Int
@@ -225,6 +237,8 @@ Notation:
  τ,σ  other types
  τ♭   type τ, flattened
 
+.. code-block:: haskell
+
  ≡    eqType
 
 (U1) Soundness.
@@ -270,6 +284,8 @@ but only when using this algorithm for matching:
 
 (M1) If (match σ τ) succeeds with θ, then all matchable tyvars
      in σ are bound in θ.
+
+.. code-block:: haskell
 
      Property M1 means that we must extend the substitution with,
      say (a ↦ a) when appropriate during matching.
@@ -335,10 +351,16 @@ Note [Matching coercion variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this:
 
+.. code-block:: haskell
+
    type family F a
+
+.. code-block:: haskell
 
    data G a where
      MkG :: F a ~ Bool => G a
+
+.. code-block:: haskell
 
    type family Foo (x :: G a) :: F a
    type instance Foo MkG = False
@@ -347,6 +369,8 @@ We would like that to be accepted. For that to work, we need to introduce
 a coercion variable on the left and then use it on the right. Accordingly,
 at use sites of Foo, we need to be able to use matching to figure out the
 value for the coercion. (See the desugared version:
+
+.. code-block:: haskell
 
    axFoo :: [a :: *, c :: F a ~ Bool]. Foo (MkG c) = False |> (sym c)
 
@@ -457,3 +481,4 @@ These two TyConApps have the same TyCon at the front but they
 are surelyApart, so we can report that without looking any
 further (see #15704).
 ------------ unify_ty: the main workhorse -----------
+

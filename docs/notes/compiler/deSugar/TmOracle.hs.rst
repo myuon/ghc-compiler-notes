@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/TmOracle.hs>`_
+
+====================
+compiler/deSugar/TmOracle.hs.rst
+====================
+
 Note [Deep equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Solving nested equalities is the most difficult part. The general strategy
@@ -12,3 +18,4 @@ is the following:
     truePmExpr, falsePmExpr or (e1' ~ e2') in case it is uncertain. Note
     that it is not e but rather e', since it may perform some
     simplifications deeper.
+

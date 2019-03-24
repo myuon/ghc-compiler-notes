@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs>`_
+
+====================
+compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs.rst
+====================
+
 Note [accSqueeze]
 ~~~~~~~~~~~~~~~~~~~~
 BL 2007/09
@@ -28,3 +34,4 @@ the most efficient variant tried. Benchmark compiling 10-times SHA1.hs follows.
                                  100.00%   99.70%    95.19%    94.65%
  -fnew-codegen -fregs-iterative  206.72s   343.632s  194.694s  208.677s
                                  100.00%   166.23%   94.18%    100.95%
+

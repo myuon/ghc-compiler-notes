@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Desugar.hs>`_
+
+====================
+compiler/deSugar/Desugar.hs.rst
+====================
+
 Note [Top-level evidence]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Top-level evidence bindings may be mutually recursive with the top-level value
@@ -116,3 +122,4 @@ and similar, which will elicit exactly these warnings, and risk never
 firing.  But it's not clear what to do instead.  We could make the
 class method rules inactive in phase 2, but that would delay when
 subsequent transformations could fire.
+

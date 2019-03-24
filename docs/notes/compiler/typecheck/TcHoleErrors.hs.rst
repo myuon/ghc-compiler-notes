@@ -1,14 +1,26 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHoleErrors.hs>`_
+
+====================
+compiler/typecheck/TcHoleErrors.hs.rst
+====================
+
 Note [Valid hole fits include ...]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `findValidHoleFits` returns the "Valid hole fits include ..." message.
 For example, look at the following definitions in a file called test.hs:
 
+.. code-block:: haskell
+
    import Data.List (inits)
+
+.. code-block:: haskell
 
    f :: [String]
    f = _ "hello, world"
 
 The hole in `f` would generate the message:
+
+.. code-block:: haskell
 
   • Found hole: _ :: [Char] -> [String]
   • In the expression: _
@@ -88,14 +100,20 @@ constraints and relevant constraints within the enclosing implications.
 
 As an example, let's look at the following code:
 
+.. code-block:: haskell
+
   f :: Show a => a -> String
   f x = show _
 
 The hole will result in the hole constraint:
 
+.. code-block:: haskell
+
   [WD] __a1ph {0}:: a0_a1pd[tau:2] (CHoleCan: ExprHole(_))
 
 Here the nested implications are just one level deep, namely:
+
+.. code-block:: haskell
 
   [Implic {
       TcLevel = 2
@@ -118,6 +136,8 @@ As we can see, the givens say that the information about the skolem
 
 The simples are:
 
+.. code-block:: haskell
+
   [[WD] __a1ph {0}:: a0_a1pd[tau:2] (CHoleCan: ExprHole(_)),
     [WD] $dShow_a1pe {0}:: Show a0_a1pd[tau:2] (CNonCanonical)]
 
@@ -125,6 +145,8 @@ I.e. the hole `a0_a1pd[tau:2]` and the constraint that the type of the hole must
 fulfill `Show a0_a1pd[tau:2])`.
 
 So when we run the check, we need to make sure that the
+
+.. code-block:: haskell
 
   [WD] $dShow_a1pe {0}:: Show a0_a1pd[tau:2] (CNonCanonical)
 
@@ -135,6 +157,8 @@ constraints needed by tcSubType_NC and the relevant constraints (see
 Note [Relevant Constraints] for more details) in the nested implications, we
 can pass the information in the givens along to the simplifier. For our example,
 we end up needing to check whether the following constraints are soluble.
+
+.. code-block:: haskell
 
   WC {wc_impl =
         Implic {
@@ -180,12 +204,18 @@ And similarly as the number of arguments increases
 
 As an example, let's look at the following code:
 
+.. code-block:: haskell
+
   f :: [Integer] -> Integer
   f = _
 
 with `-frefinement-level-hole-fits=1`, we'd get:
 
+.. code-block:: haskell
+
   Valid refinement hole fits include
+
+.. code-block:: haskell
 
     foldl1 (_ :: Integer -> Integer -> Integer)
       with foldl1 @[] @Integer
@@ -217,6 +247,8 @@ with `-frefinement-level-hole-fits=1`, we'd get:
 Which are hole fits with holes in them. This allows e.g. beginners to
 discover the fold functions and similar, but also allows for advanced users
 to figure out the valid functions in the Free monad, e.g.
+
+.. code-block:: haskell
 
   instance Functor f => Monad (Free f) where
       Pure a >>= f = f a
@@ -287,10 +319,14 @@ whose free unification variables are mentioned in the type of the hole.
 In the simplest case, these are all non-hole constraints in the simples, such
 as is the case in
 
+.. code-block:: haskell
+
   f :: String
   f = show _
 
 Where the simples will be :
+
+.. code-block:: haskell
 
   [[WD] __a1kz {0}:: a0_a1kv[tau:1] (CHoleCan: ExprHole(_)),
     [WD] $dShow_a1kw {0}:: Show a0_a1kv[tau:1] (CNonCanonical)]
@@ -298,11 +334,15 @@ Where the simples will be :
 However, when there are multiple holes, we need to be more careful. As an
 example, Let's take a look at the following code:
 
+.. code-block:: haskell
+
   f :: Show a => a -> String
   f x = show (_b (show _a))
 
 Here there are two holes, `_a` and `_b`, and the simple constraints passed to
 findValidHoleFits are:
+
+.. code-block:: haskell
 
   [[WD] _a_a1pi {0}:: String
                         -> a0_a1pd[tau:2] (CHoleCan: ExprHole(_b)),
@@ -331,4 +371,5 @@ actual source. However, As evidenced by #15321, #15007 and #15202, this can
 cause bewildering error messages. The solution here is simple: if a candidate
 would cause the type checker to error, it is not a valid hole fit, and thus it
 is discarded.
+
 

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMeta.hs>`_
+
+====================
+compiler/deSugar/DsMeta.hs.rst
+====================
+
 Note [Scoped type variables in bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
@@ -6,8 +12,12 @@ Consider
 Here the 'forall a' brings 'a' into scope over the binding group.
 To achieve this we
 
+.. code-block:: haskell
+
   a) Gensym a binding for 'a' at the same time as we do one for 'f'
      collecting the relevant binders with hsScopedTvBinders
+
+.. code-block:: haskell
 
   b) When processing the 'forall', don't gensym
 
@@ -28,6 +38,8 @@ Consider
 
 We want to ensure that the 'b' in the type signature and the default
 implementation are the same, so we do the following:
+
+.. code-block:: haskell
 
   a) Before desugaring the signature and binding of 'foo', use
      get_scoped_tvs to collect type variables in 'forall' and
@@ -70,11 +82,15 @@ Note [Don't quantify implicit type variables in quotes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If you're not careful, it's suprisingly easy to take this quoted declaration:
 
+.. code-block:: haskell
+
   [d| idProxy :: forall proxy (b :: k). proxy b -> proxy b
       idProxy x = x
     |]
 
 and have Template Haskell turn it into this:
+
+.. code-block:: haskell
 
   idProxy :: forall k proxy (b :: k). proxy b -> proxy b
   idProxy x = x
@@ -86,4 +102,5 @@ Usually, the culprit behind these bugs is taking implicitly quantified type
 variables (often from the hsib_vars field of HsImplicitBinders) and putting
 them into a `ForallT` or `ForallC`. Doing so caused #13018 and #13123.
 represent associated family instances
+
 

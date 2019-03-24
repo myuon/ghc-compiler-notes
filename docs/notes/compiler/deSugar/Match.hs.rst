@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Match.hs>`_
+
+====================
+compiler/deSugar/Match.hs.rst
+====================
+
 Note [Match Ids]
 ~~~~~~~~~~~~~~~~
 Most of the matching functions take an Id or [Id] as argument.  This Id
@@ -75,6 +81,8 @@ Note [Don't use Literal for PgN]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Previously we had, as PatGroup constructors
 
+.. code-block:: haskell
+
   | ...
   | PgN   Literal       -- Overloaded literals
   | PgNpK Literal       -- n+k patterns
@@ -127,6 +135,8 @@ Note [Grouping overloaded literal patterns]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 WATCH OUT!  Consider
 
+.. code-block:: haskell
+
         f (n+1) = ...
         f (n+2) = ...
         f (n+1) = ...
@@ -140,3 +150,4 @@ If the first arg matches '1' but the second does not match 'True', we
 cannot jump to the third equation!  Because the same argument might
 match '2'!
 Hence we don't regard 1 and 2, or (n+1) and (n+2), as part of the same group.
+

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs>`_
+
+====================
+compiler/typecheck/TcMType.hs.rst
+====================
+
 Note [ExpType]
 ~~~~~~~~~~~~~~
 
@@ -25,8 +31,12 @@ Note [TcLevel of ExpType]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
 
+.. code-block:: haskell
+
   data G a where
     MkG :: G Bool
+
+.. code-block:: haskell
 
   foo MkG = True
 
@@ -120,6 +130,8 @@ Whenever we allocate a unification variable (MetaTyVar) we give
 it a fresh name.   #16221 is a very tricky case that illustrates
 why this is important:
 
+.. code-block:: haskell
+
    data SameKind :: k -> k -> *
    data T0 a = forall k2 (b :: k2). MkT0 (SameKind a b) !Int
 
@@ -181,6 +193,8 @@ variables appear:
 
   - "Kind variables" appear in the kind of some other free variable
 
+.. code-block:: haskell
+
      These are the ones we default to * if -XPolyKinds is off
 
   - "Type variables" are all free vars that are not kind variables
@@ -222,6 +236,8 @@ Note [CandidatesQTvs determinism and order]
   affects some optimizations like worker-wrapper, we want this order to
   be deterministic.
 
+.. code-block:: haskell
+
   To achieve that we use deterministic sets of variables that can be
   converted to lists in a deterministic order. For more information
   about deterministic sets see Note [Deterministic UniqFM] in UniqDFM.
@@ -238,6 +254,8 @@ Note [Naughty quantification candidates]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider (#14880, dependent/should_compile/T14880-2), suppose
 we are trying to generalise this type:
+
+.. code-block:: haskell
 
   forall arg. ... (alpha[tau]:arg) ...
 
@@ -301,9 +319,13 @@ Note [Defaulting with -XNoPolyKinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
 
+.. code-block:: haskell
+
   data Compose f g a = Mk (f (g a))
 
 We infer
+
+.. code-block:: haskell
 
   Compose :: forall k1 k2. (k2 -> *) -> (k1 -> k2) -> k1 -> *
   Mk :: forall k1 k2 (f :: k2 -> *) (g :: k1 -> k2) (a :: k1).
@@ -378,13 +400,19 @@ Note [Zonking to Skolem]
 We used to zonk quantified type variables to regular TyVars.  However, this
 leads to problems.  Consider this program from the regression test suite:
 
+.. code-block:: haskell
+
   eval :: Int -> String -> String -> String
   eval 0 root actual = evalRHS 0 root actual
+
+.. code-block:: haskell
 
   evalRHS :: Int -> a
   evalRHS 0 root actual = eval 0 root actual
 
 It leads to the deferral of an equality (wrapped in an implication constraint)
+
+.. code-block:: haskell
 
   forall a. () => ((String -> String -> String) ~ a)
 
@@ -411,8 +439,12 @@ Note [Silly Type Synonyms]
 Consider this:
         type C u a = u  -- Note 'a' unused
 
+.. code-block:: haskell
+
         foo :: (forall a. C u a -> C u a) -> u
         foo x = ...
+
+.. code-block:: haskell
 
         bar :: Num u => u
         bar = foo (\t -> t + t)
@@ -496,3 +528,4 @@ But c.f Note [Sharing when zonking to Type] in TcHsSyn.
                  Tidying
 *                                                                      *
 ************************************************************************
+

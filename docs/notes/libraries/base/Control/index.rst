@@ -1,4 +1,4 @@
-docs/notes/libraries/base/Control
+libraries/base/Control
 =================================
 
 .. toctree::

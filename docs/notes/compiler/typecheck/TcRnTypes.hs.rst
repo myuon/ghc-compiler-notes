@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs>`_
+
+====================
+compiler/typecheck/TcRnTypes.hs.rst
+====================
+
 Note [Identity versus semantic module]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When typechecking an hsig file, it is convenient to keep track
@@ -21,8 +27,12 @@ Which one should you use?
        signatures (we just generate blank object files for
        hsig files.)
 
+.. code-block:: haskell
+
        A corrolary of this is that the following invariant holds at any point
        past desugaring,
+
+.. code-block:: haskell
 
            if I have a Module, this_mod, in hand representing the module
            currently being compiled,
@@ -75,6 +85,8 @@ We gather two sorts of usage information
       Records *defined* Names (local, top-level)
           and *used*    Names (local or imported)
 
+.. code-block:: haskell
+
       Used (a) to report "defined but not used"
                (see RnNames.reportUnusedNames)
            (b) to generate version-tracking usage info in interface
@@ -84,6 +96,8 @@ We gather two sorts of usage information
 
  * tcg_used_gres
       Used only to report unused import declarations
+
+.. code-block:: haskell
 
       Records each *occurrence* an *imported* (not locally-defined) entity.
       The occurrence is recorded by keeping a GlobalRdrElt for it.
@@ -117,10 +131,14 @@ In arrow notation, a variable bound by a proc (or enclosed let/kappa)
 is not in scope to the left of an arrow tail (-<) or the head of (|..|).
 For example
 
+.. code-block:: haskell
+
         proc x -> (e1 -< e2)
 
 Here, x is not in scope in e1, but it is in scope in e2.  This can get
 a bit complicated:
+
+.. code-block:: haskell
 
         let x = 3 in
         proc y -> (proc z -> e1) -< e2
@@ -158,6 +176,8 @@ ClosedLet means that
    These ClosedLets can definitely be floated to top level; and we
    may need to do so for static forms.
 
+.. code-block:: haskell
+
    Property:   ClosedLet
              is equivalent to
                NonClosedLet emptyNameSet True
@@ -184,6 +204,8 @@ or otherwise) is just so we can produce better error messages
 Note [Bindings with closed types: ClosedTypeId]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
+
+.. code-block:: haskell
 
   f x = let g ys = map not ys
         in ...
@@ -245,11 +267,17 @@ Note [Type variables in the type environment]
 The type environment has a binding for each lexically-scoped
 type variable that is in scope.  For example
 
+.. code-block:: haskell
+
   f :: forall a. a -> a
   f x = (x :: a)
 
+.. code-block:: haskell
+
   g1 :: [a] -> a
   g1 (ys :: [b]) = head ys :: b
+
+.. code-block:: haskell
 
   g2 :: [Int] -> Int
   g2 (ys :: [c]) = head ys :: c
@@ -424,6 +452,8 @@ But (tiresomely) we do keep *some* Derived constraints:
       - Given/Given interactions (subset of FunDepOrigin1):
         The definitely-insoluble ones reflect unreachable code.
 
+.. code-block:: haskell
+
         Others not-definitely-insoluble ones like [D] a ~ Int do not
         reflect unreachable code; indeed if fundeps generated proofs, it'd
         be a useful equality.  See #14763.   So we discard them.
@@ -505,9 +535,13 @@ Note that
         [D] ty ~ ty2 (from the functional dependency)
         which will trigger superclass expansion.
 
+.. code-block:: haskell
+
     It's a bit of a special case, but it's easy to do.  The runtime cost
     is low because the unsolved set is usually empty anyway (errors
     aside), and the first non-imlicit-parameter will terminate the search.
+
+.. code-block:: haskell
 
     The special case is worth it (#11480, comment:2) because it
     applies to CallStack constraints, which aren't type errors. If we have
@@ -525,8 +559,12 @@ Note [Given insolubles]
 Consider (#14325, comment:)
     class (a~b) => C a b
 
+.. code-block:: haskell
+
     foo :: C a c => a -> c
     foo x = x
+
+.. code-block:: haskell
 
     hm3 :: C (f b) b => b -> f b
     hm3 x = foo x
@@ -614,6 +652,8 @@ Some of the errors that we get during canonicalization are best
 reported when all constraints have been simplified as much as
 possible. For instance, assume that during simplification the
 following constraints arise:
+
+.. code-block:: haskell
 
  [Wanted]   F alpha ~  uf1
  [Wanted]   beta ~ uf1 beta
@@ -783,6 +823,7 @@ We /do/ say that a [W] can discharge a [WD].  In evidence terms it
 certainly can, and the /caller/ arranges that the otherwise-lost [D]
 is spat out as a new Derived.  
 
+
 Note [SubGoalDepth]
 ~~~~~~~~~~~~~~~~~~~
 The 'SubGoalDepth' takes care of stopping the constraint solver from looping.
@@ -803,6 +844,8 @@ level.
      d{7} = $dfEqList d'{8}
   where d'{8} : Eq Int, and d' has depth 8.
 
+.. code-block:: haskell
+
   For civilised (decidable) instance declarations, each increase of
   depth removes a type constructor from the type, so the depth never
   gets big; i.e. is bounded by the structural depth of the type.
@@ -814,6 +857,8 @@ equalities involving type functions. Example:
   If there is a type function equation "F () = Int", this would be rewritten to
     [W] d{8} : Int ~ a
   and remembered as having depth 8.
+
+.. code-block:: haskell
 
   Again, without UndecidableInstances, this counter is bounded, but without it
   can resolve things ad infinitum. Hence there is a maximum level.
@@ -868,5 +913,6 @@ in the right place.  So we proceed as follows:
 * Typically a'' will have a nice pretty name like "a", but the point is
   that the foral-bound variables of the signature we report line up with
   the instantiated skolems lying  around in other types.
+
 
 

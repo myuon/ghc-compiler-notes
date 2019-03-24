@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMatches.hs>`_
+
+====================
+compiler/typecheck/TcMatches.hs.rst
+====================
+
 Note [Polymorphic expected type for tcMatchesFun]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tcMatchesFun may be given a *sigma* (polymorphic) type
@@ -8,6 +14,8 @@ See Note [sig_tau may be polymorphic] in TcPat.
 Note [Case branches must never infer a non-tau type]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
+
+.. code-block:: haskell
 
   case ... of
     ... -> \(x :: forall a. a -> a) -> x
@@ -23,6 +31,8 @@ tau-type.
 
 An even trickier case looks like
 
+.. code-block:: haskell
+
   f x True  = x undefined
   f x False = x ()
 
@@ -30,6 +40,8 @@ Here, we see that the arguments must also be non-Infer. Thus, we must
 use expTypeToType on the output of matchExpectedFunTys, not the input.
 
 But we make a special case for a one-branch case. This is so that
+
+.. code-block:: haskell
 
   f = \(x :: forall a. a -> a) -> x
 
@@ -71,6 +83,8 @@ constraints bound in one arm can't possibly be available in another
 (#13242).  Our current rule is this (more details and discussion
 on the ticket). Consider
 
+.. code-block:: haskell
+
    ...stmts...
    ApplicativeStmts [arg1, arg2, ... argN]
    ...more stmts...
@@ -90,4 +104,5 @@ Now, we say that:
 
 To achieve this, we just typecheck each 'argi' separately, bring all
 the variables they bind into scope, and typecheck the thing_inside.
+
 

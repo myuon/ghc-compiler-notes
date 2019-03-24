@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs>`_
+
+====================
+compiler/hsSyn/HsDecls.hs.rst
+====================
+
 Note [The Naming story]
 ~~~~~~~~~~~~~~~~~~~~~~~
 Here is the story about the implicit names that go with type, class,
@@ -226,6 +232,8 @@ NOTE THAT
     case. (Naturally, any kind variable mentioned before the :: should
     not be bound after it.)
 
+.. code-block:: haskell
+
     This last point is much more debatable than the others; see
     #15142 comment:22
 
@@ -270,6 +278,8 @@ values are:
       type family Id a = r where ...
       type family Id a = (r :: *) where ...
 
+.. code-block:: haskell
+
    Naming result of a type family is required if we want to provide
    injectivity annotation for a type family:
       type family Id a = r | r -> a where ...
@@ -282,6 +292,8 @@ Note [Injectivity annotation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A user can declare a type family to be injective:
+
+.. code-block:: haskell
 
    type family Id a = r | r -> a where ...
 
@@ -310,6 +322,8 @@ more complicated injectivity annotations. For example we could declare that
 if we know the result of Plus and one of its arguments we can determine the
 other argument:
 
+.. code-block:: haskell
+
    type family Plus a b = (r :: Nat) | r a -> b, r b -> a where ...
 
 Here injectivity annotation would consist of two comma-separated injectivity
@@ -331,6 +345,8 @@ There's a wrinkle in ConDeclGADT
        con_args   = RecCon <the record fields>
        con_res_ty = T a
 
+.. code-block:: haskell
+
   We need the RecCon before the reanmer, so we can find the record field
   binders in HsUtils.hsConDeclsBinders.
 
@@ -341,6 +357,8 @@ There's a wrinkle in ConDeclGADT
       a :*: (b -> (a :*: (b -> (a :+: b))))
   so it's hard to split up the arguments until we've done the precedence
   resolution (in the renamer).
+
+.. code-block:: haskell
 
   So:  - In the parser (RdrHsSyn.mkGadtDecl), we put the whole constr
          type into the res_ty for a ConDeclGADT for now, and use
@@ -401,12 +419,16 @@ the hsib_vars. In the latter case, note that in particular
 
 * The hsib_vars *includes* type variables that are already in scope
 
+.. code-block:: haskell
+
    Eg   class C s t where
           type F t p :: *
         instance C w (a,b) where
           type F (a,b) x = x->a
    The hsib_vars of the F decl are {a,b,x}, even though the F decl
    is nested inside the 'instance' decl.
+
+.. code-block:: haskell
 
    However after the renamer, the uniques will match up:
         instance C w7 (a8,b9) where
@@ -419,3 +441,4 @@ type patterns with binders in a surrounding HsImplicitBndrs, we use raw type
 variables (LHsQTyVars) in the feqn_pats field of FamEqn.
 
 c.f. Note [TyVar binders for associated declarations]
+

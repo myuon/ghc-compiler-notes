@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSwitch.hs>`_
+
+====================
+compiler/cmm/CmmSwitch.hs.rst
+====================
+
 Note [Cmm Switches, the general plan]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -27,6 +33,8 @@ separated.
 ---------------------------------------------------------------------------
  Note [Magic Constants in CmmSwitch]
 
+.. code-block:: haskell
+
  There are a lot of heuristics here that depend on magic values where it is
  hard to determine the "best" value (for whatever that means). These are the
  magic values:
@@ -50,6 +58,8 @@ I.e. instead of
 do
     _u20N:
             jmp *_n20Q(,%r14,8)
+
+.. code-block:: haskell
 
     _n20Q:
             .quad   0
@@ -155,3 +165,4 @@ for these reasons:
    for more parallelism when building GHC.
  * The interaction between the modules is very explicit and easy to
    understand, due to the small and simple interface.
+

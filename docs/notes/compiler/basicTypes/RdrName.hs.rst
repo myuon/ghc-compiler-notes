@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs>`_
+
+====================
+compiler/basicTypes/RdrName.hs.rst
+====================
+
 Note [Local bindings with Exact Names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 With Template Haskell we can make local bindings that have Exact Names.
@@ -22,11 +28,17 @@ It is just possible to have *both* if there is a module loop: a Name
 is defined locally in A, and also brought into scope by importing a
 module that SOURCE-imported A.  Exapmle (#7672):
 
+.. code-block:: haskell
+
  A.hs-boot   module A where
                data T
 
+.. code-block:: haskell
+
  B.hs        module B(Decl.T) where
                import {-# SOURCE #-} qualified A as Decl
+
+.. code-block:: haskell
 
  A.hs        module A where
                import qualified B
@@ -43,8 +55,12 @@ Note [Parents]
   data T           Data constructors
                    Record-field ids
 
+.. code-block:: haskell
+
   data family T    Data constructors and record-field ids
                    of all visible data instances of T
+
+.. code-block:: haskell
 
   class C          Class operations
                    Associated type constructors
@@ -74,12 +90,16 @@ In a definition arising from a normal module (without
 field's label is the same as the OccName of the selector's Name.  The
 GlobalRdrEnv will contain an entry like this:
 
+.. code-block:: haskell
+
     "x" |->  GRE x (FldParent T Nothing) LocalDef
 
 When -XDuplicateRecordFields is enabled for the module that contains
 T, the selector's Name will be mangled (see comments in FieldLabel).
 Thus we store the actual field label in par_lbl, and the GlobalRdrEnv
 entry looks like this:
+
+.. code-block:: haskell
 
     "x" |->  GRE $sel:x:MkT (FldParent T (Just "x")) LocalDef
 
@@ -187,6 +207,8 @@ There are two reasons for shadowing:
     External Names, like Ghci4.x.  We want a new binding for 'x' (say)
     to override the existing binding for 'x'.  Example:
 
+.. code-block:: haskell
+
            ghci> :load M    -- Brings `x` and `M.x` into scope
            ghci> x
            ghci> "Hello"
@@ -208,6 +230,8 @@ There are two reasons for shadowing:
 
 * Nested Template Haskell declaration brackets
   See Note [Top-level Names in Template Haskell decl quotes] in RnNames
+
+.. code-block:: haskell
 
   Consider a TH decl quote:
       module M where
@@ -263,9 +287,15 @@ dominates import-item B if we choose A over B. In general, we try to
 choose the import that is most likely to render other imports
 unnecessary.  Here is the dominance relationship we choose:
 
+.. code-block:: haskell
+
     a) import Foo dominates import qualified Foo.
 
+.. code-block:: haskell
+
     b) import Foo dominates import Foo(x).
+
+.. code-block:: haskell
 
     c) Otherwise choose the textually first one.
 
@@ -285,3 +315,4 @@ But the rules are not perfect; consider
    foo = M.x + M.y
 
 The M.x will use import #2, but M.y can only use import #1.
+

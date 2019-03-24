@@ -1,4 +1,4 @@
-docs/notes/compiler/ghci
+compiler/ghci
 =================================
 
 .. toctree::

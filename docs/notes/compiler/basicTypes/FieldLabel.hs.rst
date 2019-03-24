@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/FieldLabel.hs>`_
+
+====================
+compiler/basicTypes/FieldLabel.hs.rst
+====================
+
 Note [Why selector names include data constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -12,4 +18,5 @@ constructor name generated until relatively late in the typechecking
 process.
 
 Of course, datatypes with no constructors cannot have any fields.
+
 

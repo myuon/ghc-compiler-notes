@@ -1,6 +1,14 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs>`_
+
+====================
+compiler/simplCore/Simplify.hs.rst
+====================
+
 Note [The big picture]
 ~~~~~~~~~~~~~~~~~~~~~~
 The general shape of the simplifier is this:
+
+.. code-block:: haskell
 
   simplExpr :: SimplEnv -> InExpr -> SimplCont -> SimplM (SimplFloats, OutExpr)
   simplBind :: SimplEnv -> InBind -> SimplM (SimplFloats, SimplEnv)
@@ -30,8 +38,12 @@ The general shape of the simplifier is this:
        There may be auxiliary bindings too; see prepareRhs
      - An environment suitable for simplifying the scope of the binding
 
+.. code-block:: haskell
+
    The floats may also be empty, if the binding is inlined unconditionally;
    in that case the returned SimplEnv will have an augmented substitution.
+
+.. code-block:: haskell
 
    The returned floats and env both have an in-scope set, and they are
    guaranteed to be the same.
@@ -49,6 +61,8 @@ documented with simplifyArgs.
 Eta expansion
 ~~~~~~~~~~~~~~
 For eta expansion, we want to catch things like
+
+.. code-block:: haskell
 
         case e of (a,b) -> \x -> case a of (p,q) -> \y -> r
 
@@ -70,8 +84,12 @@ There's a chance that e will be a constructor application or function, or someth
 like that, so moving the coercion to the usage site may well cancel the coercions
 and lead to further optimisation.  Example:
 
+.. code-block:: haskell
+
      data family T a :: *
      data instance T Int = T Int
+
+.. code-block:: haskell
 
      foo :: Int -> Int -> Int
      foo m n = ...
@@ -101,6 +119,8 @@ Note [Float coercions (unlifted)]
 BUT don't do [Float coercions] if 'e' has an unlifted type.
 This *can* happen:
 
+.. code-block:: haskell
+
      foo :: Int = (error (# Int,Int #) "urk")
                   `cast` CoUnsafe (# Int,Int #) Int
 
@@ -127,6 +147,8 @@ Note [Cannot trivialise]
 Consider:
    f :: Int -> Addr#
 
+.. code-block:: haskell
+
    foo :: Bar
    foo = Bar (f 3)
 
@@ -139,9 +161,13 @@ simplifier loop.  Better not to ANF-ise it at all.
 
 Literal strings are an exception.
 
+.. code-block:: haskell
+
    foo = Ptr "blob"#
 
 We want to turn this into:
+
+.. code-block:: haskell
 
    foo1 = "blob"#
    foo = Ptr foo1
@@ -160,12 +186,18 @@ where g has arity 2, will have arity 2.  But if there's a rewrite rule
 where h has arity 1, then f's arity will decrease.  Here's a real-life example,
 which is in the output of Specialise:
 
+.. code-block:: haskell
+
      Rec {
         $dm {Arity 2} = \d.\x. op d
         {-# RULES forall d. $dm Int d = $s$dm #-}
 
+.. code-block:: haskell
+
         dInt = MkD .... opInt ...
         opInt {Arity 1} = $dm dInt
+
+.. code-block:: haskell
 
         $s$dm {Arity 0} = \x. op dInt }
 
@@ -229,6 +261,8 @@ input Core program, because any expression may contain binders, which
 we must find in order to extend the SimplEnv accordingly. But types
 do not contain binders and so it is tempting to write things like
 
+.. code-block:: haskell
+
     simplExpr env (Type ty) = return (Type (substTy env ty))   -- Bad!
 
 This is Bad because the result includes a thunk (substTy env ty) which
@@ -238,6 +272,8 @@ line above is not strict in ty.
 
 So instead our strategy is for the simplifier to fully evaluate
 OutTypes when it emits them into the output Core program, for example
+
+.. code-block:: haskell
 
     simplExpr env (Type ty) = do { ty' <- simplType env ty     -- Good
                                  ; return (Type ty') }
@@ -344,6 +380,8 @@ Note [Rules and unfolding for join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we have
 
+.. code-block:: haskell
+
    simplExpr (join j x = rhs                         ) cont
              (      {- RULE j (p:ps) = blah -}       )
              (      {- StableUnfolding j = blah -}   )
@@ -369,13 +407,19 @@ inward), we want to treat join points specially. Since they're always
 tail-called and we want to maintain this invariant, we can do this (for any
 evaluation context E):
 
+.. code-block:: haskell
+
   E[join j = e
     in case ... of
          A -> jump j 1
          B -> jump j 2
          C -> f 3]
 
+.. code-block:: haskell
+
     -->
+
+.. code-block:: haskell
 
   join j = E[e]
   in case ... of
@@ -401,6 +445,8 @@ Note [Join points wih -fno-case-of-case]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Supose case-of-case is switched off, and we are simplifying
 
+.. code-block:: haskell
+
     case (join j x = <j-rhs> in
           case y of
              A -> j 1
@@ -410,6 +456,8 @@ Supose case-of-case is switched off, and we are simplifying
 Usually, we'd push the outer continuation (case . of <outer-alts>) into
 both the RHS and the body of the join point j.  But since we aren't doing
 case-of-case we may then end up with this totally bogus result
+
+.. code-block:: haskell
 
     join x = case <j-rhs> of <outer-alts> in
     case (case y of
@@ -421,6 +469,8 @@ This would be OK in the language of the paper, but not in GHC: j is no longer
 a join point.  We can only do the "push contination into the RHS of the
 join point j" if we also push the contination right down to the /jumps/ to
 j, so that it can evaporate there.  If we are doing case-of-case, we'll get to
+
+.. code-block:: haskell
 
     join x = case <j-rhs> of <outer-alts> in
     case y of
@@ -539,6 +589,8 @@ After firing a rule, we occurrence-analyse the instantiated RHS before
 simplifying it.  Usually this doesn't make much difference, but it can
 be huge.  Here's an example (simplCore/should_compile/T7785)
 
+.. code-block:: haskell
+
   map f (map f (map f xs)
 
 = -- Use build/fold form of map, twice
@@ -597,9 +649,13 @@ Note [Optimising tagToEnum#]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If we have an enumeration data type:
 
+.. code-block:: haskell
+
   data Foo = A | B | C
 
 Then we want to transform
+
+.. code-block:: haskell
 
    case tagToEnum# x of   ==>    case x of
      A -> e1                       DEFAULT -> e1
@@ -636,6 +692,8 @@ Note [Case elimination]
 The case-elimination transformation discards redundant case expressions.
 Start with a simple situation:
 
+.. code-block:: haskell
+
         case x# of      ===>   let y# = x# in e
           y# -> e
 
@@ -646,6 +704,8 @@ non-bottom!
 The code in SimplUtils.prepareAlts has the effect of generalise this
 idea to look for a case where we're scrutinising a variable, and we
 know that only the default case can match.  For example:
+
+.. code-block:: haskell
 
         case x of
           0#      -> ...
@@ -658,6 +718,8 @@ DEFAULT, after which it's an instance of the previous case.  This
 really only shows up in eliminating error-checking code.
 
 Note that SimplUtils.mkCase combines identical RHSs.  So
+
+.. code-block:: haskell
 
         case e of       ===> case e of DEFAULT -> r
            True  -> r
@@ -679,6 +741,8 @@ If a case over a lifted type has a single alternative, and is being
 used as a strict 'let' (all isDeadBinder bndrs), we may want to do
 this transformation:
 
+.. code-block:: haskell
+
     case e of r       ===>   let r = e in ...r...
       _ -> ...r...
 
@@ -689,6 +753,8 @@ We treat the unlifted and lifted cases separately:
   This turns     case a +# b of r -> ...r...
   into           let r = a +# b in ...r...
   and thence     .....(a +# b)....
+
+.. code-block:: haskell
 
   However, if we have
       case indexArray# a i of r -> ...r...
@@ -705,10 +771,14 @@ We treat the unlifted and lifted cases separately:
         create a thunk (call by need) instead of evaluating it
         right away (call by value)
 
+.. code-block:: haskell
+
   However, we can turn the case into a /strict/ let if the 'r' is
   used strictly in the body.  Then we won't lose divergence; and
   we won't build a thunk because the let is strict.
   See also Note [Case-to-let for strictly-used binders]
+
+.. code-block:: haskell
 
   NB: absentError satisfies exprIsHNF: see Note [aBSENT_ERROR_ID] in MkCore.
   We want to turn
@@ -753,10 +823,14 @@ There have been various earlier versions of this patch:
 * By Sept 18 the code looked like this:
      || scrut_is_demanded_var scrut
 
+.. code-block:: haskell
+
     scrut_is_demanded_var :: CoreExpr -> Bool
     scrut_is_demanded_var (Cast s _) = scrut_is_demanded_var s
     scrut_is_demanded_var (Var _)    = isStrictDmd (idDemandInfo case_bndr)
     scrut_is_demanded_var _          = False
+
+.. code-block:: haskell
 
   This only fired if the scrutinee was a /variable/, which seems
   an unnecessary restriction. So in #15631 I relaxed it to allow
@@ -766,6 +840,8 @@ There have been various earlier versions of this patch:
 * Previously, in Jan 13 the code looked like this:
      || case_bndr_evald_next rhs
 
+.. code-block:: haskell
+
     case_bndr_evald_next :: CoreExpr -> Bool
       -- See Note [Case binder next]
     case_bndr_evald_next (Var v)         = v == case_bndr
@@ -773,6 +849,8 @@ There have been various earlier versions of this patch:
     case_bndr_evald_next (App e _)       = case_bndr_evald_next e
     case_bndr_evald_next (Case e _ _ _)  = case_bndr_evald_next e
     case_bndr_evald_next _               = False
+
+.. code-block:: haskell
 
   This patch was part of fixing #7542. See also
   Note [Eta reduction of an eval'd function] in CoreUtils.)
@@ -801,14 +879,20 @@ f x y = if x < 0 then jtos x
 
 At a particular call site we have (f v 1).  So we inline to get
 
+.. code-block:: haskell
+
         if v < 0 then jtos x
         else if 1==0 then "" else jtos x
 
 Now simplify the 1==0 conditional:
 
+.. code-block:: haskell
+
         if v<0 then jtos v else jtos v
 
 Now common-up the two branches of the case:
+
+.. code-block:: haskell
 
         case (v<0) of DEFAULT -> jtos v
 
@@ -884,6 +968,8 @@ so that 'rhs' can take advantage of the form of x'.  Notice that Note
 
 We'd also like to eliminate empty types (#13468). So if
 
+.. code-block:: haskell
+
     data Void
     type instance F Bool = Void
 
@@ -919,7 +1005,11 @@ Note [Adding evaluatedness info to pattern-bound variables]
 addEvals records the evaluated-ness of the bound variables of
 a case pattern.  This is *important*.  Consider
 
+.. code-block:: haskell
+
      data T = T !Int !Int
+
+.. code-block:: haskell
 
      case x of { T a b -> T (a+1) b }
 
@@ -932,6 +1022,8 @@ NB: simplLamBinders preserves this eval info
 In addition to handling data constructor fields with !s, addEvals
 also records the fact that the result of seq# is always in WHNF.
 See Note [seq# magic] in PrelRules.  Example (#15226):
+
+.. code-block:: haskell
 
   case seq# v s of
     (# s', v' #) -> E
@@ -1016,6 +1108,8 @@ first has one alternative.  That's why we call prepareCaseCont here.
 Consider this, which arises from thunk splitting (see Note [Thunk
 splitting] in WorkWrap):
 
+.. code-block:: haskell
+
       let
         x* = case (case v of {pn -> rn}) of
                I# a -> I# a
@@ -1053,6 +1147,8 @@ If we make a join point with c but not c# we get
 
 But if later inlining scrutinises the c, thus
 
+.. code-block:: haskell
+
   $j = \c -> ... case c of { I# y -> ... } ...
 
 we won't see that 'c' has already been scrutinised.  This actually
@@ -1061,12 +1157,16 @@ difference to allocation.
 
 An alternative plan is this:
 
+.. code-block:: haskell
+
    $j = \c# -> let c = I# c# in ...c....
 
 but that is bad if 'c' is *not* later scrutinised.
 
 So instead we do both: we pass 'c' and 'c#' , and record in c's inlining
 (a stable unfolding) that it's really I# c#, thus
+
+.. code-block:: haskell
 
    $j = \c# -> \c[=I# c#] -> ...c....
 
@@ -1227,6 +1327,8 @@ for several reasons
   Consider:       let j = if .. then I# 3 else I# 4
                   in case .. of { A -> j; B -> j; C -> ... }
 
+.. code-block:: haskell
+
   Now CPR doesn't w/w j because it's a thunk, so
   that means that the enclosing function can't w/w either,
   which is a lose.  Here's the example that happened in practice:
@@ -1293,3 +1395,4 @@ cases where he really, really wanted a RULE for a recursive function
 to apply in that function's own right-hand side.
 
 See Note [Forming Rec groups] in OccurAnal
+

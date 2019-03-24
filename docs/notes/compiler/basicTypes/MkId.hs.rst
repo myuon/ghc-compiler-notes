@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/MkId.hs>`_
+
+====================
+compiler/basicTypes/MkId.hs.rst
+====================
+
 Note [Wired-in Ids]
 ~~~~~~~~~~~~~~~~~~~
 A "wired-in" Id can be referred to directly in GHC (e.g. 'voidPrimId')
@@ -60,6 +66,8 @@ In the case of data instances, the wrapper also applies the coercion turning
 the representation type into the family instance type to cast the result of
 the wrapper.  For example, consider the declarations
 
+.. code-block:: haskell
+
   data family Map k :: * -> *
   data instance Map (a, b) v = MapPair (Map a (Pair b v))
 
@@ -70,13 +78,19 @@ tyConFamInst_maybe). A coercion allows you to move between
 representation and family type.  It is accessible from :R123Map via
 tyConFamilyCoercion_maybe and has kind
 
+.. code-block:: haskell
+
   Co123Map a b v :: {Map (a, b) v ~ :R123Map a b v}
 
 The wrapper and worker of MapPair get the types
 
+.. code-block:: haskell
+
         -- Wrapper
   $WMapPair :: forall a b v. Map a (Map a b v) -> Map (a, b) v
   $WMapPair a b v = MapPair a b v `cast` sym (Co123Map a b v)
+
+.. code-block:: haskell
 
         -- Worker
   MapPair :: forall a b v. Map a (Map a b v) -> :R123Map a b v
@@ -85,24 +99,34 @@ This coercion is conditionally applied by wrapFamInstBody.
 
 It's a bit more complicated if the data instance is a GADT as well!
 
+.. code-block:: haskell
+
    data instance T [a] where
         T1 :: forall b. b -> T [Maybe b]
 
 Hence we translate to
+
+.. code-block:: haskell
 
         -- Wrapper
   $WT1 :: forall b. b -> T [Maybe b]
   $WT1 b v = T1 (Maybe b) b (Maybe b) v
                         `cast` sym (Co7T (Maybe b))
 
+.. code-block:: haskell
+
         -- Worker
   T1 :: forall c b. (c ~ Maybe b) => b -> :R7T c
+
+.. code-block:: haskell
 
         -- Coercion from family type to representation type
   Co7T a :: T [a] ~ :R7T a
 
 Newtype instances through an additional wrinkle into the mix. Consider the
 following example (adapted from #15318, comment:2):
+
+.. code-block:: haskell
 
   data family T a
   newtype instance T [a] = MkT [a]
@@ -118,19 +142,29 @@ We need two coercions in order to cast from (1) to (3):
 
 (a) A newtype coercion axiom:
 
+.. code-block:: haskell
+
       axiom coTList a :: TList a ~ [a]
+
+.. code-block:: haskell
 
     (Where TList is the representation tycon of the newtype instance.)
 
 (b) A data family instance coercion axiom:
 
+.. code-block:: haskell
+
       axiom coT a :: T [a] ~ TList a
 
 When we translate the newtype instance to Core, we obtain:
 
+.. code-block:: haskell
+
     -- Wrapper
   $WMkT :: forall a. [a] -> T [a]
   $WMkT a x = MkT a x |> Sym (coT a)
+
+.. code-block:: haskell
 
     -- Worker
   MkT :: forall a. [a] -> TList [a]
@@ -168,13 +202,21 @@ effect whether a wrapper is present or not:
 
 (2) Matching against the map/coerce RULE. Suppose we have the RULE
 
+.. code-block:: haskell
+
     {-# RULE "map/coerce" map coerce = ... #-}
+
+.. code-block:: haskell
 
     As described in Note [Getting the map/coerce RULE to work],
     the occurrence of 'coerce' is transformed into:
 
+.. code-block:: haskell
+
     {-# RULE "map/coerce" forall (c :: T1 ~R# T2).
                           map ((\v -> v) `cast` c) = ... #-}
+
+.. code-block:: haskell
 
     We'd like 'map Age' to match the LHS. For this to happen, Age
     must be unfolded, otherwise we'll be stuck. This is tested in T16208.
@@ -187,12 +229,18 @@ Note [Inline partially-applied constructor wrappers]
 We allow the wrapper to inline when partially applied to avoid
 boxing values unnecessarily. For example, consider
 
+.. code-block:: haskell
+
    data Foo a = Foo !Int a
+
+.. code-block:: haskell
 
    instance Traversable Foo where
      traverse f (Foo i a) = Foo i <$> f a
 
 This desugars to
+
+.. code-block:: haskell
 
    traverse f foo = case foo of
         Foo i# a -> let i = I# i#
@@ -200,6 +248,8 @@ This desugars to
 
 If the wrapper `$WFoo` is not inlined, we get a fruitless reboxing of `i`.
 But if we inline the wrapper, we get
+
+.. code-block:: haskell
 
    map (\a. case i of I# i# a -> Foo i# a) (f a)
 
@@ -269,13 +319,19 @@ Note [Data con wrappers and GADT syntax]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider these two very similar data types:
 
+.. code-block:: haskell
+
   data T1 a b = MkT1 b
+
+.. code-block:: haskell
 
   data T2 a b where
     MkT2 :: forall b a. b -> T2 a b
 
 Despite their similar appearance, T2 will have a data con wrapper but T1 will
 not. What sets them apart? The types of their constructors, which are:
+
+.. code-block:: haskell
 
   MkT1 :: forall a b. b -> T1 a b
   MkT2 :: forall b a. b -> T2 a b
@@ -291,6 +347,8 @@ order the worker expects.
 
 A somewhat surprising consequence of this is that *newtypes* can have data con
 wrappers! After all, a newtype can also be written with GADT syntax:
+
+.. code-block:: haskell
 
   newtype T3 a b where
     MkT3 :: forall b a. b -> T3 a b
@@ -309,6 +367,8 @@ there is an exception to this rule: newtype constructors. You might not think
 that newtypes would pose a challenge, since newtypes are seemingly forbidden
 from having strictness annotations in the first place. But consider this
 (from #16141):
+
+.. code-block:: haskell
 
   {-# LANGUAGE StrictData #-}
   {-# OPTIONS_GHC -O #-}
@@ -347,6 +407,8 @@ The flag UnboxSmallStrictFields ensures that any field that can
 (safely) be unboxed to a word-sized unboxed field, should be so unboxed.
 For example:
 
+.. code-block:: haskell
+
     data A = A Int#
     newtype B = B A
     data C = C !B
@@ -359,6 +421,8 @@ All of these should have an Int# as their representation, except
 G which should have two Int#s.
 
 However
+
+.. code-block:: haskell
 
     data T = T !(S Int)
     data S = S !a
@@ -454,6 +518,8 @@ transform to
 
 Rather than attempt some general analysis to support this, I've added
 enough support that you can do this using a rewrite rule:
+
+.. code-block:: haskell
 
   RULE "f/seq" forall n.  seq (f n) = seq n
 
@@ -578,11 +644,15 @@ The identifier `magicDict` is just a place-holder, which is used to
 implement a primitive that we cannot define in Haskell but we can write
 in Core.  It is declared with a place-holder type:
 
+.. code-block:: haskell
+
     magicDict :: forall a. a
 
 The intention is that the identifier will be used in a very specific way,
 to create dictionaries for classes with a single method.  Consider a class
 like this:
+
+.. code-block:: haskell
 
    class C a where
      f :: T a
@@ -591,7 +661,11 @@ We are going to use `magicDict`, in conjunction with a built-in Prelude
 rule, to cast values of type `T a` into dictionaries for `C a`.  To do
 this, we define a function like this in the library:
 
+.. code-block:: haskell
+
   data WrapC a b = WrapC (C a => Proxy a -> b)
+
+.. code-block:: haskell
 
   withT :: (C a => Proxy a -> b)
         ->  T a -> Proxy a -> b
@@ -634,3 +708,4 @@ The evaldUnfolding makes it look that some primitive value is
 evaluated, which in turn makes Simplify.interestingArg return True,
 which in turn makes INLINE things applied to said value likely to be
 inlined.
+

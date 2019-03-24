@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsUtils.hs>`_
+
+====================
+compiler/deSugar/DsUtils.hs.rst
+====================
+
 Note [Localise pattern binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider     module M where
@@ -75,8 +81,12 @@ There are two cases.
            ; y = case t of (x,y) -> y }
        in t `seq` body
 
+.. code-block:: haskell
+
   Note that we return 't' as the variable to force if the pattern
   is strict (i.e. with -XStrict or an outermost-bang-pattern)
+
+.. code-block:: haskell
 
   Note that (A) /includes/ the situation where
 
@@ -114,12 +124,16 @@ There are two cases.
       t = case e of Just x -> Unit x
       x = case t of Unit x -> x
 
+.. code-block:: haskell
+
     Again, forcing 't' will fail if 'e' yields Nothing.
 
 Note that even though this is rather general, the special cases
 work out well:
 
 * One binder, not -XStrict:
+
+.. code-block:: haskell
 
     let Just (Just v) = e in body
   ==>
@@ -181,6 +195,8 @@ join points] in WorkWrap.)
 When we make a failure point we ensure that it
 does not look like a thunk. Example:
 
+.. code-block:: haskell
+
    let fail = \rw -> error "urk"
    in case x of
         [] -> fail realWorld#
@@ -224,3 +240,4 @@ Specifically:
    !pat    => !pat   -- always
    pat     => !pat   -- when -XStrict
    pat     => pat    -- otherwise
+

@@ -1,4 +1,4 @@
-docs/notes/compiler/typecheck
+compiler/typecheck
 =================================
 
 .. toctree::

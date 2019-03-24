@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/MonadUtils.hs>`_
+
+====================
+compiler/utils/MonadUtils.hs.rst
+====================
+
 Note [Inline @zipWithNM@ functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -40,4 +46,5 @@ to fusion.
 As such, since there are not any differences between 2-ary 'mapAndUnzipM' and
 its n-ary counterparts below aside from the number of arguments, the `INLINE`
 pragma should be replicated in the @mapAndUnzipNM@ functions below as well.
+
 

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs>`_
+
+====================
+compiler/typecheck/TcGenDeriv.hs.rst
+====================
+
 Note [Generating Ord instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose constructors are K1..Kn, and some are nullary.
@@ -17,6 +23,8 @@ The general form we generate is:
                    K1 {}  -> LT
                    K2 ... -> ...eq_rhs(K2)...
                    _      -> GT
+
+.. code-block:: haskell
 
      Otherwise do a tag compare against the bigger range
      (because this is the one most likely to succeed)
@@ -110,10 +118,16 @@ into the derived instance. We need type applications on the argument
 to `coerce` to make it obvious what instantiation of the method we're
 coercing from.  So from, say,
 
+.. code-block:: haskell
+
   class C a b where
     op :: forall c. a -> [b] -> c -> Int
 
+.. code-block:: haskell
+
   newtype T x = MkT <rep-ty>
+
+.. code-block:: haskell
 
   instance C a <rep-ty> => C a (T x) where
     op = coerce @ (a -> [<rep-ty>] -> c -> Int)
@@ -129,11 +143,15 @@ is important.
 Giving 'coerce' two explicitly-visible type arguments grants us finer control
 over how it should be instantiated. Recall
 
+.. code-block:: haskell
+
   coerce :: Coercible a b => a -> b
 
 By giving it explicit type arguments we deal with the case where
 'op' has a higher rank type, and so we must instantiate 'coerce' with
 a polytype.  E.g.
+
+.. code-block:: haskell
 
    class C a where op :: a -> forall b. b -> b
    newtype T x = MkT <rep-ty>
@@ -144,6 +162,8 @@ a polytype.  E.g.
 
 The use of type applications is crucial here. If we had tried using only
 explicit type signatures, like so:
+
+.. code-block:: haskell
 
    instance C <rep-ty> => C (T x) where
      op = coerce (op :: <rep-ty> -> forall b. b -> b)
@@ -163,7 +183,11 @@ Note [Newtype-deriving trickiness]
 Consider (#12768):
   class C a where { op :: D a => a -> a }
 
+.. code-block:: haskell
+
   instance C a  => C [a] where { op = opList }
+
+.. code-block:: haskell
 
   opList :: (C a, D [a]) => [a] -> [a]
   opList = ...
@@ -174,7 +198,11 @@ Now suppose we try GND on this:
 The GND is expecting to get an implementation of op for N by
 coercing opList, thus:
 
+.. code-block:: haskell
+
   instance C a => C (N a) where { op = opN }
+
+.. code-block:: haskell
 
   opN :: (C a, D (N a)) => N a -> N a
   opN = coerce @([a]   -> [a])
@@ -191,16 +219,24 @@ Note [GND and QuantifiedConstraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider the following example from #15290:
 
+.. code-block:: haskell
+
   class C m where
     join :: m (m a) -> m a
 
+.. code-block:: haskell
+
   newtype T m a = MkT (m a)
+
+.. code-block:: haskell
 
   deriving instance
     (C m, forall p q. Coercible p q => Coercible (m p) (m q)) =>
     C (T m)
 
 The code that GHC used to generate for this was:
+
+.. code-block:: haskell
 
   instance (C m, forall p q. Coercible p q => Coercible (m p) (m q)) =>
       C (T m) where
@@ -214,10 +250,14 @@ as we'll explain:
 
 The call to `coerce` gives rise to:
 
+.. code-block:: haskell
+
   Coercible (forall a.   m   (m a) ->   m a)
             (forall a. T m (T m a) -> T m a)
 
 And that simplified to the following implication constraint:
+
+.. code-block:: haskell
 
   forall a <no-ev>. m (T m a) ~R# m (m a)
 
@@ -235,6 +275,8 @@ polymorphic types, we instead let an explicit type signature do the polymorphic
 instantiation, and omit the `forall`s in the type applications.
 More concretely, we generate the following code instead:
 
+.. code-block:: haskell
+
   instance (C m, forall p q. Coercible p q => Coercible (m p) (m q)) =>
       C (T m) where
     join = coerce @(  m   (m a) ->   m a)
@@ -249,10 +291,16 @@ in the presence of the explicit `:: forall a. T m (T m a) -> T m a` type
 signature, but in fact leaving it off will break this example (from the
 T15290d test case):
 
+.. code-block:: haskell
+
   class C a where
     c :: Int -> forall b. b -> a
 
+.. code-block:: haskell
+
   instance C Int
+
+.. code-block:: haskell
 
   instance C Age where
     c = coerce @(Int -> forall b. b -> Int)
@@ -265,6 +313,8 @@ argument of @(Int -> forall b. b -> Age) is enough to prevent this.
 Be aware that the use of an explicit type signature doesn't /solve/ this
 problem; it just makes it less likely to occur. For example, if a class has
 a truly higher-rank type like so:
+
+.. code-block:: haskell
 
   class CProblem m where
     op :: (forall b. ... (m b) ...) -> Int
@@ -280,11 +330,15 @@ We make an effort to make the code generated through GND be robust w.r.t.
 ambiguous type variables. As one example, consider the following example
 (from #15637):
 
+.. code-block:: haskell
+
   class C a where f :: String
   instance C () where f = "foo"
   newtype T = T () deriving C
 
 A naïve attempt and generating a C T instance would be:
+
+.. code-block:: haskell
 
   instance C T where
     f = coerce @String @String f
@@ -294,6 +348,8 @@ This isn't going to typecheck, however, since GHC doesn't know what to
 instantiate the type variable `a` with in the call to `f` in the method body.
 (Note that `f :: forall a. String`!) To compensate for the possibility of
 ambiguity here, we explicitly instantiate `a` like so:
+
+.. code-block:: haskell
 
   instance C T where
     f = coerce @String @String (f @())
@@ -306,8 +362,12 @@ Note [Auxiliary binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 We often want to make a top-level auxiliary binding.  E.g. for comparison we haev
 
+.. code-block:: haskell
+
   instance Ord T where
     compare a b = $con2tag a `compare` $con2tag b
+
+.. code-block:: haskell
 
   $con2tag :: T -> Int
   $con2tag = ...code....
@@ -323,3 +383,4 @@ To make the symbol names short we take a base62 hash of the full name.
 
 In the past we used the *unique* from the parent, but that's not stable across
 recompilations as uniques are nondeterministic.
+

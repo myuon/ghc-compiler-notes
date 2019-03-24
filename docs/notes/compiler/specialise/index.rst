@@ -1,4 +1,4 @@
-docs/notes/compiler/specialise
+compiler/specialise
 =================================
 
 .. toctree::

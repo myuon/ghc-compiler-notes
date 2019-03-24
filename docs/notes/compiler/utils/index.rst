@@ -1,4 +1,4 @@
-docs/notes/compiler/utils
+compiler/utils
 =================================
 
 .. toctree::

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/OccName.hs>`_
+
+====================
+compiler/basicTypes/OccName.hs.rst
+====================
+
 Note [Suppressing uniques in OccNames]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is a hack to de-wobblify the OccNames that contain uniques from
@@ -63,15 +69,21 @@ Note [Tidying multiple names at once]
 
 Consider
 
+.. code-block:: haskell
+
     > :t (id,id,id)
 
 Every id contributes a type variable to the type signature, and all of them are
 "a". If we tidy them one by one, we get
 
+.. code-block:: haskell
+
     (id,id,id) :: (a2 -> a2, a1 -> a1, a -> a)
 
 which is a bit unfortunate, as it unfairly renames only one of them. What we
 would like to see is
+
+.. code-block:: haskell
 
     (id,id,id) :: (a3 -> a3, a2 -> a2, a1 -> a1)
 
@@ -84,4 +96,5 @@ This prepared TidyEnv can then be used with tidyOccName. See tidyTyCoVarBndrs
 for an example where this is used.
 
 This is #12382.
+
 

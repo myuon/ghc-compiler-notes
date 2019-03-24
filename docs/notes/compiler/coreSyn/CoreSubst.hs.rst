@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSubst.hs>`_
+
+====================
+compiler/coreSyn/CoreSubst.hs.rst
+====================
+
 Note [Extending the Subst]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 For a core Subst, which binds Ids as well, we make a different choice for Ids
@@ -13,6 +19,8 @@ In consequence:
 
 * If all subst envs are empty, substExpr would be a
   no-op, so substExprSC ("short cut") does nothing.
+
+.. code-block:: haskell
 
   However, substExpr still goes ahead and substitutes.  Reason: we may
   want to replace existing Ids with new ones from the in-scope set, to
@@ -95,3 +103,4 @@ analyser, so it's possible that the worker is not even in scope any more.
 
 In all all these cases we simply drop the special case, returning to
 InlVanilla.  The WARN is just so I can see if it happens a lot.
+

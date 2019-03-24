@@ -1,4 +1,4 @@
-docs/notes/compiler/types
+compiler/types
 =================================
 
 .. toctree::

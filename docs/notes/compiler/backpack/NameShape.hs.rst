@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/backpack/NameShape.hs>`_
+
+====================
+compiler/backpack/NameShape.hs.rst
+====================
+
 Note [NameShape]
 ~~~~~~~~~~~~~~~~
 When we write a declaration in a signature, e.g., data T, we
@@ -32,3 +38,4 @@ data NameShape = NameShape {
     }
 NB: substitution functions need 'HscEnv' since they need the name cache
 to allocate new names if we change the 'Module' of a 'Name'
+

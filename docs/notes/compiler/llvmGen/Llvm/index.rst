@@ -1,4 +1,4 @@
-docs/notes/compiler/llvmGen/Llvm
+compiler/llvmGen/Llvm
 =================================
 
 .. toctree::

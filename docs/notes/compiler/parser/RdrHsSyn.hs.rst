@@ -1,8 +1,16 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/parser/RdrHsSyn.hs>`_
+
+====================
+compiler/parser/RdrHsSyn.hs.rst
+====================
+
 Note [Parsing data constructors is hard]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The problem with parsing data constructors is that they look a lot like types.
 Compare:
+
+.. code-block:: haskell
 
   (s1)   data T = C t1 t2
   (s2)   type T = C t1 t2
@@ -17,6 +25,8 @@ data constructors, and in other contexts (e.g. 'type' declarations) assume we
 are parsing type constructors.
 
 This simple rule does not work because of two problematic cases:
+
+.. code-block:: haskell
 
   (p1)   data T = C t1 t2 :+ t3
   (p2)   data T = C t1 t2 => t3
@@ -33,6 +43,8 @@ constructor, a type, or a context, we would need unlimited lookahead which
 To further complicate matters, the interpretation of (!) and (~) is different
 in constructors and types:
 
+.. code-block:: haskell
+
   (b1)   type T = C ! D
   (b2)   data T = C ! D
   (b3)   data T = C ! D => E
@@ -41,6 +53,8 @@ In (b1) and (b3), (!) is a type operator with two arguments: 'C' and 'D'. At
 the same time, in (b2) it is a strictness annotation: 'C' is a data constructor
 with a single strict argument 'D'. For the programmer, these cases are usually
 easy to tell apart due to whitespace conventions:
+
+.. code-block:: haskell
 
   (b2)   data T = C !D         -- no space after the bang hints that
                                -- it is a strictness annotation
@@ -52,6 +66,8 @@ lookahead.
 The solution that accounts for all of these issues is to initially parse data
 declarations and types as a reversed list of TyEl:
 
+.. code-block:: haskell
+
   data TyEl = TyElOpr RdrName
             | TyElOpd (HsType GhcPs)
             | TyElBang | TyElTilde
@@ -59,6 +75,8 @@ declarations and types as a reversed list of TyEl:
 
 For example, both occurences of (C ! D) in the following example are parsed
 into equal lists of TyEl:
+
+.. code-block:: haskell
 
   data T = C ! D => C ! D   results in   [ TyElOpd (HsTyVar "D")
                                          , TyElBang
@@ -92,6 +110,8 @@ Note [TyElKindApp SrcSpan interpretation]
 
 A TyElKindApp captures type application written in haskell as
 
+.. code-block:: haskell
+
     @ Foo
 
 where Foo is some type.
@@ -119,6 +139,8 @@ not null |  not null    >0      -- "cannot appear inside a type"
 
 The (null acc && null xs && k>0) case is handled in clause [opr]
 by the following check:
+
+.. code-block:: haskell
 
     if ... || null (filter isTyElOpd xs)
      then failOpFewArgs (L l op)
@@ -158,6 +180,8 @@ Note [isFunLhs vs mergeDataCon]
 
 When parsing a function LHS, we do not know whether to treat (!) as
 a strictness annotation or an infix operator:
+
+.. code-block:: haskell
 
   f ! a = ...
 
@@ -215,23 +239,33 @@ expression or a pattern without unlimited lookahead (which we do not have in
 
 View patterns:
 
+.. code-block:: haskell
+
     f (Con a b     ) = ...  -- 'Con a b' is a pattern
     f (Con a b -> x) = ...  -- 'Con a b' is an expression
 
 do-notation:
+
+.. code-block:: haskell
 
     do { Con a b <- x } -- 'Con a b' is a pattern
     do { Con a b }      -- 'Con a b' is an expression
 
 Guards:
 
+.. code-block:: haskell
+
     x | True <- p && q = ...  -- 'True' is a pattern
     x | True           = ...  -- 'True' is an expression
 
 Top-level value/function declarations (FunBind/PatBind):
 
+.. code-block:: haskell
+
     f !a         -- TH splice
     f !a = ...   -- function declaration
+
+.. code-block:: haskell
 
     Until we encounter the = sign, we don't know if it's a top-level
     TemplateHaskell splice where ! is an infix operator, or if it's a function
@@ -240,13 +274,19 @@ Top-level value/function declarations (FunBind/PatBind):
 There are also places in the grammar where we do not know whether we are
 parsing an expression or a command:
 
+.. code-block:: haskell
+
     proc x -> do { (stuff) -< x }   -- 'stuff' is an expression
     proc x -> do { (stuff) }        -- 'stuff' is a command
+
+.. code-block:: haskell
 
     Until we encounter arrow syntax (-<) we don't know whether to parse 'stuff'
     as an expression or a command.
 
 In fact, do-notation is subject to both ambiguities:
+
+.. code-block:: haskell
 
     proc x -> do { (stuff) -< x }        -- 'stuff' is an expression
     proc x -> do { (stuff) <- f -< x }   -- 'stuff' is a pattern
@@ -260,11 +300,17 @@ concerns local to the parser, and does not require duplication of hsSyn types,
 or an extra pass over the entire AST, is to parse into a function from a GADT
 to a parser-validator:
 
+.. code-block:: haskell
+
     data ExpCmdG b where
       ExpG :: ExpCmdG HsExpr
       CmdG :: ExpCmdG HsCmd
 
+.. code-block:: haskell
+
     type ExpCmd = forall b. ExpCmdG b -> PV (Located (b GhcPs))
+
+.. code-block:: haskell
 
     checkExp :: ExpCmd -> PV (LHsExpr GhcPs)
     checkCmd :: ExpCmd -> PV (LHsCmd GhcPs)
@@ -273,11 +319,15 @@ to a parser-validator:
 
 Consider the 'alts' production used to parse case-of alternatives:
 
+.. code-block:: haskell
+
   alts :: { Located ([AddAnn],[LMatch GhcPs (LHsExpr GhcPs)]) }
     : alts1     { sL1 $1 (fst $ unLoc $1,snd $ unLoc $1) }
     | ';' alts  { sLL $1 $> ((mj AnnSemi $1:(fst $ unLoc $2)),snd $ unLoc $2) }
 
 We abstract over LHsExpr, and it becomes:
+
+.. code-block:: haskell
 
   alts :: { forall b. ExpCmdG b -> PV (Located ([AddAnn],[LMatch GhcPs (Located (b GhcPs))])) }
     : alts1
@@ -290,11 +340,15 @@ We abstract over LHsExpr, and it becomes:
 Note that 'ExpCmdG' is a singleton type, the value is completely
 determined by the type:
 
+.. code-block:: haskell
+
   when (b~HsExpr),  tag = ExpG
   when (b~HsCmd),   tag = CmdG
 
 This is a clear indication that we can use a class to pass this value behind
 the scenes:
+
+.. code-block:: haskell
 
   class    ExpCmdI b      where expCmdG :: ExpCmdG b
   instance ExpCmdI HsExpr where expCmdG = ExpG
@@ -303,6 +357,8 @@ the scenes:
 And now the 'alts' production is simplified, as we no longer need to
 thread 'tag' explicitly:
 
+.. code-block:: haskell
+
   alts :: { forall b. ExpCmdI b => PV (Located ([AddAnn],[LMatch GhcPs (Located (b GhcPs))])) }
     : alts1     { $1 >>= \ $1 ->
                   return $ sL1 $1 (fst $ unLoc $1,snd $ unLoc $1) }
@@ -310,6 +366,8 @@ thread 'tag' explicitly:
                   return $ sLL $1 $> ((mj AnnSemi $1:(fst $ unLoc $2)),snd $ unLoc $2) }
 
 Compared to the initial definition, the added bits are:
+
+.. code-block:: haskell
 
     forall b. ExpCmdI b => PV ( ... ) -- in the type signature
     $1 >>= \ $1 -> return $           -- in one reduction rule
@@ -347,14 +405,22 @@ There are several issues with this:
   * We cannot handle corner cases. For instance, the following function
     declaration LHS is not a valid expression (see #1087):
 
+.. code-block:: haskell
+
       !a + !b = ...
 
   * There are points in the pipeline where the representation was awfully
     incorrect. For instance,
 
+.. code-block:: haskell
+
       f !a b !c = ...
 
+.. code-block:: haskell
+
     is first parsed as
+
+.. code-block:: haskell
 
       (f ! a b) ! c = ...
 
@@ -387,12 +453,16 @@ interpreted as either an expression or a command depending on outer context:
 Even though we have both 'HsLam' and 'HsCmdLam', we can look at
 the body to disambiguate:
 
+.. code-block:: haskell
+
   \p -> 5        -- definitely an expression
   \p -> x -< y   -- definitely a command
 
 This means we could use a bottom-up flow of information to determine
 whether we are parsing an expression or a command, using a sum type
 for intermediate results:
+
+.. code-block:: haskell
 
   Either (LHsExpr GhcPs) (LHsCmd GhcPs)
 
@@ -403,7 +473,11 @@ There are two problems with this:
 
   * Bottom-up flow of information leads to poor error messages. Consider
 
+.. code-block:: haskell
+
         if ... then 5 else (x -< y)
+
+.. code-block:: haskell
 
     Do we report that '5' is not a valid command or that (x -< y) is not a
     valid expression?  It depends on whether we want the entire node to be
@@ -452,6 +526,8 @@ intersections between HsExpr, HsCmd, and HsPat.
 
 The intersection between HsPat and HsExpr:
 
+.. code-block:: haskell
+
   HsPat  =  VarPat   | TuplePat      | SigPat        | ParPat   | ...
   HsExpr =  HsVar    | ExplicitTuple | ExprWithTySig | HsPar    | ...
   -------------------------------------------------------------------
@@ -459,12 +535,16 @@ The intersection between HsPat and HsExpr:
 
 The intersection between HsCmd and HsExpr:
 
+.. code-block:: haskell
+
   HsCmd  = HsCmdIf | HsCmdCase | HsCmdDo | HsCmdPar
   HsExpr = HsIf    | HsCase    | HsDo    | HsPar
   ------------------------------------------------
   Frame = FrameIf  | FrameCase | FrameDo | FramePar
 
 The intersection between HsCmd and HsPat:
+
+.. code-block:: haskell
 
   HsPat  = ParPat   | ...
   HsCmd  = HsCmdPar | ...
@@ -474,6 +554,8 @@ The intersection between HsCmd and HsPat:
 Take the union of each intersection and this yields the final 'Frame' data
 type. The problem with this approach is that we end up duplicating a good
 portion of hsSyn:
+
+.. code-block:: haskell
 
     Frame         for  HsExpr, HsPat, HsCmd
     TupArgFrame   for  HsTupArg
@@ -488,6 +570,8 @@ Alternative VII, a product type
 We could avoid the intermediate representation of Alternative VI by parsing
 into a product of interpretations directly:
 
+.. code-block:: haskell
+
     -- See Note [Parser-Validator]
     type ExpCmdPat = ( PV (LHsExpr GhcPs)
                      , PV (LHsCmd GhcPs)
@@ -500,6 +584,8 @@ each possible option.
 Then, as soon as we have parsed far enough to resolve the ambiguity, we pick
 the appropriate component of the product, discarding the rest:
 
+.. code-block:: haskell
+
     checkExpOf3 (e, _, _) = e  -- interpret as an expression
     checkCmdOf3 (_, c, _) = c  -- interpret as a command
     checkPatOf3 (_, _, p) = p  -- interpret as a pattern
@@ -508,8 +594,12 @@ We can easily define ambiguities between arbitrary subsets of interpretations.
 For example, when we know ahead of type that only an expression or a command is
 possible, but not a pattern, we can use a smaller type:
 
+.. code-block:: haskell
+
     -- See Note [Parser-Validator]
     type ExpCmd = (PV (LHsExpr GhcPs), PV (LHsCmd GhcPs))
+
+.. code-block:: haskell
 
     checkExpOf2 (e, _) = e  -- interpret as an expression
     checkCmdOf2 (_, c) = c  -- interpret as a command
@@ -518,12 +608,16 @@ However, there is a slight problem with this approach, namely code duplication
 in parser productions. Consider the 'alts' production used to parse case-of
 alternatives:
 
+.. code-block:: haskell
+
   alts :: { Located ([AddAnn],[LMatch GhcPs (LHsExpr GhcPs)]) }
     : alts1     { sL1 $1 (fst $ unLoc $1,snd $ unLoc $1) }
     | ';' alts  { sLL $1 $> ((mj AnnSemi $1:(fst $ unLoc $2)),snd $ unLoc $2) }
 
 Under the new scheme, we have to completely duplicate its type signature and
 each reduction rule:
+
+.. code-block:: haskell
 
   alts :: { ( PV (Located ([AddAnn],[LMatch GhcPs (LHsExpr GhcPs)])) -- as an expression
             , PV (Located ([AddAnn],[LMatch GhcPs (LHsCmd GhcPs)]))  -- as a command
@@ -554,9 +648,13 @@ Note [Parser-Validator]
 When resolving ambiguities, we need to postpone failure to make a choice later.
 For example, if we have ambiguity between some A and B, our parser could be
 
+.. code-block:: haskell
+
   abParser :: P (Maybe A, Maybe B)
 
 This way we can represent four possible outcomes of parsing:
+
+.. code-block:: haskell
 
     (Just a, Nothing)       -- definitely A
     (Nothing, Just b)       -- definitely B
@@ -566,6 +664,8 @@ This way we can represent four possible outcomes of parsing:
 However, if we want to report informative parse errors, accumulate warnings,
 and add API annotations, we are better off using 'P' instead of 'Maybe':
 
+.. code-block:: haskell
+
   abParser :: P (P A, P B)
 
 So we have an outer layer of P that consumes the input and builds the inner
@@ -574,5 +674,8 @@ layer, which validates the input.
 For clarity, we introduce the notion of a parser-validator: a parser that does
 not consume any input, but may fail or use other effects. Thus we have:
 
+.. code-block:: haskell
+
   abParser :: P (PV A, PV B)
+
 

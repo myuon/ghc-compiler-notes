@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Base.hs>`_
+
+====================
+libraries/base/GHC/Base.hs.rst
+====================
+
 Note [Depend on GHC.Integer]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The Integer type is special because TidyPgm uses
@@ -44,6 +50,8 @@ Note [Recursive bindings for Applicative/Monad]
 The original Applicative/Monad proposal stated that after
 implementation, the designated implementation of (>>) would become
 
+.. code-block:: haskell
+
   (>>) :: forall a b. m a -> m b -> m b
   (>>) = (*>)
 
@@ -68,9 +76,13 @@ The rules for map work like this.
   rewrite all saturated applications of map with its build/fold
   form, hoping for fusion to happen.
 
+.. code-block:: haskell
+
   In phase 1 and 0, we switch off that rule, inline build, and
   switch on the "mapList" rule, which rewrites the foldr/mapFB
   thing back into plain map.
+
+.. code-block:: haskell
 
   It's important that these two rules aren't both active at once
   (along with build's unfolding) else we'd get an infinite loop
@@ -78,6 +90,8 @@ The rules for map work like this.
 
 * This same pattern is followed by many other functions:
   e.g. append, filter, iterate, repeat, etc. in GHC.List
+
+.. code-block:: haskell
 
   See also Note [Inline FB functions] in GHC.List
 
@@ -93,3 +107,4 @@ The rules for map work like this.
   Which is not very clever.
 
 * Any similarity to the Functor laws for [] is expected.
+

@@ -1,6 +1,14 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Check.hs>`_
+
+====================
+compiler/deSugar/Check.hs.rst
+====================
+
 Note [Recovering from unsatisfiable pattern-matching constraints]
 ~~~~~~~~~~~~~~~~
 Consider the following code (see #12957 and #15450):
+
+.. code-block:: haskell
 
   f :: Int ~ Bool => ()
   f = case True of { False -> () }
@@ -47,6 +55,8 @@ then
 
 To see how all cases come into play, consider the following example:
 
+.. code-block:: haskell
+
   data family T a :: *
   data instance T Int = T1 | T2 Bool
   -- Which gives rise to FC:
@@ -54,13 +64,19 @@ To see how all cases come into play, consider the following example:
   --   data R:TInt = T1 | T2 Bool
   --   axiom ax_ti : T Int ~R R:TInt
 
+.. code-block:: haskell
+
   newtype G1 = MkG1 (T Int)
   newtype G2 = MkG2 G1
+
+.. code-block:: haskell
 
   type instance F Int  = F Char
   type instance F Char = G2
 
 In this case pmTopNormaliseType_maybe env ty_cs (F Int) results in
+
+.. code-block:: haskell
 
   Just (G2, [MkG2,MkG1], R:TInt)
 
@@ -74,10 +90,14 @@ Which means that in source Haskell:
 
 Given the following type family:
 
+.. code-block:: haskell
+
   type family F a
   type instance F Int = Void
 
 Should the following program (from #14813) be considered exhaustive?
+
+.. code-block:: haskell
 
   f :: (i ~ Int) => F i -> a
   f x = case x of {}
@@ -110,8 +130,12 @@ we do the following:
        patterns and types we print should respect newtypes and also show the
        family type constructors and not the representation constructors.
 
+.. code-block:: haskell
+
    (c) A list of all newtype data constructors dcs, each one corresponding to a
        newtype rewrite performed in (b).
+
+.. code-block:: haskell
 
    For an example see also Note [Type normalisation for EmptyCase]
    in types/FamInstEnv.hs.
@@ -150,9 +174,13 @@ from translation in pattern matcher.
     checker will fail to match the literals patterns correctly. See
     #14546.
 
+.. code-block:: haskell
+
   In Note [Undecidable Equality for Overloaded Literals], we say: "treat
   overloaded literals that look different as different", but previously we
   didn't do such things.
+
+.. code-block:: haskell
 
   Now, we translate the literal value to match and the literal patterns
   consistently:
@@ -180,10 +208,14 @@ from translation in pattern matcher.
     OverloadedStrings is enabled, it further be turned as HsOverLit HsIsString.
     For example:
 
+.. code-block:: haskell
+
       case "foo" of
           "foo" -> putStrLn "A"
           "bar" -> putStrLn "B"
           "baz" -> putStrLn "C"
+
+.. code-block:: haskell
 
     Previously, the overloaded string values are translated to PmOLit and the
     non-overloaded string values are translated to PmSLit. However the string
@@ -191,11 +223,17 @@ from translation in pattern matcher.
     characters. The inconsistency leads to wrong warnings about redundant and
     non-exhaustive pattern matching warnings, as reported in #14546.
 
+.. code-block:: haskell
+
     In order to catch the redundant pattern in following case:
+
+.. code-block:: haskell
 
       case "foo" of
           ('f':_) -> putStrLn "A"
           "bar" -> putStrLn "B"
+
+.. code-block:: haskell
 
     in this patch, we translate non-overloaded string literals, both in value
     position and pattern position, as list of characters. For overloaded string
@@ -206,12 +244,16 @@ from translation in pattern matcher.
     capture the exhaustiveness of pattern "foo" and the redundancy of pattern
     "bar" and "baz" in the following code:
 
+.. code-block:: haskell
+
       {-# LANGUAGE OverloadedStrings #-}
       main = do
         case "foo" of
             "foo" -> putStrLn "A"
             "bar" -> putStrLn "B"
             "baz" -> putStrLn "C"
+
+.. code-block:: haskell
 
   We must ensure that doing the same translation to literal values and patterns
   in `translatePat` and `hsExprToPmExpr`. The previous inconsistent work led to
@@ -235,8 +277,12 @@ cases:
   b) Pattern @p@ can fail. This means that when checking the guard, we will
      generate several cases, with no useful information. E.g.:
 
+.. code-block:: haskell
+
        h (f -> [a,b]) = ...
        h x ([a,b] <- f x) = ...
+
+.. code-block:: haskell
 
        uncovered set = { [x |> { False ~ (f x ~ [])            }]
                        , [x |> { False ~ (f x ~ (t1:[]))       }]
@@ -256,6 +302,8 @@ cases:
        2) The size of the uncovered set increases a lot, without gaining more
           expressivity in our warnings.
 
+.. code-block:: haskell
+
      Hence, in this case, we replace the guard @([a,b] <- f x)@ with a *dummy*
      @fake_pat@: @True <- _@. That is, we record that there is a possibility
      of failure but we minimize it to a True/False. This generates a single
@@ -266,6 +314,8 @@ cases:
 An overloaded list @[...]@ should be translated to @x ([...] <- toList x)@. The
 problem is exactly like above, as its solution. For future reference, the code
 below is the *right thing to do*:
+
+.. code-block:: haskell
 
    ListPat (ListPatTc elem_ty (Just (pat_ty, _to_list))) lpats
      otherwise -> do
@@ -311,6 +361,8 @@ The pattern match checker did not know how to handle coerced patterns `CoPat`
 efficiently, which gave rise to #11276. The original approach translated
 `CoPat`s:
 
+.. code-block:: haskell
+
     pat |> co    ===>    x (pat <- (e |> co))
 
 Instead, we now check whether the coercion is a hole or if it is just refl, in
@@ -347,7 +399,11 @@ generates two different forms of constraints:
 As it turns out, these alone are not enough to detect a certain class of
 unreachable code. Consider the following example (adapted from #15305):
 
+.. code-block:: haskell
+
   data K = K1 | K2 !Void
+
+.. code-block:: haskell
 
   f :: K -> ()
   f K1 = ()
@@ -386,7 +442,11 @@ determine whether a strict type is inhabitable by a terminating value or not.
   not satisfiable.
 * Given the following definition of `MyVoid`:
 
+.. code-block:: haskell
+
     data MyVoid = MkMyVoid !Void
+
+.. code-block:: haskell
 
   `nonVoid MyVoid` returns False. The InhabitationCandidate for the MkMyVoid
   constructor contains Void as a strict argument type, and since `nonVoid Void`
@@ -398,7 +458,11 @@ We must be careful when recursively calling `nonVoid` on the strict argument
 types of an InhabitationCandidate, because doing so naïvely can cause GHC to
 fall into an infinite loop. Consider the following example:
 
+.. code-block:: haskell
+
   data Abyss = MkAbyss !Abyss
+
+.. code-block:: haskell
 
   stareIntoTheAbyss :: Abyss -> a
   stareIntoTheAbyss x = case x of {}
@@ -419,7 +483,11 @@ the coverage checker incomplete with respect to functions like
 stareIntoTheAbyss above. Then again, the same problem occurs with recursive
 newtypes, like in the following code:
 
+.. code-block:: haskell
+
   newtype Chasm = MkChasm Chasm
+
+.. code-block:: haskell
 
   gazeIntoTheChasm :: Chasm -> a
   gazeIntoTheChasm x = case x of {} -- Erroneously warned as non-exhaustive
@@ -428,6 +496,8 @@ So this limitation is somewhat understandable.
 
 Note that even with this recursion detection, there is still a possibility that
 `nonVoid` can run in exponential time. Consider the following data type:
+
+.. code-block:: haskell
 
   data T = MkT !T !T !T
 
@@ -445,6 +515,8 @@ is exactly 1 (i.e., we have a linear chain instead of a tree), then it's okay
 to stick with a larger maximum recursion depth.
 
 Another microoptimization applies to data types like this one:
+
+.. code-block:: haskell
 
   data S a = ![a] !T
 
@@ -467,12 +539,20 @@ type constructor heading the return type. This is nice and simple, but it does
 mean that there are scenarios when a COMPLETE set might be incompatible with
 the type of a scrutinee. For instance, consider (from #14135):
 
+.. code-block:: haskell
+
   data Foo a = Foo1 a | Foo2 a
+
+.. code-block:: haskell
 
   pattern MyFoo2 :: Int -> Foo Int
   pattern MyFoo2 i = Foo2 i
 
+.. code-block:: haskell
+
   {-# COMPLETE Foo1, MyFoo2 #-}
+
+.. code-block:: haskell
 
   f :: Foo a -> a
   f (Foo1 x) = x
@@ -493,15 +573,21 @@ One might wonder why GHC only checks /pattern synonym/ constructors, and not
 GADT constructor very well may not match the type of a scrutinee, and that's
 OK. Consider this example (from #14059):
 
+.. code-block:: haskell
+
   data SBool (z :: Bool) where
     SFalse :: SBool False
     STrue  :: SBool True
+
+.. code-block:: haskell
 
   pattern STooGoodToBeTrue :: forall (z :: Bool). ()
                            => z ~ True
                            => SBool z
   pattern STooGoodToBeTrue = STrue
   {-# COMPLETE SFalse, STooGoodToBeTrue #-}
+
+.. code-block:: haskell
 
   wobble :: SBool z -> Bool
   wobble STooGoodToBeTrue = True
@@ -519,6 +605,8 @@ the GADTs Meet Their Match paper) must take some care to emit enough type
 constraints when handling data constructors with exisentially quantified type
 variables. To better explain what the challenge is, consider a constructor K
 of the form:
+
+.. code-block:: haskell
 
   K @e_1 ... @e_m ev_1 ... ev_v ty_1 ... ty_n :: T u_1 ... u_p
 
@@ -549,15 +637,23 @@ for the existential tyvars and put them into the PmCon. This works well for
 many cases, but it can break down if you nest GADT pattern matches in just
 the right way. For instance, consider the following program:
 
+.. code-block:: haskell
+
     data App f a where
       App :: f a -> App f (Maybe a)
+
+.. code-block:: haskell
 
     data Ty a where
       TBool :: Ty Bool
       TInt  :: Ty Int
 
+.. code-block:: haskell
+
     data T f a where
       C :: T Ty (Maybe Bool)
+
+.. code-block:: haskell
 
     foo :: T f a -> App f a -> ()
     foo C (App TBool) = ()
@@ -567,11 +663,15 @@ tyvars, GHC would mark foo's patterns as non-exhaustive.
 
 When foo is desugared to Core, it looks roughly like so:
 
+.. code-block:: haskell
+
     foo @f @a (C co1 _co2) (App @a1 _co3 (TBool |> co1)) = ()
 
 (Where `a1` is an existential tyvar.)
 
 That, in turn, is processed by the coverage checker to become:
+
+.. code-block:: haskell
 
     foo @f @a (C co1 _co2) (App @a1 _co3 (pmvar123 :: f a1))
       | TBool <- pmvar123 |> co1
@@ -588,6 +688,8 @@ However, when we check the guard, it will use the type of pmvar123, which is
 `f a1`. Thus, when considering if pmvar123 can match the constructor TInt,
 it will generate the constraint `a1 ~ Int`. This means our final set of
 equality constraints would be:
+
+.. code-block:: haskell
 
     f  ~ Ty
     a  ~ Maybe Bool
@@ -609,6 +711,8 @@ ConVar case. In the former PmCon, we have `a1` in hand, which is exactly the
 existential tyvar we want! Thus, we can force `a1` to be the same as `a2` here
 by emitting an additional `a1 ~ a2` constraint. Now our final set of equality
 constraints will be:
+
+.. code-block:: haskell
 
     f  ~ Ty
     a  ~ Maybe Bool
@@ -645,9 +749,13 @@ example we accurately give 2 redundancy warnings for the marked cases:
 f :: [a] -> Bool
 f x = case x of
 
+.. code-block:: haskell
+
   []    -> case x of        -- brings (x ~ []) in scope
              []    -> True
              (_:_) -> False -- can't happen
+
+.. code-block:: haskell
 
   (_:_) -> case x of        -- brings (x ~ (_:_)) in scope
              (_:_) -> True
@@ -688,10 +796,14 @@ Instead of translating x@p as:  x (p <- x)
 we instead translate it as:     p (x <- coercePattern p)
 for performance reasons. For example:
 
+.. code-block:: haskell
+
   f x@True  = 1
   f y@False = 2
 
 Gives the following with the first translation:
+
+.. code-block:: haskell
 
   x |> {x == False, x == y, y == True}
 
@@ -717,6 +829,8 @@ Consider (#12957)
     T1 :: { x :: Int } -> T Bool
     T2 :: { x :: Int } -> T a
     T3 :: T a
+
+.. code-block:: haskell
 
   f :: T Char -> T a
   f r = r { x = 3 }
@@ -745,13 +859,19 @@ with each other):
 1. Pattern matching on literals generates twice as many constraints as needed.
    Consider the following (tests/ghci/should_run/ghcirun004):
 
+.. code-block:: haskell
+
     foo :: Int -> Int
     foo 1    = 0
     ...
     foo 5000 = 4999
 
+.. code-block:: haskell
+
    The covered and uncovered set *should* look like:
      U0 = { x |> {} }
+
+.. code-block:: haskell
 
      C1  = { 1  |> { x ~ 1 } }
      U1  = { x  |> { False ~ (x ~ 1) } }
@@ -759,6 +879,8 @@ with each other):
      C10 = { 10 |> { False ~ (x ~ 1), .., False ~ (x ~ 9), x ~ 10 } }
      U10 = { x  |> { False ~ (x ~ 1), .., False ~ (x ~ 9), False ~ (x ~ 10) } }
      ...
+
+.. code-block:: haskell
 
      If we replace { False ~ (x ~ 1) } with { y ~ False, y ~ (x ~ 1) }
      we get twice as many constraints. Also note that half of them are just the
@@ -792,3 +914,4 @@ If instead we allow constraints of the form (e ~ e),
 The performance improvement becomes even more important when more arguments are
 involved.
 Debugging Infrastructre
+

@@ -1,11 +1,21 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Traversable.hs>`_
+
+====================
+libraries/base/Data/Traversable.hs.rst
+====================
+
 Note [Inline default methods]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider
+
+.. code-block:: haskell
 
    class ... => Traversable t where
        ...
        mapM :: Monad m => (a -> m b) -> t a -> m (t b)
        mapM = traverse   -- Default method
+
+.. code-block:: haskell
 
    instance Traversable [] where
        {-# INLINE traverse #-}
@@ -13,12 +23,16 @@ Consider
 
 This gives rise to a list-instance of mapM looking like this
 
+.. code-block:: haskell
+
   $fTraversable[]_$ctraverse = ...code for traverse on lists...
        {-# INLINE $fTraversable[]_$ctraverse #-}
   $fTraversable[]_$cmapM    = $fTraversable[]_$ctraverse
 
 Now the $ctraverse obediently inlines into the RHS of $cmapM, /but/
 that's all!  We get
+
+.. code-block:: haskell
 
   $fTraversable[]_$cmapM = ...code for traverse on lists...
 
@@ -38,3 +52,4 @@ Solution: add an INLINE pragma on the default method:
        {-# INLINE mapM #-}     -- VERY IMPORTANT!
        mapM = traverse
 instances for Prelude types
+

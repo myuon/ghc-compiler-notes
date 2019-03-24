@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Err.hs>`_
+
+====================
+libraries/base/GHC/Err.hs.rst
+====================
+
 Note [Errors in base]
 ~~~~~~~~~~~~~~~~~~~~~
 As of base-4.9.0.0, `error` produces a stack trace alongside the
@@ -14,3 +20,4 @@ name of the offending partial function, so the partial stack-trace
 does not provide any extra information, just noise. Thus, we export
 the callstack-aware error, but within base we use the
 errorWithoutStackTrace variant for more hygienic error messages.
+

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmBind.hs>`_
+
+====================
+compiler/codeGen/StgCmmBind.hs.rst
+====================
+
 Note [Selectors]
 ~~~~~~~~~~~~~~~~
 We look at the body of the closure to see if it's a selector---turgid,
@@ -13,6 +19,8 @@ form:
 Note [Ap thunks]
 ~~~~~~~~~~~~~~~~
 A more generic AP thunk of the form
+
+.. code-block:: haskell
 
         x = [ x_1...x_n ] \.. [] -> x_1 ... x_n
 
@@ -41,3 +49,4 @@ the original value of R1. This way R1 may get modified but loopification will
 not care.
 A function closure pointer may be tagged, so we
 must take it into account when accessing the free variables.
+

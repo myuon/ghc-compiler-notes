@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DriverPipeline.hs>`_
+
+====================
+compiler/main/DriverPipeline.hs.rst
+====================
+
 Note [-Xlinker -rpath vs -Wl,-rpath]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -34,3 +40,4 @@ We must enable bigobj output in a few places:
 
 Unfortunately the big object format is not supported on 32-bit targets so
 none of this can be used in that case.
+

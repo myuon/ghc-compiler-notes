@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs>`_
+
+====================
+compiler/iface/IfaceSyn.hs.rst
+====================
+
 Note [Versioning of instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 See [http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance#Instances]
@@ -57,6 +63,8 @@ Consider
 
 The IfaceDecl actually looks like
 
+.. code-block:: haskell
+
    data TPr p q where
       T1 :: forall p q. forall c. (p~Int,q~Maybe c) => TPr p q
       T2 :: forall p q. (p~Bool) => TPr p q
@@ -80,9 +88,13 @@ in the free names, because its type will probably show up in
 the free names of 'e'.  But in rare circumstances this may
 not happen.   Here's the one that bit me:
 
+.. code-block:: haskell
+
    module DynFlags where
      import {-# SOURCE #-} Packages( PackageState )
      data DynFlags = DF ... PackageState ...
+
+.. code-block:: haskell
 
    module Packages where
      import DynFlags
@@ -122,3 +134,4 @@ of the type constructor or class itself. So deserializing them lazily
 would be more involved. Similar comments apply to the other
 constructors of IfaceDecl with the additional point that they probably
 represent a small proportion of all declarations.
+

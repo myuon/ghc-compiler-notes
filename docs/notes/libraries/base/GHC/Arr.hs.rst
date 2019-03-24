@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Arr.hs>`_
+
+====================
+libraries/base/GHC/Arr.hs.rst
+====================
+
 Note [Inlining index]
 ~~~~~~~~~~~~~~~~~~~~~
 We inline the 'index' operation,
@@ -16,12 +22,20 @@ Note [Double bounds-checking of index values]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When you index an array, a!x, there are two possible bounds checks we might make:
 
+.. code-block:: haskell
+
   (A) Check that (inRange (bounds a) x) holds.
+
+.. code-block:: haskell
 
       (A) is checked in the method for 'index'
 
+.. code-block:: haskell
+
   (B) Check that (index (bounds a) x) lies in the range 0..n,
       where n is the size of the underlying array
+
+.. code-block:: haskell
 
       (B) is checked in the top-level function (!), in safeIndex.
 
@@ -55,6 +69,8 @@ Note [amap]
 ~~~~~~~~~~~~~~
 amap was originally defined like this:
 
+.. code-block:: haskell
+
  amap f arr@(Array l u n _) =
      unsafeArray' (l,u) n [(i, f (unsafeAt arr i)) | i <- [0 .. n - 1]]
 
@@ -70,3 +86,4 @@ There are two problems:
 See Breitner, Eisenberg, Peyton Jones, and Weirich, "Safe Zero-cost
 Coercions for Haskell", section 6.5:
   http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/coercible.pdf
+

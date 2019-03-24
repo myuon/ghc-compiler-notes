@@ -1,4 +1,4 @@
-docs/notes/compiler/rename
+compiler/rename
 =================================
 
 .. toctree::

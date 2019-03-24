@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/PprTyThing.hs>`_
+
+====================
+compiler/main/PprTyThing.hs.rst
+====================
+
 Note [Pretty printing via IfaceSyn]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Our general plan for prett-printing
@@ -27,6 +33,8 @@ Why do this?
   tidyType) to avoids having (forall a a. blah) where the two
   a's have different uniques.
 
+.. code-block:: haskell
+
   Alas, for type constructors, TyCon, tidying does not work well,
   because a TyCon includes DataCons which include Types, which mention
   TyCons. And tidying can't tidy a mutually recursive data structure
@@ -36,6 +44,8 @@ Why do this?
   tidying must take place when we convert to IfaceDecl. E.g.
   MkIface.tyThingToIfaceDecl which converts a TyThing (i.e. TyCon,
   Class etc) to an IfaceDecl.
+
+.. code-block:: haskell
 
   Bottom line: IfaceDecls are already 'tidy', so it's straightforward
   to print them.
@@ -62,3 +72,4 @@ Consequences:
 - See Note [Free tyvars in IfaceType] in IfaceType
 
 See #7730, #8776 for details   ------------------
+

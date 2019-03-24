@@ -1,13 +1,23 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs>`_
+
+====================
+compiler/rename/RnSource.hs.rst
+====================
+
 Note [Wildcards in family instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Wild cards can be used in type/data family instance declarations to indicate
 that the name of a type variable doesn't matter. Each wild card will be
 replaced with a new unique type variable. For instance:
 
+.. code-block:: haskell
+
     type family F a b :: *
     type instance F Int _ = Int
 
 is the same as
+
+.. code-block:: haskell
 
     type family F a b :: *
     type instance F Int b = Int
@@ -97,6 +107,8 @@ Although type family equations can bind type variables with explicit foralls,
 it need not be the case that all variables that appear on the RHS must be bound
 by a forall. For instance, the following is acceptable:
 
+.. code-block:: haskell
+
    class C a where
      type T a b
    instance C (Maybe a) where
@@ -159,10 +171,14 @@ Note [Floating `via` type variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Imagine the following `deriving via` clause:
 
+.. code-block:: haskell
+
     data Quux
       deriving Eq via (Const a Quux)
 
 This should be rejected. Why? Because it would generate the following instance:
+
+.. code-block:: haskell
 
     instance Eq Quux where
       (==) = coerce @(Quux         -> Quux         -> Bool)
@@ -192,6 +208,8 @@ Checking LHS is simple because the only type variable allowed on the LHS of
 injectivity condition is the variable naming the result in type family head.
 Example of disallowed annotation:
 
+.. code-block:: haskell
+
     type family Foo a b = r | b -> a
 
 Verifying RHS of injectivity consists of checking that:
@@ -199,10 +217,14 @@ Verifying RHS of injectivity consists of checking that:
  1. only variables defined in type family head appear on the RHS (kind
     variables are also allowed).  Example of disallowed annotation:
 
+.. code-block:: haskell
+
        type family Foo a = r | r -> b
 
  2. for associated types the result variable does not shadow any of type
     class variables. Example of disallowed annotation:
+
+.. code-block:: haskell
 
        class Foo a b where
           type F a = b | b -> a
@@ -218,3 +240,4 @@ There is no reason not to allow the stupid theta if there are no data
 constructors.  It's still stupid, but does no harm, and I don't want
 to cause programs to break unnecessarily (notably HList).  So if there
 are no data constructors we allow h98_style = True
+

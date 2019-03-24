@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Foreign/Ptr.hs>`_
+
+====================
+libraries/base/Foreign/Ptr.hs.rst
+====================
+
 Note [Exporting constructors of marshallable foreign types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 One might expect that IntPtr, WordPtr, and the other newtypes in the
@@ -13,3 +19,4 @@ so being able to use abstract types in a foreign declaration breaks their
 abstraction (see #3008). As a result, the constructors of all FFI-related
 newtypes in base must be exported in order to be useful for FFI programming,
 even at the cost of exposing their underlying, architecture-dependent types.
+

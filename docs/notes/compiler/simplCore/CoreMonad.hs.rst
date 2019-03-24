@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CoreMonad.hs>`_
+
+====================
+compiler/simplCore/CoreMonad.hs.rst
+====================
+
 Note [Which transformations are innocuous]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 At one point (Jun 18) I wondered if some transformations (ticks)
@@ -42,6 +48,8 @@ PostInlineUnconditionally
   case .. of { A -> ...x...y...
                B -> ...x...y... }
   Current postinlineUnconditinaly will inline y, and then x; sigh.
+
+.. code-block:: haskell
 
   But PostInlineUnconditionally might also unlock subsequent
   transformations for the same reason as PreInlineUnconditionally,
@@ -88,4 +96,5 @@ only be given to things defined in the same module. However, since we would
 only want to deserialise every annotation once, we would have to build a cache
 for every module in the HTP. In the end, it's probably not worth it as long as
 we aren't using annotations heavily.
+
 

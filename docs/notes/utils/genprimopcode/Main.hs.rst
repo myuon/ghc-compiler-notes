@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/utils/genprimopcode/Main.hs>`_
+
+====================
+utils/genprimopcode/Main.hs.rst
+====================
+
 Note [Placeholder declarations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We are generating fake declarations for things in GHC.Prim, just to
@@ -17,3 +23,4 @@ but it seems easier to generate
         tagToEnum# = let x = x in x
 We don't do this for *all* bindings because for ones with an unboxed
 RHS we would get other complaints (e.g.can't unify "*" with "#").
+

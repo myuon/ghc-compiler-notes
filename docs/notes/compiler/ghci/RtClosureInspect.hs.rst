@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/RtClosureInspect.hs>`_
+
+====================
+compiler/ghci/RtClosureInspect.hs.rst
+====================
+
 Note [Constructor arg types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider a GADT (cf #7386)
@@ -34,6 +40,8 @@ Example:
 Suppose we are doing RTTI for a partially evaluated
 closure t, the real type of which is t :: MkT Int, for
 
+.. code-block:: haskell
+
    newtype MkT a = MkT [Maybe a]
 
 The table below shows the results of RTTI and the improvement
@@ -46,11 +54,15 @@ Regard the two first columns as input and the next two as output.
   2 |     _     |   MkT b   |    a     | none       | OK
   3 |     _     |   t Int   |    a     | none       | OK
 
+.. code-block:: haskell
+
   If t is not evaluated at *all*, we are safe.
 
   4 |  (_ : _)  |    t b    |   [a]    | t = []     | UNSOUND
   5 |  (_ : _)  |   MkT b   |  MkT a   | none       | OK (compensating for the missing newtype)
   6 |  (_ : _)  |   t Int   |  [Int]   | t = []     | UNSOUND
+
+.. code-block:: haskell
 
   If a is a minimal whnf, we run into trouble. Note that
   row 5 above does newtype enrichment on the ty_rtty parameter.
@@ -61,6 +73,8 @@ Regard the two first columns as input and the next two as output.
   8 | (Just _:_)|   MkT b   |  MkT a   |  none      | OK
   9 | (Just _:_)|   t Int   |   FAIL   |  none      | OK
 
+.. code-block:: haskell
+
   And if t is any more evaluated than whnf, we are still in trouble.
   Because constraints are solved in top-down order, when we reach the
   Maybe subterm what we got is already unsound. This explains why the
@@ -69,6 +83,8 @@ Regard the two first columns as input and the next two as output.
   10 | (Just _:_)|  t Int  | [Maybe a]   |  FAIL    | OK
   11 | (Just 1:_)|  t Int  | [Maybe Int] |  FAIL    | OK
 
+.. code-block:: haskell
+
   We can undo the failure in row 9 by leaving out the constraint
   coming from the type signature of t (i.e., the 2nd column).
   Note that this type information is still used
@@ -76,6 +92,8 @@ Regard the two first columns as input and the next two as output.
   when trying to calculate the improvement, as there is no unifier for
   t Int = [Maybe a] or t Int = [Maybe Int].
 
+
+.. code-block:: haskell
 
   Another set of examples with t :: [MkT (Maybe Int)]  \equiv  [[Maybe (Maybe Int)]]
 
@@ -93,7 +111,11 @@ the type, but which may produce a false type.
 
 In pseudocode:
 
+.. code-block:: haskell
+
   rtti' :: a -> IO Type  -- Does not use the static type information
+
+.. code-block:: haskell
 
   obtainType :: a -> Type -> IO (Maybe (Term, Improvement))
   obtainType v old_ty = do
@@ -103,6 +125,8 @@ In pseudocode:
          else return Nothing
   where check rtti_ty old_ty = check1 rtti_ty &&
                               check2 rtti_ty old_ty
+
+.. code-block:: haskell
 
   check1 :: Type -> Bool
   check2 :: Type -> Type -> Bool
@@ -114,6 +138,8 @@ If that is not the case, then we consider two conditions.
 1. To prevent the class of unsoundness displayed by
    rows 4 and 7 in the example: no higher kind tyvars
    accepted.
+
+.. code-block:: haskell
 
   check1 (t a)   = NO
   check1 (t Int) = NO
@@ -133,4 +159,5 @@ If that is not the case, then we consider two conditions.
   check2 [Maybe Int] (t Int) = True
   check2 (Maybe [a])   (m [Int]) = False
   check2 (Maybe [Int]) (m [Int]) = True
+
 

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Literal.hs>`_
+
+====================
+compiler/basicTypes/Literal.hs.rst
+====================
+
 Note [Integer literals]
 ~~~~~~~~~~~~~~~~~~~~~~~
 An Integer literal is represented using, well, an Integer, to make it
@@ -143,9 +149,14 @@ Here are the moving parts:
   value. The important thing is that it is a heap pointer,
   which the garbage collector can follow if it encounters it.
 
+.. code-block:: haskell
+
   We considered maintaining LitRubbish in STG, and lowering
   it in the code genreators, but it seems simpler to do it
   once and for all in CoreToSTG.
 
+.. code-block:: haskell
+
   In ByteCodeAsm we just lower it as a 0 literal, because
   it's all boxed and lifted to the host GC anyway.
+

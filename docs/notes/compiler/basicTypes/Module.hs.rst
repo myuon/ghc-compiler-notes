@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Module.hs>`_
+
+====================
+compiler/basicTypes/Module.hs.rst
+====================
+
 Note [The identifier lexicon]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Unit IDs, installed package IDs, ABI hashes, package names,
@@ -139,6 +145,8 @@ to existing code.
 
 Instead, we adopted the following encoding scheme:
 
+.. code-block:: haskell
+
      <A>   ===> hole:A
      {A.T} ===> hole:A.T
 
@@ -163,3 +171,4 @@ turning the env to a list.
 See Note [Unique Determinism] for more information about the source of
 nondeterminismand and Note [Deterministic UniqFM] for explanation of why
 it matters for maps.
+

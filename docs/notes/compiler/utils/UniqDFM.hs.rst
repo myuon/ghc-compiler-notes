@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/UniqDFM.hs>`_
+
+====================
+compiler/utils/UniqDFM.hs.rst
+====================
+
 Note [Deterministic UniqFM]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A @UniqDFM@ is just like @UniqFM@ with the following additional
@@ -27,6 +33,8 @@ every value with the insertion time that can later be used to sort the
 values when asked to convert to a list.
 
 An alternative would be to have
+
+.. code-block:: haskell
 
   data UniqDFM ele = UDFM (M.IntMap ele) [ele]
 
@@ -69,3 +77,4 @@ set in the order that they were inserted into the smaller set. That's
 O(m log m) for extracting the elements from the smaller set in the
 insertion order and O(m * min(n+m, W)) to insert them into the bigger
 set.
+

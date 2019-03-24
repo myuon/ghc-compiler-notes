@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/IdInfo.hs>`_
+
+====================
+compiler/basicTypes/IdInfo.hs.rst
+====================
+
 Note [Specialisations and RULES in IdInfo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Generally speaking, a GlobalId has an *empty* RuleInfo.  All their
@@ -29,3 +35,4 @@ isExprLevPoly in CoreUtils for where this info is used. Storing
 this is required to prevent perf/compiler/T5631 from blowing up.
 
 See Note [Levity info]
+

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/List.hs>`_
+
+====================
+libraries/base/GHC/List.hs.rst
+====================
+
 Note [Inline FB functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 After fusion rules successfully fire, we are usually left with one or more calls
@@ -88,6 +94,8 @@ NB: Zips for larger tuples are in the List module.
     zip xs ys = build (\c n -> foldr2 (zipFB c) n xs ys)
   See also Note [Inline FB functions]
 
+.. code-block:: haskell
+
   Ditto rule "zipWith".
 
 * To give this rule a chance to fire, we give zip a NOLINLINE[1]
@@ -104,3 +112,4 @@ NB: Zips for larger tuples are in the List module.
 
   Ditto rule "zipWithList".
 --------------------------------------------
+

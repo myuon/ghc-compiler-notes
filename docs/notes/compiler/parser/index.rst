@@ -1,4 +1,4 @@
-docs/notes/compiler/parser
+compiler/parser
 =================================
 
 .. toctree::

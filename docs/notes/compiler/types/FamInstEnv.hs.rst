@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs>`_
+
+====================
+compiler/types/FamInstEnv.hs.rst
+====================
+
 Note [FamInsts and CoAxioms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * CoAxioms and FamInsts are just like
@@ -23,8 +29,12 @@ Under-saturation has two potential causes:
  U2) When the user has specified a return kind instead of written out patterns.
      Example:
 
+.. code-block:: haskell
+
        data family Sing (a :: k)
        data instance Sing :: Bool -> Type
+
+.. code-block:: haskell
 
      The data family tycon Sing has an arity of 2, the k and the a. But
      the data instance has only one pattern, Bool (standing in for k).
@@ -38,12 +48,18 @@ Over-saturation is also possible:
       an instance might legitimately have more arguments than the family.
       Example:
 
+.. code-block:: haskell
+
         data family Fix :: (Type -> k) -> k
         data instance Fix f = MkFix1 (f (Fix f))
         data instance Fix f x = MkFix2 (f (Fix f x) x)
 
+.. code-block:: haskell
+
       In the first instance here, the k in the data family kind is chosen to
       be Type. In the second, it's (Type -> Type).
+
+.. code-block:: haskell
 
       However, we require that any over-saturation is eta-reducible. That is,
       we require that any extra patterns be bare unrepeated type variables;
@@ -108,6 +124,8 @@ For example
 Then we get a data type for each instance, and an axiom:
    data TInt a = T1 a | T2
    data TBoolList a = T3 a
+
+.. code-block:: haskell
 
    axiom ax7   :: T Int ~ TInt   -- Eta-reduced
    axiom ax8 a :: T Bool [a] ~ TBoolList a
@@ -253,6 +271,8 @@ Note [Always number wildcard types in CoAxBranch]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider the following example (from the DataFamilyInstanceLHS test case):
 
+.. code-block:: haskell
+
   data family Sing (a :: k)
   data instance Sing (_ :: MyKind) where
       SingA :: Sing A
@@ -260,6 +280,8 @@ Consider the following example (from the DataFamilyInstanceLHS test case):
 
 If we're not careful during tidying, then when this program is compiled with
 -ddump-types, we'll get the following information:
+
+.. code-block:: haskell
 
   COERCION AXIOMS
     axiom DataFamilyInstanceLHS.D:R:SingMyKind_0 ::
@@ -270,6 +292,8 @@ that. To avoid this issue, when building a CoAxiom (which is what eventually
 gets printed above), we tidy all the variables in an env that already contains
 '_'. Thus, any variable named '_' will be renamed, giving us the nicer output
 here:
+
+.. code-block:: haskell
 
   COERCION AXIOMS
     axiom DataFamilyInstanceLHS.D:R:SingMyKind_0 ::
@@ -300,29 +324,43 @@ conditions hold:
 1. For each pair of *different* equations of a type family, one of the following
    conditions holds:
 
+.. code-block:: haskell
+
    A:  RHSs are different.
+
+.. code-block:: haskell
 
    B1: OPEN TYPE FAMILIES: If the RHSs can be unified under some substitution
        then it must be possible to unify the LHSs under the same substitution.
        Example:
 
+.. code-block:: haskell
+
           type family FunnyId a = r | r -> a
           type instance FunnyId Int = Int
           type instance FunnyId a = a
 
+.. code-block:: haskell
+
        RHSs of these two equations unify under [ a |-> Int ] substitution.
        Under this substitution LHSs are equal therefore these equations don't
        violate injectivity annotation.
+
+.. code-block:: haskell
 
    B2: CLOSED TYPE FAMILIES: If the RHSs can be unified under some
        substitution then either the LHSs unify under the same substitution or
        the LHS of the latter equation is overlapped by earlier equations.
        Example 1:
 
+.. code-block:: haskell
+
           type family SwapIntChar a = r | r -> a where
               SwapIntChar Int  = Char
               SwapIntChar Char = Int
               SwapIntChar a    = a
+
+.. code-block:: haskell
 
        Say we are checking the last two equations. RHSs unify under [ a |->
        Int ] substitution but LHSs don't. So we apply the substitution to LHS
@@ -331,14 +369,20 @@ conditions hold:
        that pair of last two equations does not violate injectivity
        annotation.
 
+.. code-block:: haskell
+
    A special case of B is when RHSs unify with an empty substitution ie. they
    are identical.
+
+.. code-block:: haskell
 
    If any of the above two conditions holds we conclude that the pair of
    equations does not violate injectivity annotation. But if we find a pair
    of equations where neither of the above holds we report that this pair
    violates injectivity annotation because for a given RHS we don't have a
    unique LHS. (Note that (B) actually implies (A).)
+
+.. code-block:: haskell
 
    Note that we only take into account these LHS patterns that were declared
    as injective.
@@ -349,8 +393,12 @@ conditions hold:
    to cover all possible patterns.  So for example this definition will be
    rejected:
 
+.. code-block:: haskell
+
       type family W1 a = r | r -> a
       type instance W1 [a] = a
+
+.. code-block:: haskell
 
    If it were accepted we could call `W1 [W1 Int]`, which would reduce to
    `W1 Int` and then by injectivity we could conclude that `[W1 Int] ~ Int`,
@@ -491,6 +539,8 @@ c d).
 
 Here is a nice example of why it's all necessary:
 
+.. code-block:: haskell
+
   type family F a b where
     F Int Bool = Char
     F a   b    = Double
@@ -509,3 +559,4 @@ case that (F blah blah) can reduce to Double, no matter what (blah)
 is!  Flattening as done below ensures this.
 
 flattenTys is defined here because of module dependencies.
+

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs>`_
+
+====================
+compiler/types/CoAxiom.hs.rst
+====================
+
 Note [Coercion axiom branches]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In order to allow closed type families, an axiom needs to contain an
@@ -96,6 +102,8 @@ In the case of a CoAxBranch of an associated type-family instance,
 we use the *same* type variables (where possible) as the
 enclosing class or instance.  Consider
 
+.. code-block:: haskell
+
   instance C Int [z] where
      type F Int [z] = ...   -- Second param must be [z]
 
@@ -112,13 +120,19 @@ Note [CoAxBranch roles]
 ~~~~~~~~~~~~~~~~~~~~~~~
 Consider this code:
 
+.. code-block:: haskell
+
   newtype Age = MkAge Int
   newtype Wrap a = MkWrap a
+
+.. code-block:: haskell
 
   convert :: Wrap Age -> Int
   convert (MkWrap (MkAge i)) = i
 
 We want this to compile to:
+
+.. code-block:: haskell
 
   NTCo:Wrap :: forall a. Wrap a ~R a
   NTCo:Age  :: Age ~R Int
@@ -221,3 +235,4 @@ we don't eta-expand when showing things to the user.)
 (See also Note [Newtype eta] in TyCon.  This is notionally separate
 and deals with the axiom connecting a newtype with its representation
 type; but it too is eta-reduced.)
+

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs>`_
+
+====================
+compiler/prelude/PrelRules.hs.rst
+====================
+
 Note [Constant folding]
 ~~~~~~~~~~~~~~~~~~~~~~~
 primOpRules generates a rewrite rule for each primop
@@ -66,6 +72,8 @@ Note [Guarding against silly shifts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this code:
 
+.. code-block:: haskell
+
   import Data.Bits( (.|.), shiftL )
   chunkToBitmap :: [Bool] -> Word32
   chunkToBitmap chunk = foldr (.|.) 0 [ 1 `shiftL` n | (True,n) <- zip chunk [0..] ]
@@ -114,11 +122,15 @@ There are two cases:
 - Shifting fixed-width things: the primops ISll, Sll, etc
   These are handled by shiftRule.
 
+.. code-block:: haskell
+
   We are happy to shift by any amount up to wordSize but no more.
 
 - Shifting Integers: the function shiftLInteger, shiftRInteger
   from the 'integer' library.   These are handled by rule_shift_op,
   and match_Integer_shift_op.
+
+.. code-block:: haskell
 
   Here we could in principle shift by any amount, but we arbitary
   limit the shift to 4 bits; in particualr we do not want shift by a
@@ -158,6 +170,8 @@ check won't see that, alas.  It's crude but it works.
 Here's are two cases that should fail
         f :: forall a. a
         f = tagToEnum# 0        -- Can't do tagToEnum# at a type variable
+
+.. code-block:: haskell
 
         g :: Int
         g = tagToEnum# 0        -- Int is not an enumeration
@@ -212,6 +226,8 @@ is /not/ the same as the Prelude function seq :: a -> b -> b
 as you can see from its type.  In fact, seq# is the implementation
 mechanism for 'evaluate'
 
+.. code-block:: haskell
+
    evaluate :: a -> IO a
    evaluate a = IO $ \s -> seq# a s
 
@@ -226,12 +242,18 @@ Things to note
   why not instead say this?
       case x of { DEFAULT -> blah)
 
+.. code-block:: haskell
+
   Reason (see #5129): if we saw
     catch# (\s -> case x of { DEFAULT -> raiseIO# exn s }) handler
+
+.. code-block:: haskell
 
   then we'd drop the 'case x' because the body of the case is bottom
   anyway. But we don't want to do that; the whole /point/ of
   seq#/evaluate is to evaluate 'x' first in the IO monad.
+
+.. code-block:: haskell
 
   In short, we /always/ evaluate the first argument and never
   just discard it.
@@ -263,13 +285,21 @@ When compiling a (base-package) module that defines one of the
 functions mentioned in the RHS of a built-in rule, there's a danger
 that we'll see
 
+.. code-block:: haskell
+
         f = ...(eq String x)....
 
+.. code-block:: haskell
+
         ....and lower down...
+
+.. code-block:: haskell
 
         eqString = ...
 
 Then a rewrite would give
+
+.. code-block:: haskell
 
         f = ...(eqString x)...
         ....and lower down...
@@ -378,3 +408,4 @@ Hence caseRules returns (AltCon -> Maybe AltCon), with Nothing indicating
 an alternative that is unreachable.
 
 You may wonder how this can happen: check out #15436.
+

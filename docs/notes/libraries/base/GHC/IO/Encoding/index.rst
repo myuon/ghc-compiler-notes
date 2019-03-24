@@ -1,4 +1,4 @@
-docs/notes/libraries/base/GHC/IO/Encoding
+libraries/base/GHC/IO/Encoding
 =================================
 
 .. toctree::

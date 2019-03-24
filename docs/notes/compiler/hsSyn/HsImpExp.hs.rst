@@ -1,14 +1,25 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsImpExp.hs>`_
+
+====================
+compiler/hsSyn/HsImpExp.hs.rst
+====================
+
 Note [IEThingWith]
 ~~~~~~~~~~~~~~~~~~
 
 A definition like
+
+.. code-block:: haskell
 
     module M ( T(MkT, x) ) where
       data T = MkT { x :: Int }
 
 gives rise to
 
+.. code-block:: haskell
+
     IEThingWith T [MkT] [FieldLabel "x" False x)]           (without DuplicateRecordFields)
     IEThingWith T [MkT] [FieldLabel "x" True $sel:x:MkT)]   (with    DuplicateRecordFields)
 
 See Note [Representing fields in AvailInfo] in Avail for more details.
+

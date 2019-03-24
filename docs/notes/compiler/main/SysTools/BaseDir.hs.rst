@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/SysTools/BaseDir.hs>`_
+
+====================
+compiler/main/SysTools/BaseDir.hs.rst
+====================
+
 Note [topdir: How GHC finds its files]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -26,4 +32,5 @@ with the make build system or Hadrian, and on whether we're
 running a bindist, we might find the mingw toolchain and perl
 either under $topdir/../{mingw, perl}/ or
 $topdir/../../{mingw, perl}/.
+
 

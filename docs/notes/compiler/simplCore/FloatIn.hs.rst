@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs>`_
+
+====================
+compiler/simplCore/FloatIn.hs.rst
+====================
+
 Note [Dead bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~
 At a literal we won't usually have any floated bindings; the
@@ -28,11 +34,15 @@ places, we're not tempted.
 
 We do need to be careful about jumps, however:
 
+.. code-block:: haskell
+
   joinrec j x y z = ... in
   jump j a b c
 
 Previous versions often floated the definition of a recursive function into its
 only non-recursive occurrence. But for a join point, this is a disaster:
+
+.. code-block:: haskell
 
   (joinrec j x y z = ... in
   jump j) a b c -- wrong!
@@ -66,13 +76,19 @@ Note [Floating in past a lambda group]
   case of FloatOut.floatExpr) and we don't want to float straight
   back in again.
 
+.. code-block:: haskell
+
   It *is* important to float into one-shot lambdas, however;
   see the remarks with noFloatIntoRhs.
 
 So we treat lambda in groups, using the following rule:
 
+.. code-block:: haskell
+
  Float in if (a) there is at least one Id,
          and (b) there are no non-one-shot Ids
+
+.. code-block:: haskell
 
  Otherwise drop all the bindings outside the group.
 
@@ -168,6 +184,8 @@ But there are wrinkles
   because it can't be floated out (can_fail), the thunk will stay
   there.  Disaster!  (This happened in nofib 'simple' and 'scs'.)
 
+.. code-block:: haskell
+
   Solution: only float cases into the branches of other cases, and
   not into the arguments of an application, or the RHS of a let. This
   is somewhat conservative, but it's simple.  And it still hits the
@@ -180,6 +198,8 @@ But there are wrinkles
   Now, floating that indexing operation into the (f r) thunk will
   not create any new thunks, but it will keep the array 'a' alive
   for much longer than the programmer expected.
+
+.. code-block:: haskell
 
   So again, not floating a case into a let or argument seems like
   the Right Thing
@@ -206,6 +226,8 @@ would destroy the let/app invariant.
   In both cases we'll float straight back out again
   NB: Must line up with fiExpr (AnnLam...); see #7088
 
+.. code-block:: haskell
+
   (a) is important: we /must/ float into a one-shot lambda group
   (which includes join points). This makes a big difference
   for things like
@@ -218,6 +240,8 @@ would destroy the let/app invariant.
 
 * Wrinkle 2: for RHSs, do not float into a HNF; we'll just float right
   back out again... not tragic, but a waste of time.
+
+.. code-block:: haskell
 
   For function arguments we will still end up with this
   in-then-out stuff; consider
@@ -245,3 +269,4 @@ situations like
 
 If the thing is used in all RHSs there is nothing gained,
 so we don't duplicate then.
+

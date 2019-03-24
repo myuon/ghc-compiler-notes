@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs>`_
+
+====================
+compiler/specialise/Rules.hs.rst
+====================
+
 Note [Overall plumbing for rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * After the desugarer:
@@ -21,6 +27,8 @@ Note [Overall plumbing for rules]
   Ids in other packages.  This RuleBase simply grow monotonically, as
   ghc --make compiles one module after another.
 
+.. code-block:: haskell
+
   During simplification, interface files may get demand-loaded,
   as the simplifier explores the unfoldings for Ids it has in
   its hand.  (Via an unsafePerformIO; the EPS is really a cache.)
@@ -30,15 +38,23 @@ Note [Overall plumbing for rules]
 * The result of all this is that during Core-to-Core optimisation
   there are four sources of rules:
 
+.. code-block:: haskell
+
     (a) Rules in the IdInfo of the Id they are a rule for.  These are
         easy: fast to look up, and if you apply a substitution then
         it'll be applied to the IdInfo as a matter of course.
+
+.. code-block:: haskell
 
     (b) Rules declared in this module for imported Ids, kept in the
         ModGuts. If you do a substitution, you'd better apply the
         substitution to these.  There are seldom many of these.
 
+.. code-block:: haskell
+
     (c) Rules declared in the HomePackageTable.  These never change.
+
+.. code-block:: haskell
 
     (d) Rules in the ExternalPackageTable. These can grow in response
         to lazy demand-loading of interfaces.
@@ -49,6 +65,8 @@ Note [Overall plumbing for rules]
   generate a RuleBase for (c) by combing rules from all the modules
   "below" us.  That's why we can't just select the home-package RuleBase
   from HscEnv.
+
+.. code-block:: haskell
 
   [NB: we are inconsistent here.  We should do the same for external
   packages, but we don't.  Same for type-class instances.]
@@ -133,17 +151,27 @@ bound on the LHS:
   unbound template type variables.  Consider this (#10689,
   simplCore/should_compile/T10689):
 
+.. code-block:: haskell
+
     type Foo a b = b
+
+.. code-block:: haskell
 
     f :: Eq a => a -> Bool
     f x = x==x
 
+.. code-block:: haskell
+
     {-# RULES "foo" forall (x :: Foo a Char). f x = True #-}
     finkle = f 'c'
+
+.. code-block:: haskell
 
   The rule looks like
     forall (a::*) (d::Eq Char) (x :: Foo a Char).
          f (Foo a Char) d x = True
+
+.. code-block:: haskell
 
   Matching the rule won't bind 'a', and legitimately so.  We fudge by
   pretending that 'a' is bound to (Any :: *).
@@ -158,10 +186,14 @@ bound on the LHS:
     RULE forall (c :: Int~Int). f (x |> <Int>) = e
   and then perhaps drop it altogether.  Now 'c' is unbound.
 
+.. code-block:: haskell
+
   It's tricky to be sure this never happens, so instead I
   say it's OK to have an unbound coercion binder in a RULE
   provided its type is (c :: t~t).  Then, when the RULE
   fires we can substitute <t> for c.
+
+.. code-block:: haskell
 
   This actually happened (in a RULE for a local function)
   in #13410, and also in test T10602.
@@ -268,6 +300,8 @@ There are a couple of tricky points.
       --> NOT!
         let v = x+1 in f (x+1) v
 
+.. code-block:: haskell
+
   (b) What if two non-nested let bindings bind the same variable?
         f (let v = e1 in b1) (let v = e2 in b2)
       --> NOT!
@@ -328,6 +362,8 @@ Consider this example
 
 SpecConstr sees this fragment:
 
+.. code-block:: haskell
+
         case w_smT of wild_Xf [Just A] {
           Data.Maybe.Nothing -> lvl_smf;
           Data.Maybe.Just n_acT [Just S(L)] ->
@@ -336,6 +372,8 @@ SpecConstr sees this fragment:
             }};
 
 and correctly generates the rule
+
+.. code-block:: haskell
 
         RULES: "SC:$wfoo1" [0] __forall {y_amr [Just L] :: GHC.Prim.Int#
                                           sc_snn :: GHC.Prim.Int#}
@@ -353,5 +391,6 @@ at all.
 
 That is why the 'lookupRnInScope' call in the (Var v2) case of 'match'
 is so important.
+
 
 

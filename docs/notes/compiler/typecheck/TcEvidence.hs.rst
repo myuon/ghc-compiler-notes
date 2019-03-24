@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcEvidence.hs>`_
+
+====================
+compiler/typecheck/TcEvidence.hs.rst
+====================
+
 Note [TcCoercions]
 ~~~~~~~~~~~~~~~~~~
 | TcCoercions are a hack used by the typechecker. Normally,
@@ -97,6 +103,8 @@ in the program source as runtime values, without any support
 from the RTS. We accomplish this by assigning a special meaning
 to constraints of type GHC.Stack.Types.HasCallStack, an alias
 
+.. code-block:: haskell
+
   type HasCallStack = (?callStack :: CallStack)
 
 Implicit parameters of type GHC.Stack.Types.CallStack (the name is not
@@ -105,8 +113,12 @@ important) are solved in three steps:
 1. Occurrences of CallStack IPs are solved directly from the given IP,
    just like a regular IP. For example, the occurrence of `?stk` in
 
+.. code-block:: haskell
+
      error :: (?stk :: CallStack) => String -> a
      error s = raise (ErrorCall (s ++ prettyCallStack ?stk))
+
+.. code-block:: haskell
 
    will be solved for the `?stk` in `error`s context as before.
 
@@ -114,44 +126,72 @@ important) are solved in three steps:
    append the current call-site to it. For example, consider a
    call to the callstack-aware `error` above.
 
+.. code-block:: haskell
+
      undefined :: (?stk :: CallStack) => a
      undefined = error "undefined!"
+
+.. code-block:: haskell
 
    Here we want to take the given `?stk` and append the current
    call-site, before passing it to `error`. In essence, we want to
    rewrite `error "undefined!"` to
 
+.. code-block:: haskell
+
      let ?stk = pushCallStack <error's location> ?stk
      in error "undefined!"
 
+.. code-block:: haskell
+
    We achieve this effect by emitting a NEW wanted
+
+.. code-block:: haskell
 
      [W] d :: IP "stk" CallStack
 
+.. code-block:: haskell
+
    from which we build the evidence term
+
+.. code-block:: haskell
 
      EvCsPushCall "error" <error's location> (EvId d)
 
+.. code-block:: haskell
+
    that we use to solve the call to `error`. The new wanted `d` will
    then be solved per rule (1), ie as a regular IP.
+
+.. code-block:: haskell
 
    (see TcInteract.interactDict)
 
 3. We default any insoluble CallStacks to the empty CallStack. Suppose
    `undefined` did not request a CallStack, ie
 
+.. code-block:: haskell
+
      undefinedNoStk :: a
      undefinedNoStk = error "undefined!"
+
+.. code-block:: haskell
 
    Under the usual IP rules, the new wanted from rule (2) would be
    insoluble as there's no given IP from which to solve it, so we
    would get an "unbound implicit parameter" error.
 
+.. code-block:: haskell
+
    We don't ever want to emit an insoluble CallStack IP, so we add a
    defaulting pass to default any remaining wanted CallStacks to the
    empty CallStack with the evidence term
 
+.. code-block:: haskell
+
      EvCsEmpty
+
+.. code-block:: haskell
 
    (see TcSimplify.simpl_top and TcSimplify.defaultCallStacks)
 
@@ -160,9 +200,13 @@ explicitly, but is notably limited by the fact that the stack will
 stop at the first function whose type does not include a CallStack IP.
 For example, using the above definition of `undefined`:
 
+.. code-block:: haskell
+
   head :: [a] -> a
   head []    = undefined
   head (x:_) = x
+
+.. code-block:: haskell
 
   g = head []
 
@@ -187,14 +231,22 @@ Important Details:
 - We will automatically solve any wanted CallStack regardless of the
   name of the IP, i.e.
 
+.. code-block:: haskell
+
     f = show (?stk :: CallStack)
     g = show (?loc :: CallStack)
+
+.. code-block:: haskell
 
   are both valid. However, we will only push new SrcLocs onto existing
   CallStacks when the IP names match, e.g. in
 
+.. code-block:: haskell
+
     head :: (?loc :: CallStack) => [a] -> a
     head [] = error (show (?stk :: CallStack))
+
+.. code-block:: haskell
 
   the printed CallStack will NOT include head's call-site. This reflects the
   standard scoping rules of implicit-parameters.
@@ -206,6 +258,8 @@ Important Details:
 - When we emit a new wanted CallStack from rule (2) we set its origin to
   `IPOccOrigin ip_name` instead of the original `OccurrenceOf func`
   (see TcInteract.interactDict).
+
+.. code-block:: haskell
 
   This is a bit shady, but is how we ensure that the new wanted is
   solved like a regular IP.
@@ -224,4 +278,5 @@ can just squeeze by.  Here's how.
 * So we can track usage via the processing for that implication,
   (see Note [Tracking redundant constraints] in TcSimplify).
   We can ignore usage from the EvFun altogether.
+
 

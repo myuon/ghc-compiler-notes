@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplCore.hs>`_
+
+====================
+compiler/simplCore/SimplCore.hs.rst
+====================
+
 Note [Inline in InitialPhase]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In GHC 8 and earlier we did not inline anything in the InitialPhase. But that is
@@ -9,6 +15,8 @@ Id's Activation allows it.
 
 This is a surprisingly big deal. Compiler performance improved a lot
 when I made this change:
+
+.. code-block:: haskell
 
    perf/compiler/T5837.run            T5837 [stat too good] (normal)
    perf/compiler/parsing001.run       parsing001 [stat too good] (normal)
@@ -53,13 +61,19 @@ We must be careful about discarding (obviously) or even merging the
 RULES on the exported Id. The example that went bad on me at one stage
 was this one:
 
+.. code-block:: haskell
+
     iterate :: (a -> a) -> a -> [a]
         [Exported]
     iterate = iterateList
 
+.. code-block:: haskell
+
     iterateFB c f x = x `c` iterateFB c f (f x)
     iterateList f x =  x : iterateList f (f x)
         [Not exported]
+
+.. code-block:: haskell
 
     {-# RULES
     "iterate"   forall f x.     iterate f x = build (\c _n -> iterateFB c f x)
@@ -68,11 +82,17 @@ was this one:
 
 This got shorted out to:
 
+.. code-block:: haskell
+
     iterateList :: (a -> a) -> a -> [a]
     iterateList = iterate
 
+.. code-block:: haskell
+
     iterateFB c f x = x `c` iterateFB c f (f x)
     iterate f x =  x : iterate f (f x)
+
+.. code-block:: haskell
 
     {-# RULES
     "iterate"   forall f x.     iterate f x = build (\c _n -> iterateFB c f x)
@@ -147,10 +167,14 @@ Note [Indirection zapping and ticks]
 Unfortunately this is another place where we need a special case for
 ticks. The following happens quite regularly:
 
+.. code-block:: haskell
+
         x_local = <expression>
         x_exported = tick<x> x_local
 
 Which we want to become:
+
+.. code-block:: haskell
 
         x_exported =  tick<x> <expression>
 
@@ -180,3 +204,4 @@ Overwriting, rather than merging, seems to work ok.
 We also zap the InlinePragma on the lcl_id. It might originally
 have had a NOINLINE, which we have now transferred; and we really
 want the lcl_id to inline now that its RHS is trivial!
+

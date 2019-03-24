@@ -1,23 +1,39 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsUtils.hs>`_
+
+====================
+compiler/hsSyn/HsUtils.hs.rst
+====================
+
 Note [Kind signatures in typeToLHsType]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There are types that typeToLHsType can produce which require explicit kind
 signatures in order to kind-check. Here is an example from #14579:
 
+.. code-block:: haskell
+
   -- type P :: forall {k} {t :: k}. Proxy t
   type P = 'Proxy
+
+.. code-block:: haskell
 
   -- type Wat :: forall a. Proxy a -> *
   newtype Wat (x :: Proxy (a :: Type)) = MkWat (Maybe a)
     deriving Eq
 
+.. code-block:: haskell
+
   -- type Wat2 :: forall {a}. Proxy a -> *
   type Wat2 = Wat
+
+.. code-block:: haskell
 
   -- type Glurp :: * -> *
   newtype Glurp a = MkGlurp (Wat2 (P :: Proxy a))
     deriving Eq
 
 The derived Eq instance for Glurp (without any kind signatures) would be:
+
+.. code-block:: haskell
 
   instance Eq a => Eq (Glurp a) where
     (==) = coerce @(Wat2 P  -> Wat2 P  -> Bool)
@@ -64,6 +80,8 @@ E.g.
 The top-level bindings for f,g are not unlifted (because of the Num a =>),
 but the local, recursive, monomorphic bindings are:
 
+.. code-block:: haskell
+
       t = /\a \(d:Num a).
          letrec fm :: (# a, a #) = ...g...
                 gm :: a -> a = ...f...
@@ -93,5 +111,6 @@ In a type or data family instance declaration, the type
 constructor is an *occurrence* not a binding site
     type instance T Int = Int -> Int   -- No binders
     data instance S Bool = S1 | S2     -- Binders are S1,S2
+
 
 

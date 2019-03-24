@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/PmExpr.hs>`_
+
+====================
+compiler/deSugar/PmExpr.hs.rst
+====================
+
 Note [PmExprOther in PmExpr]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Since there is no plan to extend the (currently pretty naive) term oracle in
@@ -14,10 +20,14 @@ Note [Undecidable Equality for Overloaded Literals]
 Equality on overloaded literals is undecidable in the general case. Consider
 the following example:
 
+.. code-block:: haskell
+
   instance Num Bool where
     ...
     fromInteger 0 = False -- C-like representation of booleans
     fromInteger _ = True
+
+.. code-block:: haskell
 
     f :: Bool -> ()
     f 1 = ()        -- Clause A
@@ -44,8 +54,12 @@ be anything. This poses difficulties for:
    What should our message for `f` above be? A reasonable approach would be
    to issue:
 
+.. code-block:: haskell
+
      Pattern matches are (potentially) redundant:
        f 2 = ...    under the assumption that 1 == 2
+
+.. code-block:: haskell
 
    but seems to complex and confusing for the user.
 
@@ -73,3 +87,4 @@ impact of this is the following:
     2. Pattern matcing on literals can never be considered exhaustive unless we
        have a catch-all clause. Hence, this assumption affects mainly the
        appearance of the warnings and is, in practice safe.
+

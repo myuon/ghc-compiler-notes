@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysWiredIn.hs>`_
+
+====================
+compiler/prelude/TysWiredIn.hs.rst
+====================
+
 Note [Wiring in RuntimeRep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The RuntimeRep type (and friends) in GHC.Types has a bunch of constructors,
@@ -12,6 +18,8 @@ to this Note, so a search for this Note's name should find all the lists.
 Note [Any types]
 ~~~~~~~~~~~~~~~~
 The type constructor Any,
+
+.. code-block:: haskell
 
     type family Any :: k where { }
 
@@ -55,9 +63,13 @@ It has these properties:
 It's used to instantiate un-constrained type variables after type checking. For
 example, 'length' has type
 
+.. code-block:: haskell
+
   length :: forall a. [a] -> Int
 
 and the list datacon for the empty list has type
+
+.. code-block:: haskell
 
   [] :: forall a. [a]
 
@@ -107,3 +119,4 @@ For a handful of primitive types (Int, Char, Word, Flaot, Double),
 we can readily box and an unboxed version (Int#, Char# etc) using
 the corresponding data constructor.  This is useful in a couple
 of places, notably let-floating 
+

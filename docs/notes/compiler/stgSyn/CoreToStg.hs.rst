@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/CoreToStg.hs>`_
+
+====================
+compiler/stgSyn/CoreToStg.hs.rst
+====================
+
 Note [Live vs free]
 ~~~~~~~~~~~~~~~~~~~
 
@@ -11,12 +17,16 @@ variable's stack slot (if it has one):
 
 There ought to be a better way to say this. Here are some examples:
 
+.. code-block:: haskell
+
         let v = [q] \[x] -> e
         in
         ...v...  (but no q's)
 
 Just after the `in', v is live, but q is dead. If the whole of that
 let expression was enclosed in a case expression, thus:
+
+.. code-block:: haskell
 
         case (let v = [q] \[x] -> e in ...v...) of
                 alts[...q...]
@@ -25,6 +35,8 @@ let expression was enclosed in a case expression, thus:
 we'll return later to the `alts' and need it.
 
 Let-no-escapes make this a bit more interesting:
+
+.. code-block:: haskell
 
         let-no-escape v = [q] \ [x] -> e
         in
@@ -40,6 +52,8 @@ Note [What are these SRTs all about?]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Consider the Core program,
+
+.. code-block:: haskell
 
     fibs = go 1 1
       where go a b = let c = a + c
@@ -74,6 +88,8 @@ account of join points.
 
 Consider:
 
+.. code-block:: haskell
+
     let x = fvs \ args -> e
     in
         if ... then x else
@@ -101,6 +117,8 @@ Under these circumstances we say that `x' is non-escaping.
 
 An example of when (4) does not hold:
 
+.. code-block:: haskell
+
     let x = ...
     in case x of ...alts...
 
@@ -111,6 +129,8 @@ alts' context.
 
 Things can get a little more complicated.  Consider:
 
+.. code-block:: haskell
+
     let y = ...
     in let x = fvs \ args -> ...y...
     in ...x...
@@ -119,6 +139,8 @@ Now, if `x' is used in a non-escaping way in ...x..., and `y' is used in a
 non-escaping way in ...y..., then `y' is non-escaping.
 
 `x' can even be recursive!  Eg:
+
+.. code-block:: haskell
 
     letrec x = [y] \ [v] -> if v then x True else ...
     in
@@ -141,6 +163,8 @@ We now initialize these correctly. The initialization works like this:
                 collected to be able to generate cost centre initialization
                 code, so `coreToTopStgRhs` now returns `CollectedCCs`.
 
+.. code-block:: haskell
+
                 If -fcaf-all is not enabled, use "all CAFs" cost centre.
 
     - Non-CAF:  Top-level (static) data is not counted in heap profiles; nor
@@ -156,3 +180,4 @@ Note [Collect args]
 
 This big-lambda case occurred following a rather obscure eta expansion.
 It all seems a bit yukky to me.
+

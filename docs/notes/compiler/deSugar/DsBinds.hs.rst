@@ -1,6 +1,14 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsBinds.hs>`_
+
+====================
+compiler/deSugar/DsBinds.hs.rst
+====================
+
 Note [Desugaring AbsBinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 In the general AbsBinds case we desugar the binding to this:
+
+.. code-block:: haskell
 
        tup a (d:Num a) = let fm = ...gm...
                              gm = ...fm...
@@ -44,8 +52,12 @@ Class methods can generate
          { AbsBinds [tvs] [dicts] ...blah }
 So the overloading is in the nested AbsBinds. A good example is in GHC.Float:
 
+.. code-block:: haskell
+
   class  (Real a, Fractional a) => RealFrac a  where
     round :: (Integral b) => a -> b
+
+.. code-block:: haskell
 
   instance  RealFrac Float  where
     {-# SPECIALIZE round :: Float -> Int #-}
@@ -60,6 +72,8 @@ Note [Abstracting over tyvars only]
 When abstracting over type variable only (not dictionaries), we don't really need to
 built a tuple and select from it, as we do in the general case. Instead we can take
 
+.. code-block:: haskell
+
         AbsBinds [a,b] [ ([a,b], fg, fl, _),
                          ([b],   gg, gl, _) ]
                 { fl = e1
@@ -67,6 +81,8 @@ built a tuple and select from it, as we do in the general case. Instead we can t
                    h = e3 }
 
 and desugar it to
+
+.. code-block:: haskell
 
         fg = /\ab. let B in e1
         gg = /\b. let a = () in let B in S(e2)
@@ -81,10 +97,14 @@ Notice (a) g has a different number of type variables to f, so we must
              use the mkArbitraryType thing to fill in the gaps.
              We use a type-let to do that.
 
+.. code-block:: haskell
+
          (b) The local variable h isn't in the exports, and rather than
              clone a fresh copy we simply replace h by (h a b), where
              the two h's have different types!  Shadowing happens here,
              which looks confusing but works fine.
+
+.. code-block:: haskell
 
          (c) The result is *still* quadratic-sized if there are a lot of
              small bindings.  So if there are more than some small
@@ -122,6 +142,8 @@ Note [Nested arities]
 ~~~~~~~~~~~~~~~~~~~~~
 For reasons that are not entirely clear, method bindings come out looking like
 this:
+
+.. code-block:: haskell
 
   AbsBinds [] [] [$cfromT <= [] fromT]
     $cfromT [InlPrag=INLINE] :: T Bool -> Bool
@@ -172,17 +194,23 @@ in the dsHsBind family of functions, and later seq'ed in DsExpr.ds_val_bind.
 
 Consider a recursive group like this
 
+.. code-block:: haskell
+
   letrec
      f : g = rhs[f,g]
   in <body>
 
 Without `Strict`, we get a translation like this:
 
+.. code-block:: haskell
+
   let t = /\a. letrec tm = rhs[fm,gm]
                       fm = case t of fm:_ -> fm
                       gm = case t of _:gm -> gm
                 in
                 (fm,gm)
+
+.. code-block:: haskell
 
   in let f = /\a. case t a of (fm,_) -> fm
   in let g = /\a. case t a of (_,gm) -> gm
@@ -196,11 +224,15 @@ Alas, `tm` isn't in scope in the `in <body>` part.
 The simplest thing is to return it in the polymorphic
 tuple `t`, thus:
 
+.. code-block:: haskell
+
   let t = /\a. letrec tm = rhs[fm,gm]
                       fm = case t of fm:_ -> fm
                       gm = case t of _:gm -> gm
                 in
                 (tm, fm, gm)
+
+.. code-block:: haskell
 
   in let f = /\a. case t a of (_,fm,_) -> fm
   in let g = /\a. case t a of (_,_,gm) -> gm
@@ -222,6 +254,8 @@ to levity polymorphism. These checks all used to be handled in the typechecker
 in checkStrictBinds (before Jan '17).
 
 We define an "unlifted bind" to be any bind that binds an unlifted id. Note that
+
+.. code-block:: haskell
 
   x :: Char
   (# True, x #) = blah
@@ -320,8 +354,12 @@ Note [Free tyvars on rule LHS]
 Consider
   data T a = C
 
+.. code-block:: haskell
+
   foo :: T a -> Int
   foo C = 1
+
+.. code-block:: haskell
 
   {-# RULES "myrule"  foo C = 1 #-}
 
@@ -356,6 +394,8 @@ Then we get the SpecPrag
 
 And from that we want the rule
 
+.. code-block:: haskell
+
         RULE forall dInt. f Int dInt = f_spec
         f_spec = let f = <rhs> in f Int dInt
 
@@ -376,6 +416,8 @@ drop_dicts drops dictionary bindings on the LHS where possible.
    quantify over it. That makes 'd' free in the LHS, but that is later
    picked up by extra_dict_bndrs (Note [Dead spec binders]).
 
+.. code-block:: haskell
+
    NB 1: We can only drop the binding if the RHS doesn't bind
          one of the orig_bndrs, which we assume occur on RHS.
          Example
@@ -386,12 +428,16 @@ drop_dicts drops dictionary bindings on the LHS where possible.
          Of course, the ($dfEqlist d) in the pattern makes it less likely
          to match, but there is no other way to get d:Eq a
 
+.. code-block:: haskell
+
    NB 2: We do drop_dicts *before* simplOptEpxr, so that we expect all
          the evidence bindings to be wrapped around the outside of the
          LHS.  (After simplOptExpr they'll usually have been inlined.)
          dsHsWrapper does dependency analysis, so that civilised ones
          will be simple NonRec bindings.  We don't handle recursive
          dictionaries!
+
+.. code-block:: haskell
 
     NB3: In the common case of a non-overloaded, but perhaps-polymorphic
          specialisation, we don't need to bind *any* dictionaries for use
@@ -402,6 +448,8 @@ drop_dicts drops dictionary bindings on the LHS where possible.
          but the RHS uses no dictionaries, so we want to end up with
              RULE forall s (d :: MonadAbstractIOST (ReaderT s)).
                 useAbstractMonad (ReaderT s) d = $suseAbstractMonad s
+
+.. code-block:: haskell
 
    #8848 is a good example of where there are some interesting
    dictionary bindings to discard.
@@ -429,12 +477,18 @@ Note [Simplify rule LHS]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 simplOptExpr occurrence-analyses and simplifies the LHS:
 
+.. code-block:: haskell
+
    (a) Inline any remaining dictionary bindings (which hopefully
        occur just once)
+
+.. code-block:: haskell
 
    (b) Substitute trivial lets, so that they don't get in the way.
        Note that we substitute the function too; we might
        have this as a LHS:  let f71 = M.f Int in f71
+
+.. code-block:: haskell
 
    (c) Do eta reduction.  To see why, consider the fold/build rule,
        which without simplification looked like:
@@ -479,6 +533,8 @@ Note [No RULES on datacons]
 
 Previously, `RULES` like
 
+.. code-block:: haskell
+
     "JustNothing" forall x . Just x = Nothing
 
 were allowed. Simon Peyton Jones says this seems to have been a
@@ -488,5 +544,6 @@ Furthermore, Ben Gamari and Reid Barton are considering trying to
 detect the presence of "static data" that the simplifier doesn't
 need to traverse at all. Such rules do not play well with that.
 So for now, we ban them altogether as requested by #13290. See also #7398.
+
 
 

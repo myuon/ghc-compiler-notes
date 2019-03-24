@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmMonad.hs>`_
+
+====================
+compiler/codeGen/StgCmmMonad.hs.rst
+====================
+
 Note [Virtual and real heap pointers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The code generator can allocate one or more objects contiguously, performing
@@ -26,3 +32,4 @@ real Hp register of a particular word in the allocation chunk. This
 is what getHpRelOffset does.  Since the returned offset is relative
 to the real Hp register, it is valid only until you change the real
 Hp register.  (Changing virtHp doesn't matter.)
+

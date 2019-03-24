@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnMonad.hs>`_
+
+====================
+compiler/typecheck/TcRnMonad.hs.rst
+====================
+
 Note [Default types]
 ~~~~~~~~~~~~~~~~~~~~~~~
 The Integer type is simply not available in package ghc-prim (it is
@@ -14,6 +20,8 @@ an actual crash (attempting to look up the Integer type).
 Note [Constraints and errors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this (#12124):
+
+.. code-block:: haskell
 
   foo :: Maybe Int
   foo = return (case Left 3 of
@@ -81,3 +89,4 @@ asynchronous exception as a synchronous exception, and the exception will end
 up as the value of the unsafeInterleaveIO thunk (see #8006 for a detailed
 discussion).  We don't currently know a general solution to this problem, but
 we can use uninterruptibleMask_ to avoid the situation.
+

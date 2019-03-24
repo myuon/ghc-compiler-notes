@@ -1,8 +1,16 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Class.hs>`_
+
+====================
+compiler/types/Class.hs.rst
+====================
+
 Note [Associated type defaults]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following is an example of associated type defaults:
    class C a where
      data D a r
+
+.. code-block:: haskell
 
      type F x a b :: *
      type F p q r = (p,q)->r    -- Default
@@ -51,5 +59,6 @@ header.
 
 Having the same variables for class and tycon is also used in checkValidRoles
 (in TcTyClsDecls) when checking a class's roles.
+
 
 

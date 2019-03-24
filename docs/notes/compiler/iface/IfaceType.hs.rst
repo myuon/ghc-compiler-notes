@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceType.hs>`_
+
+====================
+compiler/iface/IfaceType.hs.rst
+====================
+
 Note [Free tyvars in IfaceType]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Nowadays (since Nov 16, 2016) we pretty-print a Type by converting to
@@ -102,6 +108,7 @@ Substitutions on IfaceType are done only during pretty-printing to
 construct the result type of a GADT, and does not deal with binders
 (eg IfaceForAll), so it doesn't need fancy capture stuff.  
 
+
 Note [Suppressing invisible arguments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We use the IfaceAppArgs data type to specify which of the arguments to a type
@@ -110,16 +117,22 @@ should be displayed when pretty-printing, under the control of
 See also Type.filterOutInvisibleTypes.
 For example, given
 
+.. code-block:: haskell
+
     T :: forall k. (k->*) -> k -> *    -- Ordinary kind polymorphism
     'Just :: forall k. k -> 'Maybe k   -- Promoted
 
 we want
+
+.. code-block:: haskell
 
     T * Tree Int    prints as    T Tree Int
     'Just *         prints as    Just *
 
 For type constructors (IfaceTyConApp), IfaceAppArgs is a quite natural fit,
 since the corresponding Core constructor:
+
+.. code-block:: haskell
 
     data Type
       = ...
@@ -132,12 +145,16 @@ IfaceAppArgs list.
 
 We also want this behavior for IfaceAppTy, since given:
 
+.. code-block:: haskell
+
     data Proxy (a :: k)
     f :: forall (t :: forall a. a -> Type). Proxy Type (t Bool True)
 
 We want to print the return type as `Proxy (t True)` without the use of
 -fprint-explicit-kinds (#15330). Accomplishing this is trickier than in the
 tycon case, because the corresponding Core constructor for IfaceAppTy:
+
+.. code-block:: haskell
 
     data Type
       = ...
@@ -171,6 +188,8 @@ arguments, and this Note explains how we do it.
 
 As two running examples, consider the following code:
 
+.. code-block:: haskell
+
   {-# LANGUAGE PolyKinds #-}
   data T1 a
   data T2 (a :: k)
@@ -178,12 +197,16 @@ As two running examples, consider the following code:
 When displaying these types (with -fprint-explicit-kinds on), we could just
 do the following:
 
+.. code-block:: haskell
+
   T1 k a
   T2 k a
 
 That certainly gets the job done. But it lacks a crucial piece of information:
 is the `k` argument inferred or specified? To communicate this, we use visible
 kind application syntax to distinguish the two cases:
+
+.. code-block:: haskell
 
   T1 @{k} a
   T2 @k   a
@@ -204,9 +227,13 @@ mind, which argued that RuntimeRep variables would throw a wrench into
 nearly any teach approach since they appear in even the lowly ($)
 function's type,
 
+.. code-block:: haskell
+
     ($) :: forall (w :: RuntimeRep) a (b :: TYPE w). (a -> b) -> a -> b
 
 which is significantly less readable than its non RuntimeRep-polymorphic type of
+
+.. code-block:: haskell
 
     ($) :: (a -> b) -> a -> b
 
@@ -245,23 +272,37 @@ criteria are met:
 
 2. A bound type variable has a polymorphic kind. E.g.,
 
+.. code-block:: haskell
+
      forall k (a::k). Proxy a -> Proxy a
+
+.. code-block:: haskell
 
    Since a's kind mentions a variable k, we print the foralls.
 
 3. A bound type variable is a visible argument (#14238).
    Suppose we are printing the kind of:
 
+.. code-block:: haskell
+
      T :: forall k -> k -> Type
+
+.. code-block:: haskell
 
    The "forall k ->" notation means that this kind argument is required.
    That is, it must be supplied at uses of T. E.g.,
 
+.. code-block:: haskell
+
      f :: T (Type->Type)  Monad -> Int
+
+.. code-block:: haskell
 
    So we print an explicit "T :: forall k -> k -> Type",
    because omitting it and printing "T :: k -> Type" would be
    utterly misleading.
+
+.. code-block:: haskell
 
    See Note [VarBndrs, TyCoVarBinders, TyConBinders, and visibility]
    in TyCoRep.
@@ -275,6 +316,8 @@ Note [Printing foralls in type family instances]
 We use the same criteria as in Note [When to print foralls] to determine
 whether a type family instance should be pretty-printed with an explicit
 `forall`. Example:
+
+.. code-block:: haskell
 
   type family Foo (a :: k) :: k where
     Foo Maybe       = []
@@ -304,10 +347,14 @@ original source code.)
 
 We adopt the same strategy for data family instances. Example:
 
+.. code-block:: haskell
+
   data family DF (a :: k)
   data instance DF '[a, b] = DFList
 
 That data family instance is pretty-printed as:
+
+.. code-block:: haskell
 
   data instance forall j (a :: j) (b :: j). DF '[a, b] = DFList
 
@@ -331,3 +378,4 @@ This would be bad, because the '[' looks like a character literal.
 Solution: in type-level lists and tuples, add a leading space
 if the first type is itself promoted.  See pprSpaceIfPromotedTyCon.
 -----------------
+

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/BooleanFormula.hs>`_
+
+====================
+compiler/utils/BooleanFormula.hs.rst
+====================
+
 Note [Simplification of BooleanFormulas]
 ~~~~~~~~~~~~~~~~~~~~~~
 The smart constructors (`mkAnd` and `mkOr`) do some attempt to simplify expressions. In particular,
@@ -32,3 +38,4 @@ We don't show a ridiculous error message like
 --------------------------------------------------------------------
  Evaluation and simplification
 --------------------------------------------------------------------
+

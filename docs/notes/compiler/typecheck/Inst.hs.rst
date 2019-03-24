@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/Inst.hs>`_
+
+====================
+compiler/typecheck/Inst.hs.rst
+====================
+
 Note [Deep skolemisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 deeplySkolemise decomposes and skolemises a type, returning a type
@@ -5,9 +11,13 @@ with all its arrows visible (ie not buried under foralls)
 
 Examples:
 
+.. code-block:: haskell
+
   deeplySkolemise (Int -> forall a. Ord a => blah)
     =  ( wp, [a], [d:Ord a], Int -> blah )
     where wp = \x:Int. /\a. \(d:Ord a). <hole> x
+
+.. code-block:: haskell
 
   deeplySkolemise  (forall a. Ord a => Maybe a -> forall b. Eq b => blah)
     =  ( wp, [a,b], [d1:Ord a,d2:Eq b], Maybe a -> blah )
@@ -53,8 +63,12 @@ some instance exists, in case downstream code uses it.
 Implementing this is a little tricky.  Consider the following
 situation (sigof03):
 
+.. code-block:: haskell
+
  module A where
      instance C T where ...
+
+.. code-block:: haskell
 
  module ASig where
      instance C T
@@ -65,6 +79,8 @@ we should ignore it for the purpose of doing a duplicate check,
 since it's not actually a duplicate. But don't skip the check
 entirely, we still want this to fail (tcfail221):
 
+.. code-block:: haskell
+
  module ASig where
      instance C T
      instance C T
@@ -74,10 +90,13 @@ class instances may not have been loaded yet at all.  The usual
 situation when A imports another module which provides the
 instances (sigof02m):
 
+.. code-block:: haskell
+
  module A(module B) where
      import B
 
 See also Note [Signature lazy interface loading].  We can't
 rely on this, however, since sometimes we'll have spurious
 type class instances in the EPS, see #9422 (sigof02dm)
+
 

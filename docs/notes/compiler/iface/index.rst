@@ -1,4 +1,4 @@
-docs/notes/compiler/iface
+compiler/iface
 =================================
 
 .. toctree::

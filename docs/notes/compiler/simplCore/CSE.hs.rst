@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs>`_
+
+====================
+compiler/simplCore/CSE.hs.rst
+====================
+
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
 We have to be careful about shadowing.
@@ -19,12 +25,18 @@ Let-bindings have two cases, implemented by addBinding.
 
 * SUBSTITUTE: applies when the RHS is a variable
 
+.. code-block:: haskell
+
      let x = y in ...(h x)....
+
+.. code-block:: haskell
 
   Here we want to extend the /substitution/ with x -> y, so that the
   (h x) in the body might CSE with an enclosing (let v = h y in ...).
   NB: the substitution maps InIds, so we extend the substitution with
       a binding for the original InId 'x'
+
+.. code-block:: haskell
 
   How can we have a variable on the RHS? Doesn't the simplifier inline them?
 
@@ -43,10 +55,16 @@ Let-bindings have two cases, implemented by addBinding.
 
 * EXTEND THE REVERSE MAPPING: applies in all other cases
 
+.. code-block:: haskell
+
      let x = h y in ...(h y)...
+
+.. code-block:: haskell
 
   Here we want to extend the /reverse mapping (cs_map)/ so that
   we CSE the (h y) call to x.
+
+.. code-block:: haskell
 
   Note that we use EXTEND even for a trivial expression, provided it
   is not a variable or literal. In particular this /includes/ type
@@ -55,6 +73,8 @@ Let-bindings have two cases, implemented by addBinding.
      case f @ Int of { r2 -> ...
   Here we want to common-up the two uses of (f @ Int) so we can
   remove one of the case expressions.
+
+.. code-block:: haskell
 
   See also Note [Corner case for case expressions] for another
   reason not to use SUBSTITUTE for all trivial expressions.
@@ -91,21 +111,31 @@ For example:
                  (a:as) -> case a of wild1 {
                              (p,q) -> ...(wild1:as)...
 
+.. code-block:: haskell
+
   Here, (wild1:as) is morally the same as (a:as) and hence equal to
   wild. But that's not quite obvious.  In the rest of the compiler we
   want to keep it as (wild1:as), but for CSE purpose that's a bad
   idea.
 
+.. code-block:: haskell
+
   By using addBinding we add the binding (wild1 -> a) to the substitution,
   which does exactly the right thing.
 
+.. code-block:: haskell
+
   (Notice this is exactly backwards to what the simplifier does, which
   is to try to replaces uses of 'a' with uses of 'wild1'.)
+
+.. code-block:: haskell
 
   This is the main reason that addBinding is called with a trivial rhs.
 
 * Non-trivial scrutinee
      case (f x) of y { pat -> ...let z = f x in ... }
+
+.. code-block:: haskell
 
   By using addBinding we'll add (f x :-> y) to the cs_map, and
   thereby CSE the inner (f x) to y.
@@ -118,16 +148,26 @@ There are some subtle interactions of CSE with functions that the user
 has marked as INLINE or NOINLINE. (Examples from Roman Leshchinskiy.)
 Consider
 
+.. code-block:: haskell
+
         yes :: Int  {-# NOINLINE yes #-}
         yes = undefined
+
+.. code-block:: haskell
 
         no :: Int   {-# NOINLINE no #-}
         no = undefined
 
+.. code-block:: haskell
+
         foo :: Int -> Int -> Int  {-# NOINLINE foo #-}
         foo m n = n
 
+.. code-block:: haskell
+
         {-# RULES "foo/no" foo no = id #-}
+
+.. code-block:: haskell
 
         bar :: Int -> Int
         bar = foo yes
@@ -140,8 +180,12 @@ have substituted even if 'yes' was NOINLINE).
 
 But we do need to take care.  Consider
 
+.. code-block:: haskell
+
         {-# NOINLINE bar #-}
         bar = <rhs>     -- Same rhs as foo
+
+.. code-block:: haskell
 
         foo = <rhs>
 
@@ -149,6 +193,8 @@ If CSE produces
         foo = bar
 then foo will never be inlined to <rhs> (when it should be, if <rhs>
 is small).  The conclusion here is this:
+
+.. code-block:: haskell
 
    We should not add
        <rhs> :-> bar
@@ -183,6 +229,8 @@ because we promised to inline foo as what the user wrote.  See similar
 SimplUtils Note [Stable unfoldings and postInlineUnconditionally].
 
 Nor do we want to change the reverse mapping. Suppose we have
+
+.. code-block:: haskell
 
    {-# Unf = Stable (\pq. build blah) #-}
    foo = <expr>
@@ -237,11 +285,15 @@ Note [Look inside join-point binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Another way how CSE for joint points is tricky is
 
+.. code-block:: haskell
+
   let join foo x = (x, 42)
       join bar x = (x, 42)
   in … jump foo 1 … jump bar 2 …
 
 naively, CSE would turn this into
+
+.. code-block:: haskell
 
   let join foo x = (x, 42)
       join bar = foo
@@ -283,11 +335,15 @@ Note [Take care with literal strings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this example:
 
+.. code-block:: haskell
+
   x = "foo"#
   y = "foo"#
   ...x...y...x...y....
 
 We would normally turn this into:
+
+.. code-block:: haskell
 
   x = "foo"#
   y = x
@@ -299,6 +355,8 @@ of type Addr# must be a string literal, not another variable. See Note
 
 For this reason, we special case top-level bindings to literal strings and leave
 the original RHS unmodified. This produces:
+
+.. code-block:: haskell
 
   x = "foo"#
   y = "foo"#
@@ -361,5 +419,6 @@ to be doing, which is why I put it here.
 
 I acutally saw some examples in the wild, where some inlining made e1 too
 big for cheapEqExpr to catch it.
+
 
 

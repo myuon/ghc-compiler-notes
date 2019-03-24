@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/MkIface.hs>`_
+
+====================
+compiler/iface/MkIface.hs.rst
+====================
+
 Note [Fingerprinting IfaceDecls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -24,13 +30,19 @@ Note [The ABI of an IfaceDecl]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The ABI of a declaration consists of:
 
+.. code-block:: haskell
+
    (a) the full name of the identifier (inc. module and package,
        because these are used to construct the symbol name by which
        the identifier is known externally).
 
+.. code-block:: haskell
+
    (b) the declaration itself, as exposed to clients.  That is, the
        definition of an Id is included in the fingerprint only if
        it is made available as an unfolding in the interface.
+
+.. code-block:: haskell
 
    (c) the fixity of the identifier (if it exists)
    (d) for Ids: rules
@@ -68,5 +80,6 @@ Names too: see Note [Binders in Template Haskell] in Convert, and
   - Such Names are always for locally-defined things, for which we
     don't gather usage info, so we can just ignore them in ent_map
   - They are always System Names, hence the assert, just as a double check.
+
 
 

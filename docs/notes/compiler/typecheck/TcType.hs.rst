@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs>`_
+
+====================
+compiler/typecheck/TcType.hs.rst
+====================
+
 Note [TcTyVars and TyVars in the typechecker]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The typechecker uses a lot of type variables with special properties,
@@ -23,6 +29,8 @@ reasons:
     signature for 'foo'.  In doing so we call solveEqualities to
     solve any kind equalities in foo's signature.  So the solver
     may see free occurrences of 'k'.
+
+.. code-block:: haskell
 
     See calls to tcExtendTyVarEnv for other places that ordinary
     TyVars are bought into scope, and hence may show up in the types
@@ -87,6 +95,8 @@ A TyVarTv is a specialised variant of TauTv, with the following invarints:
 TyVarTvs are only distinguished to improve error messages.
 Consider this
 
+.. code-block:: haskell
+
   data T (a:k1) = MkT (S a)
   data S (b:k2) = MkS (T b)
 
@@ -128,16 +138,24 @@ Note [TcLevel and untouchable type variables]
 
 * INVARIANTS.  In a tree of Implications,
 
+.. code-block:: haskell
+
     (ImplicInv) The level number (ic_tclvl) of an Implication is
                 STRICTLY GREATER THAN that of its parent
+
+.. code-block:: haskell
 
     (SkolInv)   The level number of the skolems (ic_skols) of an
                 Implication is equal to the level of the implication
                 itself (ic_tclvl)
 
+.. code-block:: haskell
+
     (GivenInv)  The level number of a unification variable appearing
                 in the 'ic_given' of an implication I should be
                 STRICTLY LESS THAN the ic_tclvl of I
+
+.. code-block:: haskell
 
     (WantedInv) The level number of a unification variable appearing
                 in the 'ic_wanted' of an implication I should be
@@ -154,6 +172,8 @@ Note [WantedInv]
 ~~~~~~~~~~~~~~~~
 Why is WantedInv important?  Consider this implication, where
 the constraint (C alpha[3]) disobeys WantedInv:
+
+.. code-block:: haskell
 
    forall[2] a. blah => (C alpha[3])
                         (forall[3] b. alpha[3] ~ b)
@@ -324,15 +344,21 @@ Note [Inheriting implicit parameters]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider this:
 
+.. code-block:: haskell
+
         f x = (x::Int) + ?y
 
 where f is *not* a top-level binding.
 From the RHS of f we'll get the constraint (?y::Int).
 There are two types we might infer for f:
 
+.. code-block:: haskell
+
         f :: Int -> Int
 
 (so we get ?y from the context of f's definition), or
+
+.. code-block:: haskell
 
         f :: (?y::Int) => Int -> Int
 
@@ -384,10 +410,16 @@ http://www.cis.upenn.edu/~sweirich/publications.html). A key part
 of that algorithm is to distinguish user-specified variables from inferred
 variables. For example, the following should typecheck:
 
+.. code-block:: haskell
+
   f :: forall a b. a -> b -> b
   f = const id
 
+.. code-block:: haskell
+
   g = const id
+
+.. code-block:: haskell
 
   x = f @Int @Bool 5 False
   y = g 5 @Bool False
@@ -455,6 +487,8 @@ this actually is. There are two main tricks:
     for a PredType like (Show a, Eq a) :: Constraint, since we don't
     count the "implicit" tuple in the ThetaType itself.
 
+.. code-block:: haskell
+
     In fact, the Paterson test just checks *each component* of the top level
     ThetaType against the size bound, one at a time. By analogy, it should be
     OK to return the size of the *largest* tuple component as the size of the
@@ -467,3 +501,4 @@ this actually is. There are two main tricks:
 NB: we don't want to detect PredTypes in sizeType (and then call
 sizePred on them), or we might get an infinite loop if that PredType
 is irreducible. See #5581.
+

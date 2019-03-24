@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs>`_
+
+====================
+compiler/main/DynFlags.hs.rst
+====================
+
 Note [Updating flag description in the User's Guide]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -26,10 +32,14 @@ There are a few steps to adding (or removing) a language extension,
 
  * Adding the extension to GHC.LanguageExtensions
 
+.. code-block:: haskell
+
    The Extension type in libraries/ghc-boot-th/GHC/LanguageExtensions/Type.hs
    is the canonical list of language extensions known by GHC.
 
  * Adding a flag to DynFlags.xFlags
+
+.. code-block:: haskell
 
    This is fairly self-explanatory. The name should be concise, memorable,
    and consistent with any previous implementations of the similar idea in
@@ -37,19 +47,27 @@ There are a few steps to adding (or removing) a language extension,
 
  * Adding the flag to the documentation
 
+.. code-block:: haskell
+
    This is the same as any other flag. See
    Note [Updating flag description in the User's Guide]
 
  * Adding the flag to Cabal
+
+.. code-block:: haskell
 
    The Cabal library has its own list of all language extensions supported
    by all major compilers. This is the list that user code being uploaded
    to Hackage is checked against to ensure language extension validity.
    Consequently, it is very important that this list remains up-to-date.
 
+.. code-block:: haskell
+
    To this end, there is a testsuite test (testsuite/tests/driver/T4437.hs)
    whose job it is to ensure these GHC's extensions are consistent with
    Cabal.
+
+.. code-block:: haskell
 
    The recommended workflow is,
 
@@ -66,6 +84,8 @@ There are a few steps to adding (or removing) a language extension,
        expectedGhcOnlyExtensions.
 
  * Adding the flag to the GHC Wiki
+
+.. code-block:: haskell
 
    There is a change log tracking language extension additions and removals
    on the GHC wiki:  https://ghc.haskell.org/trac/ghc/wiki/LanguagePragmaHistory
@@ -104,6 +124,8 @@ Note [Documenting optimisation flags]
 If you change the list of flags enabled for particular optimisation levels
 please remember to update the User's Guide. The relevant file is:
 
+.. code-block:: haskell
+
   docs/users_guide/using-optimisation.rst
 
 Make sure to note whether a flag is implied by -O0, -O or -O2.
@@ -130,6 +152,8 @@ Note [Documenting warning flags]
 
 If you change the list of warning enabled by default
 please remember to update the User's Guide. The relevant file is:
+
+.. code-block:: haskell
 
  docs/users_guide/using-warnings.rst
 
@@ -166,3 +190,4 @@ combination when parsing flags, we also need to check when we update
 the flags; this is because API clients may parse flags but update the
 DynFlags afterwords, before finally running code inside a session (see
 T10052 and #10052).
+

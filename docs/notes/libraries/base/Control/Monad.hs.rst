@@ -1,9 +1,17 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Control/Monad.hs>`_
+
+====================
+libraries/base/Control/Monad.hs.rst
+====================
+
 Note [Worker/wrapper transform on replicateM/replicateM_]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The implementations of replicateM and replicateM_ both leverage the
 worker/wrapper transform. The simpler implementation of replicateM_, as an
 example, would be:
+
+.. code-block:: haskell
 
     replicateM_ 0 _ = pure ()
     replicateM_ n f = f *> replicateM_ (n - 1) f
@@ -16,3 +24,4 @@ specialising for the particular action.
 
 For further information, see this issue comment, which includes side-by-side
 Core: https://gitlab.haskell.org/ghc/ghc/issues/11795#note_118976
+

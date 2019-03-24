@@ -1,6 +1,14 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmLayoutStack.hs>`_
+
+====================
+compiler/cmm/CmmLayoutStack.hs.rst
+====================
+
 Note [Always false stack check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We can optimise stack checks of the form
+
+.. code-block:: haskell
 
   if ((Sp + x) - y < SpLim) then .. else ..
 
@@ -16,3 +24,4 @@ the likelihood of a fallthrough if the branch is not taken.  But
 not every conditional is inverted as the control flow optimiser
 places some requirements on the predecessors of both branch targets.
 So we better look for the inverted comparison too.
+

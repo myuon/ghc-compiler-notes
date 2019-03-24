@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs>`_
+
+====================
+compiler/typecheck/ClsInst.hs.rst
+====================
+
 Note [Shortcut solving: overlap]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we have
@@ -24,12 +30,18 @@ A part of the type-level literals implementation are the classes
 "KnownNat" and "KnownSymbol", which provide a "smart" constructor for
 defining singleton values.  Here is the key stuff from GHC.TypeLits
 
+.. code-block:: haskell
+
   class KnownNat (n :: Nat) where
     natSing :: SNat n
+
+.. code-block:: haskell
 
   newtype SNat (n :: Nat) = SNat Integer
 
 Conceptually, this class has infinitely many instances:
+
+.. code-block:: haskell
 
   instance KnownNat 0       where natSing = SNat 0
   instance KnownNat 1       where natSing = SNat 1
@@ -53,6 +65,8 @@ and another to make it into a `KnownNat` dictionary.
 Also note that `natSing` and `SNat` are never actually exposed from the
 library---they are just an implementation detail.  Instead, users see
 a more convenient function, defined in terms of `natSing`:
+
+.. code-block:: haskell
 
   natVal :: KnownNat n => proxy n -> Integer
 
@@ -182,13 +196,19 @@ Note [HasField instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we have
 
+.. code-block:: haskell
+
     data T y = MkT { foo :: [y] }
 
 and `foo` is in scope.  Then GHC will automatically solve a constraint like
 
+.. code-block:: haskell
+
     HasField "foo" (T Int) b
 
 by emitting a new wanted
+
+.. code-block:: haskell
 
     T alpha -> [alpha] ~# T Int -> b
 
@@ -196,6 +216,8 @@ and building a HasField dictionary out of the selector function `foo`,
 appropriately cast.
 
 The HasField class is defined (in GHC.Records) thus:
+
+.. code-block:: haskell
 
     class HasField (x :: k) r a | x r -> a where
       getField :: r -> a
@@ -205,21 +227,31 @@ Hence we can solve `HasField "foo" (T Int) b` by taking an expression
 of type `T Int -> b` and casting it using the newtype coercion.
 Note that
 
+.. code-block:: haskell
+
     foo :: forall y . T y -> [y]
 
 so the expression we construct is
+
+.. code-block:: haskell
 
     foo @alpha |> co
 
 where
 
+.. code-block:: haskell
+
     co :: (T alpha -> [alpha]) ~# HasField "foo" (T Int) b
 
 is built from
 
+.. code-block:: haskell
+
     co1 :: (T alpha -> [alpha]) ~# (T Int -> b)
 
 which is the new wanted, and
+
+.. code-block:: haskell
 
     co2 :: (T Int -> b) ~# HasField "foo" (T Int) b
 
@@ -232,3 +264,4 @@ encounter a HasField constraint where the field is not a literal
 string, or does not belong to the type, then we fall back on the
 normal constraint solver behaviour.
 See Note [HasField instances]
+

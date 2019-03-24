@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnEnv.hs>`_
+
+====================
+compiler/rename/RnEnv.hs.rst
+====================
+
 Note [Signature lazy interface loading]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -7,15 +13,21 @@ compiling a signature module against an its implementation, we do NOT
 load interface files associated with its names until after the type
 checking phase.  For example:
 
+.. code-block:: haskell
+
     module ASig where
         data T
         f :: T -> T
 
 Suppose we compile this with -sig-of "A is ASig":
 
+.. code-block:: haskell
+
     module B where
         data T = T
         f T = T
+
+.. code-block:: haskell
 
     module A(module B) where
         import B
@@ -42,6 +54,8 @@ declared in a signature can never be a duplicate.)
 
 This behavior might change in the future.  Consider this
 alternate module B:
+
+.. code-block:: haskell
 
     module B where
         {-# DEPRECATED T, f "Don't use" #-}
@@ -81,8 +95,12 @@ resolve fields that would otherwise be ambiguous (provided the
 
 For example, consider:
 
+.. code-block:: haskell
+
    data S = MkS { x :: Int }
    data T = MkT { x :: Int }
+
+.. code-block:: haskell
 
    e = MkS { x = 3 }
 
@@ -97,13 +115,19 @@ subtle: the occurrence may be unqualified even if the field is
 imported only qualified (but if the occurrence is qualified, the
 qualifier must be correct). For example:
 
+.. code-block:: haskell
+
    module A where
      data S = MkS { x :: Int }
      data T = MkT { x :: Int }
 
+.. code-block:: haskell
+
    module B where
      import qualified A (S(..))
      import A (T(MkT))
+
+.. code-block:: haskell
 
      e1 = MkT   { x = 3 }   -- x not in scope, so fail
      e2 = A.MkS { B.x = 3 } -- module qualifier is wrong, so fail
@@ -126,6 +150,8 @@ will be False, and we fall back on looking it up normally using
 lookupGlobalOccRn.  We don't report an error immediately because the
 actual problem might be located elsewhere.  For example (#9975):
 
+.. code-block:: haskell
+
    data Test = Test { x :: Int }
    pattern Test wat = Test { x = wat }
 
@@ -139,9 +165,13 @@ the environment first, we will try and fail to find `x` amongst the
 Alternatively, the scope check can fail due to Template Haskell.
 Consider (#12130):
 
+.. code-block:: haskell
+
    module Foo where
      import M
      b = $(funny)
+
+.. code-block:: haskell
 
    module M(funny) where
      data T = MkT { x :: Int }
@@ -415,6 +445,8 @@ data HsSigCtxt = ... | TopSigCtxt NameSet | ....
   value bindings; for fixity declarations, the NameSet should also
   include class sigs and record selectors
 
+.. code-block:: haskell
+
       infix 3 `f`          -- Yes, ok
       f :: C a => a -> a   -- No, not ok
       class C a where
@@ -436,3 +468,4 @@ the list type constructor.
 
 Note that setRdrNameSpace on an Exact name requires the Name to be External,
 which it always is for built in syntax.
+

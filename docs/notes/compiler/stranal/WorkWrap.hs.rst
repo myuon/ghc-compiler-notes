@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs>`_
+
+====================
+compiler/stranal/WorkWrap.hs.rst
+====================
+
 Note [Don't w/w INLINE things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 It's very important to refrain from w/w-ing an INLINE function (ie one
@@ -35,9 +41,13 @@ This comes in practice (#6056).
 Solution: do the w/w for strictness analysis, but transfer the Stable
 unfolding to the *worker*.  So we will get something like this:
 
+.. code-block:: haskell
+
   {-# INLINE[0] f #-}
   f :: Ord a => [a] -> Int -> a
   f d x y = case y of I# y' -> fw d x y'
+
+.. code-block:: haskell
 
   {-# INLINABLE[0] fw #-}
   fw :: Ord a => [a] -> Int# -> a
@@ -53,9 +63,13 @@ Note [Worker-wrapper for NOINLINE functions]
 We used to disable worker/wrapper for NOINLINE things, but it turns out
 this can cause unnecessary reboxing of values. Consider
 
+.. code-block:: haskell
+
   {-# NOINLINE f #-}
   f :: Int -> a
   f x = error (show x)
+
+.. code-block:: haskell
 
   g :: Bool -> Bool -> Int -> Int
   g True  True  p = f p
@@ -64,6 +78,8 @@ this can cause unnecessary reboxing of values. Consider
 
 the strictness analysis will discover f and g are strict, but because f
 has no wrapper, the worker for g will rebox p. So we get
+
+.. code-block:: haskell
 
   $wg x y p# =
     let p = I# p# in  -- Yikes! Reboxing!
@@ -76,6 +92,8 @@ has no wrapper, the worker for g will rebox p. So we get
         case y of
           False -> $wg True True p#
           True -> case f p of { }
+
+.. code-block:: haskell
 
   g x y p = case p of (I# p#) -> $wg x y p#
 
@@ -93,11 +111,17 @@ It is crucial that we do this for *all* NOINLINE functions. #10069
 demonstrates what happens when we promise to w/w a (NOINLINE) leaf function, but
 fail to deliver:
 
+.. code-block:: haskell
+
   data C = C Int# Int#
+
+.. code-block:: haskell
 
   {-# NOINLINE c1 #-}
   c1 :: C -> Int#
   c1 (C _ n) = n
+
+.. code-block:: haskell
 
   {-# NOINLINE fc #-}
   fc :: C -> Int#
@@ -105,11 +129,17 @@ fail to deliver:
 
 Failing to w/w `c1`, but still w/wing `fc` leads to the following code:
 
+.. code-block:: haskell
+
   c1 :: C -> Int#
   c1 (C _ n) = n
 
+.. code-block:: haskell
+
   $wfc :: Int# -> Int#
   $wfc n = let c = C 0# n in 2 #* c1 c
+
+.. code-block:: haskell
 
   fc :: C -> Int#
   fc (C _ n) = $wfc n
@@ -135,8 +165,12 @@ Note [Simplifying inside stable unfoldings].
 If the original is NOINLINE, it's important that the work inherit the
 original activation. Consider
 
+.. code-block:: haskell
+
   {-# NOINLINE expensive #-}
   expensive x = x + 1
+
+.. code-block:: haskell
 
   f y = let z = expensive y in ...
 
@@ -144,10 +178,14 @@ If expensive's worker inherits the wrapper's activation,
 we'll get this (because of the compromise in point (2) of
 Note [Wrapper activation])
 
+.. code-block:: haskell
+
   {-# NOINLINE[0] $wexpensive #-}
   $wexpensive x = x + 1
   {-# INLINE[0] expensive #-}
   expensive x = $wexpensive x
+
+.. code-block:: haskell
 
   f y = let z = expensive y in ...
 
@@ -180,6 +218,8 @@ There is an infelicity though.  We may get something like
 ==>
       g x = case gw x of r -> I# r
 
+.. code-block:: haskell
+
       f {- InlineStable, Template = g val -}
       f = case gw x of r -> I# r
 
@@ -196,18 +236,28 @@ CPR'd, then the case expression around the worker function will get pushed into
 the join point by the simplifier, which will have the same effect that CPR would
 have - the result will be returned in an unboxed tuple.
 
+.. code-block:: haskell
+
   f z = let join j x y = (x+1, y+1)
         in case z of A -> j 1 2
                      B -> j 2 3
 
+.. code-block:: haskell
+
   =>
+
+.. code-block:: haskell
 
   f z = case $wf z of (# a, b #) -> (a, b)
   $wf z = case (let join j x y = (x+1, y+1)
                 in case z of A -> j 1 2
                              B -> j 2 3) of (a, b) -> (# a, b #)
 
+.. code-block:: haskell
+
   =>
+
+.. code-block:: haskell
 
   f z = case $wf z of (# a, b #) -> (a, b)
   $wf z = let join j x y = (# x+1, y+1 #)
@@ -219,10 +269,16 @@ a join point because it would not be tail-called. However, doing the *argument*
 part of W/W still works for join points, since the wrapper body will make a tail
 call:
 
+.. code-block:: haskell
+
   f z = let join j x y = x + y
         in ...
 
+.. code-block:: haskell
+
   =>
+
+.. code-block:: haskell
 
   f z = let join $wj x# y# = x# +# y#
                  j x y = case x of I# x# ->
@@ -250,6 +306,8 @@ When should the wrapper inlining be active?
    But if f is w/w'd (which it might be), we want the inlining to
    occur just as if it hadn't been.
 
+.. code-block:: haskell
+
    (This only matters if f's RHS is big enough to w/w, but small
    enough to inline given the call site, but that can happen.)
 
@@ -259,14 +317,22 @@ When should the wrapper inlining be active?
            f n 0 = n              -- Strict in the Int, hence wrapper
            f n x = f (n+n) (x-1)
 
+.. code-block:: haskell
+
            g :: Int -> Int
            g x = f x x            -- Provokes a specialisation for f
+
+.. code-block:: haskell
 
          module Bar where
            import Foo
 
+.. code-block:: haskell
+
            h :: Int -> Int
            h x = f 3 x
+
+.. code-block:: haskell
 
    In module Bar we want to give specialisations a chance to fire
    before inlining f's wrapper.
@@ -347,13 +413,19 @@ attach OneShot annotations to the worker’s lambda binders.
 
 Example:
 
+.. code-block:: haskell
+
   -- Original function
   f [Demand=<L,1*C1(U)>] :: (a,a) -> a
   f = \p -> ...
 
+.. code-block:: haskell
+
   -- Wrapper
   f [Demand=<L,1*C1(U)>] :: a -> a -> a
   f = \p -> case p of (a,b) -> $wf a b
+
+.. code-block:: haskell
 
   -- Worker
   $wf [Demand=<L,1*C1(C1(U))>] :: Int -> Int
@@ -388,11 +460,15 @@ Note [Thunk splitting]
 Suppose x is used strictly (never mind whether it has the CPR
 property).
 
+.. code-block:: haskell
+
       let
         x* = x-rhs
       in body
 
 splitThunk transforms like this:
+
+.. code-block:: haskell
 
       let
         x* = case x-rhs of { I# a -> I# a }
@@ -400,11 +476,15 @@ splitThunk transforms like this:
 
 Now simplifier will transform to
 
+.. code-block:: haskell
+
       case x-rhs of
         I# a -> let x* = I# a
                 in body
 
 which is what we want. Now suppose x-rhs is itself a case:
+
+.. code-block:: haskell
 
         x-rhs = case e of { T -> I# a; F -> I# b }
 
@@ -429,3 +509,4 @@ several binders, and if the binders are lifted
 E.g.     x = e
     -->  x = let x = e in
              case x of (a,b) -> let x = (a,b)  in x
+

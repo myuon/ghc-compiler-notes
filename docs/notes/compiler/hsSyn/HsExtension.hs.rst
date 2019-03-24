@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExtension.hs>`_
+
+====================
+compiler/hsSyn/HsExtension.hs.rst
+====================
+
 Note [Trees that grow]
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -31,12 +37,17 @@ case where the cases are listed separately.
 
 So
 
+.. code-block:: haskell
+
   type instance XXHsIPBinds    (GhcPass p) = NoExt
 
 will correctly deduce Outputable for (GhcPass p), but
+
+.. code-block:: haskell
 
   type instance XIPBinds       GhcPs = NoExt
   type instance XIPBinds       GhcRn = NoExt
   type instance XIPBinds       GhcTc = TcEvBinds
 
 will not.
+

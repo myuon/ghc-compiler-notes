@@ -1,4 +1,4 @@
-docs/notes/libraries/base/Data
+libraries/base/Data
 =================================
 
 .. toctree::

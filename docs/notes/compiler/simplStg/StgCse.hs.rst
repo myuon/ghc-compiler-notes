@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/StgCse.hs>`_
+
+====================
+compiler/simplStg/StgCse.hs.rst
+====================
+
 Note [All alternatives are the binder]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -5,11 +11,15 @@ When all alternatives simply refer to the case binder, then we do not have
 to bother with the case expression at all (#13588). CoreSTG does this as well,
 but sometimes, types get into the way:
 
+.. code-block:: haskell
+
     newtype T = MkT Int
     f :: (Int, Int) -> (T, Int)
     f (x, y) = (MkT x, y)
 
 Core cannot just turn this into
+
+.. code-block:: haskell
 
     f p = p
 
@@ -22,11 +32,15 @@ Note [Trivial case scrutinee]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We want to be able to handle nested reconstruction of constructors as in
 
+.. code-block:: haskell
+
     nested :: Either Int (Either Int a) -> Either Bool (Either Bool a)
     nested (Right (Right v)) = Right (Right v)
     nested _ = Left True
 
 So if we come across
+
+.. code-block:: haskell
 
     case x of r1
       Right a -> case a of r2
@@ -57,3 +71,4 @@ then the list of free variables would be wrong, so for now, we do not CSE
 across such a closure, simply because I (Joachim) was not sure about possible
 knock-on effects. If deemed safe and worth the slight code complication of
 re-calculating this list during or after this pass, this can surely be done.
+

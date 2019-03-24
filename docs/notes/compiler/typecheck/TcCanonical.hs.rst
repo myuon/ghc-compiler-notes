@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs>`_
+
+====================
+compiler/typecheck/TcCanonical.hs.rst
+====================
+
 Note [Canonicalization]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -7,6 +13,8 @@ unary (i.e. treats individual constraints one at a time).
 Constraints originating from user-written code come into being as
 CNonCanonicals (except for CHoleCans, arising from holes). We know nothing
 about these constraints. So, first:
+
+.. code-block:: haskell
 
      Classify CNonCanoncal constraints, depending on whether they
      are equalities, class predicates, or other.
@@ -54,11 +62,15 @@ Givens and Wanteds. But:
 * (Major) if we want recursive superclasses, there would be an infinite
   number of them.  Here is a real-life example (#10318);
 
+.. code-block:: haskell
+
      class (Frac (Frac a) ~ Frac a,
             Fractional (Frac a),
             IntegralDomain (Frac a))
          => IntegralDomain a where
       type Frac a :: *
+
+.. code-block:: haskell
 
   Notice that IntegralDomain has an associated type Frac, and one
   of IntegralDomain's superclasses is another IntegralDomain constraint.
@@ -70,6 +82,8 @@ So here's the plan:
    This is done using mkStrictSuperClasses in canClassNC, when
    we take a non-canonical Given constraint and cannonicalise it.
 
+.. code-block:: haskell
+
    However stop if you encounter the same class twice.  That is,
    mkStrictSuperClasses expands eagerly, but has a conservative
    termination condition: see Note [Expanding superclasses] in TcType.
@@ -77,6 +91,8 @@ So here's the plan:
 2. Solve the wanteds as usual, but do no further expansion of
    superclasses for canonical CDictCans in solveSimpleGivens or
    solveSimpleWanteds; Note [Danger of adding superclasses during solving]
+
+.. code-block:: haskell
 
    However, /do/ continue to eagerly expand superlasses for new /given/
    /non-canonical/ constraints (canClassNC does this).  As #12175
@@ -89,6 +105,8 @@ So here's the plan:
    try harder: take both the Givens and Wanteds, and expand
    superclasses again.  See the calls to expandSuperClasses in
    TcSimplify.simpl_loop and solveWanteds.
+
+.. code-block:: haskell
 
    This may succeed in generating (a finite number of) extra Givens,
    and extra Deriveds. Both may help the proof.
@@ -153,7 +171,11 @@ in expandSuperClasses.  So a "layer" might be a whole stack of superclasses.)
 We do this eagerly for Givens mainly because of some very obscure
 cases like this:
 
+.. code-block:: haskell
+
    instance Bad a => Eq (T a)
+
+.. code-block:: haskell
 
    f :: (Ord (T a)) => blah
    f x = ....needs Eq (T a), Ord (T a)....
@@ -166,6 +188,8 @@ complaining we expand one layer in advance.
 Note [Instance and Given overlap] in TcInteract.
 
 We also want to do this if we have
+
+.. code-block:: haskell
 
    f :: F (T a) => blah
 
@@ -182,12 +206,16 @@ Note [Why adding superclasses can help]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Examples of how adding superclasses can help:
 
+.. code-block:: haskell
+
     --- Example 1
         class C a b | a -> b
     Suppose we want to solve
          [G] C a b
          [W] C a beta
     Then adding [D] beta~b will let us solve it.
+
+.. code-block:: haskell
 
     -- Example 2 (similar but using a type-equality superclass)
         class (F a ~ b) => C a b
@@ -199,13 +227,19 @@ Examples of how adding superclasses can help:
          [D] F a ~ beta
     Now we get [D] beta ~ b, and can solve that.
 
+.. code-block:: haskell
+
     -- Example (tcfail138)
       class L a b | a -> b
       class (G a, L a b) => C a b
 
+.. code-block:: haskell
+
       instance C a b' => G (Maybe a)
       instance C a b  => C (Maybe a) a
       instance L (Maybe a) a
+
+.. code-block:: haskell
 
     When solving the superclasses of the (C (Maybe a) a) instance, we get
       [G] C a b, and hance by superclasses, [G] G a, [G] L a b
@@ -222,6 +256,8 @@ Examples of how adding superclasses can help:
 Note [Danger of adding superclasses during solving]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here's a serious, but now out-dated example, from #4497:
+
+.. code-block:: haskell
 
    class Num (RealOf t) => Normed t
    type family RealOf x
@@ -246,6 +282,7 @@ happen.
 Mind you, now that Wanteds cannot rewrite Derived, I think this particular
 situation can't happen.
   
+
 
 Note [Equality superclasses in quantified constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -290,7 +327,11 @@ Note [Quantified constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The -XQuantifiedConstraints extension allows type-class contexts like this:
 
+.. code-block:: haskell
+
   data Rose f x = Rose x (f (Rose f x))
+
+.. code-block:: haskell
 
   instance (Eq a, forall b. Eq b => Eq (f b))
         => Eq (Rose f a)  where
@@ -405,6 +446,8 @@ When can_eq_nc' attempts to decompose a tycon application we haven't yet zonked.
 This means that we may very well have a FunTy containing a type of some unknown
 kind. For instance, we may have,
 
+.. code-block:: haskell
+
     FunTy (a :: k) Int
 
 Where k is a unification variable. tcRepSplitTyConApp_maybe panics in the event
@@ -431,10 +474,14 @@ Note [Newtypes can blow the stack]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we have
 
+.. code-block:: haskell
+
   newtype X = MkX (Int -> X)
   newtype Y = MkY (Int -> Y)
 
 and now wish to prove
+
+.. code-block:: haskell
 
   [W] X ~R Y
 
@@ -451,9 +498,13 @@ Note [Eager reflexivity check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we have
 
+.. code-block:: haskell
+
   newtype X = MkX (Int -> X)
 
 and
+
+.. code-block:: haskell
 
   [W] X ~R X
 
@@ -484,6 +535,8 @@ We must use canEqFailure, not canEqHardFailure here, because there is
 the possibility of success if working with a representational equality.
 Here is one case:
 
+.. code-block:: haskell
+
   type family TF a where TF Char = Bool
   data family DF a
   newtype instance DF Bool = MkDF Int
@@ -494,6 +547,8 @@ that `a` is, in fact, Char, and then the equality succeeds.
 
 Here is another case:
 
+.. code-block:: haskell
+
   [G] Age ~R Int
 
 where Age's constructor is not in scope. We don't want to report
@@ -501,7 +556,11 @@ an "inaccessible code" error in the context of this Given!
 
 For example, see typecheck/should_compile/T10493, repeated here:
 
+.. code-block:: haskell
+
   import Data.Ord (Down)  -- no constructor
+
+.. code-block:: haskell
 
   foo :: Coercible (Down Int) Int => Down Int -> Int
   foo = coerce
@@ -611,6 +670,8 @@ decomposable.)
 Here is a representative example of why representational equality over
 newtypes is tricky:
 
+.. code-block:: haskell
+
   newtype Nt a = Mk Bool         -- NB: a is not used in the RHS,
   type role Nt representational  -- but the user gives it an R role anyway
 
@@ -618,8 +679,12 @@ If we have [W] Nt alpha ~R Nt beta, we *don't* want to decompose to
 [W] alpha ~R beta, because it's possible that alpha and beta aren't
 representationally equal. Here's another example.
 
+.. code-block:: haskell
+
   newtype Nt a = MkNt (Id a)
   type family Id a where Id a = a
+
+.. code-block:: haskell
 
   [W] Nt Int ~R Nt Age
 
@@ -647,7 +712,11 @@ that IO is a newtype.
 
 However we must be careful.  Consider
 
+.. code-block:: haskell
+
   type role Nt representational
+
+.. code-block:: haskell
 
   [G] Nt a ~R Nt b       (1)
   [W] NT alpha ~R Nt b   (2)
@@ -747,6 +816,8 @@ Note [No top-level newtypes on RHS of representational equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we're in this situation:
 
+.. code-block:: haskell
+
  work item:  [W] c1 : a ~R b
      inert:  [G] c2 : b ~R Id a
 
@@ -832,6 +903,8 @@ Note [Equalities with incompatible kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 What do we do when we have an equality
 
+.. code-block:: haskell
+
   (tv :: k1) ~ (rhs :: k2)
 
 where k1 and k2 differ? This Note explores this treacherous area.
@@ -841,19 +914,27 @@ a tyvar will flatten its kind (Note [Flattening] in TcFlatten); flattening
 the kind might introduce a cast. So we might have a casted tyvar on the
 left. We thus revise our test case to
 
+.. code-block:: haskell
+
   (tv |> co :: k1) ~ (rhs :: k2)
 
 We must proceed differently here depending on whether we have a Wanted
 or a Given. Consider this:
 
+.. code-block:: haskell
+
  [W] w :: (alpha :: k) ~ (Int :: Type)
 
 where k is a skolem. One possible way forward is this:
+
+.. code-block:: haskell
 
  [W] co :: k ~ Type
  [W] w :: (alpha :: k) ~ (Int |> sym co :: k)
 
 The next step will be to unify
+
+.. code-block:: haskell
 
   alpha := Int |> sym co
 
@@ -865,6 +946,8 @@ is embarrassing. See #11198 for more tales of destruction.
 The reason for this odd behavior is much the same as
 Note [Wanteds do not rewrite Wanteds] in TcRnTypes: note that the
 new `co` is a Wanted.
+
+.. code-block:: haskell
 
    The solution is then not to use `co` to "rewrite" -- that is, cast
    -- `w`, but instead to keep `w` heterogeneous and
@@ -918,19 +1001,27 @@ of type application on the other, we simply must expand out the type
 synonyms in order to continue decomposing the equality constraint into
 primitive equality constraints.  For example, suppose we have
 
+.. code-block:: haskell
+
   type F a = [Int]
 
 and we encounter the equality
+
+.. code-block:: haskell
 
   F a ~ [b]
 
 In order to continue we must expand F a into [Int], giving us the
 equality
 
+.. code-block:: haskell
+
   [Int] ~ [b]
 
 which we can then decompose into the more primitive equality
 constraint
+
+.. code-block:: haskell
 
   Int ~ b.
 
@@ -954,6 +1045,7 @@ qThe flattener preserves type synonyms, so they should appear in new_pred
 as well as in old_pred; that is important for good error messages.
  
 
+
 Note [unifyWanted and unifyDerived]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When decomposing equalities we often create new wanted constraints for
@@ -965,3 +1057,4 @@ type, perhaps fruitlessly), unifyWanted traverses the common structure, and
 bales out when it finds a difference by creating a new Wanted constraint.
 But where it succeeds in finding common structure, it just builds a coercion
 to reflect it.
+

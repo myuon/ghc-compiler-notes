@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Foldable.hs>`_
+
+====================
+libraries/base/Data/Foldable.hs.rst
+====================
+
 Note [List fusion and continuations in 'c']
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Suppose we define
@@ -6,19 +12,29 @@ Suppose we define
 
 Now suppose we want to optimise the call
 
+.. code-block:: haskell
+
   mapM_ <big> (build g)
     where
   g c n = ...(c x1 y1)...(c x2 y2)....n...
 
 GHC used to proceed like this:
 
+.. code-block:: haskell
+
   mapM_ <big> (build g)
+
+.. code-block:: haskell
 
   = { Definition of mapM_ }
     foldr ((>>) . <big>) (return ()) (build g)
 
+.. code-block:: haskell
+
   = { foldr/build rule }
     g ((>>) . <big>) (return ())
+
+.. code-block:: haskell
 
   = { Inline g }
     let c = (>>) . <big>
@@ -30,6 +46,8 @@ be absolutely terrible for performance, as we saw in #8763.
 
 It's much better to define
 
+.. code-block:: haskell
+
   mapM_ f = foldr c (return ())
     where
       c x k = f x >> k
@@ -37,6 +55,8 @@ It's much better to define
 
 Now we get
   mapM_ <big> (build g)
+
+.. code-block:: haskell
 
   = { inline mapM_ }
     foldr c (return ()) (build g)
@@ -49,12 +69,16 @@ because the INLINE pragma stops it; see
 Note [Simplifying inside stable unfoldings] in SimplUtils.
 Continuing:
 
+.. code-block:: haskell
+
   = { foldr/build rule }
     g c (return ())
       where ...
          c x k = f x >> k
          {-# INLINE c #-}
             f = <big>
+
+.. code-block:: haskell
 
   = { inline g }
     ...(c x1 y1)...(c x2 y2)....n...
@@ -63,7 +87,11 @@ Continuing:
             f = <big>
             n = return ()
 
+.. code-block:: haskell
+
       Now, crucially, `c` does inline
+
+.. code-block:: haskell
 
   = { inline c }
     ...(f x1 >> y1)...(f x2 >> y2)....n...
@@ -94,3 +122,4 @@ maximumBy and minimumBy (see
 https://gitlab.haskell.org/ghc/ghc/issues/10830#note_129843 for a further
 discussion). But using foldl1 is at least always better than using foldr1, so
 GHC has chosen to adopt that approach for now.
+

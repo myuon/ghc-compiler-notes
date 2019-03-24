@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/KnownUniques.hs>`_
+
+====================
+compiler/prelude/KnownUniques.hs.rst
+====================
+
 Note [Uniques for tuple type and data constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -11,3 +17,4 @@ Wired-in tuple data constructor keys occupy *three* slots:
    * u+2: the TyConRepName of the promoted TyCon
 ------------------------------------------------
  Constraint tuples
+

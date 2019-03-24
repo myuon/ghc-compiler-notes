@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/ByteCodeGen.hs>`_
+
+====================
+compiler/ghci/ByteCodeGen.hs.rst
+====================
+
 Note [Implementing tagToEnum#]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 (implement_tagToId arg names) compiles code which takes an argument
@@ -9,9 +15,13 @@ The code we generate is this:
                 push arg
                 push bogus-word
 
+.. code-block:: haskell
+
                 TESTEQ_I 0 L1
                   PUSH_G <lbl for first data con>
                   JMP L_Exit
+
+.. code-block:: haskell
 
         L1:     TESTEQ_I 1 L2
                   PUSH_G <lbl for second data con>
@@ -21,7 +31,11 @@ The code we generate is this:
                   PUSH_G <lbl for last data con>
                   JMP L_Exit
 
+.. code-block:: haskell
+
         L_fail: CASEFAIL
+
+.. code-block:: haskell
 
         L_exit: SLIDE 1 n
                 ENTER
@@ -32,3 +46,4 @@ tested.  This is very weird, but it's the way it is right now.  See
 Interpreter.c.  We don't acutally need an info-table here; we just
 need to have the argument to be one-from-top on the stack, hence pushing
 a 1-word null. See #8383.
+

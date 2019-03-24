@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/utils/ghc-pkg/Main.hs>`_
+
+====================
+utils/ghc-pkg/Main.hs.rst
+====================
+
 Note [Recompute abi-depends]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -29,4 +35,5 @@ See #14381, and Cabal issue #4728.
 Additionally, because we are throwing away the original (declared) ABI deps, we
 return a boolean that indicates whether any abi-depends were actually
 overridden.
+
 

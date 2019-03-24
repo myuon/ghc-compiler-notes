@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs>`_
+
+====================
+compiler/typecheck/TcPatSyn.hs.rst
+====================
+
 Note [Pattern synonym error recovery]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If type inference for a pattern synonym fails, we can't continue with
@@ -121,11 +127,15 @@ into universal and existential.  The rule is this
 
 For example
 
+.. code-block:: haskell
+
    pattern P :: () => b -> T a
    pattern P x = ...
 
 Here 'a' is universal, and 'b' is existential.  But there is a wrinkle:
 how do we split the arg_tys from req_ty?  Consider
+
+.. code-block:: haskell
 
    pattern Q :: () => b -> S c -> T a
    pattern Q x = ...
@@ -158,8 +168,12 @@ signature, we need to be quite careful.
 ----- Provided constraints
 Example
 
+.. code-block:: haskell
+
     data T a where
       MkT :: Ord a => a -> T a
+
+.. code-block:: haskell
 
     pattern P :: () => Eq a => a -> [T a]
     pattern P x = [MkT x]
@@ -174,8 +188,12 @@ And yes, (Eq a) is derivable from the (Ord a) bound by P's rhs.
 Unusually, we instantiate the existential tyvars of the pattern with
 *meta* type variables.  For example
 
+.. code-block:: haskell
+
     data S where
       MkS :: Eq a => [a] -> S
+
+.. code-block:: haskell
 
     pattern P :: () => Eq x => x -> S
     pattern P x <- MkS x
@@ -184,6 +202,8 @@ The pattern synonym conceals from its client the fact that MkS has a
 list inside it.  The client just thinks it's a type 'x'.  So we must
 unify x := [a] during type checking, and then use the instantiating type
 [a] (called ex_tys) when building the matcher.  In this case we'll get
+
+.. code-block:: haskell
 
    $mP :: S -> (forall x. Ex x => x -> r) -> r -> r
    $mP x k = case x of
@@ -202,6 +222,8 @@ a pattern synonym.  What about the /building/ side?
 * For ImplicitBidirectional, the builder is still typechecked in
   tcPatSynBuilderBind, by converting the pattern to an expression and
   typechecking it.
+
+.. code-block:: haskell
 
   At one point, for ImplicitBidirectional I used TyVarTvs (instead of
   TauTvs) in tcCheckPatSynDecl.  But (a) strengthening the check here
@@ -253,9 +275,13 @@ The rationale for rejecting as-patterns in pattern synonym definitions
 is that an as-pattern would introduce nonindependent pattern synonym
 arguments, e.g. given a pattern synonym like:
 
+.. code-block:: haskell
+
         pattern K x y = x@(Just y)
 
 one could write a nonsensical function like
+
+.. code-block:: haskell
 
         f (K Nothing x) = ...
 
@@ -294,3 +320,4 @@ when desugaring record pattern synonym updates.
 Any change to this ordering should make sure to change deSugar/DsExpr.hs if you
 want to avoid difficult to decipher core lint errors!
  
+

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsPat.hs>`_
+
+====================
+compiler/hsSyn/HsPat.hs.rst
+====================
+
 Note [DotDot fields]
 ~~~~~~~~~~~~~~~~~~~~
 The rec_dotdot field means this:
@@ -6,7 +12,11 @@ The rec_dotdot field means this:
 
 In the latter case:
 
+.. code-block:: haskell
+
   *before* renamer: rec_flds are exactly the n user-written fields
+
+.. code-block:: haskell
 
   *after* renamer:  rec_flds includes *all* fields, with
                     the first 'n' being the user-written ones
@@ -46,21 +56,31 @@ unambiguous updates can be represented by 'DsMeta.repUpdFields'.
 
 For example, suppose we have:
 
+.. code-block:: haskell
+
     data S = MkS { x :: Int }
     data T = MkT { x :: Int }
+
+.. code-block:: haskell
 
     f z = (z { x = 3 }) :: S
 
 The parsed HsRecUpdField corresponding to the record update will have:
 
+.. code-block:: haskell
+
     hsRecFieldLbl = Unambiguous "x" NoExt :: AmbiguousFieldOcc RdrName
 
 After the renamer, this will become:
+
+.. code-block:: haskell
 
     hsRecFieldLbl = Ambiguous   "x" NoExt :: AmbiguousFieldOcc Name
 
 (note that the Unambiguous constructor is not type-correct here).
 The typechecker will determine the particular selector:
+
+.. code-block:: haskell
 
     hsRecFieldLbl = Unambiguous "x" $sel:x:MkS  :: AmbiguousFieldOcc Id
 
@@ -72,8 +92,12 @@ Note [Unboxed sum patterns aren't irrefutable]
 Unlike unboxed tuples, unboxed sums are *not* irrefutable when used as
 patterns. A simple example that demonstrates this is from #14228:
 
+.. code-block:: haskell
+
   pattern Just' x = (# x | #)
   pattern Nothing' = (# | () #)
+
+.. code-block:: haskell
 
   foo x = case x of
     Nothing' -> putStrLn "nothing"
@@ -87,3 +111,4 @@ minimum unboxed sum arity is 2.
 Failing to mark unboxed sum patterns as non-irrefutable would cause the Just'
 case in foo to be unreachable, as GHC would mistakenly believe that Nothing'
 is the only thing that could possibly be matched!
+

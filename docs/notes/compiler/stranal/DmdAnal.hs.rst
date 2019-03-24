@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs>`_
+
+====================
+compiler/stranal/DmdAnal.hs.rst
+====================
+
 Note [Stamp out space leaks in demand analysis]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The demand analysis pass outputs a new copy of the Core program in
@@ -40,6 +46,8 @@ at most once, so oneify it.
 Note [IO hack in the demand analyser]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There's a hack here for I/O operations.  Consider
+
+.. code-block:: haskell
 
      case foo x s of { (# s', r #) -> y }
 
@@ -165,6 +173,8 @@ Consider
    g :: (Int,Int) -> Int
    g (p,q) = p+q
 
+.. code-block:: haskell
+
    f :: T -> Int -> Int
    f x p = g (join j y = (p,y)
               in case x of
@@ -215,6 +225,8 @@ test case of #8963.
 Note [Product demands for function body]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This example comes from shootout/binary_trees:
+
+.. code-block:: haskell
 
     Main.check' = \ b z ds. case z of z' { I# ip ->
                                 case ds_d13s of
@@ -279,11 +291,15 @@ If the rhs is a thunk, we usually forget the CPR info, because
 it is presumably shared (else it would have been inlined, and
 so we'd lose sharing if w/w'd it into a function).  E.g.
 
+.. code-block:: haskell
+
         let r = case expensive of
                   (a,b) -> (b,a)
         in ...
 
 If we marked r as having the CPR property, then we'd w/w into
+
+.. code-block:: haskell
 
         let $wr = \() -> case expensive of
                             (a,b) -> (# b, a #)
@@ -293,6 +309,8 @@ If we marked r as having the CPR property, then we'd w/w into
 
 But now r is a thunk, which won't be inlined, so we are no further ahead.
 But consider
+
+.. code-block:: haskell
 
         f x = let r = case expensive of (a,b) -> (b,a)
               in if foo r then r else (x,x)
@@ -387,6 +405,8 @@ This should be strict in x.
 
 So the new plan is to define unsafePerformIO using the 'lazy' combinator:
 
+.. code-block:: haskell
+
         unsafePerformIO (IO m) = lazy (case m realWorld# of (# _, r #) -> r)
 
 Remember, 'lazy' is a wired-in identity-function Id, of type a->a, which is
@@ -417,6 +437,8 @@ go is called.   So we put the DmdEnv for x in go's DmdType.
 
 Another example:
 
+.. code-block:: haskell
+
         f :: Int -> Int -> Int
         f x y = let t = x+1
             h z = if z==0 then t else
@@ -429,6 +451,8 @@ that if we unleash a demand on x at the call site for t.
 
 Incidentally, here's a place where lambda-lifting h would
 lose the cigar --- we couldn't see the joint strictness in t/x
+
+.. code-block:: haskell
 
         ON THE OTHER HAND
 
@@ -486,10 +510,14 @@ binders the CPR property.  Specifically
                                            else I# 8 }
         f False x = I# 3
 
+.. code-block:: haskell
+
    By giving 'y' the CPR property, we ensure that 'f' does too, so we get
         f b x = case fw b x of { r -> I# r }
         fw True  x = case x of y { I# x' -> if x' ==# 3 then x' else 8 }
         fw False x = 3
+
+.. code-block:: haskell
 
    Of course there is the usual risk of re-boxing: we have 'x' available
    boxed and unboxed, but we return the unboxed version for the wrapper to
@@ -500,10 +528,16 @@ binders the CPR property.  Specifically
    Note [Initial CPR for strict binders].  But we can go a little
    further. Consider
 
+.. code-block:: haskell
+
       data T = MkT !Int Int
+
+.. code-block:: haskell
 
       f2 (MkT x y) | y>0       = f2 (MkT x (y-1))
                    | otherwise = x
+
+.. code-block:: haskell
 
    For $wf2 we are going to unbox the MkT *and*, since it is strict, the
    first argument of the MkT; see Note [Add demands for strict constructors]
@@ -537,6 +571,8 @@ If the binder is marked demanded with a strict demand, then give it a
 CPR signature. Here's a concrete example ('f1' in test T10482a),
 assuming h is strict:
 
+.. code-block:: haskell
+
   f1 :: Int -> Int
   f1 x = case h x of
           A -> x
@@ -569,15 +605,21 @@ Here are some examples (stranal/should_compile/T10482a) of the
 usefulness of Note [CPR in a product case alternative].  The main
 point: all of these functions can have the CPR property.
 
+.. code-block:: haskell
+
     ------- f1 -----------
     -- x is used strictly by h, so it'll be available
     -- unboxed before it is returned in the True branch
+
+.. code-block:: haskell
 
     f1 :: Int -> Int
     f1 x = case h x x of
             True  -> x
             False -> f1 (x-1)
 
+
+.. code-block:: haskell
 
     ------- f2 -----------
     -- x is a strict field of MkT2, so we'll pass it unboxed
@@ -586,32 +628,50 @@ point: all of these functions can have the CPR property.
     -- of the original arguments to the function, so it's
     -- a bit more delicate.
 
+.. code-block:: haskell
+
     data T2 = MkT2 !Int Int
+
+.. code-block:: haskell
 
     f2 :: T2 -> Int
     f2 (MkT2 x y) | y>0       = f2 (MkT2 x (y-1))
                   | otherwise = x
 
 
+.. code-block:: haskell
+
     ------- f3 -----------
     -- h is strict in x, so x will be unboxed before it
     -- is rerturned in the otherwise case.
 
+.. code-block:: haskell
+
     data T3 = MkT3 Int Int
+
+.. code-block:: haskell
 
     f1 :: T3 -> Int
     f1 (MkT3 x y) | h x y     = f3 (MkT3 x (y-1))
                   | otherwise = x
 
 
+.. code-block:: haskell
+
     ------- f4 -----------
     -- Just like f2, but MkT4 can't unbox its strict
     -- argument automatically, as f2 can
 
+.. code-block:: haskell
+
     data family Foo a
     newtype instance Foo Int = Foo Int
 
+.. code-block:: haskell
+
     data T4 a = MkT4 !(Foo a) Int
+
+.. code-block:: haskell
 
     f4 :: T4 Int -> Int
     f4 (MkT4 x@(Foo v) y) | y>0       = f4 (MkT4 x (y-1))
@@ -631,6 +691,8 @@ which case we'll do the entire fixpoint shebang on for each iteration
 of A. This can be illustrated by the following example:
 
 Example:
+
+.. code-block:: haskell
 
   f [] = []
   f (x:xs) = let g []     = f xs
@@ -680,6 +742,8 @@ generator, though.  So:
       but WITHOUT subsequent worker/wrapper and simplifier,
    right before TidyCore.  See SimplCore.getCoreToDo.
 
+.. code-block:: haskell
+
    This way, correct information finds its way into the module interface
    (strictness signatures!) and the code generator (single-entry thunks!)
 
@@ -688,3 +752,4 @@ relied upon, as the simplifier tends to be very careful about not
 duplicating actual function calls.
 
 Also see #11731.
+

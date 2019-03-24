@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Foreign/Marshal/Alloc.hs>`_
+
+====================
+libraries/base/Foreign/Marshal/Alloc.hs.rst
+====================
+
 Note [NOINLINE for touch#]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Both allocaBytes and allocaBytesAligned use the touch#, which is notoriously
@@ -10,3 +16,4 @@ simplifier can't see the divergence.
 These can be removed once #14375 is fixed, which suggests that we instead do
 away with touch# in favor of a primitive that will capture the scoping left
 implicit in the case of touch#.
+

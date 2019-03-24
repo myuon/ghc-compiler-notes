@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmProcPoint.hs>`_
+
+====================
+compiler/cmm/CmmProcPoint.hs.rst
+====================
+
 Note [Proc-point analysis]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -32,6 +38,8 @@ It may be worthwhile to attempt the Adams optimization by rewriting
 the graph before the assignment of proc-point protocols.  Here are a
 couple of rules:
 
+.. code-block:: haskell
+
   g() returns to k;                    g() returns to L;
   k: CopyIn c ress; goto L:
    ...                        ==>        ...
@@ -40,9 +48,12 @@ couple of rules:
 
 And when c == c' and ress == ress', this also:
 
+.. code-block:: haskell
+
   g() returns to k;                    g() returns to L;
   k: CopyIn c ress; goto L:
    ...                        ==>        ...
   L: CopyIn c' ress'                   L: CopyIn c' ress' ;
 
 In both cases the goal is to eliminate k.
+

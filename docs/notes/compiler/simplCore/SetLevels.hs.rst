@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs>`_
+
+====================
+compiler/simplCore/SetLevels.hs.rst
+====================
+
 Note [FloatOut inside INLINE]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @InlineCtxt@ very similar to @Level 0 0@, but is used for one purpose:
@@ -31,6 +37,8 @@ Note [Join ceiling]
 ~~~~~~~~~~~~~~~~~~~
 Join points can't float very far; too far, and they can't remain join points
 So, suppose we have:
+
+.. code-block:: haskell
 
   f x = (joinrec j y = ... x ... in jump j x) + 1
 
@@ -258,6 +266,8 @@ the components of the tuple individually.
 I did experiment with a form of boxing that works for any type, namely
 wrapping in a function.  In our example
 
+.. code-block:: haskell
+
    let y = case f x of r -> \v. f x
    in case y void of r -> blah
 
@@ -331,6 +341,8 @@ But, as ever, we need to be careful:
        lvl = \xy. errror (show x ++ show y)
        ...let {v = lvl x} in ...
 
+.. code-block:: haskell
+
     Then of course we don't want to separately float the body (error ...)
     as /another/ MFE, so we tell lvlFloatRhs not to do that, via the is_bot
     argument.
@@ -354,6 +366,8 @@ Id, *immediately*, for three reasons:
     Here we don't want to replace 'x' with 'lvl', else we may get Lint
     errors, e.g. via a case with empty alternatives:  (case x of {})
     Lint complains unless the scrutinee of such a case is clearly bottom.
+
+.. code-block:: haskell
 
     This was reported in #11290.   But since the whole bottoming-float
     thing is based on the cheap-and-cheerful exprIsBottom, I'm not sure
@@ -511,6 +525,8 @@ The le_subst and le_env always implement the same mapping,
 where out_x is an OutVar, and a,b are its arguments (when
 we perform abstraction at the same time as floating).
 
+.. code-block:: haskell
+
   le_subst maps to CoreExpr
   le_env   maps to LevelledExpr
 
@@ -540,3 +556,4 @@ Here v is strict; but if we float v to top level, it isn't any more.
 
 Similarly, if we're floating a join point, it won't be one anymore, so we zap
 join point information as well.
+

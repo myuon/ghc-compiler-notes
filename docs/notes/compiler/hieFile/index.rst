@@ -1,4 +1,4 @@
-docs/notes/compiler/hieFile
+compiler/hieFile
 =================================
 
 .. toctree::

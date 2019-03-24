@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FamInst.hs>`_
+
+====================
+compiler/typecheck/FamInst.hs.rst
+====================
+
 Note [The type family instance consistency story]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -5,8 +11,12 @@ To preserve type safety we must ensure that for any given module, all
 the type family instances used either in that module or in any module
 it directly or indirectly imports are consistent. For example, consider
 
+.. code-block:: haskell
+
   module F where
     type family F a
+
+.. code-block:: haskell
 
   module A where
     import F( F )
@@ -14,11 +24,15 @@ it directly or indirectly imports are consistent. For example, consider
     f :: F Int -> Bool
     f x = x
 
+.. code-block:: haskell
+
   module B where
     import F( F )
     type instance F Int = Char
     g :: Char -> F Int
     g x = x
+
+.. code-block:: haskell
 
   module Bad where
     import A( f )
@@ -203,3 +217,4 @@ Check that the proposed new instance is OK,
 and then add it to the home inst env
 This must be lazy in the fam_inst arguments, see Note [Lazy axiom match]
 in FamInstEnv.hs
+

@@ -1,4 +1,4 @@
-docs/notes/compiler/deSugar
+compiler/deSugar
 =================================
 
 .. toctree::

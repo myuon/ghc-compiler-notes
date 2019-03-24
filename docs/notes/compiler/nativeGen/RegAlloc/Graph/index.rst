@@ -1,4 +1,4 @@
-docs/notes/compiler/nativeGen/RegAlloc/Graph
+compiler/nativeGen/RegAlloc/Graph
 =================================
 
 .. toctree::

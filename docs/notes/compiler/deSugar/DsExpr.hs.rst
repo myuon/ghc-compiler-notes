@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsExpr.hs>`_
+
+====================
+compiler/deSugar/DsExpr.hs.rst
+====================
+
 Note [Desugaring vars]
 ~~~~~~~~~~~~~~~~~~~~~~
 In one situation we can get a *coercion* variable in a HsVar, namely
@@ -7,6 +13,8 @@ the support method for an equality superclass:
 Then we get
    $dfCT :: forall ab. blah => C (T a) (T b)
    $dfCT ab blah = MkC ($c$p1C a blah) ($cop a blah)
+
+.. code-block:: haskell
 
    $c$p1C :: forall ab. blah => (T a ~ T b)
    $c$p1C ab blah = let ...; g :: T a ~ T b = ... } in g
@@ -70,6 +78,8 @@ beneficial. This is a bit of a trade-off,
  * when it works, fusion can be a significant win. Allocations are reduced
    by up to 25% in some nofib programs. Specifically,
 
+.. code-block:: haskell
+
         Program           Size    Allocs   Runtime  CompTime
         rewrite          +0.0%    -26.3%      0.02     -1.8%
            ansi          -0.3%    -13.8%      0.00     +0.0%
@@ -130,4 +140,5 @@ without a wrapper, then that is surely problem and we can reject.
 We thus have a parameter to `dsExpr` that tracks whether or not we are
 directly in an HsWrap. If we find a levity-polymorphic hasNoBinding Id when
 we're not directly in an HsWrap, reject.
+
 

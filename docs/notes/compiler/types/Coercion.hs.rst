@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs>`_
+
+====================
+compiler/types/Coercion.hs.rst
+====================
+
 Note [Function coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Remember that
@@ -104,13 +110,19 @@ The KPUSH rule deals with this situation
    g :: T t1 ~ T t2
    x :: t1 -> Maybe t1
 
+.. code-block:: haskell
+
    case (K @t1 x) |> g of
      K (y:t2 -> Maybe t2) -> rhs
 
 We want to push the coercion inside the constructor application.
 So we do this
 
+.. code-block:: haskell
+
    g' :: t1~t2  =  Nth 0 g
+
+.. code-block:: haskell
 
    case K @t2 (x |> g' -> Maybe g') of
      K (y:t2 -> Maybe t2) -> rhs
@@ -131,6 +143,8 @@ Note [extendLiftingContextEx]
 Consider we have datatype
   K :: \/k. \/a::k. P -> T k  -- P be some type
   g :: T k1 ~ T k2
+
+.. code-block:: haskell
 
   case (K @k1 @t1 x) |> g of
     K y -> rhs
@@ -214,18 +228,26 @@ Invariant (F2) of Note [Flattening] says that flattening is homogeneous.
 This causes some trouble when flattening a function applied to a telescope
 of arguments, perhaps with dependency. For example, suppose
 
+.. code-block:: haskell
+
   type family F :: forall (j :: Type) (k :: Type). Maybe j -> Either j k -> Bool -> [k]
 
 and we wish to flatten the args of (with kind applications explicit)
+
+.. code-block:: haskell
 
   F a b (Just a c) (Right a b d) False
 
 where all variables are skolems and
 
+.. code-block:: haskell
+
   a :: Type
   b :: Type
   c :: a
   d :: k
+
+.. code-block:: haskell
 
   [G] aco :: a ~ fa
   [G] bco :: b ~ fb
@@ -235,6 +257,8 @@ where all variables are skolems and
 The first step is to flatten all the arguments. This is done before calling
 simplifyArgsWorker. We start from
 
+.. code-block:: haskell
+
   a
   b
   Just a c
@@ -242,6 +266,8 @@ simplifyArgsWorker. We start from
   False
 
 and get
+
+.. code-block:: haskell
 
   (fa,                             co1 :: fa ~ a)
   (fb,                             co2 :: fb ~ b)
@@ -300,6 +326,8 @@ getting res_co :: [fb] ~ [b], and we cast our result.
 
 Accordingly, the final result is
 
+.. code-block:: haskell
+
   F fa fb (Just fa (fc |> aco) |> Maybe (sym aco) |> sym (Maybe (sym aco)))
           (Right fa fb (fd |> bco) |> Either (sym aco) (sym bco) |> sym (Either (sym aco) (sym bco)))
           False
@@ -319,6 +347,8 @@ binders. But perhaps inner_ki is a tyvar that has been instantiated with a
 
 Here is an example.
 
+.. code-block:: haskell
+
   a :: forall (k :: Type). k -> k
   type family Star
   Proxy :: forall j. j -> Type
@@ -328,8 +358,12 @@ Here is an example.
   bo :: Type
   [G] bc :: bo ~ Bool   (in inert set)
 
+.. code-block:: haskell
+
   co :: (forall j. j -> Type) ~ (forall (j :: Star). (j |> axStar) -> Star)
   co = forall (j :: sym axStar). (<j> -> sym axStar)
+
+.. code-block:: haskell
 
   We are flattening:
   a (forall (j :: Star). (j |> axStar) -> Star)   -- 1
@@ -339,6 +373,8 @@ Here is an example.
       :: Star
 
 First, we flatten all the arguments (before simplifyArgsWorker), like so:
+
+.. code-block:: haskell
 
     (forall j. j -> Type, co1 :: (forall j. j -> Type) ~
                                  (forall (j :: Star). (j |> axStar) -> Star))  -- 1
@@ -392,11 +428,15 @@ coercionKind.)
 
 So we now call
 
+.. code-block:: haskell
+
   decomposePiCos co1
                  (Pair (forall j. j -> Type) (forall (j :: Star). (j |> axStar) -> Star))
                  [bo |> sym axStar, NoWay |> sym bc]
 
 to get
+
+.. code-block:: haskell
 
   co5 :: Star ~ Type
   co6 :: (j |> axStar) ~ (j |> co5), substituted to
@@ -406,10 +446,14 @@ to get
 
 We then use these casts on (the flattened) (3) and (4) to get
 
+.. code-block:: haskell
+
   (Bool |> sym axStar |> co5 :: Type)   -- (C3)
   (False |> sym bc |> co6    :: bo)     -- (C4)
 
 We can simplify to
+
+.. code-block:: haskell
 
   Bool                        -- (C3)
   (False |> sym bc :: bo)     -- (C4)
@@ -433,24 +477,36 @@ So, we have to twiddle the result coercion appropriately.
 
 Let's check whether this is well-typed. We know
 
+.. code-block:: haskell
+
   a :: forall (k :: Type). k -> k
 
+.. code-block:: haskell
+
   a (forall j. j -> Type) :: (forall j. j -> Type) -> forall j. j -> Type
+
+.. code-block:: haskell
 
   a (forall j. j -> Type)
     Proxy
       :: forall j. j -> Type
+
+.. code-block:: haskell
 
   a (forall j. j -> Type)
     Proxy
     Bool
       :: Bool -> Type
 
+.. code-block:: haskell
+
   a (forall j. j -> Type)
     Proxy
     Bool
     False
       :: Type
+
+.. code-block:: haskell
 
   a (forall j. j -> Type)
     Proxy
@@ -465,3 +521,4 @@ Whew.
 
 This is shared between the flattener and the normaliser in FamInstEnv.
 See Note [simplifyArgsWorker]
+

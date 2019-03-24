@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/Linker.hs>`_
+
+====================
+compiler/ghci/Linker.hs.rst
+====================
+
 Note [Crash early load_dyn and locateLib]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If a package is "normal" (exposes it's code from more than zero Haskell
@@ -52,3 +58,4 @@ So instead get a list of location that GCC would search and use findDirs
 which hopefully is written in an optimized mannor to take advantage of
 caching. At the very least we remove the overhead of the fork/exec and waits
 which dominate a large percentage of startup time on Windows.
+

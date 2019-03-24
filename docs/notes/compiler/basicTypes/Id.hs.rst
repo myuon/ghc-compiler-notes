@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Id.hs>`_
+
+====================
+compiler/basicTypes/Id.hs.rst
+====================
+
 Note [Free type variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 At one time we cached the free type variables of the type of an Id
@@ -93,9 +99,13 @@ This transfer is used in three places:
 
 Consider the short-distance let-floating:
 
+.. code-block:: haskell
+
    f = /\a. let g = rhs in ...
 
 Then if we float thus
+
+.. code-block:: haskell
 
    g' = /\a. rhs
    f = /\a. ...[g' a/g]....
@@ -109,9 +119,13 @@ we *do not* want to lose g's
 Mostly this is just an optimisation, but it's *vital* to
 transfer the occurrence info.  Consider
 
+.. code-block:: haskell
+
    NonRec { f = /\a. let Rec { g* = ..g.. } in ... }
 
 where the '*' means 'LoopBreaker'.  Then if we float we must get
+
+.. code-block:: haskell
 
    Rec { g'* = /\a. ...(g' a)... }
    NonRec { f = /\a. ...[g' a/g]....}
@@ -132,3 +146,4 @@ arity and strictness info before transferring it.  E.g.
       g' = \y. \x. e
       + substitute (g' y) for g
 Notice that g' has an arity one more than the original g
+

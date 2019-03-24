@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs>`_
+
+====================
+compiler/typecheck/TcUnify.hs.rst
+====================
+
 Note [Herald for matchExpectedFunTys]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The 'herald' always looks like:
@@ -8,14 +14,22 @@ The 'herald' always looks like:
 
 This is used to construct a message of form
 
+.. code-block:: haskell
+
    The abstraction `\Just 1 -> ...' takes two arguments
    but its type `Maybe a -> a' has only one
+
+.. code-block:: haskell
 
    The equation(s) for `f' have two arguments
    but its type `Maybe a -> a' has only one
 
+.. code-block:: haskell
+
    The section `(f 3)' requires 'f' to take two arguments
    but its type `Int -> Int' has only one
+
+.. code-block:: haskell
 
    The function 'f' is applied to two arguments
    but its type `Int -> Int' has only one
@@ -24,12 +38,16 @@ When visible type applications (e.g., `f @Int 1 2`, as in #13902) enter the
 picture, we have a choice in deciding whether to count the type applications as
 proper arguments:
 
+.. code-block:: haskell
+
    The function 'f' is applied to one visible type argument
      and two value arguments
    but its type `forall a. a -> a` has only one visible type argument
      and one value argument
 
 Or whether to include the type applications as part of the herald itself:
+
+.. code-block:: haskell
 
    The expression 'f @Int' is applied to two arguments
    but its type `Int -> Int` has only one
@@ -68,6 +86,8 @@ which checks
 That is, that a value of type actual_ty is acceptable in
 a place expecting a value of type expected_ty.  I.e. that
 
+.. code-block:: haskell
+
     actual ty   is more polymorphic than   expected_ty
 
 It returns a coercion function
@@ -79,6 +99,8 @@ These functions do not actually check for subsumption. They check if
 expected_ty is an appropriate annotation to use for something of type
 actual_ty. This difference matters when thinking about visible type
 application. For example,
+
+.. code-block:: haskell
 
    forall a. a -> forall b. b -> b
       DOES NOT SUBSUME
@@ -215,6 +237,8 @@ has the ir_inst flag.
 
 * ir_inst = True: deeply instantiate
 
+.. code-block:: haskell
+
   Consider
     f x = (*)
   We want to instantiate the type of (*) before returning, else we
@@ -222,10 +246,14 @@ has the ir_inst flag.
     f :: forall {a}. a -> forall b. Num b => b -> b -> b
   This is surely confusing for users.
 
+.. code-block:: haskell
+
   And worse, the monomorphism restriction won't work properly. The MR is
   dealt with in simplifyInfer, and simplifyInfer has no way of
   instantiating. This could perhaps be worked around, but it may be
   hard to know even when instantiation should happen.
+
+.. code-block:: haskell
 
   Another reason.  Consider
        f :: (?x :: Int) => a -> a
@@ -235,9 +263,15 @@ has the ir_inst flag.
 
 * ir_inst = False: do not instantiate
 
+.. code-block:: haskell
+
   Consider this (which uses visible type application):
 
+.. code-block:: haskell
+
     (let { f :: forall a. a -> a; f x = x } in f) @Int
+
+.. code-block:: haskell
 
   We'll call TcExpr.tcInferFun to infer the type of the (let .. in f)
   And we don't want to instantite the type of 'f' when we reach it,
@@ -248,8 +282,12 @@ Note [Promoting a type]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Consider (#12427)
 
+.. code-block:: haskell
+
   data T where
     MkT :: (Int -> Int) -> a -> T
+
+.. code-block:: haskell
 
   h y = case y of MkT v w -> v
 
@@ -384,6 +422,8 @@ So either
    (a) either we must check for identical argument kinds
        when decomposing applications,
 
+.. code-block:: haskell
+
    (b) or we must be prepared for ill-kinded unification sub-problems
 
 Currently we adopt (b) since it seems more robust -- no need to maintain
@@ -498,13 +538,19 @@ Wanteds and Givens, but either way, deepest wins!  Simple.
 * Givens. Suppose we have something like
      forall a[2]. b[1] ~ a[2] => beta[1] ~ a[2]
 
+.. code-block:: haskell
+
   If we orient the Given a[2] on the left, we'll rewrite the Wanted to
   (beta[1] ~ b[1]), and that can float out of the implication.
   Otherwise it can't.  By putting the deepest variable on the left
   we maximise our changes of eliminating skolem capture.
 
+.. code-block:: haskell
+
   See also TcSMonad Note [Let-bound skolems] for another reason
   to orient with the deepest skolem on the left.
+
+.. code-block:: haskell
 
   IMPORTANT NOTE: this test does a level-number comparison on
   skolems, so it's important that skolems have (accurate) level
@@ -539,11 +585,17 @@ T10226, T10009.)
           [G] F a ~ a
           [WD] F alpha ~ alpha, alpha ~ a
 
+.. code-block:: haskell
+
     From Givens we get
           [G] F a ~ fsk, fsk ~ a
 
+.. code-block:: haskell
+
     Now if we flatten we get
           [WD] alpha ~ fmv, F alpha ~ fmv, alpha ~ a
+
+.. code-block:: haskell
 
     Now, if we unified alpha := fmv, we'd get
           [WD] F fmv ~ fmv, [WD] fmv ~ a
@@ -552,6 +604,8 @@ T10226, T10009.)
 So instead the Fmv Orientation Invariant puts the fmv on the
 left, giving
       [WD] fmv ~ alpha, [WD] F alpha ~ fmv, [WD] alpha ~ a
+
+.. code-block:: haskell
 
     Now we get alpha:=a, and everything works out
 
@@ -676,8 +730,12 @@ inside a type synonym may help resolve a spurious occurs check
 error. Consider:
           type A a = ()
 
+.. code-block:: haskell
+
           f :: (A a -> a -> ()) -> ()
           f = \ _ -> ()
+
+.. code-block:: haskell
 
           x :: ()
           x = f (\ x p -> p x)
@@ -701,11 +759,15 @@ Because the same code is now shared between unifying types and unifying
 kinds, we sometimes will see proper TyVars floating around the unifier.
 Example (from test case polykinds/PolyKinds12):
 
+.. code-block:: haskell
+
     type family Apply (f :: k1 -> k2) (x :: k1) :: k2
     type instance Apply g y = g y
 
 When checking the instance declaration, we first *kind-check* the LHS
 and RHS, discovering that the instance really should be
+
+.. code-block:: haskell
 
     type instance Apply k3 k4 (g :: k3 -> k4) (y :: k3) = g y
 
@@ -774,4 +836,5 @@ kind had instead been
   (alpha :: kappa)
 then this kind equality would rightly complain about unifying kappa
 with (forall k. k->*)
+
 

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmPrim.hs>`_
+
+====================
+compiler/codeGen/StgCmmPrim.hs.rst
+====================
+
 Note [Comparing stable names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -10,3 +16,4 @@ between SNOs and entries in the SNT, so simple pointer equality
 does the trick.
 These primops are implemented by CallishMachOps, because they sometimes
 turn into foreign calls depending on the backend.
+

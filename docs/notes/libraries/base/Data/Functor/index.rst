@@ -1,4 +1,4 @@
-docs/notes/libraries/base/Data/Functor
+libraries/base/Data/Functor
 =================================
 
 .. toctree::

@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTypeNats.hs>`_
+
+====================
+compiler/typecheck/TcTypeNats.hs.rst
+====================
+
 Note [Type-level literals]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 There are currently two forms of type-level literals: natural numbers, and
@@ -10,6 +16,8 @@ type-level literals.
 
 See also the Wiki page:
 
+.. code-block:: haskell
+
     https://ghc.haskell.org/trac/ghc/wiki/TypeNats
 
 
@@ -20,6 +28,8 @@ There are a few steps to adding a built-in type family:
 
 * Adding a unique for the type family TyCon
 
+.. code-block:: haskell
+
   These go in PrelNames. It will likely be of the form
   @myTyFamNameKey = mkPreludeTyConUnique xyz@, where @xyz@ is a number that
   has not been chosen before in PrelNames. There are several examples already
@@ -27,8 +37,12 @@ There are a few steps to adding a built-in type family:
 
 * Adding the type family TyCon itself
 
+.. code-block:: haskell
+
   This goes in TcTypeNats. There are plenty of examples of how to define
   these—see, for instance, typeNatAddTyCon.
+
+.. code-block:: haskell
 
   Once your TyCon has been defined, be sure to:
 
@@ -37,10 +51,14 @@ There are a few steps to adding a built-in type family:
 
 * Exposing associated type family axioms
 
+.. code-block:: haskell
+
   When defining the type family TyCon, you will need to define an axiom for
   the type family in general (see, for instance, axAddDef), and perhaps other
   auxiliary axioms for special cases of the type family (see, for instance,
   axAdd0L and axAdd0R).
+
+.. code-block:: haskell
 
   After you have defined all of these axioms, be sure to include them in the
   typeNatCoAxiomRules list, defined in TcTypeNats.
@@ -48,18 +66,28 @@ There are a few steps to adding a built-in type family:
 
 * Define the type family somewhere
 
+.. code-block:: haskell
+
   Finally, you will need to define the type family somewhere, likely in @base@.
   Currently, all of the built-in type families are defined in GHC.TypeLits or
   GHC.TypeNats, so those are likely candidates.
 
+.. code-block:: haskell
+
   Since the behavior of your built-in type family is specified in TcTypeNats,
   you should give an open type family definition with no instances, like so:
 
+.. code-block:: haskell
+
     type family MyTypeFam (m :: Nat) (n :: Nat) :: Nat
+
+.. code-block:: haskell
 
   Changing the argument and result kinds as appropriate.
 
 * Update the relevant test cases
+
+.. code-block:: haskell
 
   The GHC test suite will likely need to be updated after you add your built-in
   type family. For instance:
@@ -82,11 +110,15 @@ Note [Weakened interaction rule for subtraction]
 
 A simpler interaction here might be:
 
+.. code-block:: haskell
+
   `s - t ~ r` --> `t + r ~ s`
 
 This would enable us to reuse all the code for addition.
 Unfortunately, this works a little too well at the moment.
 Consider the following example:
+
+.. code-block:: haskell
 
     0 - 5 ~ r --> 5 + r ~ 0 --> (5 = 0, r = 0)
 
@@ -106,3 +138,4 @@ which fails.
 So, for the time being, we only add an improvement when the RHS is a constant,
 which happens to work OK for the moment, although clearly we need to do
 something more general.
+

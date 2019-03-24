@@ -1,7 +1,15 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/MatchCon.hs>`_
+
+====================
+compiler/deSugar/MatchCon.hs.rst
+====================
+
 Note [Record patterns]
 ~~~~~~~~~~~~~~~~~~~~~~
 Consider
          data T = T { x,y,z :: Bool }
+
+.. code-block:: haskell
 
          f (T { y=True, x=False }) = ...
 
@@ -11,6 +19,8 @@ matching against (T { y=False, x=undefined }): should fail without
 touching the undefined.
 
 Now consider:
+
+.. code-block:: haskell
 
          f (T { y=True, x=False }) = ...
          f (T { x=True, y= False}) = ...
@@ -33,15 +43,21 @@ Note [Existentials in shift_con_pat]
 Consider
         data T = forall a. Ord a => T a (a->Int)
 
+.. code-block:: haskell
+
         f (T x f) True  = ...expr1...
         f (T y g) False = ...expr2..
 
 When we put in the tyvars etc we get
 
+.. code-block:: haskell
+
         f (T a (d::Ord a) (x::a) (f::a->Int)) True =  ...expr1...
         f (T b (e::Ord b) (y::a) (g::a->Int)) True =  ...expr2...
 
 After desugaring etc we'll get a single case:
+
+.. code-block:: haskell
 
         f = \t::T b::Bool ->
             case t of
@@ -58,4 +74,5 @@ Originally I tried to use
         (\b -> let e = d in expr2) a
 to do this substitution.  While this is "correct" in a way, it fails
 Lint, because e::Ord b but d::Ord a.
+
 

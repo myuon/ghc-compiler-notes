@@ -1,3 +1,9 @@
+`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmHeap.hs>`_
+
+====================
+compiler/codeGen/StgCmmHeap.hs.rst
+====================
+
 Note [Single stack check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 When compiling a function we can determine how much stack space it
@@ -68,3 +74,4 @@ Note [Self-recursive tail calls] in StgCmmExpr). We emit it if:
     true is when compiling stack and heap checks at the entry to a
     function. This is the only situation when we want to emit a self-loop
     label.
+
