@@ -98,7 +98,13 @@ app opt = do
               ]
 
           liftIO $ Text.writeFile outputFn $ Text.unlines [
+            -- Link to source
             "`[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/" `Text.append` (fromJust $ Text.stripSuffix ".rst" $ fromJust $ Text.stripPrefix "docs/notes/" $ Text.pack outputFn) `Text.append` ">`_",
+            "",
+            -- Filename header
+            "====================",
+            fromJust $ Text.stripPrefix "docs/notes/" $ Text.pack outputFn,
+            "====================",
             "",
             d
             ]
