@@ -14,3 +14,7 @@ test:
 generate:
 	rm -rf docs/notes
 	cabal new-build && cabal new-exec -- ghc-compiler-notes conf/ghc-8.6.4.yml
+
+.PHONY: serve-docs
+serve-docs:
+	sphinx-autobuild docs docs/_build
