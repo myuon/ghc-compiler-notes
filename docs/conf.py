@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'ghc-compiler-notes'
-copyright = '2019, ghc'
-author = 'ghc'
+copyright = '2019, myuon'
+author = 'myuon'
 
 # The short X.Y version
 version = ''
@@ -130,7 +130,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'ghc-compiler-notes.tex', 'ghc-compiler-notes Documentation',
-     'ghc', 'manual'),
+     'myuon', 'manual'),
 ]
 
 
