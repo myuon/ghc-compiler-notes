@@ -1,9 +1,10 @@
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module GHC.Compiler.Notes.App where
 
 import           Control.Monad.Catch
-import           Control.Monad.Trans.Reader
+import           Control.Monad.Trans.Reader (ReaderT(..))
 import           Control.Monad.IO.Class
 import           Capability.Accessors
 import           Capability.Reader
@@ -16,10 +17,14 @@ import           Control.Monad
 import           Control.Monad.Trans.State
 import qualified Packages
 import           Data.Kind
+import           SrcLoc
+import qualified Data.Text as Text
+import           GHC.Compiler.Notes.Types
 
 
 data AppContext = AppContext
   { envDynFlags :: DynFlags.DynFlags
+  , envSourceResourceGetter :: FilePath -> Maybe SrcSpan -> Text.Text
   }
   deriving Generic
 
@@ -44,6 +49,7 @@ appContext AppContextCommon{..} = do
 
   return $ AppContext
     { envDynFlags = dflags
+    , envSourceResourceGetter = gitlabResourceGetter
     }
   where
     dflagsUpdater = do
@@ -60,6 +66,13 @@ appContext AppContextCommon{..} = do
           = DynFlags.addGlobalInclude (DynFlags.includePaths dflags)
             sFlagsGlobalIncludePaths
         }
+
+    gitlabResourceGetter fn opts =
+      "https://gitlab.haskell.org/ghc/ghc/tree/master/" <> Text.pack fn <> case opts of
+        Nothing -> ""
+        Just s  -> case srcSpanStart s of
+          RealSrcLoc l -> "#L" <> Text.pack (show $ srcLocLine l)
+          _            -> "#"
 
 defaultAppContext :: MonadIO m => m AppContext
 defaultAppContext = appContext $ AppContextCommon
@@ -88,5 +101,14 @@ newtype AppT (m :: Type -> Type) a = AppT
     ) via (ReaderT AppContext m)
 
 deriving
+  via (MonadReader (ReaderT AppContext m))
+  instance Monad m => HasReader "AppContext" AppContext (AppT m)
+
+deriving
   via (Field "envDynFlags" "ctx" (MonadReader (ReaderT AppContext m)))
   instance Monad m => HasReader "envDynFlags" DynFlags.DynFlags (AppT m)
+
+instance Monad m => HasSourceResourceGetter (AppT m) where
+  sourceResourceGetter fn opts = do
+    ctx <- ask @"AppContext"
+    pure $ envSourceResourceGetter ctx fn opts

@@ -15,6 +15,8 @@ import qualified Text.Regex.Applicative as Regex
 import           Control.Applicative
 import           Data.Coerce
 import           Data.Monoid
+import qualified Data.Text.Monadic as Text
+import           Control.Monad
 
 
 data CollectedNotesCtx = CollectedNotesCtx
@@ -117,7 +119,7 @@ noteTitleSectionLineMatcher = lineMatcher <* spacesMatcher
       , '~'
       , '^'
       , '_'
-      -- , '*'
+      -- , '*' -- for sub section
       , '+'
       , '#'
       ]
@@ -161,7 +163,6 @@ isPragmaBlockComment = \case
   _             -> False
   where
     go "#-}"    = True
-    go ('\n':_) = False
     go []       = False
     go (_:ns)   = go ns
 
@@ -287,9 +288,28 @@ sinkParsingNoteComment ctx = lift await >>= \case
 completeParsingNote :: ParsingCtx -> CollectNotesStateParser o ()
 completeParsingNote (L p buf) =
   addNoteByCollectingInState $ L p $ Note
-    { noteId = NoteId mempty
-    , noteContent = buf
+    { noteId = noteIdFromBuf
+    , noteContent = noteContentFromBuf
     }
+  where
+    noteIdFromBuf =
+      let
+        firstLine = Text.takeWhile (/= '\n') buf
+      in case Regex.match noteTitleMatcher $ Text.unpack firstLine of
+        Nothing    -> error "unreachable"
+        Just title -> NoteId $ Text.pack title
+
+    noteContentFromBuf =
+      let
+        skipTwoLine c = do
+          i <- get
+          if i >= 2
+            then pure False
+            else do
+              when (c == '\n') do
+                put $ i + 1
+              pure True
+      in Text.strip $ evalState (Text.dropWhileM skipTwoLine buf) (0 :: Int)
 
 isTopLevelSrcLoc :: SrcLoc -> Bool
 isTopLevelSrcLoc UnhelpfulLoc{} = False

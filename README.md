@@ -9,13 +9,14 @@ Requirements:
 
 * GHC (== 8.6.x): for `ghc-paths`
 * GCC: for `CPP`
+* Sphinx: for `docs` building
 
 ```bash
 git clone https://github.com/myuon/ghc-compiler-notes.git
 cd ghc-compiler-notes
-git clone https://gitlab.haskell.org/ghc/ghc.git output/ghc
-cabal new-build
-cabal new-exec -- ghc-compiler-notes conf/ghc-8.6.4.yml
+git clone --depth 1 https://gitlab.haskell.org/ghc/ghc.git output/ghc
+make generate
+make docs
 ```
 
 See `output/doc`
