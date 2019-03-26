@@ -54,8 +54,6 @@ workflows:
   docs:
     jobs:
       - generate:
-          requires:
-            - build-test-8_6_3
           filters:
             branches:
               ignore: /.*/
