@@ -26,8 +26,7 @@ jobs:
     docker:
       - image: haskell:8.6.3
     steps:
-      - attach_workspace:
-          at: .
+      - checkout
       - run: cabal new-update
       - run: make generate
       - run: git config --global user.email "ci@example.com"
