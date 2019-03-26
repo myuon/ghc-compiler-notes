@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs>`_
 
-====================
-compiler/stranal/WwLib.hs.rst
-====================
+compiler/stranal/WwLib.hs
+=========================
+
 
 Note [Always do CPR w/w]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L207>`__
+
 At one time we refrained from doing CPR w/w for thunks, on the grounds that
 we might duplicate work.  But that is already handled by the demand analyser,
 which doesn't give the CPR proprety if w/w might waste work: see
@@ -19,7 +22,10 @@ is #5920.
 
 
 Note [Limit w/w arity]
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L219>`__
+
 Guard against high worker arity as it generates a lot of stack traffic.
 A simplified example is #11565#comment:6
 
@@ -28,7 +34,7 @@ if the result produces a wrapper with arity higher than -fmax-worker-args=.
 
 It is a bit all or nothing, consider
 
-.. code-block:: haskell
+::
 
         f (x,y) (a,b,c,d,e ... , z) = rhs
 
@@ -38,7 +44,7 @@ w/w on the (x,y) pair... it's the huge product that is the problem.
 Could we instead refrain from w/w on an arg-by-arg basis? Yes, that'd
 solve f. But we can get a lot of args from deeply-nested products:
 
-.. code-block:: haskell
+::
 
         g (a, (b, (c, (d, ...)))) = rhs
 
@@ -51,6 +57,9 @@ Still not very clever because it had a left-right bias.
 
 Note [Protecting the last value argument]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L288>`__
+
 If the user writes (\_ -> E), they might be intentionally disallowing
 the sharing of E. Since absence analysis and worker-wrapper are keen
 to remove such unused arguments, we add in a void argument to prevent
@@ -67,10 +76,12 @@ so f can't be inlined *under a lambda*.
 Note [Join points and beta-redexes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L301>`__
+
 Originally, the worker would invoke the original function by calling it with
 arguments, thus producing a beta-redex for the simplifier to munch away:
 
-.. code-block:: haskell
+::
 
   \x y z -> e => (\x y z -> e) wx wy wz
 
@@ -78,16 +89,16 @@ Now that we have special rules about join points, however, this is Not Good if
 the original function is itself a join point, as then it may contain invocations
 of other join points:
 
-.. code-block:: haskell
+::
 
   join j1 x = ...
   join j2 y = if y == 0 then 0 else j1 y
 
-.. code-block:: haskell
+::
 
   =>
 
-.. code-block:: haskell
+::
 
   join j1 x = ...
   join $wj2 y# = let wy = I# y# in (\y -> if y == 0 then 0 else jump j1 y) wy
@@ -96,7 +107,7 @@ of other join points:
 There can't be an intervening lambda between a join point's declaration and its
 occurrences, so $wj2 here is wrong. But of course, this is easy enough to fix:
 
-.. code-block:: haskell
+::
 
   ...
   let join $wj2 y# = let wy = I# y# in let y = wy in if y == 0 then 0 else j1 y
@@ -109,6 +120,8 @@ worry about hygiene, but luckily wy is freshly generated.)
 
 Note [Join points returning functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L332>`__
 
 It is crucial that the arity of a join point depends on its *callers,* not its
 own syntax. What this means is that a join point can have "extra lambdas":
@@ -141,18 +154,21 @@ unimplemented; we simply give up.
 
 
 Note [Freshen WW arguments]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L470>`__
+
 Wen we do a worker/wrapper split, we must not in-scope names as the arguments
 of the worker, else we'll get name capture.  E.g.
 
-.. code-block:: haskell
+::
 
    -- y1 is in scope from further out
    f x = ..y1..
 
 If we accidentally choose y1 as a worker argument disaster results:
 
-.. code-block:: haskell
+::
 
    fww y1 y2 = let x = (y1,y2) in ...y1...
 
@@ -166,14 +182,14 @@ To avoid this:
   * Because of this cloning we have to substitute in the type/kind of the
     new binders.  That's why we carry the TCvSubst through mkWWargs.
 
-.. code-block:: haskell
+::
 
     So we need a decent in-scope set, just in case that type/kind
     itself has foralls.  We get this from the free vars of the RHS of the
     function since those are the only variables that might be captured.
     It's a lazy thunk, which will only be poked if the type/kind has a forall.
 
-.. code-block:: haskell
+::
 
     Another tricky case was when f :: forall a. a -> forall a. a->a
     (i.e. with shadowing), and then the worker used the same 'a' twice.
@@ -182,30 +198,33 @@ To avoid this:
 
 Note [Unpacking arguments with product and polymorphic demands]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L536>`__
+
 The argument is unpacked in a case if it has a product type and has a
 strict *and* used demand put on it. I.e., arguments, with demands such
 as the following ones:
 
-.. code-block:: haskell
+::
 
    <S,U(U, L)>
    <S(L,S),U>
 
 will be unpacked, but
 
-.. code-block:: haskell
+::
 
    <S,U> or <B,U>
 
 will not, because the pieces aren't used. This is quite important otherwise
 we end up unpacking massive tuples passed to the bottoming function. Example:
 
-.. code-block:: haskell
+::
 
         f :: ((Int,Int) -> String) -> (Int,Int) -> a
         f g pr = error (g pr)
 
-.. code-block:: haskell
+::
 
         main = print (f fst (1, error "no"))
 
@@ -223,8 +242,12 @@ as-yet-un-filled-in pkgState files.
  See Note [How to do the worker/wrapper split]
 
 
+
 Note [How to do the worker/wrapper split]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L647>`__
+
 The worker-wrapper transformation, mkWWstr_one, takes into account
 several possibilities to decide if the function is worthy for
 splitting:
@@ -240,7 +263,7 @@ splitting:
    product demand (splitProdDmd_maybe), then unbox it and w/w its
    pieces.  For example
 
-.. code-block:: haskell
+::
 
     f :: (Int, Int) -> Int
     f p = (case p of (a,b) -> a) + 1
@@ -248,12 +271,12 @@ splitting:
     f :: (Int, Int) -> Int
     f p = case p of (a,b) -> $wf a
 
-.. code-block:: haskell
+::
 
     $wf :: Int -> Int
     $wf a = a + 1
 
-.. code-block:: haskell
+::
 
   and
     g :: Bool -> (Int, Int) -> Int
@@ -268,16 +291,16 @@ splitting:
    splitProdDmd_maybe returns Nothing.  Otherwise we risk decomposing
    a massive tuple which is barely used.  Example:
 
-.. code-block:: haskell
+::
 
         f :: ((Int,Int) -> String) -> (Int,Int) -> a
         f g pr = error (g pr)
 
-.. code-block:: haskell
+::
 
         main = print (f fst (1, error "no"))
 
-.. code-block:: haskell
+::
 
    Here, f does not take 'pr' apart, and it's stupid to do so.
    Imagine that it had millions of fields. This actually happened
@@ -292,6 +315,9 @@ splitting:
 
 Note [Worker-wrapper for bottoming functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L700>`__
+
 We used not to split if the result is bottom.
 [Justification:  there's no efficiency to be gained.]
 
@@ -308,13 +334,16 @@ unboxed thing to f, and have it reboxed in the error cases....]
 
 Note [Add demands for strict constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L714>`__
+
 Consider this program (due to Roman):
 
-.. code-block:: haskell
+::
 
     data X a = X !a
 
-.. code-block:: haskell
+::
 
     foo :: X Int -> Int -> Int
     foo (X a) n = go 0
@@ -324,7 +353,7 @@ Consider this program (due to Roman):
 
 We want the worker for 'foo' too look like this:
 
-.. code-block:: haskell
+::
 
     $wfoo :: Int# -> Int# -> Int#
 
@@ -335,7 +364,7 @@ because X is strict, so its argument must be evaluated.  And if we
 *don't* pass an unboxed argument, we can't even repair it by adding a
 `seq` thus:
 
-.. code-block:: haskell
+::
 
     foo (X a) n = a `seq` go 0
 
@@ -372,13 +401,13 @@ argument, and pass an Int to $wfoo!
 
 This works in nested situations like
 
-.. code-block:: haskell
+::
 
     data family Bar a
     data instance Bar (a, b) = BarPair !(Bar a) !(Bar b)
     newtype instance Bar Int = Bar Int
 
-.. code-block:: haskell
+::
 
     foo :: Bar ((Int, Int), Int) -> Int -> Int
     foo f k = case f of BarPair x y ->
@@ -398,13 +427,13 @@ We used to add data-con strictness demands when demand analysing case
 expression. However, it was noticed in #15696 that this misses some cases. For
 instance, consider the program (from T10482)
 
-.. code-block:: haskell
+::
 
     data family Bar a
     data instance Bar (a, b) = BarPair !(Bar a) !(Bar b)
     newtype instance Bar Int = Bar Int
 
-.. code-block:: haskell
+::
 
     foo :: Bar ((Int, Int), Int) -> Int -> Int
     foo f k =
@@ -418,7 +447,7 @@ We really should be able to assume that `p` is already evaluated since it came
 from a strict field of BarPair. This strictness would allow us to produce a
 worker of type:
 
-.. code-block:: haskell
+::
 
     $wfoo :: Int# -> Int# -> Int# -> Int -> Int
     $wfoo p# q# y# = ...
@@ -428,7 +457,7 @@ even though the `case x` is only lazily evaluated
 Indeed before we fixed #15696 this would happen since we would float the inner
 `case x` through the `case burble` to get:
 
-.. code-block:: haskell
+::
 
     foo f k =
       case f of
@@ -449,9 +478,11 @@ the case on `x` up through the case on `burble`.
 
 
 
-
 Note [mkWWstr and unsafeCoerce]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L836>`__
+
 By using unsafeCoerce, it is possible to make the number of demands fail to
 match the number of constructor arguments; this happened in #8037.
 If so, the worker/wrapper split doesn't work right and we get a Core Lint
@@ -461,13 +492,16 @@ bug.  The fix here is simply to decline to do w/w if that happens.
 
 Note [Record evaluated-ness in worker/wrapper]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L843>`__
+
 Suppose we have
 
-.. code-block:: haskell
+::
 
    data T = MkT !Int Int
 
-.. code-block:: haskell
+::
 
    f :: T -> T
    f x = e
@@ -475,13 +509,13 @@ Suppose we have
 and f's is strict, and has the CPR property.  The we are going to generate
 this w/w split
 
-.. code-block:: haskell
+::
 
    f x = case x of
            MkT x1 x2 -> case $wf x1 x2 of
                            (# r1, r2 #) -> MkT r1 r2
 
-.. code-block:: haskell
+::
 
    $wfw x1 x2 = let x = MkT x1 x2 in
                 case e of
@@ -510,9 +544,11 @@ to record that the relevant binder is evaluated.
 
 
 
-
 Note [Do not unpack class dictionaries]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L891>`__
+
 If we have
    f :: Ord a => [a] -> Int -> a
    {-# INLINABLE f #-}
@@ -534,8 +570,11 @@ Historical note: #14955 describes how I got this fix wrong
 the first time.
 
 
+
 Note [non-algebraic or open body type warning]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L1066>`__
 
 There are a few cases where the W/W transformation is told that something
 returns a constructor, but the type at hand doesn't really match this. One
@@ -554,9 +593,11 @@ other cases where something went avoidably wrong.
 
 
 
-
 Note [Profiling and unpacking]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L1085>`__
+
 If the original function looked like
         f = \ x -> {-# SCC "foo" #-} E
 
@@ -575,9 +616,11 @@ part of the function (post transformation) anyway.
 
 
 
-
 Note [Absent errors]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WwLib.hs#L1110>`__
+
 We make a new binding for Ids that are marked absent, thus
    let x = absentError "x :: Int"
 The idea is that this binding will never be used; but if it

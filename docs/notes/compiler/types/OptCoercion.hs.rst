@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/OptCoercion.hs>`_
 
-====================
-compiler/types/OptCoercion.hs.rst
-====================
+compiler/types/OptCoercion.hs
+=============================
+
 
 Note [Optimising coercion optimisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/OptCoercion.hs#L36>`__
+
 Looking up a coercion's role or kind is linear in the size of the
 coercion. Thus, doing this repeatedly during the recursive descent
 of coercion optimisation is disastrous. We must be careful to avoid
@@ -24,6 +27,9 @@ opt_co2.
 
 Note [Optimising InstCo]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/OptCoercion.hs#L52>`__
+
 (1) tv is a type variable
 When we have (InstCo (ForAllCo tv h g) g2), we want to optimise.
 
@@ -41,7 +47,7 @@ InstCo g1 g2 : t1'[tv |-> s1] ~ t2'[tv |-> s2]
 
 We thus want some coercion proving this:
 
-.. code-block:: haskell
+::
 
   (t1[tv |-> s1]) ~ (t2[tv |-> s2 |> sym h])
 
@@ -73,7 +79,7 @@ InstCo g1 g2 : t1'[cv |-> h1] ~ t2'[cv |-> h2]
 
 We thus want some coercion proving this:
 
-.. code-block:: haskell
+::
 
   t1'[cv |-> h1] ~ t2'[cv |-> n1 ; h2; sym n2]
 
@@ -81,8 +87,12 @@ So we substitute the coercion variable c for the coercion
 (h1 ~N (n1; h2; sym n2)) in g.
 
 
+
 Note [Optimise CoVarCo to Refl]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/OptCoercion.hs#L458>`__
+
 If we have (c :: t~t) we can optimise it to Refl. That increases the
 chances of floating the Refl upwards; e.g. Maybe c --> Refl (Maybe t)
 
@@ -91,8 +101,12 @@ in Coercion.
 -----------
 
 
+
 Note [Conflict checking with AxiomInstCo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/OptCoercion.hs#L848>`__
+
 Consider the following type family and axiom:
 
 type family Equal (a :: k) (b :: k) :: Bool
@@ -117,6 +131,9 @@ types/FamInstEnv.hs.
 
 Note [Why call checkAxInstCo during optimisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/OptCoercion.hs#L870>`__
+
 It is possible that otherwise-good-looking optimisations meet with disaster
 in the presence of axioms with multiple equations. Consider
 
@@ -152,43 +169,46 @@ coercion and checking.
 
 Note [EtaAppCo]
 ~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/OptCoercion.hs#L903>`__
+
 Suppose we're trying to optimize (co1a co1b ; co2a co2b). Ideally, we'd
 like to rewrite this to (co1a ; co2a) (co1b ; co2b). The problem is that
 the resultant coercions might not be well kinded. Here is an example (things
 labeled with x don't matter in this example):
 
-.. code-block:: haskell
+::
 
   k1 :: Type
   k2 :: Type
 
-.. code-block:: haskell
+::
 
   a :: k1 -> Type
   b :: k1
 
-.. code-block:: haskell
+::
 
   h :: k1 ~ k2
 
-.. code-block:: haskell
+::
 
   co1a :: x1 ~ (a |> (h -> <Type>)
   co1b :: x2 ~ (b |> h)
 
-.. code-block:: haskell
+::
 
   co2a :: a ~ x3
   co2b :: b ~ x4
 
 First, convince yourself of the following:
 
-.. code-block:: haskell
+::
 
   co1a co1b :: x1 x2 ~ (a |> (h -> <Type>)) (b |> h)
   co2a co2b :: a b   ~ x3 x4
 
-.. code-block:: haskell
+::
 
   (a |> (h -> <Type>)) (b |> h) `eqType` a b
 
@@ -196,7 +216,7 @@ That last fact is due to Note [Non-trivial definitional equality] in TyCoRep,
 where we ignore coercions in types as long as two types' kinds are the same.
 In our case, we meet this last condition, because
 
-.. code-block:: haskell
+::
 
   (a |> (h -> <Type>)) (b |> h) :: Type
     and
@@ -209,7 +229,7 @@ kinds don't match up.
 The solution here is to twiddle the kinds in the output coercions. First, we
 need to find coercions
 
-.. code-block:: haskell
+::
 
   ak :: kind(a |> (h -> <Type>)) ~ kind(a)
   bk :: kind(b |> h)             ~ kind(b)
@@ -229,6 +249,9 @@ The problem described here was first found in dependent/should_compile/dynamic-p
 
 Note [Eta for AppCo]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/OptCoercion.hs#L1178>`__
+
 Suppose we have
    g :: s1 t1 ~ s2 t2
 
@@ -247,5 +270,4 @@ because if g is well-kinded then
   kind (s1 t2) = kind (s2 t2)
 and these two imply
   kind s1 = kind s2
-
 

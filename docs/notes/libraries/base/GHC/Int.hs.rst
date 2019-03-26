@@ -1,14 +1,17 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Int.hs>`_
 
-====================
-libraries/base/GHC/Int.hs.rst
-====================
+libraries/base/GHC/Int.hs
+=========================
+
 
 Note [Order of tests]
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Int.hs#L1149>`__
+
 (See #3065, #5161.) Suppose we had a definition like:
 
-.. code-block:: haskell
+::
 
     quot x y
      | y == 0                     = divZeroError
@@ -23,7 +26,7 @@ test.
 
 this expands to something like:
 
-.. code-block:: haskell
+::
 
     case y of
     0 -> divZeroError
@@ -36,7 +39,7 @@ this expands to something like:
 
 Now if we have the call (x `quot` 2), and quot gets inlined, then we get:
 
-.. code-block:: haskell
+::
 
     case 2 of
     0 -> divZeroError
@@ -49,7 +52,7 @@ Now if we have the call (x `quot` 2), and quot gets inlined, then we get:
 
 which simplifies to:
 
-.. code-block:: haskell
+::
 
     case x of
     -9223372036854775808 -> x `primQuot` 2
@@ -59,14 +62,14 @@ Now we have a case with two identical branches, which would be
 eliminated (assuming it doesn't affect strictness, which it doesn't in
 this case), leaving the desired:
 
-.. code-block:: haskell
+::
 
     x `primQuot` 2
 
 except in the minBound branch we know what x is, and GHC cleverly does
 the division at compile time, giving:
 
-.. code-block:: haskell
+::
 
     case x of
     -9223372036854775808 -> -4611686018427387904
@@ -74,7 +77,7 @@ the division at compile time, giving:
 
 So instead we use a definition like:
 
-.. code-block:: haskell
+::
 
     quot x y
      | y == 0                     = divZeroError
@@ -83,7 +86,7 @@ So instead we use a definition like:
 
 which gives us:
 
-.. code-block:: haskell
+::
 
     case y of
     0 -> divZeroError
@@ -95,7 +98,7 @@ which gives us:
 
 for which our call (x `quot` 2) expands to:
 
-.. code-block:: haskell
+::
 
     case 2 of
     0 -> divZeroError
@@ -107,7 +110,7 @@ for which our call (x `quot` 2) expands to:
 
 which simplifies to:
 
-.. code-block:: haskell
+::
 
     x `primQuot` 2
 
@@ -118,7 +121,7 @@ as required.
 But we now have the same problem with a constant numerator: the call
 (2 `quot` y) expands to
 
-.. code-block:: haskell
+::
 
     case y of
     0 -> divZeroError
@@ -130,7 +133,7 @@ But we now have the same problem with a constant numerator: the call
 
 which simplifies to:
 
-.. code-block:: haskell
+::
 
     case y of
     0 -> divZeroError
@@ -139,7 +142,7 @@ which simplifies to:
 
 which simplifies to:
 
-.. code-block:: haskell
+::
 
     case y of
     0 -> divZeroError

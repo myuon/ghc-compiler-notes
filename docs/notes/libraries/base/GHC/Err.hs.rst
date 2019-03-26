@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Err.hs>`_
 
-====================
-libraries/base/GHC/Err.hs.rst
-====================
+libraries/base/GHC/Err.hs
+=========================
+
 
 Note [Errors in base]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Err.hs#L56>`__
+
 As of base-4.9.0.0, `error` produces a stack trace alongside the
 error message using the HasCallStack machinery. This provides
 a partial stack trace, containing the call-site of each function

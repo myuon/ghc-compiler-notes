@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/SrcLoc.hs>`_
 
-====================
-compiler/basicTypes/SrcLoc.hs.rst
-====================
+compiler/basicTypes/SrcLoc.hs
+=============================
+
 
 Note [HasSrcSpan Typeclass]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/SrcLoc.hs#L617>`__
 
 To be able to uniformly set/get source location spans (of `SrcSpan`) in
 syntactic entities (`HsSyn`), we use the typeclass `HasSrcSpan`.

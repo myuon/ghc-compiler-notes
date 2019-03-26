@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Foreign/Ptr.hs>`_
 
-====================
-libraries/base/Foreign/Ptr.hs.rst
-====================
+libraries/base/Foreign/Ptr.hs
+=============================
+
 
 Note [Exporting constructors of marshallable foreign types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Foreign/Ptr.hs#L109>`__
+
 One might expect that IntPtr, WordPtr, and the other newtypes in the
 Foreign.C.Types and System.Posix.Types modules to be abstract, but this is not
 the case in GHC (see #5229 and #11983). In fact, we deliberately export

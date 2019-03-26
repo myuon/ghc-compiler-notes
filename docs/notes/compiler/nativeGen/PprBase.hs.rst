@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/PprBase.hs>`_
 
-====================
-compiler/nativeGen/PprBase.hs.rst
-====================
+compiler/nativeGen/PprBase.hs
+=============================
+
 
 Note [Embedding large binary blobs]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/PprBase.hs#L151>`__
 
 To embed a blob of binary data (e.g. an UTF-8 encoded string) into the generated
 code object, we have several options:
@@ -31,7 +33,10 @@ The threshold is configurable via the `-fbinary-blob-threshold` flag.
 
 
 Note [Pretty print ASCII when AsmCodeGen]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/PprBase.hs#L179>`__
+
 Previously, when generating assembly code, we created SDoc with
 `(ptext . sLit)` for every bytes in literal bytestring, then
 combine them using `hcat`.

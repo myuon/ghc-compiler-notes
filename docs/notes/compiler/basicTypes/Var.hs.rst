@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Var.hs>`_
 
-====================
-compiler/basicTypes/Var.hs.rst
-====================
+compiler/basicTypes/Var.hs
+==========================
+
 
 Note [Evidence: EvIds and CoVars]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Var.hs#L185>`__
+
 * An EvId (evidence Id) is a term-level evidence variable
   (dictionary, implicit parameter, or equality). Could be boxed or unboxed.
 
@@ -18,6 +21,9 @@ Note [Evidence: EvIds and CoVars]
 
 Note [Kind and type variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Var.hs#L195>`__
+
 Before kind polymorphism, TyVar were used to mean type variables. Now
 they are used to mean kind *or* type variables. KindVar is used when we
 know for sure that it is a kind variable. In future, we might want to
@@ -28,9 +34,11 @@ go over the whole compiler code to use:
 
 
 
-
 Note [ExportFlag on binders]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Var.hs#L260>`__
+
 An ExportFlag of "Exported" on a top-level binder says "keep this
 binding alive; do not drop it as dead code".  This transitively
 keeps alive all the other top-level bindings that this binding refers
@@ -54,6 +62,9 @@ KeepAlive.
 
 Note [GlobalId/LocalId]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Var.hs#L281>`__
+
 A GlobalId is
   * always a constant (top-level)
   * imported, or data constructor, or primop, or record selector
@@ -70,12 +81,16 @@ A LocalId is
 After CoreTidy, top-level LocalIds are turned into GlobalIds
 
 
+
 Note [AnonArgFlag vs. ForallVisFlag]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Var.hs#L476>`__
+
 The AnonArgFlag and ForallVisFlag data types are quite similar at a first
 glance:
 
-.. code-block:: haskell
+::
 
   data AnonArgFlag   = VisArg    | InvisArg
   data ForallVisFlag = ForallVis | ForallInvis

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs>`_
 
-====================
-compiler/typecheck/TcTyDecls.hs.rst
-====================
+compiler/typecheck/TcTyDecls.hs
+===============================
+
 
 Note [Superclass cycle check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs#L238>`__
+
 The superclass cycle check for C decides if we can statically
 guarantee that expanding C's superclass cycles transitively is
 guaranteed to terminate.  This is a Haskell98 requirement,
@@ -50,8 +53,12 @@ and now expand superclasses for constraint (C Id):
 Each step expands superclasses one layer, and clearly does not terminate.
 
 
+
 Note [Role inference]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs#L352>`__
+
 The role inference algorithm datatype definitions to infer the roles on the
 parameters. Although these roles are stored in the tycons, we can perform this
 algorithm on the built tycons, as long as we don't peek at an as-yet-unknown
@@ -135,6 +142,9 @@ called from checkValidTycon.
 
 Note [Role-checking data constructor arguments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs#L433>`__
+
 Consider
   data T a where
     MkT :: Eq b => F a -> (a->a) -> T (G a)
@@ -148,17 +158,23 @@ so we need to take into account
 
 
 
-
 Note [Coercions in role inference]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs#L447>`__
+
 Is (t |> co1) representationally equal to (t |> co2)? Of course they are! Changing
 the kind of a type is totally irrelevant to the representation of that type. So,
 we want to totally ignore coercions when doing role inference. This includes omitting
 any type variables that appear in nominal positions but only within coercions.
 
 
+
 Note [Default roles for abstract TyCons in hs-boot/hsig]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs#L512>`__
+
 What should the default role for an abstract TyCon be?
 
 Originally, we inferred phantom role for abstract TyCons
@@ -184,14 +200,18 @@ accurate role here, because any types that use the abstract
 type will propagate the role information.)
 
 
+
 Note [Default method Ids and Template Haskell]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs#L806>`__
+
 Consider this (#4169):
    class Numeric a where
      fromIntegerNum :: a
      fromIntegerNum = ...
 
-.. code-block:: haskell
+::
 
    ast :: Q [Dec]
    ast = [d| instance Numeric Int |]
@@ -203,18 +223,22 @@ must bring the default method Ids into scope first (so they can be seen
 when typechecking the [d| .. |] quote, and typecheck them later.
 
 
+
 Note [Polymorphic selectors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs#L944>`__
+
 We take care to build the type of a polymorphic selector in the right
 order, so that visible type application works.
 
-.. code-block:: haskell
+::
 
   data Ord a => T a = MkT { field :: forall b. (Num a, Show b) => (a, b) }
 
 We want
 
-.. code-block:: haskell
+::
 
   field :: forall a. Ord a => T a -> forall b. (Num a, Show b) => (a, b)
 
@@ -222,6 +246,9 @@ We want
 
 Note [Naughty record selectors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs#L955>`__
+
 A "naughty" field is one for which we can't define a record
 selector, because an existential type variable would escape.  For example:
         data T = forall a. MkT { x,y::a }
@@ -247,6 +274,9 @@ sel_naughty field.
 
 Note [GADT record selectors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs#L978>`__
+
 For GADTs, we require that all constructors with a common field 'f' have the same
 result type (modulo alpha conversion).  [Checked in TcTyClsDecls.checkValidTyCon]
 E.g.
@@ -280,9 +310,12 @@ Note the need for casts in the result!
 
 Note [Selector running example]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyDecls.hs#L1009>`__
+
 It's OK to combine GADTs and type families.  Here's a running example:
 
-.. code-block:: haskell
+::
 
         data instance T [a] where
           T1 { fld :: b } :: T [Maybe b]
@@ -296,7 +329,7 @@ and there's coercion from the family type to the representation type
 
 The selector we want for fld looks like this:
 
-.. code-block:: haskell
+::
 
         fld :: forall b. T [Maybe b] -> b
         fld = /\b. \(d::T [Maybe b]).
@@ -305,5 +338,4 @@ The selector we want for fld looks like this:
 
 The scrutinee of the case has type :R7T (Maybe b), which can be
 gotten by appying the eq_spec to the univ_tvs of the data con.
-
 

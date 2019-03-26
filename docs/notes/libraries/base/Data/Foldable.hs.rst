@@ -1,18 +1,21 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Foldable.hs>`_
 
-====================
-libraries/base/Data/Foldable.hs.rst
-====================
+libraries/base/Data/Foldable.hs
+===============================
+
 
 Note [List fusion and continuations in 'c']
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Foldable.hs#L693>`__
+
 Suppose we define
   mapM_ f = foldr ((>>) . f) (return ())
 (this is the way it used to be).
 
 Now suppose we want to optimise the call
 
-.. code-block:: haskell
+::
 
   mapM_ <big> (build g)
     where
@@ -20,21 +23,21 @@ Now suppose we want to optimise the call
 
 GHC used to proceed like this:
 
-.. code-block:: haskell
+::
 
   mapM_ <big> (build g)
 
-.. code-block:: haskell
+::
 
   = { Definition of mapM_ }
     foldr ((>>) . <big>) (return ()) (build g)
 
-.. code-block:: haskell
+::
 
   = { foldr/build rule }
     g ((>>) . <big>) (return ())
 
-.. code-block:: haskell
+::
 
   = { Inline g }
     let c = (>>) . <big>
@@ -46,7 +49,7 @@ be absolutely terrible for performance, as we saw in #8763.
 
 It's much better to define
 
-.. code-block:: haskell
+::
 
   mapM_ f = foldr c (return ())
     where
@@ -56,7 +59,7 @@ It's much better to define
 Now we get
   mapM_ <big> (build g)
 
-.. code-block:: haskell
+::
 
   = { inline mapM_ }
     foldr c (return ()) (build g)
@@ -69,7 +72,7 @@ because the INLINE pragma stops it; see
 Note [Simplifying inside stable unfoldings] in SimplUtils.
 Continuing:
 
-.. code-block:: haskell
+::
 
   = { foldr/build rule }
     g c (return ())
@@ -78,7 +81,7 @@ Continuing:
          {-# INLINE c #-}
             f = <big>
 
-.. code-block:: haskell
+::
 
   = { inline g }
     ...(c x1 y1)...(c x2 y2)....n...
@@ -87,11 +90,11 @@ Continuing:
             f = <big>
             n = return ()
 
-.. code-block:: haskell
+::
 
       Now, crucially, `c` does inline
 
-.. code-block:: haskell
+::
 
   = { inline c }
     ...(f x1 >> y1)...(f x2 >> y2)....n...
@@ -103,8 +106,12 @@ And all is well!  The key thing is that the fragment
 `g`.
 
 
+
 Note [maximumBy/minimumBy space usage]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Foldable.hs#L771>`__
+
 When the type signatures of maximumBy and minimumBy were generalized to work
 over any Foldable instance (instead of just lists), they were defined using
 foldr1. This was problematic for space usage, as the semantics of maximumBy

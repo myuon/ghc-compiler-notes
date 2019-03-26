@@ -1,29 +1,32 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/TrieMap.hs>`_
 
-====================
-compiler/utils/TrieMap.hs.rst
-====================
+compiler/utils/TrieMap.hs
+=========================
+
 
 Note [foldTM determinism]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/TrieMap.hs#L138>`__
+
 We want foldTM to be deterministic, which is why we have an instance of
 TrieMap for UniqDFM, but not for UniqFM. Here's an example of some things that
 go wrong if foldTM is nondeterministic. Consider:
 
-.. code-block:: haskell
+::
 
   f a b = return (a <> b)
 
 Depending on the order that the typechecker generates constraints you
 get either:
 
-.. code-block:: haskell
+::
 
   f :: (Monad m, Monoid a) => a -> a -> m a
 
 or:
 
-.. code-block:: haskell
+::
 
   f :: (Monoid a, Monad m) => a -> a -> m a
 
@@ -35,19 +38,19 @@ sorted alphabetically.
 
 Unfortunately that doesn't quite work with this example:
 
-.. code-block:: haskell
+::
 
   f a b = let x = a <> a; y = b <> b in x
 
 where you infer:
 
-.. code-block:: haskell
+::
 
   f :: (Monoid m, Monoid m1) => m1 -> m -> m1
 
 or:
 
-.. code-block:: haskell
+::
 
   f :: (Monoid m1, Monoid m) => m1 -> m -> m1
 
@@ -57,22 +60,22 @@ according to depth first traversal and use it to order the constraints.
 The real trouble starts when the user enables incoherent instances and
 the compiler has to make an arbitrary choice. Consider:
 
-.. code-block:: haskell
+::
 
   class T a b where
     go :: a -> b -> String
 
-.. code-block:: haskell
+::
 
   instance (Show b) => T Int b where
     go a b = show a ++ show b
 
-.. code-block:: haskell
+::
 
   instance (Show a) => T a Bool where
     go a b = show a ++ show b
 
-.. code-block:: haskell
+::
 
   f = go 10 True
 
@@ -90,8 +93,11 @@ See Note [Deterministic UniqFM] in UniqDFM for more details on how it's made
 deterministic.
 
 
+
 Note [Compressed TrieMap]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/TrieMap.hs#L314>`__
 
 The GenMap constructor augments TrieMaps with leaf compression.  This helps
 solve the performance problem detailed in #9960: suppose we have a handful

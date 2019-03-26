@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs>`_
 
-====================
-compiler/rename/RnTypes.hs.rst
-====================
+compiler/rename/RnTypes.hs
+==========================
+
 
 Note [Renaming named wild cards]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs#L279>`__
+
 Identifiers starting with an underscore are always parsed as type variables.
 It is only here in the renamer that we give the special treatment.
 See Note [The wildcard story for types] in HsTypes.
@@ -18,9 +21,11 @@ of the HsWildCardBndrs structure, and we are done.
 
 
 
-
 Note [Context quantification]
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs#L349>`__
+
 Variables in type signatures are implicitly quantified
 when (1) they are in a type signature not beginning
 with "forall" or (2) in any qualified type T => R.
@@ -42,22 +47,25 @@ HsForAllTy Qualified.
 
 Note [QualTy in kinds]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs#L368>`__
+
 I was wondering whether QualTy could occur only at TypeLevel.  But no,
 we can have a qualified type in a kind too. Here is an example:
 
-.. code-block:: haskell
+::
 
   type family F a where
     F Bool = Nat
     F Nat  = Type
 
-.. code-block:: haskell
+::
 
   type family G a where
     G Type = Type -> Type
     G ()   = Nat
 
-.. code-block:: haskell
+::
 
   data X :: forall k1 k2. (F k1 ~ G k2) => k1 -> k2 -> Type where
     MkX :: X 'True '()
@@ -66,7 +74,7 @@ See that k1 becomes Bool and k2 becomes (), so the equality is
 satisfied. If I write MkX :: X 'True 'False, compilation fails with a
 suitable message:
 
-.. code-block:: haskell
+::
 
   MkX :: X 'True '()
     • Couldn't match kind ‘G Bool’ with ‘Nat’
@@ -78,8 +86,12 @@ equalities; or at least, any kinds with a class constraint are
 uninhabited.
 
 
+
 Note [bindHsQTyVars examples]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs#L855>`__
+
 Suppose we have
    data T k (a::k1) (b::k) :: k2 -> k1 -> *
 
@@ -87,17 +99,17 @@ Then:
   hs_tv_bndrs = [k, a::k1, b::k], the explicitly-bound variables
   bndrs       = [k,a,b]
 
-.. code-block:: haskell
+::
 
   bndr_kv_occs = [k,k1], kind variables free in kind signatures
                          of hs_tv_bndrs
 
-.. code-block:: haskell
+::
 
   body_kv_occs = [k2,k1], kind variables free in the
                           result kind signature
 
-.. code-block:: haskell
+::
 
   implicit_kvs = [k1,k2], kind variables free in kind signatures
                           of hs_tv_bndrs, and not bound by bndrs
@@ -128,6 +140,9 @@ variables at all.
 
 Note [Kind variable scoping]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs#L895>`__
+
 If we have
   data T (a :: k) k = ...
 we report "k is out of scope" for (a::k).  Reason: k is not brought
@@ -138,7 +153,7 @@ and a distinct, shadowing explicit k that follows, something like
 
 So the rule is:
 
-.. code-block:: haskell
+::
 
    the implicit binders never include any
    of the explicit binders in the group
@@ -168,10 +183,13 @@ In implementation terms
 
 Note [Variables used as both types and kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs#L931>`__
+
 We bind the type variables tvs, and kvs is the set of free variables of the
 kinds in the scope of the binding. Here is one typical example:
 
-.. code-block:: haskell
+::
 
    forall a b. a -> (b::k) -> (c::a)
 
@@ -180,7 +198,7 @@ Here, tvs will be {a,b}, and kvs {k,a}.
 We must make sure that kvs includes all of variables in the kinds of type
 variable bindings. For instance:
 
-.. code-block:: haskell
+::
 
    forall k (a :: k). Proxy a
 
@@ -192,8 +210,12 @@ So tvs is {k,a} and kvs is {k}.
 NB: we do this only at the binding site of 'tvs'.
 
 
+
 Note [Kind and type-variable binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs#L1430>`__
+
 In a type signature we may implicitly bind type/kind variables. For example:
   *   f :: a -> a
       f = ...
@@ -222,22 +244,25 @@ Clients of this code can remove duplicates with nubL.
 
 Note [Ordering of implicit variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs#L1456>`__
+
 Since the advent of -XTypeApplications, GHC makes promises about the ordering
 of implicit variable quantification. Specifically, we offer that implicitly
 quantified variables (such as those in const :: a -> b -> a, without a `forall`)
 will occur in left-to-right order of first occurrence. Here are a few examples:
 
-.. code-block:: haskell
+::
 
   const :: a -> b -> a       -- forall a b. ...
   f :: Eq a => b -> a -> a   -- forall a b. ...  contexts are included
 
-.. code-block:: haskell
+::
 
   type a <-< b = b -> a
   g :: a <-< b               -- forall a b. ...  type synonyms matter
 
-.. code-block:: haskell
+::
 
   class Functor f where
     fmap :: (a -> b) -> f a -> f b   -- forall f a b. ...
@@ -246,7 +271,7 @@ will occur in left-to-right order of first occurrence. Here are a few examples:
 This simple story is complicated by the possibility of dependency: all variables
 must come after any variables mentioned in their kinds.
 
-.. code-block:: haskell
+::
 
   typeRep :: Typeable a => TypeRep (a :: k)   -- forall k a. ...
 
@@ -264,10 +289,13 @@ These functions thus promise to keep left-to-right ordering.
 
 Note [Implicit quantification in type synonyms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs#L1488>`__
+
 We typically bind type/kind variables implicitly when they are in a kind
 annotation on the LHS, for example:
 
-.. code-block:: haskell
+::
 
   data Proxy (a :: k) = Proxy
   type KindOf (a :: k) = k
@@ -279,7 +307,7 @@ variables from the kind signature. That's what we do in extract_hs_tv_bndrs_kvs
 By contrast, on the RHS we can't simply collect *all* free variables. Which of
 the following are allowed?
 
-.. code-block:: haskell
+::
 
   type TySyn1 = a :: Type
   type TySyn2 = 'Nothing :: Maybe a
@@ -307,7 +335,7 @@ synonyms and type family instances.
 This is something of a stopgap solution until we can explicitly bind invisible
 type/kind variables:
 
-.. code-block:: haskell
+::
 
   type TySyn3 :: forall a. Maybe a
   type TySyn3 @a = 'Just ('Nothing :: Maybe a)
@@ -317,12 +345,14 @@ type/kind variables:
 Note [Implicit quantification in type synonyms: non-taken alternatives]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnTypes.hs#L1532>`__
+
 Alternative I: No quantification
 --------------------------------
 We could offer no implicit quantification on the RHS, accepting none of the
 TySyn<N> examples. The user would have to bind the variables explicitly:
 
-.. code-block:: haskell
+::
 
   type TySyn1 a = a :: Type
   type TySyn2 a = 'Nothing :: Maybe a
@@ -337,7 +367,7 @@ Alternative II: Indiscriminate quantification
 We could implicitly quantify over all free variables on the RHS just like we do
 on the LHS. Then we would infer the following kinds:
 
-.. code-block:: haskell
+::
 
   TySyn1 :: forall {a}. Type
   TySyn2 :: forall {a}. Maybe a
@@ -352,7 +382,7 @@ Alternative III: reportFloatingKvs
 We could augment Alternative II by hunting down free-floating variables during
 type checking. While viable, this would mean we'd end up accepting this:
 
-.. code-block:: haskell
+::
 
   data Prox k (a :: k)
   type T = Prox k

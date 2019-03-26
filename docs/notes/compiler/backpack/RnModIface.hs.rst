@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/backpack/RnModIface.hs>`_
 
-====================
-compiler/backpack/RnModIface.hs.rst
-====================
+compiler/backpack/RnModIface.hs
+===============================
+
 
 Note [rnIfaceNeverExported]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/backpack/RnModIface.hs#L369>`__
+
 For the high-level overview, see
 Note [Handling never-exported TyThings under Backpack]
 

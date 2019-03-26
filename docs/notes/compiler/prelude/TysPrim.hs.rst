@@ -1,14 +1,17 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysPrim.hs>`_
 
-====================
-compiler/prelude/TysPrim.hs.rst
-====================
+compiler/prelude/TysPrim.hs
+===========================
+
 
 Note [TYPE and RuntimeRep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysPrim.hs#L400>`__
+
 All types that classify values have a kind of the form (TYPE rr), where
 
-.. code-block:: haskell
+::
 
     data RuntimeRep     -- Defined in ghc-prim:GHC.Types
       = LiftedRep
@@ -17,11 +20,11 @@ All types that classify values have a kind of the form (TYPE rr), where
       | FloatRep
       .. etc ..
 
-.. code-block:: haskell
+::
 
     rr :: RuntimeRep
 
-.. code-block:: haskell
+::
 
     TYPE :: RuntimeRep -> TYPE 'LiftedRep  -- Built in
 
@@ -68,6 +71,9 @@ generator never has to manipulate a value of type 'a :: TYPE rr'.
 
 Note [PrimRep and kindPrimRep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysPrim.hs#L454>`__
+
 As part of its source code, in TyCon, GHC has
   data PrimRep = LiftedRep | UnliftedRep | IntRep | FloatRep | ...etc...
 
@@ -93,6 +99,9 @@ PrimRep in the promoted data constructor itself: see TyCon.promDcRepInfo.
 
 Note [The equality types story]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysPrim.hs#L648>`__
+
 GHC sports a veritable menagerie of equality types:
 
          Type or  Lifted?  Hetero?  Role      Built in         Defining module
@@ -241,12 +250,12 @@ within GHC at all.
 This is the phantom analogue of ~# and it is barely used at all.
 (The solver has no idea about this one.) Here is the motivation:
 
-.. code-block:: haskell
+::
 
     data Phant a = MkPhant
     type role Phant phantom
 
-.. code-block:: haskell
+::
 
     Phant <Int, Bool>_P :: Phant Int ~P# Phant Bool
 
@@ -255,10 +264,11 @@ don't need to worry about it.
 
 
 
-
-
 Note [The State# TyCon]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysPrim.hs#L808>`__
+
 State# is the primitive, unlifted type of states.  It has one type parameter,
 thus
         State# RealWorld

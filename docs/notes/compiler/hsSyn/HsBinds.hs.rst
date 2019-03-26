@@ -1,15 +1,18 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsBinds.hs>`_
 
-====================
-compiler/hsSyn/HsBinds.hs.rst
-====================
+compiler/hsSyn/HsBinds.hs
+=========================
+
 
 Note [AbsBinds]
 ~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsBinds.hs#L388>`__
+
 The AbsBinds constructor is used in the output of the type checker, to
 record *typechecked* and *generalised* bindings.  Specifically
 
-.. code-block:: haskell
+::
 
          AbsBinds { abs_tvs      = tvs
                   , abs_ev_vars  = [d1,d2]
@@ -21,13 +24,13 @@ record *typechecked* and *generalised* bindings.  Specifically
 
 where 'BIND' binds the monomorphic Ids 'fm' and 'gm', means
 
-.. code-block:: haskell
+::
 
         fp = fwrap [/\ tvs. \d1 d2. letrec { DBINDS        ]
                    [                       ; BIND[fm,gm] } ]
                    [                 in fm                 ]
 
-.. code-block:: haskell
+::
 
         gp = ...same again, with gm instead of fm
 
@@ -37,13 +40,13 @@ Note [ABExport wrapper].
 This is a pretty bad translation, because it duplicates all the bindings.
 So the desugarer tries to do a better job:
 
-.. code-block:: haskell
+::
 
         fp = /\ [a,b] -> \ [d1,d2] -> case tp [a,b] [d1,d2] of
                                         (fm,gm) -> fm
         ..ditto for gp..
 
-.. code-block:: haskell
+::
 
         tp = /\ [a,b] -> \ [d1,d2] -> letrec { DBINDS; BIND }
                                       in (fm,gm)
@@ -68,7 +71,7 @@ In Hindley-Milner, a recursive binding is typechecked with the
 *recursive* uses being *monomorphic*.  So after typechecking *and*
 desugaring we will get something like this
 
-.. code-block:: haskell
+::
 
     M.reverse :: forall a. [a] -> [a]
       = /\a. letrec
@@ -84,7 +87,7 @@ definition for plain 'reverse' which is *monomorphic*.  The type variable
 That's after desugaring.  What about after type checking but before
 desugaring?  That's where AbsBinds comes in.  It looks like this:
 
-.. code-block:: haskell
+::
 
    AbsBinds { abs_tvs     = [a]
             , abs_ev_vars = []
@@ -127,10 +130,13 @@ After type checking we get
 
 Note [Polymorphic recursion]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsBinds.hs#L493>`__
+
 Consider
    Rec { f x = ...(g ef)...
 
-.. code-block:: haskell
+::
 
        ; g :: forall a. [a] -> [a]
        ; g y = ...(f eg)...  }
@@ -166,20 +172,22 @@ bindings only when
 
 
 
-
 Note [The abs_sig field of AbsBinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsBinds.hs#L531>`__
+
 The abs_sig field supports a couple of special cases for bindings.
 Consider
 
-.. code-block:: haskell
+::
 
   x :: Num a => (# a, a #)
   x = (# 3, 4 #)
 
 The general desugaring for AbsBinds would give
 
-.. code-block:: haskell
+::
 
   x = /\a. \ ($dNum :: Num a) ->
       letrec xm = (# fromInteger $dNum 3, fromInteger $dNum 4 #) in
@@ -188,7 +196,7 @@ The general desugaring for AbsBinds would give
 But that has an illegal let-binding for an unboxed tuple.  In this
 case we'd prefer to generate the (more direct)
 
-.. code-block:: haskell
+::
 
   x = /\ a. \ ($dNum :: Num a) ->
      (# fromInteger $dNum 3, fromInteger $dNum 4 #)
@@ -196,7 +204,7 @@ case we'd prefer to generate the (more direct)
 A similar thing happens with representation-polymorphic defns
 (#11405):
 
-.. code-block:: haskell
+::
 
   undef :: forall (r :: RuntimeRep) (a :: TYPE r). HasCallStack => a
   undef = error "undef"
@@ -205,7 +213,7 @@ Again, the vanilla desugaring gives a local let-binding for a
 representation-polymorphic (undefm :: a), which is illegal.  But
 again we can desugar without a let:
 
-.. code-block:: haskell
+::
 
   undef = /\ a. \ (d:HasCallStack) -> error a d "undef"
 
@@ -227,6 +235,9 @@ generate code without a let-binding.
 
 Note [ABExport wrapper]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsBinds.hs#L577>`__
+
 Consider
    (f,g) = (\x.x, \y.y)
 This ultimately desugars to something like this:
@@ -246,6 +257,9 @@ variables.  The action happens in TcBinds.mkExport.
 
 Note [Bind free vars]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsBinds.hs#L594>`__
+
 The bind_fvs field of FunBind and PatBind records the free variables
 of the definition.  It is used for the following purposes
 

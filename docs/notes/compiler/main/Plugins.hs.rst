@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/Plugins.hs>`_
 
-====================
-compiler/main/Plugins.hs.rst
-====================
+compiler/main/Plugins.hs
+========================
+
 
 Note [Source plugins]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/Plugins.hs#L108>`__
+
 The `Plugin` datatype have been extended by fields that allow access to the
 different inner representations that are generated during the compilation
 process. These fields are `parsedResultAction`, `renamedResultAction`,

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/PprTyThing.hs>`_
 
-====================
-compiler/main/PprTyThing.hs.rst
-====================
+compiler/main/PprTyThing.hs
+===========================
+
 
 Note [Pretty printing via IfaceSyn]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/PprTyThing.hs#L40>`__
+
 Our general plan for prett-printing
   - Types
   - TyCons
@@ -33,7 +36,7 @@ Why do this?
   tidyType) to avoids having (forall a a. blah) where the two
   a's have different uniques.
 
-.. code-block:: haskell
+::
 
   Alas, for type constructors, TyCon, tidying does not work well,
   because a TyCon includes DataCons which include Types, which mention
@@ -45,7 +48,7 @@ Why do this?
   MkIface.tyThingToIfaceDecl which converts a TyThing (i.e. TyCon,
   Class etc) to an IfaceDecl.
 
-.. code-block:: haskell
+::
 
   Bottom line: IfaceDecls are already 'tidy', so it's straightforward
   to print them.

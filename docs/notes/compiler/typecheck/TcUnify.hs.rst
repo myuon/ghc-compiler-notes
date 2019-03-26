@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs>`_
 
-====================
-compiler/typecheck/TcUnify.hs.rst
-====================
+compiler/typecheck/TcUnify.hs
+=============================
+
 
 Note [Herald for matchExpectedFunTys]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L76>`__
+
 The 'herald' always looks like:
    "The equation(s) for 'f' have"
    "The abstraction (\x.e) takes"
@@ -14,22 +17,22 @@ The 'herald' always looks like:
 
 This is used to construct a message of form
 
-.. code-block:: haskell
+::
 
    The abstraction `\Just 1 -> ...' takes two arguments
    but its type `Maybe a -> a' has only one
 
-.. code-block:: haskell
+::
 
    The equation(s) for `f' have two arguments
    but its type `Maybe a -> a' has only one
 
-.. code-block:: haskell
+::
 
    The section `(f 3)' requires 'f' to take two arguments
    but its type `Int -> Int' has only one
 
-.. code-block:: haskell
+::
 
    The function 'f' is applied to two arguments
    but its type `Int -> Int' has only one
@@ -38,7 +41,7 @@ When visible type applications (e.g., `f @Int 1 2`, as in #13902) enter the
 picture, we have a choice in deciding whether to count the type applications as
 proper arguments:
 
-.. code-block:: haskell
+::
 
    The function 'f' is applied to one visible type argument
      and two value arguments
@@ -47,7 +50,7 @@ proper arguments:
 
 Or whether to include the type applications as part of the herald itself:
 
-.. code-block:: haskell
+::
 
    The expression 'f @Int' is applied to two arguments
    but its type `Int -> Int` has only one
@@ -59,6 +62,9 @@ choose to implement that option.
 
 Note [matchExpectedFunTys]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L115>`__
+
 matchExpectedFunTys checks that a sigma has the form
 of an n-ary function.  It passes the decomposed type to the
 thing_inside, and returns a wrapper to coerce between the two types
@@ -76,8 +82,12 @@ passed in.
 Use this one when you have an "expected" type.
 
 
+
 Note [Subsumption checking: tcSubType]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L455>`__
+
 All the tcSubType calls have the form
                 tcSubType actual_ty expected_ty
 which checks
@@ -86,7 +96,7 @@ which checks
 That is, that a value of type actual_ty is acceptable in
 a place expecting a value of type expected_ty.  I.e. that
 
-.. code-block:: haskell
+::
 
     actual ty   is more polymorphic than   expected_ty
 
@@ -100,7 +110,7 @@ expected_ty is an appropriate annotation to use for something of type
 actual_ty. This difference matters when thinking about visible type
 application. For example,
 
-.. code-block:: haskell
+::
 
    forall a. a -> forall b. b -> b
       DOES NOT SUBSUME
@@ -161,8 +171,12 @@ So it's important that we unify beta := forall a. a->a, rather than
 skolemising the type.
 
 
+
 Note [Don't skolemise unnecessarily]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L686>`__
+
 Suppose we are trying to solve
     (Char->Char) <= (forall a. a->a)
 We could skolemise the 'forall a', and then complain
@@ -199,8 +213,12 @@ error message) is very conservative:
 -------------
 
 
+
 Note [Settting the argument context]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L811>`__
+
 Consider we are doing the ambiguity check for the (bogus)
   f :: (forall a b. C b => a -> a) -> Int
 
@@ -229,15 +247,19 @@ to a UserTypeCtxt of GenSigCtxt.  Why?
  expressions
 
 
+
 Note [Deep instantiation of InferResult]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L922>`__
+
 In some cases we want to deeply instantiate before filling in
 an InferResult, and in some cases not.  That's why InferReult
 has the ir_inst flag.
 
 * ir_inst = True: deeply instantiate
 
-.. code-block:: haskell
+::
 
   Consider
     f x = (*)
@@ -246,14 +268,14 @@ has the ir_inst flag.
     f :: forall {a}. a -> forall b. Num b => b -> b -> b
   This is surely confusing for users.
 
-.. code-block:: haskell
+::
 
   And worse, the monomorphism restriction won't work properly. The MR is
   dealt with in simplifyInfer, and simplifyInfer has no way of
   instantiating. This could perhaps be worked around, but it may be
   hard to know even when instantiation should happen.
 
-.. code-block:: haskell
+::
 
   Another reason.  Consider
        f :: (?x :: Int) => a -> a
@@ -263,31 +285,35 @@ has the ir_inst flag.
 
 * ir_inst = False: do not instantiate
 
-.. code-block:: haskell
+::
 
   Consider this (which uses visible type application):
 
-.. code-block:: haskell
+::
 
     (let { f :: forall a. a -> a; f x = x } in f) @Int
 
-.. code-block:: haskell
+::
 
   We'll call TcExpr.tcInferFun to infer the type of the (let .. in f)
   And we don't want to instantite the type of 'f' when we reach it,
   else the outer visible type application won't work
 
 
+
 Note [Promoting a type]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1004>`__
+
 Consider (#12427)
 
-.. code-block:: haskell
+::
 
   data T where
     MkT :: (Int -> Int) -> a -> T
 
-.. code-block:: haskell
+::
 
   h y = case y of MkT v w -> v
 
@@ -315,9 +341,11 @@ Note [Promotion and higher rank types]
 
 
 
-
 Note [Promotion and higher rank types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1036>`__
+
 If v had a higher-rank type, say v :: (forall a. a->a) -> Int,
 then we'd emit an equality
         [W] alpha[l+1] ~ ((forall a. a->a) -> Int)
@@ -356,8 +384,12 @@ to do it.  These higher-rank notes are just here to record
 the thinking.
 
 
+
 Note [When to build an implication]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1263>`__
+
 Suppose we have some 'skolems' and some 'givens', and we are
 considering whether to wrap the constraints in their scope into an
 implication.  We must /always/ so if either 'skolems' or 'givens' are
@@ -387,8 +419,12 @@ take care:
   Building an implication keeps them separage.
 
 
+
 Note [Check for equality before deferring]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1494>`__
+
 Particularly in ambiguity checks we can get equalities like (ty ~ ty).
 If ty involves a type function we may defer, which isn't very sensible.
 An egregious example of this was in test T9872a, which has a type signature
@@ -402,6 +438,9 @@ This little short-cut in 'defer' helps quite a bit.
 
 Note [Care with type applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1505>`__
+
 Note: type applications need a bit of care!
 They can match FunTy and TyConApp, so use splitAppTy_maybe
 NB: we've already dealt with type variables and Notes,
@@ -411,6 +450,9 @@ so if one type is an App the other one jolly well better be too
 
 Note [Mismatched type lists and application decomposition]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1512>`__
+
 When we find two TyConApps, you might think that the argument lists
 are guaranteed equal length.  But they aren't. Consider matching
         w (T x) ~ Foo (T x y)
@@ -422,7 +464,7 @@ So either
    (a) either we must check for identical argument kinds
        when decomposing applications,
 
-.. code-block:: haskell
+::
 
    (b) or we must be prepared for ill-kinded unification sub-problems
 
@@ -433,6 +475,9 @@ a global invariant.
 
 Note [Expanding synonyms during unification]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1530>`__
+
 We expand synonyms during unification, but:
  * We expand *after* the variable case so that we tend to unify
    variables with un-expanded type synonym. This just makes it
@@ -457,6 +502,9 @@ We expand synonyms during unification, but:
 
 Note [Deferred Unification]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1552>`__
+
 We may encounter a unification ty1 ~ ty2 that cannot be performed syntactically,
 and yet its consistency is undetermined. Previously, there was no way to still
 make it consistent. So a mismatch error was issued.
@@ -480,9 +528,11 @@ improve error messages.
 
 
 
-
 Note [TyVar/TyVar orientation]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1711>`__
+
 Given (a ~ b), should we orient the CTyEqCan as (a~b) or (b~a)?
 This is a surprisingly tricky question!
 
@@ -528,6 +578,9 @@ So we look for a positive reason to swap, using a three-step test:
 
 Note [Deeper level on the left]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1754>`__
+
 The most important thing is that we want to put tyvars with
 the deepest level on the left.  The reason to do so differs for
 Wanteds and Givens, but either way, deepest wins!  Simple.
@@ -538,19 +591,19 @@ Wanteds and Givens, but either way, deepest wins!  Simple.
 * Givens. Suppose we have something like
      forall a[2]. b[1] ~ a[2] => beta[1] ~ a[2]
 
-.. code-block:: haskell
+::
 
   If we orient the Given a[2] on the left, we'll rewrite the Wanted to
   (beta[1] ~ b[1]), and that can float out of the implication.
   Otherwise it can't.  By putting the deepest variable on the left
   we maximise our changes of eliminating skolem capture.
 
-.. code-block:: haskell
+::
 
   See also TcSMonad Note [Let-bound skolems] for another reason
   to orient with the deepest skolem on the left.
 
-.. code-block:: haskell
+::
 
   IMPORTANT NOTE: this test does a level-number comparison on
   skolems, so it's important that skolems have (accurate) level
@@ -563,7 +616,10 @@ is a good plan.
 
 Note [Fmv Orientation Invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   * We always orient a constraint
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1781>`__
+
+* We always orient a constraint
         fmv ~ alpha
      with fmv on the left, even if alpha is
      a touchable unification variable
@@ -585,17 +641,17 @@ T10226, T10009.)
           [G] F a ~ a
           [WD] F alpha ~ alpha, alpha ~ a
 
-.. code-block:: haskell
+::
 
     From Givens we get
           [G] F a ~ fsk, fsk ~ a
 
-.. code-block:: haskell
+::
 
     Now if we flatten we get
           [WD] alpha ~ fmv, F alpha ~ fmv, alpha ~ a
 
-.. code-block:: haskell
+::
 
     Now, if we unified alpha := fmv, we'd get
           [WD] F fmv ~ fmv, [WD] fmv ~ a
@@ -605,7 +661,7 @@ So instead the Fmv Orientation Invariant puts the fmv on the
 left, giving
       [WD] fmv ~ alpha, [WD] F alpha ~ fmv, [WD] alpha ~ a
 
-.. code-block:: haskell
+::
 
     Now we get alpha:=a, and everything works out
 
@@ -613,6 +669,9 @@ left, giving
 
 Note [Eliminate flat-skols]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1821>`__
+
 Suppose we have  [G] Num (F [a])
 then we flatten to
      [G] Num fsk
@@ -633,6 +692,9 @@ the fsk.
 
 Note [Avoid unnecessary swaps]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1839>`__
+
 If we swap without actually improving matters, we can get an infinite loop.
 Consider
     work item:  a ~ b
@@ -648,6 +710,9 @@ And now the cycle just repeats
 
 Note [Eliminate younger unification variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1852>`__
+
 Given a choice of unifying
      alpha := beta   or   beta := alpha
 we try, if possible, to eliminate the "younger" one, as determined
@@ -668,8 +733,12 @@ touchable unification variable.
 Returns True <=> spontaneous solve happened
 
 
+
 Note [Prevent unification with type families]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1895>`__
+
 We prevent unification with type families because of an uneasy compromise.
 It's perfectly sound to unify with type families, and it even improves the
 error messages in the testsuite. It also modestly improves performance, at
@@ -690,6 +759,9 @@ better in practice.
 
 Note [Refactoring hazard: checkTauTvUpdate]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1913>`__
+
 I (Richard E.) have a sad story about refactoring this code, retained here
 to prevent others (or a future me!) from falling into the same traps.
 
@@ -723,19 +795,22 @@ Bottom lines:
 
 
 Note [Type synonyms and the occur check]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1945>`__
+
 Generally speaking we try to update a variable with type synonyms not
 expanded, which improves later error messages, unless looking
 inside a type synonym may help resolve a spurious occurs check
 error. Consider:
           type A a = ()
 
-.. code-block:: haskell
+::
 
           f :: (A a -> a -> ()) -> ()
           f = \ _ -> ()
 
-.. code-block:: haskell
+::
 
           x :: ()
           x = f (\ x p -> p x)
@@ -755,11 +830,14 @@ function @occ_check_ok@.
 
 Note [Non-TcTyVars in TcUnify]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L1970>`__
+
 Because the same code is now shared between unifying types and unifying
 kinds, we sometimes will see proper TyVars floating around the unifier.
 Example (from test case polykinds/PolyKinds12):
 
-.. code-block:: haskell
+::
 
     type family Apply (f :: k1 -> k2) (x :: k1) :: k2
     type instance Apply g y = g y
@@ -767,7 +845,7 @@ Example (from test case polykinds/PolyKinds12):
 When checking the instance declaration, we first *kind-check* the LHS
 and RHS, discovering that the instance really should be
 
-.. code-block:: haskell
+::
 
     type instance Apply k3 k4 (g :: k3 -> k4) (y :: k3) = g y
 
@@ -785,15 +863,23 @@ type-checking (with wrappers, etc.). Types get desugared very differently,
 causing this wibble in behavior seen here.
 
 
+
 Note [Unifying untouchables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L2020>`__
+
 We treat an untouchable type variable as if it was a skolem.  That
 ensures it won't unify with anything.  It's a slight hack, because
 we return a made-up TcTyVarDetails, but I think it works smoothly.
 
 
+
 Note [Occurrence checking: look inside kinds]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L2073>`__
+
 Suppose we are considering unifying
    (alpha :: *)  ~  Int -> (beta :: alpha -> alpha)
 This may be an error (what is that alpha doing inside beta's kind?),
@@ -809,6 +895,9 @@ NB: we may be able to remove the problem via expansion; see
 
 Note [Checking for foralls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcUnify.hs#L2086>`__
+
 Unless we have -XImpredicativeTypes (which is a totally unsupported
 feature), we do not want to unify
     alpha ~ (forall a. a->a) -> Int
@@ -836,5 +925,4 @@ kind had instead been
   (alpha :: kappa)
 then this kind equality would rightly complain about unifying kappa
 with (forall k. k->*)
-
 

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Id.hs>`_
 
-====================
-compiler/basicTypes/Id.hs.rst
-====================
+compiler/basicTypes/Id.hs
+=========================
+
 
 Note [Free type variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Id.hs#L246>`__
+
 At one time we cached the free type variables of the type of an Id
 at the root of the type in a TyNote.  The idea was to avoid repeating
 the free-type-variable calculation.  But it turned out to slow down
@@ -15,8 +18,12 @@ substitution (which changes the free type variables) is more common.
 Anyway, we removed it in March 2008.
 
 
+
 Note [Exported LocalIds]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Id.hs#L365>`__
+
 We use mkExportedLocalId for things like
  - Dictionary functions (DFunId)
  - Wrapper and matcher Ids for pattern synonyms
@@ -56,7 +63,10 @@ That is what is happening in, say tidy_insts in TidyPgm.
 
 
 Note [Levity-polymorphic Ids]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Id.hs#L555>`__
+
 Some levity-polymorphic Ids must be applied and and inlined, not left
 un-saturated.  Example:
   unsafeCoerceId :: forall r1 r2 (a::TYPE r1) (b::TYPE r2). a -> b
@@ -78,6 +88,9 @@ simple way to fix #14561.
 
 Note [Primop wrappers]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Id.hs#L574>`__
+
 Currently hasNoBinding claims that PrimOpIds don't have a curried
 function definition.  But actually they do, in GHC.PrimopWrappers,
 which is auto-generated from prelude/primops.txt.pp.  So actually, hasNoBinding
@@ -90,8 +103,12 @@ Nota Bene: GHC.PrimopWrappers is needed *regardless*, because it's
 used by GHCi, which does not implement primops direct at all.
 
 
+
 Note [transferPolyIdInfo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Id.hs#L911>`__
+
 This transfer is used in three places:
         FloatOut (long-distance let-floating)
         SimplUtils.abstractFloats (short-distance let-floating)
@@ -99,13 +116,13 @@ This transfer is used in three places:
 
 Consider the short-distance let-floating:
 
-.. code-block:: haskell
+::
 
    f = /\a. let g = rhs in ...
 
 Then if we float thus
 
-.. code-block:: haskell
+::
 
    g' = /\a. rhs
    f = /\a. ...[g' a/g]....
@@ -119,13 +136,13 @@ we *do not* want to lose g's
 Mostly this is just an optimisation, but it's *vital* to
 transfer the occurrence info.  Consider
 
-.. code-block:: haskell
+::
 
    NonRec { f = /\a. let Rec { g* = ..g.. } in ... }
 
 where the '*' means 'LoopBreaker'.  Then if we float we must get
 
-.. code-block:: haskell
+::
 
    Rec { g'* = /\a. ...(g' a)... }
    NonRec { f = /\a. ...[g' a/g]....}

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnMonad.hs>`_
 
-====================
-compiler/typecheck/TcRnMonad.hs.rst
-====================
+compiler/typecheck/TcRnMonad.hs
+===============================
+
 
 Note [Default types]
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnMonad.hs#L386>`__
+
 The Integer type is simply not available in package ghc-prim (it is
 declared in integer-gmp).  So we set the defaulting types to (Just
 []), meaning there are no default types, rather then Nothing, which
@@ -16,12 +19,14 @@ an actual crash (attempting to look up the Integer type).
 
 
 
-
 Note [Constraints and errors]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnMonad.hs#L1710>`__
+
 Consider this (#12124):
 
-.. code-block:: haskell
+::
 
   foo :: Maybe Int
   foo = return (case Left 3 of
@@ -73,9 +78,10 @@ solution: make TcUnify.uType spot manifestly-insoluble constraints.
 
 
 
-
 Note [Masking exceptions in forkM_maybe]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnMonad.hs#L2015>`__
 
 When using GHC-as-API it must be possible to interrupt snippets of code
 executed using runStmt (#1381). Since commit 02c4ab04 this is almost possible

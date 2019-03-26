@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExtension.hs>`_
 
-====================
-compiler/hsSyn/HsExtension.hs.rst
-====================
+compiler/hsSyn/HsExtension.hs
+=============================
+
 
 Note [Trees that grow]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExtension.hs#L32>`__
 
 See https://ghc.haskell.org/trac/ghc/wiki/ImplementingTreesThatGrow
 
@@ -31,19 +33,21 @@ haskell-src-exts ASTs as well.
 Note [OutputableX]
 ~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExtension.hs#L1070>`__
+
 is required because the type family resolution
 process cannot determine that all cases are handled for a `GhcPass p`
 case where the cases are listed separately.
 
 So
 
-.. code-block:: haskell
+::
 
   type instance XXHsIPBinds    (GhcPass p) = NoExt
 
 will correctly deduce Outputable for (GhcPass p), but
 
-.. code-block:: haskell
+::
 
   type instance XIPBinds       GhcPs = NoExt
   type instance XIPBinds       GhcRn = NoExt

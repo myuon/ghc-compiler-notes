@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/List.hs>`_
 
-====================
-libraries/base/GHC/List.hs.rst
-====================
+libraries/base/GHC/List.hs
+==========================
+
 
 Note [Inline FB functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/List.hs#L212>`__
+
 After fusion rules successfully fire, we are usually left with one or more calls
 to list-producing functions abstracted over cons and nil. Here we call them
 FB functions because their names usually end with 'FB'. It's a good idea to
@@ -25,8 +28,11 @@ allocation-free. Also see #13001.
 ----------------------------------------------------------------------------
 
 
+
 Note [scanl rewrite rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/List.hs#L342>`__
 
 In most cases, when we rewrite a form to one that can fuse, we try to rewrite it
 back to the original form if it does not fuse. For scanl, we do something a
@@ -56,8 +62,12 @@ foldr, foldr1, scanr, and scanr1 are the right-to-left duals of the
 above functions.
 
 
+
 Note [Fusion for foldrN]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/List.hs#L961>`__
+
 We arrange that foldr2, foldr3, etc is a good consumer for its first
 (left) list argument. Here's how. See below for the second, third
 etc list arguments
@@ -83,6 +93,9 @@ but with the foldr2/right rule it would instead produce
 
 Note [Fusion for zipN/zipWithN]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/List.hs#L984>`__
+
 We arrange that zip, zip3, etc, and zipWith, zipWit3 etc, are all
 good consumers for their first (left) argument, and good producers.
 Here's how.  See Note [Fusion for foldr2] for why it can't fuse its
@@ -94,7 +107,7 @@ NB: Zips for larger tuples are in the List module.
     zip xs ys = build (\c n -> foldr2 (zipFB c) n xs ys)
   See also Note [Inline FB functions]
 
-.. code-block:: haskell
+::
 
   Ditto rule "zipWith".
 

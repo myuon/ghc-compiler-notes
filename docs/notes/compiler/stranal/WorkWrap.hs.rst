@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs>`_
 
-====================
-compiler/stranal/WorkWrap.hs.rst
-====================
+compiler/stranal/WorkWrap.hs
+============================
+
 
 Note [Don't w/w INLINE things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L158>`__
+
 It's very important to refrain from w/w-ing an INLINE function (ie one
 with a stable unfolding) because the wrapper will then overwrite the
 old stable unfolding with the wrapper code.
@@ -26,6 +29,9 @@ test for loop-breaker-hood, but I'm not sure that ever matters.)
 
 Note [Worker-wrapper for INLINABLE functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L176>`__
+
 If we have
   {-# INLINABLE f #-}
   f :: Ord a => [a] -> Int -> a
@@ -41,13 +47,13 @@ This comes in practice (#6056).
 Solution: do the w/w for strictness analysis, but transfer the Stable
 unfolding to the *worker*.  So we will get something like this:
 
-.. code-block:: haskell
+::
 
   {-# INLINE[0] f #-}
   f :: Ord a => [a] -> Int -> a
   f d x y = case y of I# y' -> fw d x y'
 
-.. code-block:: haskell
+::
 
   {-# INLINABLE[0] fw #-}
   fw :: Ord a => [a] -> Int# -> a
@@ -60,16 +66,19 @@ in work_fn! See CoreUnfold.mkWorkerUnfolding.
 
 Note [Worker-wrapper for NOINLINE functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L204>`__
+
 We used to disable worker/wrapper for NOINLINE things, but it turns out
 this can cause unnecessary reboxing of values. Consider
 
-.. code-block:: haskell
+::
 
   {-# NOINLINE f #-}
   f :: Int -> a
   f x = error (show x)
 
-.. code-block:: haskell
+::
 
   g :: Bool -> Bool -> Int -> Int
   g True  True  p = f p
@@ -79,7 +88,7 @@ this can cause unnecessary reboxing of values. Consider
 the strictness analysis will discover f and g are strict, but because f
 has no wrapper, the worker for g will rebox p. So we get
 
-.. code-block:: haskell
+::
 
   $wg x y p# =
     let p = I# p# in  -- Yikes! Reboxing!
@@ -93,7 +102,7 @@ has no wrapper, the worker for g will rebox p. So we get
           False -> $wg True True p#
           True -> case f p of { }
 
-.. code-block:: haskell
+::
 
   g x y p = case p of (I# p#) -> $wg x y p#
 
@@ -111,17 +120,17 @@ It is crucial that we do this for *all* NOINLINE functions. #10069
 demonstrates what happens when we promise to w/w a (NOINLINE) leaf function, but
 fail to deliver:
 
-.. code-block:: haskell
+::
 
   data C = C Int# Int#
 
-.. code-block:: haskell
+::
 
   {-# NOINLINE c1 #-}
   c1 :: C -> Int#
   c1 (C _ n) = n
 
-.. code-block:: haskell
+::
 
   {-# NOINLINE fc #-}
   fc :: C -> Int#
@@ -129,17 +138,17 @@ fail to deliver:
 
 Failing to w/w `c1`, but still w/wing `fc` leads to the following code:
 
-.. code-block:: haskell
+::
 
   c1 :: C -> Int#
   c1 (C _ n) = n
 
-.. code-block:: haskell
+::
 
   $wfc :: Int# -> Int#
   $wfc n = let c = C 0# n in 2 #* c1 c
 
-.. code-block:: haskell
+::
 
   fc :: C -> Int#
   fc (C _ n) = $wfc n
@@ -154,6 +163,9 @@ splitting a NOINLINE function.
 
 Note [Worker activation]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L276>`__
+
 Follows on from Note [Worker-wrapper for INLINABLE functions]
 
 It is *vital* that if the worker gets an INLINABLE pragma (from the
@@ -165,12 +177,12 @@ Note [Simplifying inside stable unfoldings].
 If the original is NOINLINE, it's important that the work inherit the
 original activation. Consider
 
-.. code-block:: haskell
+::
 
   {-# NOINLINE expensive #-}
   expensive x = x + 1
 
-.. code-block:: haskell
+::
 
   f y = let z = expensive y in ...
 
@@ -178,14 +190,14 @@ If expensive's worker inherits the wrapper's activation,
 we'll get this (because of the compromise in point (2) of
 Note [Wrapper activation])
 
-.. code-block:: haskell
+::
 
   {-# NOINLINE[0] $wexpensive #-}
   $wexpensive x = x + 1
   {-# INLINE[0] expensive #-}
   expensive x = $wexpensive x
 
-.. code-block:: haskell
+::
 
   f y = let z = expensive y in ...
 
@@ -200,6 +212,9 @@ wrapper does; there's no point in giving it an earlier activation.
 
 Note [Don't w/w inline small non-loop-breaker things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L312>`__
+
 In general, we refrain from w/w-ing *small* functions, which are not
 loop breakers, because they'll inline anyway.  But we must take care:
 it may look small now, but get to be big later after other inlining
@@ -218,7 +233,7 @@ There is an infelicity though.  We may get something like
 ==>
       g x = case gw x of r -> I# r
 
-.. code-block:: haskell
+::
 
       f {- InlineStable, Template = g val -}
       f = case gw x of r -> I# r
@@ -231,33 +246,35 @@ won't really be executed, because calls to f will go via the inlining.
 Note [Don't CPR join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L338>`__
+
 There's no point in doing CPR on a join point. If the whole function is getting
 CPR'd, then the case expression around the worker function will get pushed into
 the join point by the simplifier, which will have the same effect that CPR would
 have - the result will be returned in an unboxed tuple.
 
-.. code-block:: haskell
+::
 
   f z = let join j x y = (x+1, y+1)
         in case z of A -> j 1 2
                      B -> j 2 3
 
-.. code-block:: haskell
+::
 
   =>
 
-.. code-block:: haskell
+::
 
   f z = case $wf z of (# a, b #) -> (a, b)
   $wf z = case (let join j x y = (x+1, y+1)
                 in case z of A -> j 1 2
                              B -> j 2 3) of (a, b) -> (# a, b #)
 
-.. code-block:: haskell
+::
 
   =>
 
-.. code-block:: haskell
+::
 
   f z = case $wf z of (# a, b #) -> (a, b)
   $wf z = let join j x y = (# x+1, y+1 #)
@@ -269,16 +286,16 @@ a join point because it would not be tail-called. However, doing the *argument*
 part of W/W still works for join points, since the wrapper body will make a tail
 call:
 
-.. code-block:: haskell
+::
 
   f z = let join j x y = x + y
         in ...
 
-.. code-block:: haskell
+::
 
   =>
 
-.. code-block:: haskell
+::
 
   f z = let join $wj x# y# = x# +# y#
                  j x y = case x of I# x# ->
@@ -290,6 +307,9 @@ call:
 
 Note [Wrapper activation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L380>`__
+
 When should the wrapper inlining be active?
 
 1. It must not be active earlier than the current Activation of the
@@ -306,7 +326,7 @@ When should the wrapper inlining be active?
    But if f is w/w'd (which it might be), we want the inlining to
    occur just as if it hadn't been.
 
-.. code-block:: haskell
+::
 
    (This only matters if f's RHS is big enough to w/w, but small
    enough to inline given the call site, but that can happen.)
@@ -317,22 +337,22 @@ When should the wrapper inlining be active?
            f n 0 = n              -- Strict in the Int, hence wrapper
            f n x = f (n+n) (x-1)
 
-.. code-block:: haskell
+::
 
            g :: Int -> Int
            g x = f x x            -- Provokes a specialisation for f
 
-.. code-block:: haskell
+::
 
          module Bar where
            import Foo
 
-.. code-block:: haskell
+::
 
            h :: Int -> Int
            h x = f 3 x
 
-.. code-block:: haskell
+::
 
    In module Bar we want to give specialisations a chance to fire
    before inlining f's wrapper.
@@ -355,14 +375,21 @@ a wrapper was inlined before the specialisation fired.
 
 Note [Wrapper NoUserInline]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L433>`__
+
 The use an inl_inline of NoUserInline on the wrapper distinguishes
 this pragma from one that was given by the user. In particular, CSE
 will not happen if there is a user-specified pragma, but should happen
 for w/w’ed things (#14186).
 
 
+
 Note [Zapping DmdEnv after Demand Analyzer]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L482>`__
+
 In the worker-wrapper pass we zap the DmdEnv.  Why?
  (a) it is never used again
  (b) it wastes space
@@ -385,6 +412,9 @@ Note [Final Demand Analyser run] in DmdAnal).
 
 Note [Zapping Used Once info in WorkWrap]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L502>`__
+
 In the worker-wrapper pass we zap the used once info in demands and in
 strictness signatures.
 
@@ -403,8 +433,11 @@ Note [Zapping DmdEnv after Demand Analyzer] above.
 -------------------
 
 
+
 Note [Demand on the worker]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L629>`__
 
 If the original function is called once, according to its demand info, then
 so is the worker. This is important so that the occurrence analyser can
@@ -413,19 +446,19 @@ attach OneShot annotations to the worker’s lambda binders.
 
 Example:
 
-.. code-block:: haskell
+::
 
   -- Original function
   f [Demand=<L,1*C1(U)>] :: (a,a) -> a
   f = \p -> ...
 
-.. code-block:: haskell
+::
 
   -- Wrapper
   f [Demand=<L,1*C1(U)>] :: a -> a -> a
   f = \p -> case p of (a,b) -> $wf a b
 
-.. code-block:: haskell
+::
 
   -- Worker
   $wf [Demand=<L,1*C1(C1(U))>] :: Int -> Int
@@ -441,9 +474,11 @@ the form [Demand=<L,1*(C1(...(C1(U))))>]
 
 
 
-
 Note [Do not split void functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L660>`__
+
 Consider this rather common form of binding:
         $j = \x:Void# -> ...no use of x...
 
@@ -457,10 +492,13 @@ in w/w so that we don't pass the argument at all.
 
 Note [Thunk splitting]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/WorkWrap.hs#L671>`__
+
 Suppose x is used strictly (never mind whether it has the CPR
 property).
 
-.. code-block:: haskell
+::
 
       let
         x* = x-rhs
@@ -468,7 +506,7 @@ property).
 
 splitThunk transforms like this:
 
-.. code-block:: haskell
+::
 
       let
         x* = case x-rhs of { I# a -> I# a }
@@ -476,7 +514,7 @@ splitThunk transforms like this:
 
 Now simplifier will transform to
 
-.. code-block:: haskell
+::
 
       case x-rhs of
         I# a -> let x* = I# a
@@ -484,7 +522,7 @@ Now simplifier will transform to
 
 which is what we want. Now suppose x-rhs is itself a case:
 
-.. code-block:: haskell
+::
 
         x-rhs = case e of { T -> I# a; F -> I# b }
 

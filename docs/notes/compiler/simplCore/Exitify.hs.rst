@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs>`_
 
-====================
-compiler/simplCore/Exitify.hs.rst
-====================
+compiler/simplCore/Exitify.hs
+=============================
+
 
 Note [Exitification]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs#L4>`__
 
 This module implements Exitification. The goal is to pull as much code out of
 recursive functions as possible, as the simplifier is better at inlining into
@@ -13,7 +15,7 @@ call-sites that are not in recursive functions.
 
 Example:
 
-.. code-block:: haskell
+::
 
   let t = foo bar
   joinrec go 0     x y = t (x*x)
@@ -31,7 +33,7 @@ this expression outside the recursive function, as a join-point.
 
 Example result:
 
-.. code-block:: haskell
+::
 
   let t = foo bar
   join exit x = t (x*x)
@@ -42,8 +44,12 @@ Example result:
 Now `t` is no longer in a recursive function, and good things happen!
 
 
+
 Note [Interesting expression]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs#L281>`__
+
 We do not want this to happen:
 
   joinrec go 0     x y = x
@@ -86,6 +92,9 @@ non-imported variable.
 
 Note [Jumps can be interesting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs#L321>`__
+
 A jump to a join point can be interesting, if its arguments contain free
 non-exported variables (z in the following example):
 
@@ -101,7 +110,7 @@ non-exported variables (z in the following example):
 The join point itself can be interesting, even if none if its
 arguments have free variables free in the joinrec.  For example
 
-.. code-block:: haskell
+::
 
   join j p = case p of (x,y) -> x+y
   joinrec go 0     x y = jump j (x,y)
@@ -112,7 +121,7 @@ Here, `j` would not be inlined because we do not inline something that looks
 like an exit join point (see Note [Do not inline exit join points]). But
 if we exitify the 'jump j (x,y)' we get
 
-.. code-block:: haskell
+::
 
   join j p = case p of (x,y) -> x+y
   join exit x y = jump j (x,y)
@@ -124,7 +133,7 @@ and now 'j' can inline, and we get rid of the pair. Here's another
 example (assume `g` to be an imported function that, on its own,
 does not make this interesting):
 
-.. code-block:: haskell
+::
 
   join j y = map f y
   joinrec go 0     x y = jump j (map g x)
@@ -136,7 +145,7 @@ like an exit join point (see Note [Do not inline exit join points]).
 
 But after exitification we have
 
-.. code-block:: haskell
+::
 
   join j y = map f y
   join exit x = jump j (map g x)
@@ -148,9 +157,10 @@ and now we can inline `j` and this will allow `map/map` to fire.
 
 
 
-
 Note [Idempotency]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs#L376>`__
 
 We do not want this to happen, where we replace the floated expression with
 essentially the same expression:
@@ -177,9 +187,12 @@ interesting expressions.
 
 Note [Calculating free variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs#L400>`__
+
 We have two options where to annotate the tree with free variables:
 
-.. code-block:: haskell
+::
 
  A) The whole tree.
  B) Each individual joinrec as we come across it.
@@ -195,12 +208,14 @@ We therefore choose B, and calculate the free variables in `exitify`.
 
 
 
-
 Note [Do not inline exit join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs#L417>`__
+
 When we have
 
-.. code-block:: haskell
+::
 
   let t = foo bar
   join exit x = t (x*x)
@@ -222,7 +237,7 @@ because the lambdas of a non-recursive join point are not considered for
 `occ_in_lam`.  For example, in the following code, `j1` is /not/ marked
 occ_in_lam, because `j2` is called only once.
 
-.. code-block:: haskell
+::
 
   join j1 x = x+1
   join j2 y = join j1 (y+2)
@@ -236,10 +251,13 @@ To prevent inlining, we check for isExitJoinId
 
 Note [Placement of the exitification pass]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs#L449>`__
+
 I (Joachim) experimented with multiple positions for the Exitification pass in
 the Core2Core pipeline:
 
-.. code-block:: haskell
+::
 
  A) Before the `simpl_phases`
  B) Between the `simpl_phases` and the "main" simplifier pass
@@ -278,6 +296,8 @@ could get more from running it multiple times, as seen in fish).
 Note [Picking arguments to abstract over]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Exitify.hs#L486>`__
+
 When we create an exit join point, so we need to abstract over those of its
 free variables that are be out-of-scope at the destination of the exit join
 point. So we go through the list `captured` and pick those that are actually
@@ -287,5 +307,4 @@ We do not just `filter (`elemVarSet` fvs) captured`, as there might be
 shadowing, and `captured` may contain multiple variables with the same Unique. I
 these cases we want to abstract only over the last occurence, hence the `foldr`
 (with emphasis on the `r`). This is #15110.
-
 

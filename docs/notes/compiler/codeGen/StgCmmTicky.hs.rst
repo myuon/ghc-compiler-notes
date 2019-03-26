@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmTicky.hs>`_
 
-====================
-compiler/codeGen/StgCmmTicky.hs.rst
-====================
+compiler/codeGen/StgCmmTicky.hs
+===============================
+
 
 Note [Ticky for slow calls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmTicky.hs#L428>`__
+
 Terminology is unfortunately a bit mixed up for these calls. codeGen
 uses "slow call" to refer to unknown calls and under-saturated known
 calls.

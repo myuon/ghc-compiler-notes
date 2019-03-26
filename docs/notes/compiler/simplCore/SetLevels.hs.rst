@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs>`_
 
-====================
-compiler/simplCore/SetLevels.hs.rst
-====================
+compiler/simplCore/SetLevels.hs
+===============================
+
 
 Note [FloatOut inside INLINE]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L161>`__
+
 @InlineCtxt@ very similar to @Level 0 0@, but is used for one purpose:
 to say "don't float anything out of here".  That's exactly what we
 want for the body of an INLINE, where we don't want to float anything
@@ -35,10 +38,13 @@ the worker at all.
 
 Note [Join ceiling]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L188>`__
+
 Join points can't float very far; too far, and they can't remain join points
 So, suppose we have:
 
-.. code-block:: haskell
+::
 
   f x = (joinrec j y = ... x ... in jump j x) + 1
 
@@ -55,8 +61,12 @@ floated to the nearest join ceiling and which to a particular binder (or set of
 binders).
 
 
+
 Note [Floating over-saturated applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L303>`__
+
 If we see (f x y), and (f x) is a redex (ie f's arity is 1),
 we call (f x) an "over-saturated application"
 
@@ -70,8 +80,12 @@ top level -- but then they must be applied to a constant dictionary and
 will almost certainly be optimised away anyway.
 
 
+
 Note [Floating single-alternative cases]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L494>`__
+
 Consider this:
   data T a = MkT !a
   f :: T Int -> blah
@@ -118,6 +132,9 @@ Things to note:
 
 Note [Check the output scrutinee for exprIsHNF]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L538>`__
+
 Consider this:
   case x of y {
     A -> ....(case y of alts)....
@@ -137,8 +154,12 @@ See Note [Floating single-alternative cases] for why
 we use exprIsHNF in the first place.
 
 
+
 Note [Floating to the top]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L699>`__
+
 We are keen to float something to the top level, even if it does not
 escape a value lambda (and hence save work), for two reasons:
 
@@ -197,6 +218,9 @@ I think this is obselete; the flag seems always on.]
 
 Note [Floating join point bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L755>`__
+
 Mostly we only float a join point if it can /stay/ a join point.  But
 there is one exception: if it can go to the top level (#13286).
 Consider
@@ -218,6 +242,9 @@ of the resulting inlining of f.  So ok, let's do it.
 
 Note [Free join points]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L774>`__
+
 We never float a MFE that has a free join-point variable.  You mght think
 this can never occur.  After all, consider
      join j x = ...
@@ -244,7 +271,10 @@ Bottom line: never float a MFE that has a free JoinId.
 
 
 Note [Floating MFEs of unlifted type]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L799>`__
+
 Suppose we have
    case f x of (r::Int#) -> blah
 we'd like to float (f x). But it's not trivial because it has type
@@ -266,7 +296,7 @@ the components of the tuple individually.
 I did experiment with a form of boxing that works for any type, namely
 wrapping in a function.  In our example
 
-.. code-block:: haskell
+::
 
    let y = case f x of r -> \v. f x
    in case y void of r -> blah
@@ -279,6 +309,9 @@ but it's more code and I'll wait to see if anyone wants it.
 
 Note [Test cheapness with exprOkForSpeculation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L829>`__
+
 We don't want to float very cheap expressions by boxing and unboxing.
 But we use exprOkForSpeculation for the test, not exprIsCheap.
 Why?  Because it's important /not/ to transform
@@ -308,6 +341,9 @@ But I suspect it's a narrow target.
 
 Note [Bottoming floats]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L856>`__
+
 If we see
         f = \x. g (error "urk")
 we'd like to float the call to error, to get
@@ -341,7 +377,7 @@ But, as ever, we need to be careful:
        lvl = \xy. errror (show x ++ show y)
        ...let {v = lvl x} in ...
 
-.. code-block:: haskell
+::
 
     Then of course we don't want to separately float the body (error ...)
     as /another/ MFE, so we tell lvlFloatRhs not to do that, via the is_bot
@@ -367,7 +403,7 @@ Id, *immediately*, for three reasons:
     errors, e.g. via a case with empty alternatives:  (case x of {})
     Lint complains unless the scrutinee of such a case is clearly bottom.
 
-.. code-block:: haskell
+::
 
     This was reported in #11290.   But since the whole bottoming-float
     thing is based on the cheap-and-cheerful exprIsBottom, I'm not sure
@@ -376,7 +412,10 @@ Id, *immediately*, for three reasons:
 
 
 Note [Bottoming floats: eta expansion] c.f Note [Bottoming floats]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L919>`__
+
 Tiresomely, though, the simplifier has an invariant that the manifest
 arity of the RHS should be the same as the arity; but we can't call
 etaExpand during SetLevels because it works over a decorated form of
@@ -386,6 +425,9 @@ CoreExpr.  So we do the eta expansion later, in FloatOut.
 
 Note [Case MFEs]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L926>`__
+
 We don't float a case expression as an MFE from a strict context.  Why not?
 Because in doing so we share a tiny bit of computation (the switch) but
 in exchange we build a thunk, which is bad.  This case reduces allocation
@@ -407,6 +449,9 @@ answer.
 
 Note [Floating literals]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L995>`__
+
 It's important to float Integer literals, so that they get shared,
 rather than being allocated every time round the loop.
 Hence the litIsTrivial.
@@ -416,9 +461,11 @@ level, which is now possible.
 
 
 
-
 Note [Escaping a value lambda]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L1005>`__
+
 We want to float even cheap expressions out of value lambdas,
 because that saves allocation.  Consider
         f = \x.  .. (\y.e) ...
@@ -446,9 +493,11 @@ call of 'f'.  Hence the (not float_is_lam) in float_me.
 
 
 
-
 Note [Floating from a RHS]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L1231>`__
+
 When floating the RHS of a let-binding, we don't always want to apply
 lvlMFE to the body of a lambda, as we usually do, because the entire
 binding body is already going to the right place (dest_lvl).
@@ -489,8 +538,12 @@ Use lvlExpr otherwise.  A little subtle, and I got it wrong at least twice
 (e.g. #13369).
 
 
+
 Note [Floating and kind casts]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L1381>`__
+
 Consider this
    case x of
      K (co :: * ~# k) -> let v :: Int |> co
@@ -512,8 +565,12 @@ Id) mentioned in type prevents this.
 Example #14270 comment:15.
 
 
+
 Note [le_subst and le_env]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L1456>`__
+
 We clone let- and case-bound variables so that they are still distinct
 when floated out; hence the le_subst/le_env.  (see point 3 of the
 module overview comment).  We also use these envs when making a
@@ -525,7 +582,7 @@ The le_subst and le_env always implement the same mapping,
 where out_x is an OutVar, and a,b are its arguments (when
 we perform abstraction at the same time as floating).
 
-.. code-block:: haskell
+::
 
   le_subst maps to CoreExpr
   le_env   maps to LevelledExpr
@@ -545,8 +602,12 @@ The domain of the both envs is *pre-cloned* Ids, though
 The domain of the le_lvl_env is the *post-cloned* Ids
 
 
+
 Note [Zapping the demand info]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SetLevels.hs#L1711>`__
+
 VERY IMPORTANT: we must zap the demand info if the thing is going to
 float out, because it may be less demanded than at its original
 binding site.  Eg

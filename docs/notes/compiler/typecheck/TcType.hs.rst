@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs>`_
 
-====================
-compiler/typecheck/TcType.hs.rst
-====================
+compiler/typecheck/TcType.hs
+============================
+
 
 Note [TcTyVars and TyVars in the typechecker]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L269>`__
+
 The typechecker uses a lot of type variables with special properties,
 notably being a unification variable with a mutable reference.  These
 use the 'TcTyVar' variant of Var.Var.
@@ -30,7 +33,7 @@ reasons:
     solve any kind equalities in foo's signature.  So the solver
     may see free occurrences of 'k'.
 
-.. code-block:: haskell
+::
 
     See calls to tcExtendTyVarEnv for other places that ordinary
     TyVars are bought into scope, and hence may show up in the types
@@ -59,6 +62,9 @@ to guarantee, with the advent of kind equalities.
 
 Note [Coercion variables in free variable lists]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L318>`__
+
 There are several places in the GHC codebase where functions like
 tyCoVarsOfType, tyCoVarsOfCt, et al. are used to compute the free type
 variables of a type. The "Co" part of these functions' names shouldn't be
@@ -71,8 +77,12 @@ GHC #12785.
 See Note [TcTyVars and TyVars in the typechecker]
 
 
+
 Note [TcRhoType]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L438>`__
+
 A TcRhoType has no foralls or contexts at the top, or to the right of an arrow
   YES    (forall a. a->a) -> Int
   NO     forall a. a ->  Int
@@ -81,9 +91,11 @@ A TcRhoType has no foralls or contexts at the top, or to the right of an arrow
 
 
 
-
 Note [Signature skolems]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L458>`__
+
 A TyVarTv is a specialised variant of TauTv, with the following invarints:
 
     * A TyVarTv can be unified only with a TyVar,
@@ -95,7 +107,7 @@ A TyVarTv is a specialised variant of TauTv, with the following invarints:
 TyVarTvs are only distinguished to improve error messages.
 Consider this
 
-.. code-block:: haskell
+::
 
   data T (a:k1) = MkT (S a)
   data S (b:k2) = MkS (T b)
@@ -105,9 +117,11 @@ because they end up unifying; we want those TyVarTvs again.
 
 
 
-
 Note [TyVars and TcTyVars during type checking]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L478>`__
+
 The Var type has constructors TyVar and TcTyVar.  They are used
 as follows:
 
@@ -130,32 +144,36 @@ A TyVarDetails is inside a TyVar
 See Note [TyVars and TcTyVars]
 
 
+
 Note [TcLevel and untouchable type variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L693>`__
+
 * Each unification variable (MetaTv)
   and each Implication
   has a level number (of type TcLevel)
 
 * INVARIANTS.  In a tree of Implications,
 
-.. code-block:: haskell
+::
 
     (ImplicInv) The level number (ic_tclvl) of an Implication is
                 STRICTLY GREATER THAN that of its parent
 
-.. code-block:: haskell
+::
 
     (SkolInv)   The level number of the skolems (ic_skols) of an
                 Implication is equal to the level of the implication
                 itself (ic_tclvl)
 
-.. code-block:: haskell
+::
 
     (GivenInv)  The level number of a unification variable appearing
                 in the 'ic_given' of an implication I should be
                 STRICTLY LESS THAN the ic_tclvl of I
 
-.. code-block:: haskell
+::
 
     (WantedInv) The level number of a unification variable appearing
                 in the 'ic_wanted' of an implication I should be
@@ -170,10 +188,13 @@ Note [TcLevel and untouchable type variables]
 
 Note [WantedInv]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L721>`__
+
 Why is WantedInv important?  Consider this implication, where
 the constraint (C alpha[3]) disobeys WantedInv:
 
-.. code-block:: haskell
+::
 
    forall[2] a. blah => (C alpha[3])
                         (forall[3] b. alpha[3] ~ b)
@@ -185,6 +206,9 @@ touchable; but then 'b' has excaped its scope into the outer implication.
 
 Note [Skolem escape prevention]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L732>`__
+
 We only unify touchable unification variables.  Because of
 (WantedInv), there can be no occurrences of the variable further out,
 so the unification can't cause the skolems to escape. Example:
@@ -220,6 +244,9 @@ uf will get unified *once more* to (F Int).
 
 Note [TcLevel assignment]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L765>`__
+
 We arrange the TcLevels like this
 
    0   Top level
@@ -228,8 +255,12 @@ We arrange the TcLevels like this
    ...etc...
 
 
+
 Note [Silly type synonym]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L962>`__
+
 Consider
   type T a = Int
 What are the free tyvars of (T x)?  Empty, of course!
@@ -242,8 +273,12 @@ Historical note: years and years ago this function was used during
 generalisation -- see #1813.  But that code has long since died.
 
 
+
 Note [anyRewritableTyVar must be role-aware]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L1064>`__
+
 anyRewritableTyVar is used during kick-out from the inert set,
 to decide if, given a new equality (a ~ ty), we should kick out
 a constraint C.  Rather than gather free variables and see if 'a'
@@ -261,8 +296,12 @@ would re-occur and we end up with an infinite loop in which each kicks
 out the other (#14363).
 
 
+
 Note [Expanding superclasses]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L2010>`__
+
 When we expand superclasses, we use the following algorithm:
 
 transSuperClasses( C tys ) returns the transitive superclasses
@@ -313,6 +352,9 @@ See also TcTyDecls.checkClassCycles.
 
 Note [Lift equality constaints when quantifying]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L2058>`__
+
 We can't quantify over a constraint (t1 ~# t2) because that isn't a
 predicate type; see Note [Types for coercions, predicates, and evidence]
 in Type.hs.
@@ -327,6 +369,9 @@ pickQuantifiablePreds) returns a Maybe rather than a Bool.
 
 Note [Quantifying over equality constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L2070>`__
+
 Should we quantify over an equality constraint (s ~ t)?  In general, we don't.
 Doing so may simply postpone a type error from the function definition site to
 its call site.  (At worst, imagine (Int ~ Bool)).
@@ -342,9 +387,12 @@ the quantified variables.
 
 Note [Inheriting implicit parameters]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L2083>`__
+
 Consider this:
 
-.. code-block:: haskell
+::
 
         f x = (x::Int) + ?y
 
@@ -352,13 +400,13 @@ where f is *not* a top-level binding.
 From the RHS of f we'll get the constraint (?y::Int).
 There are two types we might infer for f:
 
-.. code-block:: haskell
+::
 
         f :: Int -> Int
 
 (so we get ?y from the context of f's definition), or
 
-.. code-block:: haskell
+::
 
         f :: (?y::Int) => Int -> Int
 
@@ -377,6 +425,9 @@ declarations. See pickQuantifiablePreds.
 
 Note [Quantifying over equality constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L2110>`__
+
 Should we quantify over an equality constraint (s ~ t)?  In general, we don't.
 Doing so may simply postpone a type error from the function definition site to
 its call site.  (At worst, imagine (Int ~ Bool)).
@@ -391,7 +442,10 @@ the quantified variables.
 
 
 Note [AppTy and ReprEq]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L2228>`__
+
 Consider   a ~R# b a
            a ~R# a b
 
@@ -402,24 +456,28 @@ but the latter /is/ a definite error.
 On the other hand, with nominal equality, both are definite errors
 
 
+
 Note [Visible type application]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L2255>`__
+
 GHC implements a generalisation of the algorithm described in the
 "Visible Type Application" paper (available from
 http://www.cis.upenn.edu/~sweirich/publications.html). A key part
 of that algorithm is to distinguish user-specified variables from inferred
 variables. For example, the following should typecheck:
 
-.. code-block:: haskell
+::
 
   f :: forall a b. a -> b -> b
   f = const id
 
-.. code-block:: haskell
+::
 
   g = const id
 
-.. code-block:: haskell
+::
 
   x = f @Int @Bool 5 False
   y = g 5 @Bool False
@@ -445,6 +503,9 @@ in TyBinder.
 
 Note [Foreign import dynamic]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L2415>`__
+
 A dynamic stub must be of the form 'FunPtr ft -> ft' where ft is any foreign
 type.  Similarly, a wrapper stub must be of the form 'ft -> IO (FunPtr ft)'.
 
@@ -463,8 +524,12 @@ These chaps do the work; they are not exported
 ----------------------------------------------
 
 
+
 Note [Marshalling void]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L2520>`__
+
 We don't treat State# (whose PrimRep is VoidRep) as marshalable.
 In turn that means you can't write
         foreign import foo :: Int -> State# RealWorld
@@ -473,8 +538,12 @@ Reason: the back end falls over with panic "primRepHint:VoidRep";
         and there is no compelling reason to permit it
 
 
+
 Note [Paterson conditions on PredTypes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcType.hs#L2539>`__
+
 We are considering whether *class* constraints terminate
 (see Note [Paterson conditions]). Precisely, the Paterson conditions
 would have us check that "the constraint has fewer constructors and variables
@@ -487,7 +556,7 @@ this actually is. There are two main tricks:
     for a PredType like (Show a, Eq a) :: Constraint, since we don't
     count the "implicit" tuple in the ThetaType itself.
 
-.. code-block:: haskell
+::
 
     In fact, the Paterson test just checks *each component* of the top level
     ThetaType against the size bound, one at a time. By analogy, it should be

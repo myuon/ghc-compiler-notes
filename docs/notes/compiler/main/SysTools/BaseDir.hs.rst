@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/SysTools/BaseDir.hs>`_
 
-====================
-compiler/main/SysTools/BaseDir.hs.rst
-====================
+compiler/main/SysTools/BaseDir.hs
+=================================
+
 
 Note [topdir: How GHC finds its files]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/SysTools/BaseDir.hs#L51>`__
 
 GHC needs various support files (library packages, RTS etc), plus
 various auxiliary programs (cp, gcc, etc).  It starts by finding topdir,
@@ -32,5 +34,4 @@ with the make build system or Hadrian, and on whether we're
 running a bindist, we might find the mingw toolchain and perl
 either under $topdir/../{mingw, perl}/ or
 $topdir/../../{mingw, perl}/.
-
 

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmBind.hs>`_
 
-====================
-compiler/codeGen/StgCmmBind.hs.rst
-====================
+compiler/codeGen/StgCmmBind.hs
+==============================
+
 
 Note [Selectors]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmBind.hs#L233>`__
+
 We look at the body of the closure to see if it's a selector---turgid,
 but nothing deep.  We are looking for a closure of {\em exactly} the
 form:
@@ -18,9 +21,12 @@ form:
 
 Note [Ap thunks]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmBind.hs#L243>`__
+
 A more generic AP thunk of the form
 
-.. code-block:: haskell
+::
 
         x = [ x_1...x_n ] \.. [] -> x_1 ... x_n
 
@@ -36,8 +42,11 @@ for semi-obvious reasons.
 -------- Note [Selectors] ------------------
 
 
+
 Note [NodeReg clobbered with loopification]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmBind.hs#L511>`__
 
 Previously we used to pass nodeReg (aka R1) here. With profiling, upon
 entering a closure, enterFunCCS was called with R1 passed to it. But since R1

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/VarEnv.hs>`_
 
-====================
-compiler/basicTypes/VarEnv.hs.rst
-====================
+compiler/basicTypes/VarEnv.hs
+=============================
+
 
 Note [Eta expansion]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/VarEnv.hs#L374>`__
+
 When matching
      (\x.M) ~ N
 we rename x to x' with, where x' is not in scope in
@@ -17,6 +20,4 @@ the envR with a binding [x' -> x'], to support the occurs check.
 For example, if we don't do this, we can get silly matches like
         forall a.  (\y.a)  ~   v
 succeeding with [a -> v y], which is bogus of course.
-
-
 

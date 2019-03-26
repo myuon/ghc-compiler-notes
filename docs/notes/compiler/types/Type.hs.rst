@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs>`_
 
-====================
-compiler/types/Type.hs.rst
-====================
+compiler/types/Type.hs
+======================
+
 
 Note [coreView vs tcView]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L341>`__
+
 So far as the typechecker is concerned, 'Constraint' and 'TYPE
 LiftedRep' are distinct kinds.
 
@@ -21,6 +24,9 @@ See also #11715, which tracks removing this inconsistency.
 
 Note [Efficiency for mapCoercion ForAllCo case]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L499>`__
+
 As noted in Note [Forall coercions] in TyCoRep, a ForAllCo is a bit redundant.
 It stores a TyCoVar and a Coercion, where the kind of the TyCoVar always matches
 the left-hand kind of the coercion. This is convenient lots of the time, but
@@ -34,7 +40,7 @@ this problem seems to make what should be a linear algorithm into a potentially
 exponential one. But it's only going to be bad in the case where there's
 lots of foralls in the kinds of other foralls. Like this:
 
-.. code-block:: haskell
+::
 
   forall a : (forall b : (forall c : ...). ...). ...
 
@@ -45,6 +51,9 @@ for now.
 
 Note [Specialising mappers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L519>`__
+
 These INLINABLE pragmas are indispensable. mapType/mapCoercion are used
 to implement zonking, and it's vital that they get specialised to the TcM
 monad. This specialisation happens automatically (that is, without a
@@ -55,6 +64,9 @@ this one change made a 20% allocation difference in perf/compiler/T5030.
 
 Note [Decomposing fat arrow c=>t]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L684>`__
+
 Can we unify (a b) with (Eq a => ty)?   If we do so, we end up with
 a partial application like ((=>) Eq a) which doesn't make sense in
 source Haskell.  In contrast, we *can* unify (a b) with (t1 -> t2).
@@ -78,10 +90,12 @@ the type checker (e.g. when matching type-function equations).
 Note [Representation of function types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L922>`__
+
 Functions (e.g. Int -> Char) can be thought of as being applications
 of funTyCon (known in Haskell surface syntax as (->)),
 
-.. code-block:: haskell
+::
 
     (->) :: forall (r1 :: RuntimeRep) (r2 :: RuntimeRep)
                    (a :: TYPE r1) (b :: TYPE r2).
@@ -90,13 +104,13 @@ of funTyCon (known in Haskell surface syntax as (->)),
 However, for efficiency's sake we represent saturated applications of (->)
 with FunTy. For instance, the type,
 
-.. code-block:: haskell
+::
 
     (->) r1 r2 a b
 
 is equivalent to,
 
-.. code-block:: haskell
+::
 
     FunTy (Anon a) b
 
@@ -110,8 +124,12 @@ In the compiler we maintain the invariant that all saturated applications of
 See #11714.
 
 
+
 Note [Care with kind instantiation]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L1086>`__
+
 Suppose we have
   T :: forall k. k
 and we are finding the kind of
@@ -142,8 +160,12 @@ The same thing happens in ToIface.toIfaceAppArgsX.
                                 ~~~~~~~~
 
 
+
 Note [mkLamType: dictionary arguments]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L1395>`__
+
 If we have (\ (d :: Ord a). blah), we want to give it type
            (Ord a => blah_ty)
 with a fat arrow; that is, using mkInvisFunTy, not mkVisFunTy.
@@ -154,7 +176,7 @@ Suppose we do w/w on 'foo' in module A, thus (#11272, #6056)
    foo :: Ord a => Int -> blah
    foo a d x = case x of I# x' -> $wfoo @a d x'
 
-.. code-block:: haskell
+::
 
    $wfoo :: Ord a => Int# -> blah
 
@@ -172,8 +194,12 @@ when the argument is a predicate type.  See TyCoRep
 Note [Types for coercions, predicates, and evidence]
 
 
+
 Note [Evidence for quantified constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L1764>`__
+
 The superclass mechanism in TcCanonical.makeSuperClasses risks
 taking a quantified constraint like
    (forall a. C a => a ~ b)
@@ -186,8 +212,12 @@ see Note [Equality superclasses in quantified constraints]
 in TcCanonical.
 
 
+
 Note [Dictionary-like types]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L1952>`__
+
 Being "dictionary-like" means either a dictionary type or a tuple thereof.
 In GHC 6.10 we build implication constraints which construct such tuples,
 and if we land up with a binding
@@ -199,13 +229,13 @@ occurrence is itself inside an INLINE function!  Until we revise the
 handling of implication constraints, that is.)  This turned out to
 be important in getting good arities in DPH code.  Example:
 
-.. code-block:: haskell
+::
 
     class C a
     class D a where { foo :: a -> a }
     instance C a => D (Maybe a) where { foo x = x }
 
-.. code-block:: haskell
+::
 
     bar :: (C a, C b) => a -> b -> (Maybe a, Maybe b)
     {-# INLINE bar #-}
@@ -222,11 +252,15 @@ constraints build tuples.
 ToDo: it would be far easier just to use isPredTy.
 
 
+
 Note [ScopedSort]
 ~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L2072>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
   foo :: Proxy a -> Proxy (b :: k) -> Proxy (a :: k2) -> ()
 
@@ -261,7 +295,10 @@ types/kinds are fully settled and zonked.
 
 
 Note [Excess polymorphism and join points]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L2402>`__
+
 In principle, if a function would be a join point except that it fails
 the polymorphism rule (see Note [The polymorphism rule of join points] in
 CoreSyn), it can still be made a join point with some effort. This is because
@@ -271,7 +308,7 @@ same.
 
 For instance, consider:
 
-.. code-block:: haskell
+::
 
   let f :: forall a. a -> Char -> [a]
       f @a x c = ... f @a y 'a' ...
@@ -281,7 +318,7 @@ For instance, consider:
 return type is [a], where [a] is bound. But since the type argument is always
 'Int', we can rewrite it as:
 
-.. code-block:: haskell
+::
 
   let f' :: Int -> Char -> [Int]
       f' x c = ... f' y 'a' ...
@@ -289,7 +326,7 @@ return type is [a], where [a] is bound. But since the type argument is always
 
 and now we can make f' a join point:
 
-.. code-block:: haskell
+::
 
   join f' :: Int -> Char -> [Int]
        f' x c = ... jump f' y 'a' ...
@@ -300,13 +337,15 @@ add this analysis if necessary.  See #14620.
 
 
 
-
 Note [Equality on AppTys]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L2464>`__
+
 In our cast-ignoring equality, we want to say that the following two
 are equal:
 
-.. code-block:: haskell
+::
 
   (Maybe |> co) (Int |> co')   ~?       Maybe Int
 
@@ -317,7 +356,10 @@ then continue. Easy to do, but also easy to forget to do.
 
 
 Note [nonDetCmpType nondeterminism]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L2516>`__
+
 nonDetCmpType is implemented in terms of nonDetCmpTypeX. nonDetCmpTypeX
 uses nonDetCmpTc which compares TyCons by their Unique value. Using Uniques for
 ordering leads to nondeterminism. We hit the same problem in the TyVarTy case,
@@ -326,8 +368,12 @@ nonDetCmpTypeX.
 See Note [Unique Determinism] for more details.
 
 
+
 Note [typeKind vs tcTypeKind]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L2659>`__
+
 We have two functions to get the kind of a type
 
   * typeKind   ignores  the distinction between Constraint and *
@@ -342,10 +388,13 @@ See also Note [coreView vs tcView]
 
 Note [Kinding rules for types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L2671>`__
+
 In typeKind we consider Constraint and (TYPE LiftedRep) to be identical.
 We then have
 
-.. code-block:: haskell
+::
 
          t1 : TYPE rep1
          t2 : TYPE rep2
@@ -359,21 +408,21 @@ We then have
 
 In tcTypeKind we consider Constraint and (TYPE LiftedRep) to be distinct:
 
-.. code-block:: haskell
+::
 
           t1 : TYPE rep1
           t2 : TYPE rep2
     (FUN) ----------------
           t1 -> t2 : Type
 
-.. code-block:: haskell
+::
 
           t1 : Constraint
           t2 : TYPE rep
   (PRED1) ----------------
           t1 => t2 : Type
 
-.. code-block:: haskell
+::
 
           t1 : Constraint
           t2 : Constraint
@@ -396,10 +445,13 @@ Note that:
 
 
 Note [Phantom type variables in kinds]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L2716>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
   type K (r :: RuntimeRep) = Type   -- Note 'r' is unused
   data T r :: K r                   -- T :: forall r -> K r
@@ -423,8 +475,12 @@ occCheckExpand, for the same reason.
 ---------------------------
 
 
+
 Note [Occurs check expansion]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Type.hs#L2854>`__
+
 (occurCheckExpand tv xi) expands synonyms in xi just enough to get rid
 of occurrences of tv outside type function arguments, if that is
 possible; otherwise, it returns Nothing.

@@ -1,15 +1,17 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSink.hs>`_
 
-====================
-compiler/cmm/CmmSink.hs.rst
-====================
+compiler/cmm/CmmSink.hs
+=======================
+
 
 Note [dependent assignments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSink.hs#L509>`__
+
 If our assignment list looks like
 
-.. code-block:: haskell
+::
 
    [ y = e,  x = ... y ... ]
 
@@ -28,7 +30,7 @@ everything inside UniqSM.
 
 One more variant of this (#7366):
 
-.. code-block:: haskell
+::
 
   [ y = e, y = z ]
 
@@ -38,12 +40,16 @@ trivial rhs's).  But of course we can't, because y is equal to e,
 not z.
 
 
+
 Note [discard during inlining]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSink.hs#L538>`__
+
 Opportunities to discard assignments sometimes appear after we've
 done some inlining.  Here's an example:
 
-.. code-block:: haskell
+::
 
      x = R1;
      y = P64[x + 7];
@@ -57,28 +63,31 @@ inline y, and we have a dead assignment to x.  If we don't notice
 that x is dead in tryToInline, we end up retaining it.
 
 
+
 Note [Sinking and calls]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSink.hs#L622>`__
 
 We have three kinds of calls: normal (CmmCall), safe foreign (CmmForeignCall)
 and unsafe foreign (CmmUnsafeForeignCall). We perform sinking pass after
 stack layout (see Note [Sinking after stack layout]) which leads to two
 invariants related to calls:
 
-.. code-block:: haskell
+::
 
   a) during stack layout phase all safe foreign calls are turned into
      unsafe foreign calls (see Note [Lower safe foreign calls]). This
      means that we will never encounter CmmForeignCall node when running
      sinking after stack layout
 
-.. code-block:: haskell
+::
 
   b) stack layout saves all variables live across a call on the stack
      just before making a call (remember we are not sinking assignments to
      stack):
 
-.. code-block:: haskell
+::
 
       L1:
          x = R1
@@ -88,7 +97,7 @@ invariants related to calls:
          call f() returns L2
       L2:
 
-.. code-block:: haskell
+::
 
      We will attempt to sink { x = R1 } but we will detect conflict with
      { P64[Sp - 8]  = x } and hence we will drop { x = R1 } without even
@@ -107,8 +116,11 @@ UserOfRegs typeclasses.
 An abstraction of memory read or written.
 
 
+
 Note [Foreign calls clobber heap]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSink.hs#L705>`__
 
 It is tempting to say that foreign calls clobber only
 non-heap/stack memory, but unfortunately we break this invariant in

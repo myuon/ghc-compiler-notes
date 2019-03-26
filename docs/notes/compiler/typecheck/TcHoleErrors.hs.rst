@@ -1,26 +1,29 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHoleErrors.hs>`_
 
-====================
-compiler/typecheck/TcHoleErrors.hs.rst
-====================
+compiler/typecheck/TcHoleErrors.hs
+==================================
+
 
 Note [Valid hole fits include ...]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHoleErrors.hs#L50>`__
+
 `findValidHoleFits` returns the "Valid hole fits include ..." message.
 For example, look at the following definitions in a file called test.hs:
 
-.. code-block:: haskell
+::
 
    import Data.List (inits)
 
-.. code-block:: haskell
+::
 
    f :: [String]
    f = _ "hello, world"
 
 The hole in `f` would generate the message:
 
-.. code-block:: haskell
+::
 
   • Found hole: _ :: [Char] -> [String]
   • In the expression: _
@@ -90,9 +93,10 @@ replacement for the hole.
 
 
 
-
 Note [Nested implications]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHoleErrors.hs#L129>`__
 
 For the simplifier to be able to use any givens present in the enclosing
 implications to solve relevant constraints, we nest the wanted subsumption
@@ -100,20 +104,20 @@ constraints and relevant constraints within the enclosing implications.
 
 As an example, let's look at the following code:
 
-.. code-block:: haskell
+::
 
   f :: Show a => a -> String
   f x = show _
 
 The hole will result in the hole constraint:
 
-.. code-block:: haskell
+::
 
   [WD] __a1ph {0}:: a0_a1pd[tau:2] (CHoleCan: ExprHole(_))
 
 Here the nested implications are just one level deep, namely:
 
-.. code-block:: haskell
+::
 
   [Implic {
       TcLevel = 2
@@ -136,7 +140,7 @@ As we can see, the givens say that the information about the skolem
 
 The simples are:
 
-.. code-block:: haskell
+::
 
   [[WD] __a1ph {0}:: a0_a1pd[tau:2] (CHoleCan: ExprHole(_)),
     [WD] $dShow_a1pe {0}:: Show a0_a1pd[tau:2] (CNonCanonical)]
@@ -146,7 +150,7 @@ fulfill `Show a0_a1pd[tau:2])`.
 
 So when we run the check, we need to make sure that the
 
-.. code-block:: haskell
+::
 
   [WD] $dShow_a1pe {0}:: Show a0_a1pd[tau:2] (CNonCanonical)
 
@@ -158,7 +162,7 @@ Note [Relevant Constraints] for more details) in the nested implications, we
 can pass the information in the givens along to the simplifier. For our example,
 we end up needing to check whether the following constraints are soluble.
 
-.. code-block:: haskell
+::
 
   WC {wc_impl =
         Implic {
@@ -185,9 +189,11 @@ that any changes to the ev binds during a check remains localised to that check.
 
 
 
-
 Note [Valid refinement hole fits include ...]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHoleErrors.hs#L210>`__
+
 When the `-frefinement-level-hole-fits=N` flag is given, we additionally look
 for "valid refinement hole fits"", i.e. valid hole fits with up to N
 additional holes in them.
@@ -204,18 +210,18 @@ And similarly as the number of arguments increases
 
 As an example, let's look at the following code:
 
-.. code-block:: haskell
+::
 
   f :: [Integer] -> Integer
   f = _
 
 with `-frefinement-level-hole-fits=1`, we'd get:
 
-.. code-block:: haskell
+::
 
   Valid refinement hole fits include
 
-.. code-block:: haskell
+::
 
     foldl1 (_ :: Integer -> Integer -> Integer)
       with foldl1 @[] @Integer
@@ -248,7 +254,7 @@ Which are hole fits with holes in them. This allows e.g. beginners to
 discover the fold functions and similar, but also allows for advanced users
 to figure out the valid functions in the Free monad, e.g.
 
-.. code-block:: haskell
+::
 
   instance Functor f => Monad (Free f) where
       Pure a >>= f = f a
@@ -308,9 +314,10 @@ If -XScopedTypeVariables is enabled, this hole fit can even be copied verbatim.
 
 
 
-
 Note [Relevant Constraints]
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHoleErrors.hs#L323>`__
 
 As highlighted by #14273, we need to check any relevant constraints as well
 as checking for subsumption. Relevant constraints are the simple constraints
@@ -319,14 +326,14 @@ whose free unification variables are mentioned in the type of the hole.
 In the simplest case, these are all non-hole constraints in the simples, such
 as is the case in
 
-.. code-block:: haskell
+::
 
   f :: String
   f = show _
 
 Where the simples will be :
 
-.. code-block:: haskell
+::
 
   [[WD] __a1kz {0}:: a0_a1kv[tau:1] (CHoleCan: ExprHole(_)),
     [WD] $dShow_a1kw {0}:: Show a0_a1kv[tau:1] (CNonCanonical)]
@@ -334,7 +341,7 @@ Where the simples will be :
 However, when there are multiple holes, we need to be more careful. As an
 example, Let's take a look at the following code:
 
-.. code-block:: haskell
+::
 
   f :: Show a => a -> String
   f x = show (_b (show _a))
@@ -342,7 +349,7 @@ example, Let's take a look at the following code:
 Here there are two holes, `_a` and `_b`, and the simple constraints passed to
 findValidHoleFits are:
 
-.. code-block:: haskell
+::
 
   [[WD] _a_a1pi {0}:: String
                         -> a0_a1pd[tau:2] (CHoleCan: ExprHole(_b)),
@@ -364,12 +371,13 @@ hole `_b` we only require that the `$dShow_a1pe` constraint is solved.
 
 
 Note [Leaking errors]
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHoleErrors.hs#L367>`__
 
 When considering candidates, GHC believes that we're checking for validity in
 actual source. However, As evidenced by #15321, #15007 and #15202, this can
 cause bewildering error messages. The solution here is simple: if a candidate
 would cause the type checker to error, it is not a valid hole fit, and thus it
 is discarded.
-
 

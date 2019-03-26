@@ -1,15 +1,18 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Real.hs>`_
 
-====================
-libraries/base/GHC/Real.hs.rst
-====================
+libraries/base/GHC/Real.hs
+==========================
+
 
 Note [Numeric Stability of Enumerating Floating Numbers]
------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Real.hs#L276>`__
+
 When enumerate floating numbers, we could add the increment to the last number
 at every run (as what we did previously):
 
-.. code-block:: haskell
+::
 
     numericEnumFrom n =  n `seq` (n : numericEnumFrom (n + 1))
 
@@ -39,7 +42,7 @@ as the type of multiplier. In rare situations, the multiplier could be very
 large and will lead to the enumeration to infinite loop, too, which should
 be very rare. Consider the following example:
 
-.. code-block:: haskell
+::
 
     [1..9007199254740994]
 
@@ -54,8 +57,11 @@ See #15081 and Phab:D4650 for the related discussion about this problem.
 ------------------------------------------------------------
 
 
+
 Note [Integer division constant folding]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Real.hs#L415>`__
 
 Constant folding of quot, rem, div, mod, divMod and quotRem for
 Integer arguments depends crucially on inlining. Constant folding

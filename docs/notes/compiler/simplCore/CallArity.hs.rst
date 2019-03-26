@@ -1,17 +1,19 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs>`_
 
-====================
-compiler/simplCore/CallArity.hs.rst
-====================
+compiler/simplCore/CallArity.hs
+===============================
+
 
 Note [Call Arity: The goal]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L35>`__
 
 The goal of this analysis is to find out if we can eta-expand a local function,
 based on how it is being called. The motivating example is this code,
 which comes up when we implement foldl using foldr, and do list fusion:
 
-.. code-block:: haskell
+::
 
     let go = \x -> let d = case ... of
                               False -> go (x+1)
@@ -34,7 +36,7 @@ phase will eta-expand.
 
 The specification of the `calledArity` field is:
 
-.. code-block:: haskell
+::
 
     No work will be lost if you eta-expand me to the arity in `calledArity`.
 
@@ -57,13 +59,13 @@ What we want to know from an expression
 In order to obtain that information for variables, we analyze expression and
 obtain bits of information:
 
-.. code-block:: haskell
+::
 
  I.  The arity analysis:
      For every variable, whether it is absent, or called,
      and if called, which what arity.
 
-.. code-block:: haskell
+::
 
  II. The Co-Called analysis:
      For every two variables, whether there is a possibility that both are being
@@ -80,7 +82,9 @@ the information about what variables are being called once or multiple times.
 
 
 Note [Analysis I: The arity analysis]
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L100>`__
 
 The arity analysis is quite straight forward: The information about an
 expression is an
@@ -96,9 +100,10 @@ minimum (considering Nothing an infinity).
 
 
 
-
 Note [Analysis II: The Co-Called analysis]
-------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L116>`__
 
 The second part is more sophisticated. For reasons explained below, it is not
 sufficient to simply know how often an expression evaluates a variable. Instead
@@ -186,26 +191,26 @@ If the variable is a thunk we must be careful: Eta-Expansion will prevent
 sharing of work, so this is only safe if there is at most one call to the
 function. Therefore, we check whether {v,v} ∈ G.
 
-.. code-block:: haskell
+::
 
     Example:
 
-.. code-block:: haskell
+::
 
         let n = case .. of .. -- A thunk!
         in n 0 + n 1
 
-.. code-block:: haskell
+::
 
     vs.
 
-.. code-block:: haskell
+::
 
         let n = case .. of ..
         in case .. of T -> n 0
                       F -> n 1
 
-.. code-block:: haskell
+::
 
     We are only allowed to eta-expand `n` if it is going to be called at most
     once in the body of the outer let. So we need to know, for each variable
@@ -218,7 +223,7 @@ Why the co-call graph?
 Why is it not sufficient to simply remember which variables are called once and
 which are called multiple times? It would be in the previous example, but consider
 
-.. code-block:: haskell
+::
 
         let n = case .. of ..
         in case .. of
@@ -230,7 +235,7 @@ which are called multiple times? It would be in the previous example, but consid
 
 vs.
 
-.. code-block:: haskell
+::
 
         let n = case .. of ..
         in case .. of
@@ -254,42 +259,43 @@ Although for eta-expansion we need the information only for thunks, we still
 need to know whether functions are being called once or multiple times, and
 together with what other functions.
 
-.. code-block:: haskell
+::
 
     Example:
 
-.. code-block:: haskell
+::
 
         let n = case .. of ..
             f x = n (x+1)
         in f 1 + f 2
 
-.. code-block:: haskell
+::
 
     vs.
 
-.. code-block:: haskell
+::
 
         let n = case .. of ..
             f x = n (x+1)
         in case .. of T -> f 0
                       F -> f 1
 
-.. code-block:: haskell
+::
 
     Here, the body of f calls n exactly once, but f itself is being called
     multiple times, so eta-expansion is not allowed.
 
 
 
-
 Note [Analysis type signature]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L276>`__
 
 The work-hourse of the analysis is the function `callArityAnal`, with the
 following type:
 
-.. code-block:: haskell
+::
 
     type CallArityRes = (UnVarGraph, VarEnv Arity)
     callArityAnal ::
@@ -300,11 +306,11 @@ following type:
 
 and the following specification:
 
-.. code-block:: haskell
+::
 
   ((coCalls, callArityEnv), expr') = callArityEnv arity interestingIds expr
 
-.. code-block:: haskell
+::
 
                             <=>
 
@@ -320,9 +326,10 @@ and the following specification:
 
 
 
-
 Note [Which variables are interesting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L306>`__
 
 The analysis would quickly become prohibitive expensive if we would analyse all
 variables; for most variables we simply do not care about how often they are
@@ -334,6 +341,8 @@ called, i.e. variables bound in a pattern match. So interesting are variables th
 
 Note [Taking boring variables into account]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L315>`__
 
 If we decide that the variable bound in `let x = e1 in e2` is not interesting,
 the analysis of `e2` will not report anything about `x`. To ensure that
@@ -357,6 +366,8 @@ recursive groups (#10293).
 Note [Recursion and fixpointing]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L335>`__
+
 For a mutually recursive let, we begin by
  1. analysing the body, using the same incoming arity as for the whole expression.
  2. Then we iterate, memoizing for each of the bound variables the last
@@ -371,9 +382,10 @@ For a mutually recursive let, we begin by
 
 
 
-
 Note [Thunks in recursive groups]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L351>`__
 
 We never eta-expand a thunk in a recursive group, on the grounds that if it is
 part of a recursive group, then it will be called multiple times.
@@ -381,7 +393,7 @@ part of a recursive group, then it will be called multiple times.
 This is not necessarily true, e.g.  it would be safe to eta-expand t2 (but not
 t1) in the following code:
 
-.. code-block:: haskell
+::
 
   let go x = t1
       t1 = if ... then t2 else ...
@@ -394,9 +406,10 @@ relevant in the wild.
 
 
 
-
 Note [Analysing top-level binds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L370>`__
 
 We can eta-expand top-level-binds if they are not exported, as we see all calls
 to them. The plan is as follows: Treat the top-level binds as nested lets around
@@ -406,7 +419,9 @@ CallArityRes (the co-call graph is the complete graph, all arityies 0).
 
 
 Note [Trimming arity]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L378>`__
 
 In the Call Arity papers, we are working on an untyped lambda calculus with no
 other id annotations, where eta-expansion is always possible. But this is not
@@ -416,7 +431,7 @@ the case for Core!
     for the same reasons that exprArity needs this invariant (see Note
     [exprArity invariant] in CoreArity).
 
-.. code-block:: haskell
+::
 
     If we are not doing that, a too-high arity annotation will be stored with
     the id, confusing the simplifier later on.
@@ -434,6 +449,8 @@ the case for Core!
 Note [What is a thunk]
 ~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L400>`__
+
 Originally, everything that is not in WHNF (`exprIsWHNF`) is considered a
 thunk, not eta-expanded, to avoid losing any sharing. This is also how the
 published papers on Call Arity describe it.
@@ -447,6 +464,8 @@ Call Arity considers everything that is not cheap (`exprIsCheap`) as a thunk.
 
 Note [Call Arity and Join Points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CallArity.hs#L412>`__
 
 The Call Arity analysis does not care about join points, and treats them just
 like normal functions. This is ok.

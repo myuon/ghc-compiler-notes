@@ -1,23 +1,26 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/UnariseStg.hs>`_
 
-====================
-compiler/simplStg/UnariseStg.hs.rst
-====================
+compiler/simplStg/UnariseStg.hs
+===============================
+
 
 Note [Unarisation]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/UnariseStg.hs#L4>`__
+
 The idea of this pass is to translate away *all* unboxed-tuple and unboxed-sum
 binders. So for example:
 
-.. code-block:: haskell
+::
 
   f (x :: (# Int, Bool #)) = f x + f (# 1, True #)
 
-.. code-block:: haskell
+::
 
   ==>
 
-.. code-block:: haskell
+::
 
   f (x1 :: Int) (x2 :: Bool) = f x1 x2 + f 1 True
 
@@ -38,7 +41,7 @@ Suppose that a variable x : (# t1, t2 #).
 
   * Replace the binding with a curried binding for x1,x2
 
-.. code-block:: haskell
+::
 
        Lambda:   \x.e                ==>   \x1 x2. e
        Case alt: MkT a b x c d -> e  ==>   MkT a b x1 x2 c d -> e
@@ -46,22 +49,22 @@ Suppose that a variable x : (# t1, t2 #).
   * Replace argument occurrences with a sequence of args via a lookup in
     UnariseEnv
 
-.. code-block:: haskell
+::
 
        f a b x c d   ==>   f a b x1 x2 c d
 
   * Replace tail-call occurrences with an unboxed tuple via a lookup in
     UnariseEnv
 
-.. code-block:: haskell
+::
 
        x  ==>  (# x1, x2 #)
 
-.. code-block:: haskell
+::
 
     So, for example
 
-.. code-block:: haskell
+::
 
        f x = x    ==>   f x1 x2 = (# x1, x2 #)
 
@@ -72,23 +75,23 @@ Suppose that a variable x : (# t1, t2 #).
        - The scrutinee is a variable (or when it is an explicit tuple, but the
          simplifier eliminates those)
 
-.. code-block:: haskell
+::
 
     The case alternative (there can be only one) can be one of these two
     things:
 
       - An unboxed tuple pattern. e.g.
 
-.. code-block:: haskell
+::
 
           case v of x { (# x1, x2, x3 #) -> ... }
 
-.. code-block:: haskell
+::
 
         Scrutinee has to be in form `(# t1, t2, t3 #)` so we just extend the
         environment with
 
-.. code-block:: haskell
+::
 
           x :-> MultiVal [t1,t2,t3]
           x1 :-> UnaryVal t1, x2 :-> UnaryVal t2, x3 :-> UnaryVal t3
@@ -102,6 +105,9 @@ Unboxed sums are completely eliminated, see next note.
 
 Note [Translating unboxed sums to unboxed tuples]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/UnariseStg.hs#L74>`__
+
 Unarise also eliminates unboxed sum binders, and translates unboxed sums in
 return positions to unboxed tuples. We want to overlap fields of a sum when
 translating it to a tuple to have efficient memory layout. When translating a
@@ -112,7 +118,7 @@ translation of sum patterns to tuple patterns need to be in sync.
 
 These translations work like this. Suppose we have
 
-.. code-block:: haskell
+::
 
   (# x1 | | ... #) :: (# t1 | t2 | ... #)
 
@@ -137,7 +143,7 @@ For example, say we have (# (# Int#, Char #) | (# Int#, Int# #) | Int# #)
 
 We add a slot for the tag to the first position. So our tuple type is
 
-.. code-block:: haskell
+::
 
   (# Tag#, Any, Word#, Word# #)
   (we use Any for pointer slots)
@@ -146,20 +152,20 @@ Now, any term of this sum type needs to generate a tuple of this type instead.
 The translation works by simply putting arguments to first slots that they fit
 in. Suppose we had
 
-.. code-block:: haskell
+::
 
   (# (# 42#, 'c' #) | | #)
 
 42# fits in Word#, 'c' fits in Any, so we generate this application:
 
-.. code-block:: haskell
+::
 
   (# 1#, 'c', 42#, rubbish #)
 
 Another example using the same type: (# | (# 2#, 3# #) | #). 2# fits in Word#,
 3# fits in Word #, so we get:
 
-.. code-block:: haskell
+::
 
   (# 2#, rubbish, 2#, 3# #).
 
@@ -167,16 +173,19 @@ Another example using the same type: (# | (# 2#, 3# #) | #). 2# fits in Word#,
 
 Note [Types in StgConApp]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/UnariseStg.hs#L127>`__
+
 Suppose we have this unboxed sum term:
 
-.. code-block:: haskell
+::
 
   (# 123 | #)
 
 What will be the unboxed tuple representation? We can't tell without knowing the
 type of this term. For example, these are all valid tuples for this:
 
-.. code-block:: haskell
+::
 
   (# 1#, 123 #)          -- when type is (# Int | String #)
   (# 1#, 123, rubbish #) -- when type is (# Int | Float# #)
@@ -191,28 +200,31 @@ types in StgRhsCon.
 
 Note [UnariseEnv can map to literals]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/UnariseStg.hs#L145>`__
+
 To avoid redundant case expressions when unarising unboxed sums, UnariseEnv
 needs to map variables to literals too. Suppose we have this Core:
 
-.. code-block:: haskell
+::
 
   f (# x | #)
 
-.. code-block:: haskell
+::
 
   ==> (CorePrep)
 
-.. code-block:: haskell
+::
 
   case (# x | #) of y {
     _ -> f y
   }
 
-.. code-block:: haskell
+::
 
   ==> (MultiVal)
 
-.. code-block:: haskell
+::
 
   case (# 1#, x #) of [x1, x2] {
     _ -> f x1 x2
@@ -220,7 +232,7 @@ needs to map variables to literals too. Suppose we have this Core:
 
 To eliminate this case expression we need to map x1 to 1# in UnariseEnv:
 
-.. code-block:: haskell
+::
 
   x1 :-> UnaryVal 1#, x2 :-> UnaryVal x
 
@@ -230,6 +242,9 @@ so that `f x1 x2` becomes `f 1# x`.
 
 Note [Unarisation and arity]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/UnariseStg.hs#L170>`__
+
 Because of unarisation, the arity that will be recorded in the generated info
 table for an Id may be larger than the idArity. Instead we record what we call
 the RepArity, which is the Arity taking into account any expanded arguments, and
@@ -240,6 +255,9 @@ in.
 
 Note [Post-unarisation invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/UnariseStg.hs#L178>`__
+
 STG programs after unarisation have these invariants:
 
   * No unboxed sums at all.

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CoreMonad.hs>`_
 
-====================
-compiler/simplCore/CoreMonad.hs.rst
-====================
+compiler/simplCore/CoreMonad.hs
+===============================
+
 
 Note [Which transformations are innocuous]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CoreMonad.hs#L333>`__
+
 At one point (Jun 18) I wondered if some transformations (ticks)
 might be  "innocuous", in the sense that they do not unlock a later
 transformation that does not occur in the same pass.  If so, we could
@@ -49,7 +52,7 @@ PostInlineUnconditionally
                B -> ...x...y... }
   Current postinlineUnconditinaly will inline y, and then x; sigh.
 
-.. code-block:: haskell
+::
 
   But PostInlineUnconditionally might also unlock subsequent
   transformations for the same reason as PreInlineUnconditionally,
@@ -79,8 +82,12 @@ CaseMerge:
   The "let z=y" case-binder-swap gets dealt with in the next pass
 
 
+
 Note [Annotations]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CoreMonad.hs#L756>`__
+
 A Core-to-Core pass that wants to make use of annotations calls
 getAnnotations or getFirstAnnotations at the beginning to obtain a UniqFM with
 annotations of a specific type. This produces all annotations from interface
@@ -96,5 +103,4 @@ only be given to things defined in the same module. However, since we would
 only want to deserialise every annotation once, we would have to build a cache
 for every module in the HTP. In the end, it's probably not worth it as long as
 we aren't using annotations heavily.
-
 

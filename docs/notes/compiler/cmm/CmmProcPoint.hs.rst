@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmProcPoint.hs>`_
 
-====================
-compiler/cmm/CmmProcPoint.hs.rst
-====================
+compiler/cmm/CmmProcPoint.hs
+============================
+
 
 Note [Proc-point analysis]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmProcPoint.hs#L93>`__
 
 Given a specified set of proc-points (a set of block-ids), "proc-point
 analysis" figures out, for every block, which proc-point it belongs to.
@@ -23,6 +25,8 @@ belongs to two, that's a bug.
 Note [Non-existing proc-points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmProcPoint.hs#L107>`__
+
 On some architectures it might happen that the list of proc-points
 computed before stack layout pass will be invalidated by the stack
 layout. This will happen if stack layout removes from the graph
@@ -32,13 +36,17 @@ if a proc-point does not exist anymore then we will get compiler panic.
 See #8205.
 
 
+
 Note [Separate Adams optimization]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmProcPoint.hs#L476>`__
+
 It may be worthwhile to attempt the Adams optimization by rewriting
 the graph before the assignment of proc-point protocols.  Here are a
 couple of rules:
 
-.. code-block:: haskell
+::
 
   g() returns to k;                    g() returns to L;
   k: CopyIn c ress; goto L:
@@ -48,7 +56,7 @@ couple of rules:
 
 And when c == c' and ress == ress', this also:
 
-.. code-block:: haskell
+::
 
   g() returns to k;                    g() returns to L;
   k: CopyIn c ress; goto L:

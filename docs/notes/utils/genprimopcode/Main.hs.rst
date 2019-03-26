@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/utils/genprimopcode/Main.hs>`_
 
-====================
-utils/genprimopcode/Main.hs.rst
-====================
+utils/genprimopcode/Main.hs
+===========================
+
 
 Note [Placeholder declarations]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/utils/genprimopcode/Main.hs#L387>`__
+
 We are generating fake declarations for things in GHC.Prim, just to
 keep GHC's renamer and typechecker happy enough for what Haddock
 needs.  Our main plan is to say

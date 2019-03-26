@@ -1,20 +1,23 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreTidy.hs>`_
 
-====================
-compiler/coreSyn/CoreTidy.hs.rst
-====================
+compiler/coreSyn/CoreTidy.hs
+============================
+
 
 Note [Tidy IdInfo]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreTidy.hs#L237>`__
+
 All nested Ids now have the same IdInfo, namely vanillaIdInfo, which
 should save some space; except that we preserve occurrence info for
 two reasons:
 
-.. code-block:: haskell
+::
 
   (a) To make printing tidy core nicer
 
-.. code-block:: haskell
+::
 
   (b) Because we tidy RULES and InlineRules, which may then propagate
       via --make into the compilation of the next module, and we want
@@ -28,6 +31,9 @@ Note that tidyLetBndr puts more IdInfo back.
 
 Note [Preserve evaluatedness]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreTidy.hs#L253>`__
+
 Consider
   data T = MkT !Bool
   ....(case v of MkT y ->
@@ -47,6 +53,9 @@ but that seems more indirect and surprising.)
 
 Note [Preserve OneShotInfo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreTidy.hs#L270>`__
+
 We keep the OneShotInfo because we want it to propagate into the interface.
 Not all OneShotInfo is determined by a compiler analysis; some is added by a
 call of GHC.Exts.oneShot, which is then discarded before the end of the

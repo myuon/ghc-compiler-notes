@@ -1,14 +1,17 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs>`_
 
-====================
-compiler/typecheck/TcExpr.hs.rst
-====================
+compiler/typecheck/TcExpr.hs
+============================
+
 
 Note [Type-checking overloaded labels]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L278>`__
+
 Recall that we have
 
-.. code-block:: haskell
+::
 
   module GHC.OverloadedLabels where
     class IsLabel (x :: Symbol) a where
@@ -33,6 +36,9 @@ single method, it is represented by a newtype, so we can coerce
 
 Note [Left sections]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L311>`__
+
 Left sections, like (4 *), are equivalent to
         \ x -> (*) 4 x,
 or, if PostfixOperators is enabled, just
@@ -46,6 +52,9 @@ useful.
 
 Note [Typing rule for ($)]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L322>`__
+
 People write
    runST $ blah
 so much, where
@@ -61,6 +70,9 @@ rule just for saturated applications of ($).
 
 Note [Typing rule for seq]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L335>`__
+
 We want to allow
        x `seq` (# p,q #)
 which suggests this type for seq:
@@ -77,18 +89,22 @@ construct.
 See also Note [seqId magic] in MkId
 
 
+
 Note [Type of a record update]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L687>`__
+
 The main complication with RecordUpd is that we need to explicitly
 handle the *non-updated* fields.  Consider:
 
-.. code-block:: haskell
+::
 
         data T a b c = MkT1 { fa :: a, fb :: (b,c) }
                      | MkT2 { fa :: a, fb :: (b,c), fc :: c -> c }
                      | MkT3 { fd :: a }
 
-.. code-block:: haskell
+::
 
         upd :: T a b c -> (b',c) -> T a b' c
         upd t x = t { fb = x}
@@ -116,7 +132,10 @@ Hence the use of 'relevant_cont'.
 
 
 Note [Implicit type sharing]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L719>`__
+
 We also take into account any "implicit" non-update fields.  For example
         data T a b where { MkT { f::a } :: T a a; ... }
 So the "real" type of MkT is: forall ab. (a~b) => a -> T a b
@@ -134,6 +153,9 @@ We can't give it the more general type
 
 Note [Criteria for update]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L734>`__
+
 We want to allow update for existentials etc, provided the updated
 field isn't part of the existential. For example, this should be ok.
   data T a where { MkT { f1::a, f2::b->b } :: T a }
@@ -142,7 +164,7 @@ field isn't part of the existential. For example, this should be ok.
 
 The criterion we use is this:
 
-.. code-block:: haskell
+::
 
   The types of the updated fields
   mention only the universally-quantified type variables
@@ -166,7 +188,10 @@ because the expression is polymorphic...but that seems a bridge too far.
 
 Note [Data family example]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-    data instance T (a,b) = MkT { x::a, y::b }
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L762>`__
+
+data instance T (a,b) = MkT { x::a, y::b }
   --->
     data :TP a b = MkT { a::a, y::b }
     coTP a b :: T (a,b) ~ :TP a b
@@ -193,34 +218,37 @@ In the outgoing (HsRecordUpd scrut binds cons in_inst_tys out_inst_tys):
 
 
 Note [Mixed Record Field Updates]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L788>`__
+
 Consider the following pattern synonym.
 
-.. code-block:: haskell
+::
 
   data MyRec = MyRec { foo :: Int, qux :: String }
 
-.. code-block:: haskell
+::
 
   pattern HisRec{f1, f2} = MyRec{foo = f1, qux=f2}
 
 This allows updates such as the following
 
-.. code-block:: haskell
+::
 
   updater :: MyRec -> MyRec
   updater a = a {f1 = 1 }
 
 It would also make sense to allow the following update (which we reject).
 
-.. code-block:: haskell
+::
 
   updater a = a {f1 = 1, qux = "two" } ==? MyRec 1 "two"
 
 This leads to confusing behaviour when the selectors in fact refer the same
 field.
 
-.. code-block:: haskell
+::
 
   updater a = a {f1 = 1, foo = 2} ==? ???
 
@@ -228,11 +256,11 @@ For this reason, we reject a mixture of pattern synonym and normal record
 selectors in the same update block. Although of course we still allow the
 following.
 
-.. code-block:: haskell
+::
 
   updater a = (a {f1 = 1}) {foo = 2}
 
-.. code-block:: haskell
+::
 
   > updater (MyRec 0 "str")
   MyRec 2 "str"
@@ -241,6 +269,9 @@ following.
 
 Note [Visible type application for the empty list constructor]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L1242>`__
+
 Getting the expression [] @Int to typecheck is slightly tricky since [] isn't
 an ordinary data constructor. By default, when tcExpr typechecks a list
 expression, it wraps the expression in a coercion, which gives it a type to the
@@ -259,11 +290,15 @@ which is better than before.
 --------------
 
 
+
 Note [Required quantifiers in the type of a term]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L1363>`__
+
 Consider (#15859)
 
-.. code-block:: haskell
+::
 
   data A k :: k -> Type      -- A      :: forall k -> k -> Type
   type KindOf (a :: k) = k   -- KindOf :: forall k. k -> Type
@@ -284,6 +319,9 @@ in TyCoRep.
 
 Note [Visible type application zonk]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L1382>`__
+
 * Substitutions should be kind-preserving, so we need kind(tv) = kind(ty_arg).
 
 * tcHsTypeApp only guarantees that
@@ -312,8 +350,12 @@ and we had the visible type application
 --------------
 
 
+
 Note [tcSynArg]
 ~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L1464>`__
+
 Because of the rich structure of SyntaxOpType, we must do the
 contra-/covariant thing when working down arrows, to get the
 instantiation vs. skolemisation decisions correct (and, more
@@ -323,8 +365,12 @@ works on "expected" types, skolemising where necessary
 See Note [tcSynArg]
 
 
+
 Note [Push result type in]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L1600>`__
+
 Unify with expected result before type-checking the args so that the
 info from res_ty percolates to args.  This is when we might detect a
 too-few args situation.  (One can think of cases when the opposite
@@ -333,17 +379,17 @@ experimenting with putting this first.
 
 Here's an example where it actually makes a real difference
 
-.. code-block:: haskell
+::
 
    class C t a b | t a -> b
    instance C Char a Bool
 
-.. code-block:: haskell
+::
 
    data P t a = forall b. (C t a b) => MkP b
    data Q t   = MkQ (forall a. P t a)
 
-.. code-block:: haskell
+::
 
    f1, f2 :: Q Char;
    f1 = MkQ (MkP True)
@@ -356,7 +402,10 @@ in the other order, the extra signature in f2 is reqd.
 
 
 Note [Partial expression signatures]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L1692>`__
+
 Partial type signatures on expressions are easy to get wrong.  But
 here is a guiding principile
     e :: ty
@@ -383,8 +432,12 @@ Storable w.  Instead, don't generalise; then _ gets instantiated to
 CLong, as it should.
 
 
+
 Note [Adding the implicit parameter to 'assert']
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L1858>`__
+
 The typechecker transforms (assert e1 e2) to (assertError e1 e2).
 This isn't really the Right Thing because there's no way to "undo"
 if you want to see the original source code in the typechecker
@@ -395,6 +448,9 @@ being able to reconstruct the exact original program.
 
 Note [tagToEnum#]
 ~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L1866>`__
+
 Nasty check to ensure that tagToEnum# is applied to a type that is an
 enumeration TyCon.  Unification may refine the type later, but this
 check won't see that, alas.  It's crude, because it relies on our
@@ -407,7 +463,7 @@ Here's are two cases that should fail
         f :: forall a. a
         f = tagToEnum# 0        -- Can't do tagToEnum# at a type variable
 
-.. code-block:: haskell
+::
 
         g :: Int
         g = tagToEnum# 0        -- Int is not an enumeration
@@ -426,6 +482,9 @@ It's all grotesquely complicated.
 
 Note [Instantiating stupid theta]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L1893>`__
+
 Normally, when we infer the type of an Id, we don't instantiate,
 because we wish to allow for visible type application later on.
 But if a datacon has a stupid theta, we're a bit stuck. We need
@@ -440,6 +499,9 @@ the users that complain.
 
 Note [Lifting strings]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L2063>`__
+
 If we see $(... [| s |] ...) where s::String, we don't want to
 generate a mass of Cons (CharL 'x') (Cons (CharL 'y') ...)) etc.
 So this conditional short-circuits the lifting mechanism to generate
@@ -458,9 +520,11 @@ naughtiness in both branches.  c.f. TcTyClsBindings.mkAuxBinds.
 
 
 
-
 Note [Disambiguating record fields]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L2114>`__
+
 When the -XDuplicateRecordFields extension is used, and the renamer
 encounters a record selector or update that it cannot immediately
 disambiguate (because it involves fields that belong to multiple
@@ -470,7 +534,7 @@ typechecker.  In this case, the `Ambiguous` constructor of
 
 Consider the following definitions:
 
-.. code-block:: haskell
+::
 
         data S = MkS { foo :: Int }
         data T = MkT { foo :: Int, bar :: Int }
@@ -484,27 +548,27 @@ For selectors, there are two possible ways to disambiguate:
 1. Check if the pushed-in type is a function whose domain is a
    datatype, for example:
 
-.. code-block:: haskell
+::
 
        f s = (foo :: S -> Int) s
 
-.. code-block:: haskell
+::
 
        g :: T -> Int
        g = foo
 
-.. code-block:: haskell
+::
 
     This is checked by `tcCheckRecSelId` when checking `HsRecFld foo`.
 
 2. Check if the selector is applied to an argument that has a type
    signature, for example:
 
-.. code-block:: haskell
+::
 
        h = foo (s :: S)
 
-.. code-block:: haskell
+::
 
     This is checked by `tcApp`.
 
@@ -514,36 +578,36 @@ function tries to determine the parent datatype in three ways:
 
 1. Check for types that have all the fields being updated. For example:
 
-.. code-block:: haskell
+::
 
         f x = x { foo = 3, bar = 2 }
 
-.. code-block:: haskell
+::
 
    Here `f` must be updating `T` because neither `S` nor `U` have
    both fields. This may also discover that no possible type exists.
    For example the following will be rejected:
 
-.. code-block:: haskell
+::
 
         f' x = x { foo = 3, baz = 3 }
 
 2. Use the type being pushed in, if it is already a TyConApp. The
    following are valid updates to `T`:
 
-.. code-block:: haskell
+::
 
         g :: T -> T
         g x = x { foo = 3 }
 
-.. code-block:: haskell
+::
 
         g' x = x { foo = 3 } :: T
 
 3. Use the type signature of the record expression, if it exists and
    is a TyConApp. Thus this is valid update to `T`:
 
-.. code-block:: haskell
+::
 
         h x = (x :: T) { foo = 3 }
 
@@ -552,17 +616,17 @@ Note that we do not look up the types of variables being updated, and
 no constraint-solving is performed, so for example the following will
 be rejected as ambiguous:
 
-.. code-block:: haskell
+::
 
      let bad (s :: S) = foo s
 
-.. code-block:: haskell
+::
 
      let r :: T
          r = blah
      in r { foo = 3 }
 
-.. code-block:: haskell
+::
 
      \r. (r { foo = 3 },  r :: T )
 
@@ -581,8 +645,12 @@ of its argument, try to determine the name of the selector that is
 meant.
 
 
+
 Note [Splitting nested sigma types in mismatched function types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L2578>`__
+
 When one applies a function to too few arguments, GHC tries to determine this
 fact if possible so that it may give a helpful error message. It accomplishes
 this by checking if the type of the applied function has more argument types
@@ -592,19 +660,19 @@ Previously, GHC computed the number of argument types through tcSplitSigmaTy.
 This is incorrect in the face of nested foralls, however! This caused Trac
 #13311, for instance:
 
-.. code-block:: haskell
+::
 
   f :: forall a. (Monoid a) => forall b. (Monoid b) => Maybe a -> Maybe b
 
 If one uses `f` like so:
 
-.. code-block:: haskell
+::
 
   do { f; putChar 'a' }
 
 Then tcSplitSigmaTy will decompose the type of `f` into:
 
-.. code-block:: haskell
+::
 
   Tyvars: [a]
   Context: (Monoid a)
@@ -615,7 +683,7 @@ That is, it will conclude that there are *no* argument types, and since `f`
 was given no arguments, it won't print a helpful error message. On the other
 hand, tcSplitNestedSigmaTys correctly decomposes `f`'s type down to:
 
-.. code-block:: haskell
+::
 
   Tyvars: [a, b]
   Context: (Monoid a, Monoid b)
@@ -626,8 +694,12 @@ So now GHC recognizes that `f` has one more argument type than it was actually
 provided.
 
 
+
 Note [Finding the conflicting fields]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L2673>`__
+
 Suppose we have
   data A = A {a0, a1 :: Int}
          | B {b0, b1 :: Int}
@@ -650,8 +722,11 @@ Finding the smallest subset is hard, so the code here makes
 a decent stab, no more.  See #7989.
 
 
+
 Note [Not-closed error messages]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L2859>`__
 
 When variables in a static form are not closed, we go through the trouble
 of explaining why they aren't.
@@ -668,7 +743,7 @@ Thus, the following program
 
 produces the error
 
-.. code-block:: haskell
+::
 
    'g' is used in a static form but it is not closed because it
    uses 'h' which uses 'x' which is not let-bound.
@@ -689,7 +764,7 @@ And a program like
 
 produces the error
 
-.. code-block:: haskell
+::
 
    'g' is used in a static form but it is not closed because it
    uses 'h' which has a non-closed type because it contains the
@@ -699,6 +774,8 @@ produces the error
 
 Note [Checking closedness]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcExpr.hs#L2901>`__
 
 @checkClosed@ checks if a binding is closed and returns a reason if it is
 not.
@@ -713,5 +790,4 @@ type. Thus, the "reason" is a path from @n@ to this offending node.
 
 When @n@ is not closed, we traverse the graph reachable from @n@ to build
 the reason.
-
 

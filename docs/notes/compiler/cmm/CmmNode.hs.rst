@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmNode.hs>`_
 
-====================
-compiler/cmm/CmmNode.hs.rst
-====================
+compiler/cmm/CmmNode.hs
+=======================
+
 
 Note [Foreign calls]
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmNode.hs#L166>`__
+
 A CmmUnsafeForeignCall is used for *unsafe* foreign calls;
 a CmmForeignCall call is used for *safe* foreign calls.
 
@@ -35,8 +38,11 @@ made manifest in CmmLayoutStack, where they are lowered into the above
 sequence.
 
 
+
 Note [Unsafe foreign calls clobber caller-save registers]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmNode.hs#L197>`__
 
 A foreign call is defined to clobber any GlobalRegs that are mapped to
 caller-saves machine registers (according to the prevailing C ABI).
@@ -54,8 +60,12 @@ avoid any code motion that would make a caller-saves GlobalReg live
 across a foreign call during subsequent optimisations.
 
 
+
 Note [Register parameter passing]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmNode.hs#L216>`__
+
 On certain architectures, some registers are utilized for parameter
 passing in the C calling convention.  For example, in x86-64 Linux
 convention, rdi, rsi, rdx and rcx (as well as r8 and r9) may be used for
@@ -71,8 +81,11 @@ way is done in cmm/CmmOpt.hs currently.  We should fix this!
  Eq instance of CmmNode
 
 
+
 Note [Safe foreign calls clobber STG registers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmNode.hs#L382>`__
 
 During stack layout phase every safe foreign call is expanded into a block
 that contains unsafe foreign call (instead of safe foreign call) and ends
@@ -83,7 +96,7 @@ layout phase. Consider this example of what might go wrong (this is cmm
 code from stablename001 test). Here is code after common block elimination
 (before stack layout):
 
-.. code-block:: haskell
+::
 
  c1q6:
      _s1pf::P64 = R1;
@@ -98,7 +111,7 @@ code from stablename001 test). Here is code after common block elimination
 
 If we run sinking pass now (still before stack layout) we will get this:
 
-.. code-block:: haskell
+::
 
  c1q6:
      I64[(young<c1q9> + 8)] = c1q9;
@@ -113,7 +126,7 @@ If we run sinking pass now (still before stack layout) we will get this:
 Notice that _s1pf was sunk past a foreign call. When we run stack layout
 safe call to performMajorGC will be turned into:
 
-.. code-block:: haskell
+::
 
  c1q6:
      _s1pc::P64 = P64[Sp + 8];

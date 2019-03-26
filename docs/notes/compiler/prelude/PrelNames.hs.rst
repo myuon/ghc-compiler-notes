@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelNames.hs>`_
 
-====================
-compiler/prelude/PrelNames.hs.rst
-====================
+compiler/prelude/PrelNames.hs
+=============================
+
 
 Note [Known-key names]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelNames.hs#L38>`__
+
 It is *very* important that the compiler gives wired-in things and
 things with "known-key" names the correct Uniques wherever they
 occur. We have to be careful about this in exactly two places:
@@ -24,7 +27,7 @@ This is accomplished through a combination of mechanisms:
      use. For example, when we parse a [] in a type we can just insert
      an Exact RdrName Name with the listTyConKey.
 
-.. code-block:: haskell
+::
 
      Currently, I believe this is just an optimisation: it would be
      equally valid to just output Orig RdrNames that correctly record
@@ -40,7 +43,7 @@ This is accomplished through a combination of mechanisms:
      (i.e. a pair of a Module and an OccName) for a known-key name
      they get the correct Unique.
 
-.. code-block:: haskell
+::
 
      This is the most important mechanism for ensuring that known-key
      stuff gets the right Unique, and is why it is so important to
@@ -55,9 +58,11 @@ This is accomplished through a combination of mechanisms:
 
 
 
-
 Note [Infinite families of known-key names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelNames.hs#L84>`__
+
 Infinite families of known-key things (e.g. tuples and sums) pose a tricky
 problem: we can't add them to the knownKeyNames finite map which we use to
 ensure that, e.g., a reference to (,) gets assigned the right unique (if this
@@ -66,12 +71,12 @@ doesn't sound familiar see Note [Known-key names] above).
 We instead handle tuples and sums separately from the "vanilla" known-key
 things,
 
-.. code-block:: haskell
+::
 
   a) The parser recognises them specially and generates an Exact Name (hence not
      looked up in the orig-name cache)
 
-.. code-block:: haskell
+::
 
   b) The known infinite families of names are specially serialised by
      BinIface.putName, with that special treatment detected when we read back to
@@ -84,21 +89,22 @@ suffice to ensure that they always have the right Unique. In particular,
 implicit param TyCon names, constraint tuples and Any TyCons cannot be mentioned
 by the user. For those things that *can* appear in source programs,
 
-.. code-block:: haskell
+::
 
   c) IfaceEnv.lookupOrigNameCache uses isBuiltInOcc_maybe to map built-in syntax
      directly onto the corresponding name, rather than trying to find it in the
      original-name cache.
 
-.. code-block:: haskell
+::
 
      See also Note [Built-in syntax and the OrigNameCache]
 
 
 
-
 Note [The integer library]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelNames.hs#L115>`__
 
 Clearly, we need to know the names of various definitions of the integer
 library, e.g. the type itself, `mkInteger` etc. But there are two possible

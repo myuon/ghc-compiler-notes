@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSwitch.hs>`_
 
-====================
-compiler/cmm/CmmSwitch.hs.rst
-====================
+compiler/cmm/CmmSwitch.hs
+=========================
+
 
 Note [Cmm Switches, the general plan]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSwitch.hs#L25>`__
 
 Compiling a high-level switch statement, as it comes out of a STG case
 expression, for example, allows for a surprising amount of design decisions.
@@ -33,15 +35,18 @@ separated.
 ---------------------------------------------------------------------------
  Note [Magic Constants in CmmSwitch]
 
-.. code-block:: haskell
+::
 
  There are a lot of heuristics here that depend on magic values where it is
  hard to determine the "best" value (for whatever that means). These are the
  magic values:
 
 
+
 Note [Jump Table Offset]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSwitch.hs#L173>`__
 
 Usually, the code for a jump table starting at x will first subtract x from
 the value, to avoid a large amount of empty entries. But if x is very small,
@@ -59,7 +64,7 @@ do
     _u20N:
             jmp *_n20Q(,%r14,8)
 
-.. code-block:: haskell
+::
 
     _n20Q:
             .quad   0
@@ -68,8 +73,11 @@ do
             .quad   _c20r
 
 
+
 Note [createSwitchPlan]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSwitch.hs#L237>`__
 
 A SwitchPlan describes how a Switch statement is to be broken down into
 smaller pieces suitable for code generation.
@@ -145,8 +153,12 @@ While this is fairly cheap it made no big difference for the >3000 case
 and slowed down all other cases making it not worthwhile.
 
 
+
 Note [CmmSwitch vs. CmmImplementSwitchPlans]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmSwitch.hs#L481>`__
+
 I (Joachim) separated the two somewhat closely related modules
 
  - CmmSwitch, which provides the CmmSwitchTargets type and contains the strategy

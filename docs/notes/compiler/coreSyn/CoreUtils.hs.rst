@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs>`_
 
-====================
-compiler/coreSyn/CoreUtils.hs.rst
-====================
+compiler/coreSyn/CoreUtils.hs
+=============================
+
 
 Note [Type bindings]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L186>`__
+
 Core does allow type bindings, although such bindings are
 not much used, except in the output of the desugarer.
 Example:
@@ -17,6 +20,9 @@ result type (#8522).
 
 Note [Existential variables and silly type synonyms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L195>`__
+
 Consider
         data T = forall a. T (Funny a)
         type Funny a = Bool
@@ -43,8 +49,12 @@ Note that there might be existentially quantified coercion variables, too.
 Not defined with applyTypeToArg because you can't print from CoreSyn.
 
 
+
 Note [Binding coercions]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L515>`__
+
 Consider binding a CoVar, c = e.  Then, we must atisfy
 Note [CoreSyn type and coercion invariant] in CoreSyn,
 which allows only (Coercion co) on the RHS.
@@ -52,11 +62,14 @@ which allows only (Coercion co) on the RHS.
 
 
 Note [Unreachable code]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L561>`__
+
 It is possible (although unusual) for GHC to find a case expression
 that cannot match.  For example:
 
-.. code-block:: haskell
+::
 
      data Col = Red | Green | Blue
      x = Red
@@ -69,7 +82,7 @@ expression.  (Perhaps there's a NOINLINE on it, or profiling SCC stuff
 gets in the way; cf #3118.)  Then the full-lazines pass might produce
 this
 
-.. code-block:: haskell
+::
 
      x = Red
      lvl = case x of { Green -> e1; Blue -> e2 })
@@ -86,13 +99,17 @@ filters down the matching alternatives in Simplify.rebuildCase.
 -------------------------------
 
 
+
 Note [Combine identical alternatives]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L789>`__
+
 If several alternatives are identical, merge them into a single
 DEFAULT alternative.  I've occasionally seen this making a big
 difference:
 
-.. code-block:: haskell
+::
 
      case e of               =====>     case e of
        C _ -> f x                         D v -> ....v....
@@ -109,7 +126,7 @@ alternative; this picks up the common cases
 The case where Combine Identical Alternatives transformation showed up
 was like this (base/Foreign/C/Err/Error.hs):
 
-.. code-block:: haskell
+::
 
         x | p `is` 1 -> e1
           | p `is` 2 -> e2
@@ -117,7 +134,7 @@ was like this (base/Foreign/C/Err/Error.hs):
 
 where @is@ was something like
 
-.. code-block:: haskell
+::
 
         p `is` n = p /= (-1) && p == n
 
@@ -139,10 +156,13 @@ defeats combineIdenticalAlts (see #7360).
 
 Note [Care with impossible-constructors when combining alternatives]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L832>`__
+
 Suppose we have (#10538)
    data T = A | B | C | D
 
-.. code-block:: haskell
+::
 
       case x::T of   (Imposs-default-cons {A,B})
          DEFAULT -> e1
@@ -154,7 +174,7 @@ When calling combineIdentialAlts, we'll have computed that the
 A or B we'll take the other alternatives.  But suppose we combine B
 into the DEFAULT, to get
 
-.. code-block:: haskell
+::
 
       case x::T of   (Imposs-default-cons {A})
          DEFAULT -> e1
@@ -166,7 +186,7 @@ else we risk compiling 'e1' wrong!
 Not only that, but we take care when there is no DEFAULT beforehand,
 because we are introducing one.  Consider
 
-.. code-block:: haskell
+::
 
    case x of   (Imposs-default-cons {A,B,C})
      A -> e1
@@ -175,7 +195,7 @@ because we are introducing one.  Consider
 
 Then when combining the A and C alternatives we get
 
-.. code-block:: haskell
+::
 
    case x of   (Imposs-default-cons {B})
      DEFAULT -> e1
@@ -190,6 +210,9 @@ missed the first one.)
 
 Note [getIdFromTrivialExpr]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L973>`__
+
 When substituting in a breakpoint we need to strip away the type cruft
 from a trivial expression and get back to the Id.  The invariant is
 that the expression we're substituting was originally trivial
@@ -204,8 +227,12 @@ if the variable actually refers to a literal; thus we use
 T12076lit for an example where this matters.
 
 
+
 Note [Bottoming expressions]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1034>`__
+
 A bottoming expression is guaranteed to diverge, or raise an
 exception.  We can test for it in two different ways, and exprIsBottom
 checks for both of these situations:
@@ -235,26 +262,32 @@ which is likewise uninhabited.
 
 
 
-
 Note [exprIsDupable]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1070>`__
+
 @exprIsDupable@ is true of expressions that can be duplicated at a modest
                 cost in code size.  This will only happen in different case
                 branches, so there's no issue about duplicating work.
 
-.. code-block:: haskell
+::
 
                 That is, exprIsDupable returns True of (f x) even if
                 f is very very expensive to call.
 
-.. code-block:: haskell
+::
 
                 Its only purpose is to avoid fruitless let-binding
                 and then inlining of case join points
 
 
+
 Note [exprIsWorkFree]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1114>`__
+
 exprIsWorkFree is used when deciding whether to inline something; we
 don't inline it if doing so might duplicate work, by peeling off a
 complete copy of the expression.  Here we do not want even to
@@ -266,7 +299,7 @@ Previously we were a bit more liberal, which led to the primop-duplicating
 problem.  However, being more conservative did lead to a big regression in
 one nofib benchmark, wheel-sieve1.  The situation looks like this:
 
-.. code-block:: haskell
+::
 
    let noFactor_sZ3 :: GHC.Types.Int -> GHC.Types.Bool
        noFactor_sZ3 = case s_adJ of _ { GHC.Types.I# x_aRs ->
@@ -287,6 +320,9 @@ in turn was making inner loops of array calculations runs slow (#5623)
 
 Note [Case expressions are work-free]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1142>`__
+
 Are case-expressions work-free?  Consider
     let v = case x of (p,q) -> p
         go = \y -> ...case v of ...
@@ -333,6 +369,9 @@ because sharing will make sure it is only evaluated once.
 
 Note [exprIsCheap and exprIsHNF]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1186>`__
+
 Note that exprIsHNF does not imply exprIsCheap.  Eg
         let x = fac 20 in Just x
 This responds True to exprIsHNF (you can discard a seq), but
@@ -342,6 +381,9 @@ False to exprIsCheap.
 
 Note [Arguments and let-bindings exprIsCheapX]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1193>`__
+
 What predicate should we apply to the argument of an application, or the
 RHS of a let-binding?
 
@@ -365,8 +407,12 @@ in this (which it previously was):
 ------------------
 
 
+
 Note [exprIsExpandable]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1251>`__
+
 An expression is "expandable" if we are willing to duplicate it, if doing
 so might make a RULE or case-of-constructor fire.  Consider
    let x = (a,b)
@@ -411,8 +457,12 @@ expansion.  Specifically:
 -----------------------------------
 
 
+
 Note [isCheapApp: bottoming functions]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1390>`__
+
 I'm not sure why we have a special case for bottoming
 functions in isCheapApp.  Maybe we don't need it.
 
@@ -420,17 +470,20 @@ functions in isCheapApp.  Maybe we don't need it.
 
 Note [isExpandableApp: bottoming functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1395>`__
+
 It's important that isExpandableApp does not respond True to bottoming
 functions.  Recall  undefined :: HasCallStack => a
 Suppose isExpandableApp responded True to (undefined d), and we had:
 
-.. code-block:: haskell
+::
 
   x = undefined <dict-expr>
 
 Then Simplify.prepareRhs would ANF the RHS:
 
-.. code-block:: haskell
+::
 
   d = <dict-expr>
   x = undefined d
@@ -448,7 +501,10 @@ non-expandable, because ANFing them is a bad idea in the first place.
 
 
 Note [Record selection]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1418>`__
+
 I'm experimenting with making record selection
 look cheap, so we will substitute it inside a
 lambda.  Particularly for dictionary field selection.
@@ -460,6 +516,9 @@ there's no guarantee that (sel d x) will be too.  Hence (n_val_args == 1)
 
 Note [Expandable overloadings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1427>`__
+
 Suppose the user wrote this
    {-# RULE  forall x. foo (negate x) = h x #-}
    f x = ....(foo (negate x))....
@@ -472,9 +531,11 @@ it's applied only to dictionaries.
 
 
 
-
 Note [exprOkForSpeculation: case expressions]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1614>`__
+
 exprOkForSpeculation accepts very special case expressions.
 Reason: (a ==# b) is ok-for-speculation, but the litEq rules
 in PrelRules convert it (a ==# 3#) to
@@ -492,7 +553,7 @@ But we restrict it sharply:
                                                ; False -> e2 }
                        in ...) ...
 
-.. code-block:: haskell
+::
 
   Does the RHS of v satisfy the let/app invariant?  Previously we said
   yes, on the grounds that y is evaluated.  But the binder-swap done
@@ -516,7 +577,7 @@ But we restrict it sharply:
   evaluated, but the alternatives are incomplete so we should not
   evaluate it strictly.
 
-.. code-block:: haskell
+::
 
   Now, all this is for lifted types, but it'd be the same for any
   finite unlifted type. We don't have many of them, but we might
@@ -528,7 +589,7 @@ But we restrict it sharply:
   floating of single-alternative cases; it now uses exprIsHNF
   Note [Floating single-alternative cases].
 
-.. code-block:: haskell
+::
 
   But in those days, consider
     case e of x { DEAFULT ->
@@ -570,9 +631,11 @@ points do the job nicely.
 
 
 
-
 Note [Primops with lifted arguments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1704>`__
+
 Is this ok-for-speculation (see #13027)?
    reallyUnsafePtrEq# a b
 Well, yes.  The primop accepts lifted arguments and does not
@@ -589,6 +652,9 @@ Bottom line:
 
 Note [exprOkForSpeculation and SeqOp/DataToTagOp]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1718>`__
+
 Most primops with lifted arguments don't evaluate them
 (see Note [Primops with lifted arguments]), so we can ignore
 that argument entirely when doing exprOkForSpeculation.
@@ -604,6 +670,9 @@ Lots of discussion in #15696.
 
 Note [exprOkForSpeculation and evaluated variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1731>`__
+
 Recall that
   seq#       :: forall a s. a -> State# s -> (# State# s, a #)
   dataToTag# :: forall a.   a -> Int#
@@ -636,11 +705,18 @@ it doesn't have the trickiness of the let/app invariant to worry about.
 
 
 Note [exprIsHNF]             See also Note [exprIsCheap and exprIsHNF]
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1769>`__
+
+
 
 
 Note [Mark evaluated arguments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L1992>`__
+
 When pattern matching on a constructor with strict fields, the binder
 can have an 'evaldUnfolding'.  Moreover, it *should* have one, so that
 when loading an interface file unfolding like:
@@ -657,6 +733,9 @@ c.f. add_evals in Simplify.simplAlt
 
 Note [Eta reduction conditions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L2255>`__
+
 We try for eta reduction here, but *only* if we get all the way to an
 trivial expression.  We don't want to remove extra lambdas unless we
 are going to avoid allocating this thing altogether.
@@ -676,7 +755,7 @@ There are some particularly delicate points here:
         h y = case (case y of { True -> f `seq` True; False -> False }) of
                 True -> ...; False -> ...
 
-.. code-block:: haskell
+::
 
   If we (unsoundly) eta-reduce f to get f=f, the strictness analyser
   says f=bottom, and replaces the (f `seq` True) with just
@@ -686,7 +765,7 @@ There are some particularly delicate points here:
   Result: seg-fault because the boolean case actually gets a function value.
   See #1947.
 
-.. code-block:: haskell
+::
 
   So it's important to do the right thing.
 
@@ -701,7 +780,7 @@ There are some particularly delicate points here:
   Which might change a terminating program (think (f `seq` e)) to a
   non-terminating one.  So we check for being a loop breaker first.
 
-.. code-block:: haskell
+::
 
   However for GlobalIds we can look at the arity; and for primops we
   must, since they have no unfolding.
@@ -726,6 +805,9 @@ Alas.
 
 Note [Eta reduction with casted arguments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L2316>`__
+
 Consider
     (\(x:t3). f (x |> g)) :: t3 -> t2
   where
@@ -733,7 +815,7 @@ Consider
     g :: t3 ~ t1
 This should be eta-reduced to
 
-.. code-block:: haskell
+::
 
     f |> (sym g -> t2)
 
@@ -752,8 +834,12 @@ But the simplifier pushes those casts outwards, so we don't
 need to address that here.
 
 
+
 Note [Eta reduction of an eval'd function]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUtils.hs#L2425>`__
+
 In Haskell it is not true that    f = \x. f x
 because f might be bottom, and 'seq' can distinguish them.
 
@@ -765,6 +851,4 @@ to the rule that
 we can eta-reduce    \x. f x  ===>  f
 
 This turned up in #7542.
-
-
 

@@ -1,15 +1,18 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsLit.hs>`_
 
-====================
-compiler/hsSyn/HsLit.hs.rst
-====================
+compiler/hsSyn/HsLit.hs
+=======================
+
 
 Note [ol_rebindable]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsLit.hs#L171>`__
+
 The ol_rebindable field is True if this literal is actually
 using rebindable syntax.  Specifically:
 
-.. code-block:: haskell
+::
 
   False iff ol_witness is the standard one
   True  iff ol_witness is non-standard
@@ -23,6 +26,9 @@ Equivalently it's True if
 
 Note [Overloaded literal witnesses]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsLit.hs#L184>`__
+
 *Before* type checking, the HsExpr in an HsOverLit is the
 name of the coercion function, 'fromInteger' or 'fromRational'.
 *After* type checking, it is a witness for the literal, such as

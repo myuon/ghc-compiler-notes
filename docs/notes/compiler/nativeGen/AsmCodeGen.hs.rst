@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/AsmCodeGen.hs>`_
 
-====================
-compiler/nativeGen/AsmCodeGen.hs.rst
-====================
+compiler/nativeGen/AsmCodeGen.hs
+================================
+
 
 Note [Unwinding information in the NCG]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/AsmCodeGen.hs#L284>`__
 
 Unwind information is a type of metadata which allows a debugging tool
 to reconstruct the values of machine registers at the time a procedure was

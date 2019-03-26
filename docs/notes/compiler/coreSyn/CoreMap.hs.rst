@@ -1,12 +1,15 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreMap.hs>`_
 
-====================
-compiler/coreSyn/CoreMap.hs.rst
-====================
+compiler/coreSyn/CoreMap.hs
+===========================
+
 
 Note [Binders]
 ~~~~~~~~~~~~~~
- * In general we check binders as late as possible because types are
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreMap.hs#L115>`__
+
+* In general we check binders as late as possible because types are
    less likely to differ than expression structure.  That's why
       cm_lam :: CoreMapG (TypeMapG a)
    rather than
@@ -21,6 +24,9 @@ Note [Binders]
 
 Note [Empty case alternatives]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreMap.hs#L128>`__
+
 * For a key (Case e b ty (alt:alts))  we don't need to look the return type
   'ty', because every alternative has that type.
 
@@ -36,8 +42,12 @@ for the two possibilities.  Only cm_ecase looks at the type.
 See also Note [Empty case alternatives] in CoreSyn.
 
 
+
 Note [Binders]
 ~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreMap.hs#L758>`__
+
 We need to use 'BndrMap' for 'Coercion', 'CoreExpr' AND 'Type', since all
 of these data types have binding forms.
 

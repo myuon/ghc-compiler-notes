@@ -1,20 +1,23 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs>`_
 
-====================
-compiler/typecheck/TcDeriv.hs.rst
-====================
+compiler/typecheck/TcDeriv.hs
+=============================
+
 
 Note [Data decl contexts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L119>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
         data (RealFloat a) => Complex a = !a :+ !a deriving( Read )
 
 We will need an instance decl like:
 
-.. code-block:: haskell
+::
 
         instance (Read a, RealFloat a) => Read (Complex a) where
           ...
@@ -29,7 +32,7 @@ a Complex; they only take them apart.
 Our approach: identify the offending classes, and add the data type
 context to the instance decl.  The "offending classes" are
 
-.. code-block:: haskell
+::
 
         Read, Enum?
 
@@ -42,6 +45,9 @@ version.  So now all classes are "offending".
 
 Note [Newtype deriving]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L147>`__
+
 Consider this:
     class C a b
     instance C [a] Char
@@ -55,9 +61,11 @@ And then translate it to:
 
 
 
-
 Note [Newtype deriving superclasses]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L161>`__
+
 (See also #1220 for an interesting exchange on newtype
 deriving and superclasses.)
 
@@ -81,9 +89,11 @@ when the dict is constructed in TcInstDcls.tcInstDecl2
 
 
 
-
 Note [Unused constructors and deriving clauses]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L185>`__
+
 See #3221.  Consider
    data T = T1 | T2 deriving( Show )
 Are T1 and T2 unused?  Well, no: the deriving clause expands to mention
@@ -93,9 +103,12 @@ both of them.  So we gather defs/uses from deriving just like anything else.
 
 Note [Newtype deriving and unused constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L374>`__
+
 Consider this (see #1954):
 
-.. code-block:: haskell
+::
 
   module Bug(P) where
   newtype P a = MkP (IO a) deriving Monad
@@ -116,27 +129,30 @@ of genInst.
 
 Note [Staging of tcDeriving]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L393>`__
+
 Here's a tricky corner case for deriving (adapted from #2721):
 
-.. code-block:: haskell
+::
 
     class C a where
       type T a
       foo :: a -> T a
 
-.. code-block:: haskell
+::
 
     instance C Int where
       type T Int = Int
       foo = id
 
-.. code-block:: haskell
+::
 
     newtype N = N Int deriving C
 
 This will produce an instance something like this:
 
-.. code-block:: haskell
+::
 
     instance C N where
       type T N = T Int
@@ -160,7 +176,7 @@ tcDeriving. We first call genInst on the standalone derived instance specs and
 the instance specs obtained from deriving clauses. Note that the return type of
 genInst is a triple:
 
-.. code-block:: haskell
+::
 
     TcM (ThetaType -> TcM (InstInfo RdrName), BagDerivStuff, Maybe Name)
 
@@ -188,6 +204,9 @@ continuation-returning style, so we opt for that route.
 
 Note [Why we don't pass rep_tc into deriveTyData]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L453>`__
+
 Down in the bowels of mkEqnHelp, we need to convert the fam_tc back into
 the rep_tc by means of a lookup. And yet we have the rep_tc right here!
 Why look it up again? Answer: it's just easier this way.
@@ -203,25 +222,28 @@ nicely.
 
 
 Note [Avoid RebindableSyntax when deriving]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L467>`__
+
 The RebindableSyntax extension interacts awkwardly with the derivation of
 any stock class whose methods require the use of string literals. The Show
 class is a simple example (see #12688):
 
-.. code-block:: haskell
+::
 
   {-# LANGUAGE RebindableSyntax, OverloadedStrings #-}
   newtype Text = Text String
   fromString :: String -> Text
   fromString = Text
 
-.. code-block:: haskell
+::
 
   data Foo = Foo deriving Show
 
 This will generate code to the effect of:
 
-.. code-block:: haskell
+::
 
   instance Show Foo where
     showsPrec _ Foo = showString "Foo"
@@ -237,17 +259,20 @@ in derived code.
 
 Note [Flattening deriving clauses]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L533>`__
+
 Consider what happens if you run this program (from #10684) without
 DeriveGeneric enabled:
 
-.. code-block:: haskell
+::
 
     data A = A deriving (Show, Generic)
     data B = B A deriving (Show)
 
 Naturally, you'd expect GHC to give an error to the effect of:
 
-.. code-block:: haskell
+::
 
     Can't make a derived instance of `Generic A':
       You need -XDeriveGeneric to derive an instance for this class
@@ -256,7 +281,7 @@ And *only* that error, since the other two derived Show instances appear to be
 independent of this derived Generic instance. Yet GHC also used to give this
 additional error on the program above:
 
-.. code-block:: haskell
+::
 
     No instance for (Show A)
       arising from the 'deriving' clause of a data type declaration
@@ -273,7 +298,7 @@ The solution to this problem is to "flatten" the set of classes that are
 derived for a particular data type via deriving clauses. That is, if
 you have:
 
-.. code-block:: haskell
+::
 
     newtype C = C D
       deriving (E, F, G)
@@ -283,7 +308,7 @@ you have:
 Then instead of processing instances E through M under the scope of a single
 recoverM, we flatten these deriving clauses into the list:
 
-.. code-block:: haskell
+::
 
     [ E (Nothing)
     , F (Nothing)
@@ -301,8 +326,12 @@ same set of clause-derived classes.
 ----------------------------------------------------------------
 
 
+
 Note [tc_args and tycon arity]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L897>`__
+
 You might wonder if we could use (tyConArity tc) at this point, rather
 than (length tc_args).  But for data families the two can differ!  The
 tc and tc_args passed into 'deriveTyData' come from 'deriveClause' which
@@ -323,6 +352,9 @@ Notice that the arg tys might not be the same as the family tycon arity
 
 Note [Unify kinds in deriving]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L915>`__
+
 Consider (#8534)
     data T a b = MkT a deriving( Functor )
     -- where Functor :: (*->*) -> Constraint
@@ -380,13 +412,13 @@ This can lead to some surprising results when *visible* kind binder is
 unified (in contrast to the above examples, in which only non-visible kind
 binders were considered). Consider this example from #11732:
 
-.. code-block:: haskell
+::
 
     data T k (a :: k) = MkT deriving Functor
 
 Since unification yields k:=*, this results in a generated instance of:
 
-.. code-block:: haskell
+::
 
     instance Functor (T *) where ...
 
@@ -394,7 +426,7 @@ which looks odd at first glance, since one might expect the instance head
 to be of the form Functor (T k). Indeed, one could envision an alternative
 generated instance of:
 
-.. code-block:: haskell
+::
 
     instance (k ~ *) => Functor (T k) where
 
@@ -407,7 +439,7 @@ just as comfortably use (T *).
 Another way of thinking about is: deriving clauses often infer constraints.
 For example:
 
-.. code-block:: haskell
+::
 
     data S a = S a deriving Eq
 
@@ -419,19 +451,19 @@ during the deriving process.
 Another quirk of this design choice manifests when typeclasses have visible
 kind parameters. Consider this code (also from #11732):
 
-.. code-block:: haskell
+::
 
     class Cat k (cat :: k -> k -> *) where
       catId   :: cat a a
       catComp :: cat b c -> cat a b -> cat a c
 
-.. code-block:: haskell
+::
 
     instance Cat * (->) where
       catId   = id
       catComp = (.)
 
-.. code-block:: haskell
+::
 
     newtype Fun a b = Fun (a -> b) deriving (Cat k)
 
@@ -441,7 +473,7 @@ the user wrote deriving (Cat *)).
 
 What happens with DerivingVia, when you have yet another type? Consider:
 
-.. code-block:: haskell
+::
 
   newtype Foo (a :: Type) = MkFoo (Proxy a)
     deriving Functor via Proxy
@@ -459,10 +491,13 @@ might be made cleaner.
 
 Note [Unification of two kind variables in deriving]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L1033>`__
+
 As a special case of the Note above, it is possible to derive an instance of
 a poly-kinded typeclass for a poly-kinded datatype. For example:
 
-.. code-block:: haskell
+::
 
     class Category (cat :: k -> k -> *) where
     newtype T (c :: k -> k -> *) a b = MkT (c a b) deriving Category
@@ -470,7 +505,7 @@ a poly-kinded typeclass for a poly-kinded datatype. For example:
 This case is suprisingly tricky. To see why, let's write out what instance GHC
 will attempt to derive (using -fprint-explicit-kinds syntax):
 
-.. code-block:: haskell
+::
 
     instance Category k1 (T k2 c) where ...
 
@@ -480,7 +515,7 @@ the type variable binder for c, since its kind is (k2 -> k2 -> *).
 
 We used to accomplish this by doing the following:
 
-.. code-block:: haskell
+::
 
     unmapped_tkvs = filter (`notElemTCvSubst` kind_subst) all_tkvs
     (subst, _)    = substTyVarBndrs kind_subst unmapped_tkvs
@@ -491,7 +526,7 @@ this results in unmapped_tkvs being [k1], and as a consequence, k1 gets mapped
 to another kind variable in subst! That is, subst = [k2 :-> k1, k1 :-> k_new].
 This is bad, because applying that substitution yields the following instance:
 
-.. code-block:: haskell
+::
 
    instance Category k_new (T k1 c) where ...
 
@@ -508,11 +543,14 @@ To prevent this, we need to filter out any variable from all_tkvs which either
 
 
 Note [Eta-reducing type synonyms]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L1073>`__
+
 One can instantiate a type in a data family instance with a type synonym that
 mentions other type variables:
 
-.. code-block:: haskell
+::
 
   type Const a b = a
   data family Fam (f :: * -> *) (a :: *)
@@ -521,7 +559,7 @@ mentions other type variables:
 It is also possible to define kind synonyms, and they can mention other types in
 a datatype declaration. For example,
 
-.. code-block:: haskell
+::
 
   type Const a b = a
   newtype T f (a :: Const * f) = T (f a) deriving Functor
@@ -535,8 +573,12 @@ where this was first noticed). For this reason, we expand the type synonyms in
 the eta-reduced types before doing any analysis.
 
 
+
 Note [Looking up family instances for deriving]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L1143>`__
+
 tcLookupFamInstExact is an auxiliary lookup wrapper which requires
 that looked-up family instances exist.  If called with a vanilla
 tycon, the old type application is simply returned.
@@ -563,21 +605,24 @@ with standalone deriving declarations.
 
 Note [Deriving, type families, and partial applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L1167>`__
+
 When there are no type families, it's quite easy:
 
-.. code-block:: haskell
+::
 
     newtype S a = MkS [a]
     -- :CoS :: S  ~ []  -- Eta-reduced
 
-.. code-block:: haskell
+::
 
     instance Eq [a] => Eq (S a)         -- by coercion sym (Eq (:CoS a)) : Eq [a] ~ Eq (S a)
     instance Monad [] => Monad S        -- by coercion sym (Monad :CoS)  : Monad [] ~ Monad S
 
 When type familes are involved it's trickier:
 
-.. code-block:: haskell
+::
 
     data family T a b
     newtype instance T Int a = MkT [a] deriving( Eq, Monad )
@@ -585,13 +630,13 @@ When type familes are involved it's trickier:
     --  :Co:RT    :: :RT ~ []          -- Eta-reduced!
     --  :CoF:RT a :: T Int a ~ :RT a   -- Also eta-reduced!
 
-.. code-block:: haskell
+::
 
     instance Eq [a] => Eq (T Int a)     -- easy by coercion
        -- d1 :: Eq [a]
        -- d2 :: Eq (T Int a) = d1 |> Eq (sym (:Co:RT a ; :coF:RT a))
 
-.. code-block:: haskell
+::
 
     instance Monad [] => Monad (T Int)  -- only if we can eta reduce???
        -- d1 :: Monad []
@@ -612,8 +657,12 @@ See Note [Eta reduction for data families] in FamInstEnv
 ************************************************************************
 
 
+
 Note [Recursive newtypes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L1654>`__
+
 Newtype deriving works fine, even if the newtype is recursive.
 e.g.    newtype S1 = S1 [T1 ()]
         newtype T1 a = T1 (StateT S1 IO a ) deriving( Monad )
@@ -631,6 +680,9 @@ But now we require a simple context, so it's ok.
 
 Note [Determining whether newtype-deriving is appropriate]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L1669>`__
+
 When we see
   newtype NT = MkNT Foo
     deriving C
@@ -660,24 +712,27 @@ where we're sure that the resulting instance will type-check.
 
 Note [GND and associated type families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L1696>`__
+
 It's possible to use GeneralizedNewtypeDeriving (GND) to derive instances for
 classes with associated type families. A general recipe is:
 
-.. code-block:: haskell
+::
 
     class C x y z where
       type T y z x
       op :: x -> [y] -> z
 
-.. code-block:: haskell
+::
 
     newtype N a = MkN <rep-type> deriving( C )
 
-.. code-block:: haskell
+::
 
     =====>
 
-.. code-block:: haskell
+::
 
     instance C x y <rep-type> => C x y (N a) where
       type T y (N a) x = T y <rep-type> x
@@ -693,39 +748,39 @@ However, we must watch out for three things:
     variable of the class. As an example, you wouldn't be able to use GND to
     derive an instance of this class:
 
-.. code-block:: haskell
+::
 
       class C a b where
         type T a
 
-.. code-block:: haskell
+::
 
     But you would be able to derive an instance of this class:
 
-.. code-block:: haskell
+::
 
       class C a b where
         type T b
 
-.. code-block:: haskell
+::
 
     The difference is that in the latter T mentions the last parameter of C
     (i.e., it mentions b), but the former T does not. If you tried, e.g.,
 
-.. code-block:: haskell
+::
 
       newtype Foo x = Foo x deriving (C a)
 
-.. code-block:: haskell
+::
 
     with the former definition of C, you'd end up with something like this:
 
-.. code-block:: haskell
+::
 
       instance C a (Foo x) where
         type T a = T ???
 
-.. code-block:: haskell
+::
 
     This T family instance doesn't mention the newtype (or its representation
     type) at all, so we disallow such constructions with GND.
@@ -733,43 +788,43 @@ However, we must watch out for three things:
 (c) UndecidableInstances might need to be enabled. Here's a case where it is
     most definitely necessary:
 
-.. code-block:: haskell
+::
 
       class C a where
         type T a
       newtype Loop = Loop MkLoop deriving C
 
-.. code-block:: haskell
+::
 
       =====>
 
-.. code-block:: haskell
+::
 
       instance C Loop where
         type T Loop = T Loop
 
-.. code-block:: haskell
+::
 
     Obviously, T Loop would send the typechecker into a loop. Unfortunately,
     you might even need UndecidableInstances even in cases where the
     typechecker would be guaranteed to terminate. For example:
 
-.. code-block:: haskell
+::
 
       instance C Int where
         type C Int = Int
       newtype MyInt = MyInt Int deriving C
 
-.. code-block:: haskell
+::
 
       =====>
 
-.. code-block:: haskell
+::
 
       instance C MyInt where
         type T MyInt = T Int
 
-.. code-block:: haskell
+::
 
     GHC's termination checker isn't sophisticated enough to conclude that the
     definition of T MyInt terminates, so UndecidableInstances is required.
@@ -777,14 +832,14 @@ However, we must watch out for three things:
 (d) For the time being, we do not allow the last type variable of the class to
     appear in a /kind/ of an associated type family definition. For instance:
 
-.. code-block:: haskell
+::
 
     class C a where
       type T1 a        -- OK
       type T2 (x :: a) -- Illegal: a appears in the kind of x
       type T3 y :: a   -- Illegal: a appears in the kind of (T3 y)
 
-.. code-block:: haskell
+::
 
     The reason we disallow this is because our current approach to deriving
     associated type family instances—i.e., by unwrapping the newtype's type
@@ -793,7 +848,7 @@ However, we must watch out for three things:
     allowing the last variable to appear in a kind can result in improper Core
     being generated (see #14728).
 
-.. code-block:: haskell
+::
 
     There is hope for this feature being added some day, as one could
     conceivably take a newtype axiom (which witnesses a coercion between a
@@ -807,6 +862,9 @@ The same criteria apply to DerivingVia.
 
 Note [Bindings for Generalised Newtype Deriving]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L2015>`__
+
 Consider
   class Eq a => C a where
      f :: a -> a
@@ -830,9 +888,11 @@ See the paper "Safe zero-cost coercions for Haskell".
 Note [DeriveAnyClass and default family instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L2035>`__
+
 When a class has a associated type family with a default instance, e.g.:
 
-.. code-block:: haskell
+::
 
   class C a where
     type T a
@@ -842,14 +902,14 @@ then there are a couple of scenarios in which a user would expect T a to
 default to Char. One is when an instance declaration for C is given without
 an implementation for T:
 
-.. code-block:: haskell
+::
 
   instance C Int
 
 Another scenario in which this can occur is when the -XDeriveAnyClass extension
 is used:
 
-.. code-block:: haskell
+::
 
   data Example = Example deriving (C, Generic)
 
@@ -863,6 +923,9 @@ handle the empty instance declaration case).
 
 Note [Deriving strategies]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L2061>`__
+
 GHC has a notion of deriving strategies, which allow the user to explicitly
 request which approach to use when deriving an instance (enabled with the
 -XDerivingStrategies language extension). For more information, refer to the
@@ -871,14 +934,14 @@ https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/DerivingStrategies
 
 A deriving strategy can be specified in a deriving clause:
 
-.. code-block:: haskell
+::
 
     newtype Foo = MkFoo Bar
       deriving newtype C
 
 Or in a standalone deriving declaration:
 
-.. code-block:: haskell
+::
 
     deriving anyclass instance C Foo
 
@@ -886,7 +949,7 @@ Or in a standalone deriving declaration:
 declaration so that a user can derive some instance with one deriving strategy
 and other instances with another deriving strategy. For example:
 
-.. code-block:: haskell
+::
 
     newtype Baz = Baz Quux
       deriving          (Eq, Ord)
@@ -927,11 +990,14 @@ ask for a particular DerivStrategy (using the algorithm linked to above).
 
 Note [Deriving instances for classes themselves]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcDeriv.hs#L2117>`__
+
 Much of the code in TcDeriv assumes that deriving only works on data types.
 But this assumption doesn't hold true for DeriveAnyClass, since it's perfectly
 reasonable to do something like this:
 
-.. code-block:: haskell
+::
 
   {-# LANGUAGE DeriveAnyClass #-}
   class C1 (a :: Constraint) where
@@ -945,5 +1011,4 @@ the only way to go. We don't bother throwing this error if an explicit 'stock'
 or 'newtype' keyword is used, since both options have their own perfectly
 sensible error messages in the case of the above code (as C1 isn't a stock
 derivable class, and C2 isn't a newtype).
-
 

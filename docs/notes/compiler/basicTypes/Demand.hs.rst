@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs>`_
 
-====================
-compiler/basicTypes/Demand.hs.rst
-====================
+compiler/basicTypes/Demand.hs
+=============================
+
 
 Note [Exceptions and strictness]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L124>`__
+
 We used to smart about catching exceptions, but we aren't anymore.
 See #14998 for the way it's resolved at the moment.
 
@@ -48,7 +51,7 @@ alleged performance benefits. Item 2 of that ticket finally found out that it
 was entirely due to 'catchException's new (since #11555) definition, which
 was simply
 
-.. code-block:: haskell
+::
 
     catchException !io handler = catch io handler
 
@@ -62,7 +65,7 @@ So history keeps telling us that the only possibly correct strictness annotation
 for the first argument of 'catch#' is 'lazyApply1Dmd', because 'catch#' really
 is not strict in its argument: Just try this in GHCi
 
-.. code-block:: haskell
+::
 
   :set -XScopedTypeVariables
   import Control.Exception
@@ -72,8 +75,12 @@ Any analysis that assumes otherwise will be broken in some way or another
 (beyond `-fno-pendantic-bottoms`).
 
 
+
 Note [Demand on case-alternative binders]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L480>`__
+
 The demand on a binder in a case alternative comes
   (a) From the demand on the binder itself
   (b) From the demand on the case binder
@@ -82,7 +89,7 @@ Forgetting (b) led directly to #10148.
 Example. Source code:
   f x@(p,_) = if p then foo x else True
 
-.. code-block:: haskell
+::
 
   foo (p,True) = True
   foo (p,q)    = foo (q,p)
@@ -107,6 +114,9 @@ is used but the components of the case alternative are not.
 
 Note [Don't optimise UProd(Used) to Used]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L509>`__
+
 These two UseDmds:
    UProd [Used, Used]   and    Used
 are semantically equivalent, but we do not turn the former into
@@ -132,6 +142,9 @@ little bit of boxity analysis.  Not very nice.
 
 Note [Used should win]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L532>`__
+
 Both in lubUse and bothUse we want (Used `both` UProd us) to be Used.
 Why?  Because Used carries the implication the whole thing is used,
 box and all, so we don't want to w/w it.  If we use it both boxed and
@@ -143,7 +156,7 @@ Example is in the Buffer argument of GHC.IO.Handle.Internals.writeCharBuffer
 Baseline: (A) Not making Used win (UProd wins)
 Compare with: (B) making Used win for lub and both
 
-.. code-block:: haskell
+::
 
             Min          -0.3%     -5.6%    -10.7%    -11.0%    -33.3%
             Max          +0.3%    +45.6%    +11.5%    +11.5%     +6.9%
@@ -159,8 +172,12 @@ If a demand is used multiple times (i.e. reused), than any use-once
 mentioned there, that is not protected by a UCall, can happen many times.
 
 
+
 Note [Strict demands]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L624>`__
+
 isStrictDmd returns true only of demands that are
    both strict
    and  used
@@ -182,6 +199,9 @@ In #7319 we get
 
 Note [Dealing with call demands]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L643>`__
+
 Call demands are constructed and deconstructed coherently for
 strictness and absence. For instance, the strictness signature for the
 following function
@@ -192,11 +212,15 @@ f g = (snd (g 3), True)
 should be: <L,C(U(AU))>m
 
 
+
 Note [Trimming a demand to a type]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L835>`__
+
 Consider this:
 
-.. code-block:: haskell
+::
 
   f :: a -> Bool
   f x = case ... of
@@ -216,9 +240,11 @@ we pin a demand on a binder, in DmdAnal.findBndrDmd.
 
 
 
-
 Note [Threshold demands]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L856>`__
+
 Threshold usage demand is generated to figure out if
 cardinality-instrumented demands of a binding's free variables should
 be unleashed. See also [Aggregated demand for cardinality].
@@ -227,6 +253,9 @@ be unleashed. See also [Aggregated demand for cardinality].
 
 Note [Replicating polymorphic demands]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L862>`__
+
 Some demands can be considered as polymorphic. Generally, it is
 applicable to such beasts as tops, bottoms as well as Head-Used and
 Head-stricts demands. For instance,
@@ -237,8 +266,11 @@ Also, when top or bottom is occurred as a result demand, it in fact
 can be expanded to saturate a callee's arity.
 
 
+
 Note [defaultDmd and resTypeArgDmd]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1036>`__
 
 These functions are similar: They express the demand on something not
 explicitly mentioned in the environment resp. the argument list. Yet they are
@@ -249,9 +281,11 @@ different:
 
 
 
-
 Note [Nature of result demand]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1063>`__
+
 A DmdResult contains information about termination (currently distinguishing
 definite divergence and no information; it is possible to include definite
 convergence here), and CPR information about the result.
@@ -294,6 +328,9 @@ diverge, and we do not anything being passed to b.
 
 Note [Asymmetry of 'both' for DmdType and DmdResult]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1103>`__
+
 'both' for DmdTypes is *asymmetrical*, because there is only one
 result!  For example, given (e1 e2), we get a DmdType dt1 for e1, use
 its arg demand to analyse e2 giving dt2, and then do (dt1 `bothType` dt2).
@@ -312,8 +349,12 @@ We
 Equality needed for fixpoints in DmdAnal
 
 
+
 Note [The need for BothDmdArg]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1144>`__
+
 Previously, the right argument to bothDmdType, as well as the return value of
 dmdAnalStar via postProcessDmdType, was a DmdType. But bothDmdType only needs
 to know about the free variables and termination information, but nothing about
@@ -321,8 +362,11 @@ the demand put on arguments, nor cpr information. So we make that explicit by
 only passing the relevant information.
 
 
+
 Note [Demands from unsaturated function calls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1380>`__
 
 Consider a demand transformer d1 -> d2 -> r for f.
 If a sufficiently detailed demand is fed into this transformer,
@@ -360,8 +404,12 @@ peelCallDmd, which peels only one level, but also returns the demand put on the
 body of the function.
 
 
+
 Note [Default demand on free variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1435>`__
+
 If the variable is not mentioned in the environment of a demand type,
 its demand is taken to be a result demand of the type.
     For the stricness component,
@@ -376,6 +424,9 @@ Also note the equations for lubDmdResult (resp. bothDmdResult) noted there.
 
 Note [Always analyse in virgin pass]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1447>`__
+
 Tricky point: make sure that we analyse in the 'virgin' pass. Consider
    rec { f acc x True  = f (...rec { g y = ...g... }...)
          f acc x False = acc }
@@ -397,6 +448,9 @@ at least once, to initialise its signatures.
 
 Note [Analyzing with lazy demand and lambdas]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1466>`__
+
 The insight for analyzing lambdas follows from the fact that for
 strictness S = C(L). This polymorphic expansion is critical for
 cardinality analysis of the following example:
@@ -423,6 +477,9 @@ strict S by the second clause of the analysis.
 
 Note [Analysing with absent demand]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1490>`__
+
 Suppose we analyse an expression with demand <L,A>.  The "A" means
 "absent", so this expression will never be needed.  What should happen?
 There are several wrinkles:
@@ -430,7 +487,7 @@ There are several wrinkles:
 * We *do* want to analyse the expression regardless.
   Reason: Note [Always analyse in virgin pass]
 
-.. code-block:: haskell
+::
 
   But we can post-process the results to ignore all the usage
   demands coming back. This is done by postProcessDmdType.
@@ -444,26 +501,26 @@ There are several wrinkles:
           -- I.e. calls k, but discards first component of result
      f k = case k () of (# _, r #) -> r
 
-.. code-block:: haskell
+::
 
      g :: Int -> ()
      g y = f (\n -> (# case y of I# y2 -> y2, n #))
 
-.. code-block:: haskell
+::
 
   Here f's strictness signature says (correctly) that it calls its
   argument function and ignores the first component of its result.
   This is correct in the sense that it'd be fine to (say) modify the
   function so that always returned 0# in the first component.
 
-.. code-block:: haskell
+::
 
   But in function g, we *will* evaluate the 'case y of ...', because
   it has type Int#.  So 'y' will be evaluated.  So we must record this
   usage of 'y', else 'g' will say 'y' is absent, and will w/w so that
   'y' is bound to an aBSENT_ERROR thunk.
 
-.. code-block:: haskell
+::
 
   However, the argument of toCleanDmd always satisfies the let/app
   invariant; so if it is unlifted it is also okForSpeculation, and so
@@ -473,9 +530,11 @@ There are several wrinkles:
 
 
 
-
 Note [Demand transformer for a dictionary selector]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1686>`__
+
 If we evaluate (op dict-expr) under demand 'd', then we can push the demand 'd'
 into the appropriate field of the dictionary. What *is* the appropriate field?
 We just look at the strictness signature of the class op, which will be
@@ -497,8 +556,12 @@ This is weird, so I'm not worried about whether this optimises brilliantly; but
 it should not fall over.
 
 
+
 Note [Computing one-shot info]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1749>`__
+
 Consider a call
     f (\pqr. e1) (\xyz. e2) e3
 where f has usage signature
@@ -509,8 +572,12 @@ The occurrence analyser propagates this one-shot infor to the
 binders \pqr and \xyz; see Note [Use one-shot information] in OccurAnal.
 
 
+
 Note [Unsaturated applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1770>`__
+
 If a function having bottom as its demand result is applied to a less
 number of arguments than its syntactic arity, we cannot say for sure
 that it is going to diverge. This is the reason why we use the
@@ -524,18 +591,24 @@ Zap absence or one-shot information, under control of flags
 
 Note [Killing usage information]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1781>`__
+
 The flags -fkill-one-shot and -fkill-absence let you switch off the generation
 of absence or one-shot information altogether.  This is only used for performance
 tests, to see how important they are.
 
 
+
 Note [HyperStr and Use demands]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Demand.hs#L1894>`__
 
 The information "HyperStr" needs to be in the strictness signature, and not in
 the demand signature, because we still want to know about the demand on things. Consider
 
-.. code-block:: haskell
+::
 
     f (x,y) True  = error (show x)
     f (x,y) False = x+1
@@ -543,6 +616,4 @@ the demand signature, because we still want to know about the demand on things. 
 The signature of f should be <S(SL),1*U(1*U(U),A)><S,1*U>m. If we were not
 distinguishing the uses on x and y in the True case, we could either not figure
 out how deeply we can unpack x, or that we do not have to pass y.
-
-
 

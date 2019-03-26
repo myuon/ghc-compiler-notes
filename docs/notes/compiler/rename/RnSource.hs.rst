@@ -1,23 +1,26 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs>`_
 
-====================
-compiler/rename/RnSource.hs.rst
-====================
+compiler/rename/RnSource.hs
+===========================
+
 
 Note [Wildcards in family instances]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs#L856>`__
+
 Wild cards can be used in type/data family instance declarations to indicate
 that the name of a type variable doesn't matter. Each wild card will be
 replaced with a new unique type variable. For instance:
 
-.. code-block:: haskell
+::
 
     type family F a b :: *
     type instance F Int _ = Int
 
 is the same as
 
-.. code-block:: haskell
+::
 
     type family F a b :: *
     type instance F Int b = Int
@@ -34,6 +37,9 @@ See related Note [Wildcards in visible kind application] in TcHsType.hs
 
 Note [Unused type variables in family instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs#L878>`__
+
 When the flag -fwarn-unused-type-patterns is on, the compiler reports
 warnings about unused type variables in type-family instances. A
 tpye variable is considered used (i.e. cannot be turned into a wildcard)
@@ -65,6 +71,9 @@ Relevant tickets: #3699, #10586, #10982 and #11451.
 
 Note [Renaming associated types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs#L907>`__
+
 Check that the RHS of the decl mentions only type variables that are explicitly
 bound on the LHS.  For example, this is not ok
    class C a b where
@@ -107,7 +116,7 @@ Although type family equations can bind type variables with explicit foralls,
 it need not be the case that all variables that appear on the RHS must be bound
 by a forall. For instance, the following is acceptable:
 
-.. code-block:: haskell
+::
 
    class C a where
      type T a b
@@ -121,8 +130,12 @@ In each case, the function which detects improperly bound variables on the RHS
 is TcValidity.checkValidFamPats.
 
 
+
 Note [Rule LHS validity checking]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs#L1071>`__
+
 Check the shape of a transformation rule LHS.  Currently we only allow
 LHSs of the form @(f e1 .. en)@, where @f@ is not one of the
 @forall@'d variables.
@@ -136,8 +149,12 @@ lambdas.  So it seems simmpler not to check at all, and that is why
 check_e is commented out.
 
 
+
 Note [Role annotations in the renamer]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs#L1439>`__
+
 We must ensure that a type's role annotation is put in the same group as the
 proper type declaration. This is because role annotations are needed during
 type-checking when creating the type's TyCon. So, rnRoleAnnots builds a
@@ -167,18 +184,22 @@ See #8485. With the new lookup process (which includes types declared in other
 modules), we get better error messages, too.
 
 
+
 Note [Floating `via` type variables]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs#L1807>`__
+
 Imagine the following `deriving via` clause:
 
-.. code-block:: haskell
+::
 
     data Quux
       deriving Eq via (Const a Quux)
 
 This should be rejected. Why? Because it would generate the following instance:
 
-.. code-block:: haskell
+::
 
     instance Eq Quux where
       (==) = coerce @(Quux         -> Quux         -> Bool)
@@ -194,8 +215,11 @@ within the context of the `via` deriving strategy actually uses all bound
 `via` type variables, and if it doesn't, it throws an error.
 
 
+
 Note [Renaming injectivity annotation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs#L1928>`__
 
 During renaming of injectivity annotation we have to make several checks to
 make sure that it is well-formed.  At the moment injectivity annotation
@@ -208,7 +232,7 @@ Checking LHS is simple because the only type variable allowed on the LHS of
 injectivity condition is the variable naming the result in type family head.
 Example of disallowed annotation:
 
-.. code-block:: haskell
+::
 
     type family Foo a b = r | b -> a
 
@@ -217,14 +241,14 @@ Verifying RHS of injectivity consists of checking that:
  1. only variables defined in type family head appear on the RHS (kind
     variables are also allowed).  Example of disallowed annotation:
 
-.. code-block:: haskell
+::
 
        type family Foo a = r | r -> b
 
  2. for associated types the result variable does not shadow any of type
     class variables. Example of disallowed annotation:
 
-.. code-block:: haskell
+::
 
        class Foo a b where
           type F a = b | b -> a
@@ -232,8 +256,12 @@ Verifying RHS of injectivity consists of checking that:
 Breaking any of these assumptions results in an error.
 
 
+
 Note [Stupid theta]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnSource.hs#L2022>`__
+
 #3850 complains about a regression wrt 6.10 for
      data Show a => T a
 There is no reason not to allow the stupid theta if there are no data

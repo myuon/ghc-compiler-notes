@@ -1,27 +1,30 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Avail.hs>`_
 
-====================
-compiler/basicTypes/Avail.hs.rst
-====================
+compiler/basicTypes/Avail.hs
+============================
+
 
 Note [Representing fields in AvailInfo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Avail.hs#L76>`__
+
 When -XDuplicateRecordFields is disabled (the normal case), a
 datatype like
 
-.. code-block:: haskell
+::
 
   data T = MkT { foo :: Int }
 
 gives rise to the AvailInfo
 
-.. code-block:: haskell
+::
 
   AvailTC T [T, MkT] [FieldLabel "foo" False foo]
 
 whereas if -XDuplicateRecordFields is enabled it gives
 
-.. code-block:: haskell
+::
 
   AvailTC T [T, MkT] [FieldLabel "foo" True $sel:foo:MkT]
 
@@ -31,7 +34,7 @@ The labels in a field list are not necessarily unique:
 data families allow the same parent (the family tycon) to have
 multiple distinct fields with the same label. For example,
 
-.. code-block:: haskell
+::
 
   data family F a
   data instance F Int  = MkFInt { foo :: Int }
@@ -39,7 +42,7 @@ multiple distinct fields with the same label. For example,
 
 gives rise to
 
-.. code-block:: haskell
+::
 
   AvailTC F [ F, MkFInt, MkFBool ]
             [ FieldLabel "foo" True $sel:foo:MkFInt
@@ -51,7 +54,7 @@ the two data instances are defined in different modules, one with
 `-XDuplicateRecordFields` enabled and one with it disabled.  Thus it
 is possible to have
 
-.. code-block:: haskell
+::
 
   AvailTC F [ F, MkFInt, MkFBool ]
             [ FieldLabel "foo" True $sel:foo:MkFInt

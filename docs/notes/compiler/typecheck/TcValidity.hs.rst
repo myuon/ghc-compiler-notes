@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs>`_
 
-====================
-compiler/typecheck/TcValidity.hs.rst
-====================
+compiler/typecheck/TcValidity.hs
+================================
+
 
 Note [The ambiguity check for type signatures]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L79>`__
+
 checkAmbiguity is a check on *user-supplied type signatures*.  It is
 *purely* there to report functions that cannot possibly be called.  So for
 example we want to reject:
@@ -35,12 +38,12 @@ fundep!
 Behind all these special cases there is a simple guiding principle.
 Consider
 
-.. code-block:: haskell
+::
 
   f :: <type>
   f = ...blah...
 
-.. code-block:: haskell
+::
 
   g :: <type>
   g = f
@@ -78,6 +81,9 @@ unless the instance is available *here*.
 
 Note [When to call checkAmbiguity]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L145>`__
+
 We call checkAmbiguity
    (a) on user-specified type signatures
    (b) in checkValidType
@@ -104,7 +110,7 @@ Concerning (a) the ambiguity check is only used for *user* types, not
 for types coming from inteface files.  The latter can legitimately
 have ambiguous types. Example
 
-.. code-block:: haskell
+::
 
    class S a where s :: a -> (Int,Int)
    instance S Char where s _ = (1,1)
@@ -117,9 +123,11 @@ Here the worker for f gets the type
 
 
 
-
 Note [Implicit parameters and ambiguity]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L183>`__
+
 Only a *class* predicate can give rise to ambiguity
 An *implicit parameter* cannot.  For example:
         foo :: (?x :: [a]) => Int
@@ -138,8 +146,12 @@ so we can take their type variables into account as part of the
 "tau-tvs" stuff.  This is done in the function 'FunDeps.grow'.
 
 
+
 Note [When we don't check for ambiguity]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L259>`__
+
 In a few places we do not want to check a user-specified type for ambiguity
 
 * GhciCtxt: Allow ambiguous types in GHCi's :kind command
@@ -151,7 +163,7 @@ In a few places we do not want to check a user-specified type for ambiguity
   It may be that when we /use/ T, we'll give an 'a' or 'b' that somehow
   cure the ambiguity.  So we defer the ambiguity check to the use site.
 
-.. code-block:: haskell
+::
 
   There is also an implementation reason (#11608).  In the RHS of
   a type synonym we don't (currently) instantiate 'a' and 'b' with
@@ -165,9 +177,11 @@ In a few places we do not want to check a user-specified type for ambiguity
 
 
 
-
 Note [Higher rank types]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L416>`__
+
 Technically
             Int -> forall a. a->a
 is still a rank-1 type, but it's not Haskell 98 (#5957).  So the
@@ -175,8 +189,12 @@ validity checker allow a forall after an arrow only if we allow it
 before -- that is, with Rank2Types or RankNTypes
 
 
+
 Note [Correctness and performance of type synonym validity checking]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L517>`__
+
 Consider the type A arg1 arg2, where A is a type synonym. How should we check
 this type for validity? We have three distinct choices, corresponding to the
 three constructors of ExpandMode:
@@ -189,7 +207,7 @@ It's tempting to think that we could always just pick choice (3), but this
 results in serious performance issues when checking a type like in the
 signature for `f` below:
 
-.. code-block:: haskell
+::
 
   type S = ...
   f :: S (S (S (S (S (S ....(S Int)...))))
@@ -205,7 +223,7 @@ exclusively `NoExpand` 100% of the time:
 * If one always expands, then one can miss erroneous programs like the one in
   the `tcfail129` test case:
 
-.. code-block:: haskell
+::
 
     type Foo a = String -> Maybe a
     type Bar m = m Int
@@ -216,12 +234,12 @@ exclusively `NoExpand` 100% of the time:
 * If one never expands and only checks the arguments, then one can miss
   erroneous programs like the one in #16059:
 
-.. code-block:: haskell
+::
 
     type Foo b = Eq b => b
     f :: forall b (a :: Foo b). Int
 
-.. code-block:: haskell
+::
 
   The kind of `a` contains a constraint, which is illegal, but this will only
   be caught if `Foo b` is expanded.
@@ -239,61 +257,65 @@ that case, the solution is to vary the `ExpandMode`s! In more detail:
    Importantly, if the current mode is `Both`, then we check the arguments in
    `NoExpand` mode and check the expanded type in `Both` mode.
 
-.. code-block:: haskell
+::
 
    Switching to `NoExpand` when checking the arguments is vital to avoid
    exponential blowup. One consequence of this choice is that if you have
    the following type synonym in one module (with RankNTypes enabled):
 
-.. code-block:: haskell
+::
 
      {-# LANGUAGE RankNTypes #-}
      module A where
      type A = forall a. a
 
-.. code-block:: haskell
+::
 
    And you define the following in a separate module *without* RankNTypes
    enabled:
 
-.. code-block:: haskell
+::
 
      module B where
 
-.. code-block:: haskell
+::
 
      import A
 
-.. code-block:: haskell
+::
 
      type Const a b = a
      f :: Const Int A -> Int
 
-.. code-block:: haskell
+::
 
    Then `f` will be accepted, even though `A` (which is technically a rank-n
    type) appears in its type. We view this as an acceptable compromise, since
    `A` never appears in the type of `f` post-expansion. If `A` _did_ appear in
    a type post-expansion, such as in the following variant:
 
-.. code-block:: haskell
+::
 
      g :: Const A A -> Int
 
-.. code-block:: haskell
+::
 
    Then that would be rejected unless RankNTypes were enabled.
 
 
+
 Note [Unsaturated type synonyms in GHCi]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L757>`__
+
 Generally speaking, GHC disallows unsaturated uses of type synonyms or type
 families. For instance, if one defines `type Const a b = a`, then GHC will not
 permit using `Const` unless it is applied to (at least) two arguments. There is
 an exception to this rule, however: GHCi's :kind command. For instance, it
 is quite common to look up the kind of a type constructor like so:
 
-.. code-block:: haskell
+::
 
   λ> :kind Const
   Const :: j -> k -> j
@@ -307,7 +329,7 @@ here as a special case.
 That being said, we do not allow unsaturation carte blanche in GHCi. Otherwise,
 this GHCi interaction would be possible:
 
-.. code-block:: haskell
+::
 
   λ> newtype Fix f = MkFix (f (Fix f))
   λ> type Id a = a
@@ -327,11 +349,15 @@ field to False.
 --------------------------------------
 
 
+
 Note [Type variables escaping through kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L900>`__
+
 Consider:
 
-.. code-block:: haskell
+::
 
   type family T (r :: RuntimeRep) :: TYPE r
   foo :: forall r. T r
@@ -339,7 +365,7 @@ Consider:
 Something smells funny about the type of `foo`. If you spell out the kind
 explicitly, it becomes clearer from where the smell originates:
 
-.. code-block:: haskell
+::
 
   foo :: ((forall r. T r) :: TYPE r)
 
@@ -349,8 +375,12 @@ its binding site! This is not desirable, so we establish a validity check
 kinds in this way.
 
 
+
 Note [Liberal type synonyms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L948>`__
+
 If -XLiberalTypeSynonyms is on, expand closed type synonyms *before*
 doing validity checking.  This allows us to instantiate a synonym defn
 with a for-all type, or with a partially-applied type synonym.
@@ -365,7 +395,7 @@ which is fine.
 IMPORTANT: suppose T is a type synonym.  Then we must do validity
 checking on an appliation (T ty1 ty2)
 
-.. code-block:: haskell
+::
 
         *either* before expansion (i.e. check ty1, ty2)
         *or* after expansion (i.e. expand T ty1 ty2, and then check)
@@ -373,7 +403,7 @@ checking on an appliation (T ty1 ty2)
 
 If we do both, we get exponential behaviour!!
 
-.. code-block:: haskell
+::
 
   data TIACons1 i r c = c i ::: r c
   type TIACons2 t x = TIACons1 t (TIACons1 t x)
@@ -388,7 +418,7 @@ uses of type synonyms. There is a special case for rank-n types, such as
 extension to use. It used to be the case that this case came before every other
 case, but this can lead to bugs. Imagine you have this scenario (from #15954):
 
-.. code-block:: haskell
+::
 
   type A a = Int
   type B (a :: Type -> Type) = forall x. x -> x
@@ -413,6 +443,9 @@ wouldn't do.
 
 Note [Implicit parameters in instance decls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1008>`__
+
 Implicit parameters _only_ allowed in type signatures; not in instance
 decls, superclasses etc. The reason for not allowing implicit params in
 instances is a bit subtle.  If we allowed
@@ -424,8 +457,12 @@ in e.  For example, a constraint Foo [Int] might come out of e, and
 applying the instance decl would show up two uses of ?x.  #8912.
 
 
+
 Note [Validity checking for constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1047>`__
+
 We look through constraint synonyms so that we can see the underlying
 constraint(s).  For example
    type Foo = ?x::Int
@@ -437,13 +474,13 @@ But we record, in 'under_syn', whether we have looked under a synonym
 to avoid requiring language extensions at the use site.  Main example
 (#9838):
 
-.. code-block:: haskell
+::
 
    {-# LANGUAGE ConstraintKinds #-}
    module A where
       type EqShow a = (Eq a, Show a)
 
-.. code-block:: haskell
+::
 
    module B where
       import A
@@ -452,8 +489,12 @@ to avoid requiring language extensions at the use site.  Main example
 We don't want to require ConstraintKinds in module B.
 
 
+
 Note [ConstraintKinds in predicates]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1179>`__
+
 Don't check for -XConstraintKinds under a type synonym, because that
 was done at the type synonym definition site; see #9838
 e.g.   module A where
@@ -466,10 +507,13 @@ e.g.   module A where
 
 Note [Irreducible predicates in superclasses]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1189>`__
+
 Allowing type-family calls in class superclasses is somewhat dangerous
 because we can write:
 
-.. code-block:: haskell
+::
 
  type family Fooish x :: * -> Constraint
  type instance Fooish () = Foo
@@ -480,8 +524,12 @@ This will cause the constraint simplifier to loop because every time we canonica
 solved to add+canonicalise another (Foo a) constraint.  -----------------------
 
 
+
 Note [Simplifiable given constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1275>`__
+
 A type signature like
    f :: Eq [(a,b)] => a -> b
 is very fragile, for reasons described at length in TcInteract
@@ -501,7 +549,7 @@ unifiers -- that is, under the same circumstances that
 TcInteract.matchInstEnv fires an interaction with the top
 level instances.  For example (#13526), consider
 
-.. code-block:: haskell
+::
 
   instance {-# OVERLAPPABLE #-} Eq (T a) where ...
   instance                   Eq (T Char) where ..
@@ -518,36 +566,43 @@ firing!
 -----------------------
 
 
+
 Note [Kind polymorphic type classes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1343>`__
+
 MultiParam check:
 
-.. code-block:: haskell
+::
 
     class C f where...   -- C :: forall k. k -> Constraint
     instance C Maybe where...
 
-.. code-block:: haskell
+::
 
   The dictionary gets type [C * Maybe] even if it's not a MultiParam
   type class.
 
 Flexibility check:
 
-.. code-block:: haskell
+::
 
     class C f where...   -- C :: forall k. k -> Constraint
     data D a = D a
     instance C D where
 
-.. code-block:: haskell
+::
 
   The dictionary gets type [C * (D *)]. IA0_TODO it should be
   generalized actually.
 
 
+
 Note [Instances of built-in classes in signature files]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1472>`__
 
 User defined instances for KnownNat, KnownSymbol and Typeable are
 disallowed -- they are generated when needed by GHC itself on-the-fly.
@@ -555,7 +610,7 @@ disallowed -- they are generated when needed by GHC itself on-the-fly.
 However, if they occur in a Backpack signature file, they have an
 entirely different meaning. Suppose in M.hsig we see
 
-.. code-block:: haskell
+::
 
   signature M where
     data T :: Nat
@@ -572,7 +627,10 @@ in hsig files, where `is_sig` is True.
 
 
 Note [Casts during validity checking]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1687>`__
+
 Consider the (bogus)
      instance Eq Char#
 We elaborate to  'Eq (Char# |> UnivCo(hole))'  where the hole is an
@@ -587,9 +645,11 @@ the middle:
 
 
 
-
 Note [Validity checking of HasField instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1702>`__
+
 The HasField class has magic constraint solving behaviour (see Note
 [HasField instances] in TcInteract).  However, we permit users to
 declare their own instances, provided they do not clash with the
@@ -609,9 +669,11 @@ The usual functional dependency checks also apply.
 
 
 
-
 Note [Valid 'deriving' predicate]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1722>`__
+
 validDerivPred checks for OK 'deriving' context.  See Note [Exotic
 derived instance contexts] in TcDeriv.  However the predicate is
 here because it uses sizeTypes, fvTypes.
@@ -626,7 +688,7 @@ It checks for three things
     So if they are the same, there must be no constructors.  But there
     might be applications thus (f (g x)).
 
-.. code-block:: haskell
+::
 
     Note that tys only includes the visible arguments of the class type
     constructor. Including the non-visible arguments can cause the following,
@@ -649,6 +711,9 @@ It checks for three things
 
 Note [Equality class instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1755>`__
+
 We can't have users writing instances for the equality classes. But we
 still need to be able to write instances for them ourselves. So we allow
 instances only in the defining module.
@@ -656,7 +721,10 @@ instances only in the defining module.
 
 
 Note [Instances and constraint synonyms]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1790>`__
+
 Currently, we don't allow instances for constraint synonyms at all.
 Consider these (#13267):
   type C1 a = Show (a -> Bool)
@@ -677,8 +745,12 @@ and we /really/ don't want that.  So we carefully do /not/ expand
 synonyms, by matching on TyConApp directly.
 
 
+
 Note [Paterson conditions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1871>`__
+
 Termination test: the so-called "Paterson conditions" (see Section 5 of
 "Understanding functional dependencies via Constraint Handling Rules,
 JFP Jan 2007).
@@ -692,14 +764,18 @@ This is only needed with -fglasgow-exts, as Haskell 98 restrictions
 
 The underlying idea is that
 
-.. code-block:: haskell
+::
 
     for any ground substitution, each assertion in the
     context has fewer type constructors than the head.
 
 
+
 Note [Type families in instance contexts]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1958>`__
+
 Are these OK?
   type family F a
   instance F a    => C (Maybe [a]) where ...
@@ -714,6 +790,9 @@ in the instance head.  #15172.
 
 Note [Invisible arguments and termination]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L1970>`__
+
 When checking the ​Paterson conditions for termination an instance
 declaration, we check for the number of "constructors and variables"
 in the instance head and constraints. Question: Do we look at
@@ -727,13 +806,17 @@ described in #15177, which contains a number of examples.
 The suspicious bits are the calls to filterOutInvisibleTypes.
 
 
+
 Note [Check type-family instance binders]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L2321>`__
+
 In a type family instance, we require (of course), type variables
 used on the RHS are matched on the LHS. This is checked by
 checkFamPatBinders.  Here is an interesting example:
 
-.. code-block:: haskell
+::
 
     type family   T :: k
     type instance T = (Nothing :: Maybe a)
@@ -743,7 +826,7 @@ free-floating above, since there are no (visible) LHS patterns in
 `T`. However, there is an *invisible* pattern due to the return kind,
 so inside of GHC, the instance looks closer to this:
 
-.. code-block:: haskell
+::
 
     type family T @k :: k
     type instance T @(Maybe a) = (Nothing :: Maybe a)
@@ -751,13 +834,13 @@ so inside of GHC, the instance looks closer to this:
 Here, we can see that `a` really is bound by a LHS type pattern, so `a` is in
 fact not unbound. Contrast that with this example (#13985)
 
-.. code-block:: haskell
+::
 
     type instance T = Proxy (Nothing :: Maybe a)
 
 This would looks like this inside of GHC:
 
-.. code-block:: haskell
+::
 
     type instance T @(*) = Proxy (Nothing :: Maybe a)
 
@@ -766,7 +849,7 @@ the LHS, so it would be reported as free-floating.
 
 Finally, here's one more brain-teaser (from #9574). In the example below:
 
-.. code-block:: haskell
+::
 
     class Funct f where
       type Codomain f :: *
@@ -777,16 +860,18 @@ As it turns out, `o` is not free-floating in this example. That is because `o`
 bound by the kind signature of the LHS type pattern 'KProxy. To make this more
 obvious, one can also write the instance like so:
 
-.. code-block:: haskell
+::
 
     instance Funct ('KProxy :: KProxy o) where
       type Codomain ('KProxy :: KProxy o) = NatTr (Proxy :: o -> *)
 
 
 
-
 Note [Matching in the consistent-instantation check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L2365>`__
+
 Matching the class-instance header to family-instance tyvars is
 tricker than it sounds.  Consider (#13972)
     class C (a :: k) where
@@ -823,9 +908,12 @@ somewhere deep inside the type
 
 Note [Checking consistent instantiation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L2399>`__
+
 See #11450 for background discussion on this check.
 
-.. code-block:: haskell
+::
 
   class C a b where
     type T a x b
@@ -837,7 +925,7 @@ then the type instance must look like
 with exactly 'ty1' for 'a', 'ty2' for 'b', and some type 'v' for 'x'.
 For example:
 
-.. code-block:: haskell
+::
 
   instance C [p] Int
     type T [p] y Int = (p,y,y)
@@ -867,12 +955,12 @@ Note that
   itself, we do _not_ check if they are over-specific. In other words,
   it's perfectly acceptable to have an instance like this:
 
-.. code-block:: haskell
+::
 
     instance C [p] Int where
       type T [p] (Maybe x) Int = x
 
-.. code-block:: haskell
+::
 
   While the first and third arguments to T are required to be exactly [p] and
   Int, respectively, since they are bound by C, the second argument is allowed
@@ -880,13 +968,13 @@ Note that
   to define multiple equations for T that differ only in the non-class-bound
   argument:
 
-.. code-block:: haskell
+::
 
     instance C [p] Int where
       type T [p] (Maybe x)    Int = x
       type T [p] (Either x y) Int = x -> y
 
-.. code-block:: haskell
+::
 
   We once considered requiring that non-class-bound variables in associated
   type family instances be instantiated with distinct type variables. However,
@@ -896,18 +984,18 @@ Note that
   auxiliary type families. For instance, you would have to define the above
   example as:
 
-.. code-block:: haskell
+::
 
     instance C [p] Int where
       type T [p] x Int = CAux x
 
-.. code-block:: haskell
+::
 
     type family CAux x where
       CAux (Maybe x)    = x
       CAux (Either x y) = x -> y
 
-.. code-block:: haskell
+::
 
   We decided that this restriction wasn't buying us much, so we opted not
   to pursue that design (see also GHC #13398).
@@ -938,6 +1026,9 @@ poly-kinded.
 
 Note [Printing conflicts with class header]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L2494>`__
+
 It's remarkably painful to give a decent error message for conflicts
 with the class header.  Consider
    clase C b where
@@ -982,11 +1073,13 @@ This all seems absurdly complicated.
 Note [Unused explicitly bound variables in a family pattern]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L2535>`__
+
 Why is 'unusedExplicitForAllErr' not just a warning?
 
 Consider the following examples:
 
-.. code-block:: haskell
+::
 
   type instance F a = Maybe b
   type instance forall b. F a = Bool
@@ -1005,10 +1098,13 @@ the user has made a mistake -- thus we throw an error.
 
 Note [Oversaturated type family equations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L2555>`__
+
 Type family tycons have very rigid arities. We want to reject something like
 this:
 
-.. code-block:: haskell
+::
 
   type family Foo :: Type -> Type where
     Foo x = ...
@@ -1021,7 +1117,7 @@ equation has more arguments than the arity of the type family, reject.
 Things get trickier when visible kind application enters the picture. Consider
 the following example:
 
-.. code-block:: haskell
+::
 
   type family Bar (x :: j) :: forall k. Either j k where
     Bar 5 @Symbol = ...
@@ -1030,7 +1126,7 @@ The arity of Bar is two, since it binds two variables, `j` and `x`. But even
 though Bar's equation has two arguments, it's still invalid. Imagine the same
 equation in Core:
 
-.. code-block:: haskell
+::
 
     Bar Nat 5 Symbol = ...
 
@@ -1054,7 +1150,7 @@ To solve this problem in a robust way, we do the following:
    equation, drop the first n of them (where n is the arity of the type family
    tycon), and check if there are any types leftover. If so, reject.
 
-.. code-block:: haskell
+::
 
    Why does this work? We know that after dropping the first n type patterns,
    none of the leftover types can be required arguments, since step (1) would
@@ -1072,10 +1168,13 @@ family instance equations: see Note [Arity of data families] in FamInstEnv.
 
 Note [Bad TyCon telescopes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L2618>`__
+
 Now that we can mix type and kind variables, there are an awful lot of
 ways to shoot yourself in the foot. Here are some.
 
-.. code-block:: haskell
+::
 
   data SameKind :: k -> k -> *   -- just to force unification
 
@@ -1099,7 +1198,7 @@ datatype declarations.  This checks for
        T1 :: forall (a:k) (k:*) (b:k). SameKind a b -> *
   where 'k' is mentioned a's kind before k is bound
 
-.. code-block:: haskell
+::
 
   This is easy to check for: just look for
   out-of-scope variables in the kind
@@ -1116,6 +1215,9 @@ See also
 
 Note [Ambiguous kind vars]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcValidity.hs#L2656>`__
+
 We used to be concerned about ambiguous binders. Suppose we have the kind
      S1 :: forall k -> * -> *
      S2 :: forall k. * -> *

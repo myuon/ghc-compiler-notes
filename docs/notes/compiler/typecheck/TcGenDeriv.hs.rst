@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs>`_
 
-====================
-compiler/typecheck/TcGenDeriv.hs.rst
-====================
+compiler/typecheck/TcGenDeriv.hs
+================================
+
 
 Note [Generating Ord instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs#L231>`__
+
 Suppose constructors are K1..Kn, and some are nullary.
 The general form we generate is:
 
@@ -24,7 +27,7 @@ The general form we generate is:
                    K2 ... -> ...eq_rhs(K2)...
                    _      -> GT
 
-.. code-block:: haskell
+::
 
      Otherwise do a tag compare against the bigger range
      (because this is the one most likely to succeed)
@@ -56,7 +59,10 @@ Several special cases:
 
 
 Note [Game plan for deriving Ord]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs#L278>`__
+
 It's a bad idea to define only 'compare', and build the other binary
 comparisons on top of it; see #2130, #4019.  Reason: we don't
 want to laboriously make a three-way comparison, only to extract a
@@ -81,6 +87,9 @@ we generate all methods; for large ones we just use 'compare'.
 
 Note [Use expectP]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs#L922>`__
+
 Note that we use
    expectP (Ident "T1")
 rather than
@@ -94,6 +103,9 @@ the occurrence analyser, a separate issue.
 
 Note [Read for empty data types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs#L933>`__
+
 What should we get for this?  (#7931)
    data Emp deriving( Read )   -- No data constructors
 
@@ -111,23 +123,27 @@ These instances are also useful for Read (Either Int Emp), where
 we want to be able to parse (Left 3) just fine.
 
 
+
 Note [Newtype-deriving instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs#L1632>`__
+
 We take every method in the original instance and `coerce` it to fit
 into the derived instance. We need type applications on the argument
 to `coerce` to make it obvious what instantiation of the method we're
 coercing from.  So from, say,
 
-.. code-block:: haskell
+::
 
   class C a b where
     op :: forall c. a -> [b] -> c -> Int
 
-.. code-block:: haskell
+::
 
   newtype T x = MkT <rep-ty>
 
-.. code-block:: haskell
+::
 
   instance C a <rep-ty> => C a (T x) where
     op = coerce @ (a -> [<rep-ty>] -> c -> Int)
@@ -143,7 +159,7 @@ is important.
 Giving 'coerce' two explicitly-visible type arguments grants us finer control
 over how it should be instantiated. Recall
 
-.. code-block:: haskell
+::
 
   coerce :: Coercible a b => a -> b
 
@@ -151,7 +167,7 @@ By giving it explicit type arguments we deal with the case where
 'op' has a higher rank type, and so we must instantiate 'coerce' with
 a polytype.  E.g.
 
-.. code-block:: haskell
+::
 
    class C a where op :: a -> forall b. b -> b
    newtype T x = MkT <rep-ty>
@@ -163,7 +179,7 @@ a polytype.  E.g.
 The use of type applications is crucial here. If we had tried using only
 explicit type signatures, like so:
 
-.. code-block:: haskell
+::
 
    instance C <rep-ty> => C (T x) where
      op = coerce (op :: <rep-ty> -> forall b. b -> b)
@@ -180,14 +196,17 @@ TcDeriv.genInst. See #8503 for more discussion.
 
 Note [Newtype-deriving trickiness]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs#L1685>`__
+
 Consider (#12768):
   class C a where { op :: D a => a -> a }
 
-.. code-block:: haskell
+::
 
   instance C a  => C [a] where { op = opList }
 
-.. code-block:: haskell
+::
 
   opList :: (C a, D [a]) => [a] -> [a]
   opList = ...
@@ -198,11 +217,11 @@ Now suppose we try GND on this:
 The GND is expecting to get an implementation of op for N by
 coercing opList, thus:
 
-.. code-block:: haskell
+::
 
   instance C a => C (N a) where { op = opN }
 
-.. code-block:: haskell
+::
 
   opN :: (C a, D (N a)) => N a -> N a
   opN = coerce @([a]   -> [a])
@@ -217,18 +236,21 @@ So GHC rightly rejects this code.
 
 Note [GND and QuantifiedConstraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs#L1712>`__
+
 Consider the following example from #15290:
 
-.. code-block:: haskell
+::
 
   class C m where
     join :: m (m a) -> m a
 
-.. code-block:: haskell
+::
 
   newtype T m a = MkT (m a)
 
-.. code-block:: haskell
+::
 
   deriving instance
     (C m, forall p q. Coercible p q => Coercible (m p) (m q)) =>
@@ -236,7 +258,7 @@ Consider the following example from #15290:
 
 The code that GHC used to generate for this was:
 
-.. code-block:: haskell
+::
 
   instance (C m, forall p q. Coercible p q => Coercible (m p) (m q)) =>
       C (T m) where
@@ -250,14 +272,14 @@ as we'll explain:
 
 The call to `coerce` gives rise to:
 
-.. code-block:: haskell
+::
 
   Coercible (forall a.   m   (m a) ->   m a)
             (forall a. T m (T m a) -> T m a)
 
 And that simplified to the following implication constraint:
 
-.. code-block:: haskell
+::
 
   forall a <no-ev>. m (T m a) ~R# m (m a)
 
@@ -275,7 +297,7 @@ polymorphic types, we instead let an explicit type signature do the polymorphic
 instantiation, and omit the `forall`s in the type applications.
 More concretely, we generate the following code instead:
 
-.. code-block:: haskell
+::
 
   instance (C m, forall p q. Coercible p q => Coercible (m p) (m q)) =>
       C (T m) where
@@ -291,16 +313,16 @@ in the presence of the explicit `:: forall a. T m (T m a) -> T m a` type
 signature, but in fact leaving it off will break this example (from the
 T15290d test case):
 
-.. code-block:: haskell
+::
 
   class C a where
     c :: Int -> forall b. b -> a
 
-.. code-block:: haskell
+::
 
   instance C Int
 
-.. code-block:: haskell
+::
 
   instance C Age where
     c = coerce @(Int -> forall b. b -> Int)
@@ -314,7 +336,7 @@ Be aware that the use of an explicit type signature doesn't /solve/ this
 problem; it just makes it less likely to occur. For example, if a class has
 a truly higher-rank type like so:
 
-.. code-block:: haskell
+::
 
   class CProblem m where
     op :: (forall b. ... (m b) ...) -> Int
@@ -326,11 +348,14 @@ common case of methods with ordinary, prenex-quantified types.
 
 Note [GND and ambiguity]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs#L1797>`__
+
 We make an effort to make the code generated through GND be robust w.r.t.
 ambiguous type variables. As one example, consider the following example
 (from #15637):
 
-.. code-block:: haskell
+::
 
   class C a where f :: String
   instance C () where f = "foo"
@@ -338,7 +363,7 @@ ambiguous type variables. As one example, consider the following example
 
 A naïve attempt and generating a C T instance would be:
 
-.. code-block:: haskell
+::
 
   instance C T where
     f = coerce @String @String f
@@ -349,7 +374,7 @@ instantiate the type variable `a` with in the call to `f` in the method body.
 (Note that `f :: forall a. String`!) To compensate for the possibility of
 ambiguity here, we explicitly instantiate `a` like so:
 
-.. code-block:: haskell
+::
 
   instance C T where
     f = coerce @String @String (f @())
@@ -358,16 +383,20 @@ ambiguity here, we explicitly instantiate `a` like so:
 All better now.
 
 
+
 Note [Auxiliary binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenDeriv.hs#L2415>`__
+
 We often want to make a top-level auxiliary binding.  E.g. for comparison we haev
 
-.. code-block:: haskell
+::
 
   instance Ord T where
     compare a b = $con2tag a `compare` $con2tag b
 
-.. code-block:: haskell
+::
 
   $con2tag :: T -> Int
   $con2tag = ...code....

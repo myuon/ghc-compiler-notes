@@ -1,23 +1,26 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMeta.hs>`_
 
-====================
-compiler/deSugar/DsMeta.hs.rst
-====================
+compiler/deSugar/DsMeta.hs
+==========================
+
 
 Note [Scoped type variables in bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMeta.hs#L216>`__
+
 Consider
    f :: forall a. a -> a
    f x = x::a
 Here the 'forall a' brings 'a' into scope over the binding group.
 To achieve this we
 
-.. code-block:: haskell
+::
 
   a) Gensym a binding for 'a' at the same time as we do one for 'f'
      collecting the relevant binders with hsScopedTvBinders
 
-.. code-block:: haskell
+::
 
   b) When processing the 'forall', don't gensym
 
@@ -27,6 +30,9 @@ The relevant places are signposted with references to this Note
 
 Note [Scoped type variables in class and instance declarations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMeta.hs#L231>`__
+
 Scoped type variables may occur in default methods and default
 signatures. We need to bring the type variables in 'foralls'
 into the scope of the method bindings.
@@ -39,7 +45,7 @@ Consider
 We want to ensure that the 'b' in the type signature and the default
 implementation are the same, so we do the following:
 
-.. code-block:: haskell
+::
 
   a) Before desugaring the signature and binding of 'foo', use
      get_scoped_tvs to collect type variables in 'forall' and
@@ -56,6 +62,9 @@ in "rep_ty_sig" and in Trac#14885.
 
 Note [Binders and occurrences]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMeta.hs#L256>`__
+
 When we desugar [d| data T = MkT |]
 we want to get
         Data "T" [] [Con "MkT" []] []
@@ -80,9 +89,12 @@ in repTyClD and repC.
 
 Note [Don't quantify implicit type variables in quotes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMeta.hs#L278>`__
+
 If you're not careful, it's suprisingly easy to take this quoted declaration:
 
-.. code-block:: haskell
+::
 
   [d| idProxy :: forall proxy (b :: k). proxy b -> proxy b
       idProxy x = x
@@ -90,7 +102,7 @@ If you're not careful, it's suprisingly easy to take this quoted declaration:
 
 and have Template Haskell turn it into this:
 
-.. code-block:: haskell
+::
 
   idProxy :: forall k proxy (b :: k). proxy b -> proxy b
   idProxy x = x
@@ -102,5 +114,4 @@ Usually, the culprit behind these bugs is taking implicitly quantified type
 variables (often from the hsib_vars field of HsImplicitBinders) and putting
 them into a `ForallT` or `ForallC`. Doing so caused #13018 and #13123.
 represent associated family instances
-
 

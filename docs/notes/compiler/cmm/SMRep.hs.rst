@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/SMRep.hs>`_
 
-====================
-compiler/cmm/SMRep.hs.rst
-====================
+compiler/cmm/SMRep.hs
+=====================
+
 
 Note [static constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/SMRep.hs#L472>`__
 
 We used to have a CONSTR_STATIC closure type, and each constructor had
 two info tables: one with 1 (or 2 etc.), and one with
@@ -36,6 +38,9 @@ HEAP_ALLOCED() doesn't read the closure's info table.
 
 Note [Static NoCaf constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/SMRep.hs#L500>`__
+
 If we know that a top-level binding 'x' is not Caffy (ie no CAFs are
 reachable from 'x'), then a statically allocated constructor (Just x)
 is also not Caffy, and the garbage collector need not follow its
@@ -44,6 +49,4 @@ for Just, for the two cases where the argument was Caffy or non-Caffy.
 
 Currently we don't do this; instead we treat nullary constructors
 as non-Caffy, and the others as potentially Caffy.
-
-
 

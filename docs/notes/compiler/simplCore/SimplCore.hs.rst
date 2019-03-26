@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplCore.hs>`_
 
-====================
-compiler/simplCore/SimplCore.hs.rst
-====================
+compiler/simplCore/SimplCore.hs
+===============================
+
 
 Note [Inline in InitialPhase]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplCore.hs#L355>`__
+
 In GHC 8 and earlier we did not inline anything in the InitialPhase. But that is
 confusing for users because when they say INLINE they expect the function to inline
 right away.
@@ -16,7 +19,7 @@ Id's Activation allows it.
 This is a surprisingly big deal. Compiler performance improved a lot
 when I made this change:
 
-.. code-block:: haskell
+::
 
    perf/compiler/T5837.run            T5837 [stat too good] (normal)
    perf/compiler/parsing001.run       parsing001 [stat too good] (normal)
@@ -39,6 +42,9 @@ when I made this change:
 
 Note [RULEs enabled in SimplGently]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplCore.hs#L384>`__
+
 RULES are enabled when doing "gentle" simplification.  Two reasons:
 
   * We really want the class-op cancellation to happen:
@@ -56,24 +62,27 @@ to switch off those rules until after floating.
 
 
 Note [Messing up the exported Id's RULES]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplCore.hs#L799>`__
+
 We must be careful about discarding (obviously) or even merging the
 RULES on the exported Id. The example that went bad on me at one stage
 was this one:
 
-.. code-block:: haskell
+::
 
     iterate :: (a -> a) -> a -> [a]
         [Exported]
     iterate = iterateList
 
-.. code-block:: haskell
+::
 
     iterateFB c f x = x `c` iterateFB c f (f x)
     iterateList f x =  x : iterateList f (f x)
         [Not exported]
 
-.. code-block:: haskell
+::
 
     {-# RULES
     "iterate"   forall f x.     iterate f x = build (\c _n -> iterateFB c f x)
@@ -82,17 +91,17 @@ was this one:
 
 This got shorted out to:
 
-.. code-block:: haskell
+::
 
     iterateList :: (a -> a) -> a -> [a]
     iterateList = iterate
 
-.. code-block:: haskell
+::
 
     iterateFB c f x = x `c` iterateFB c f (f x)
     iterate f x =  x : iterate f (f x)
 
-.. code-block:: haskell
+::
 
     {-# RULES
     "iterate"   forall f x.     iterate f x = build (\c _n -> iterateFB c f x)
@@ -119,9 +128,11 @@ Hence hasShortableIdinfo.
 
 
 
-
 Note [Rules and indirection-zapping]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplCore.hs#L850>`__
+
 Problem: what if x_exported has a RULE that mentions something in ...bindings...?
 Then the things mentioned can be out of scope!  Solution
  a) Make sure that in this pass the usage-info from x_exported is
@@ -164,17 +175,20 @@ unfolding for something.
 
 Note [Indirection zapping and ticks]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplCore.hs#L890>`__
+
 Unfortunately this is another place where we need a special case for
 ticks. The following happens quite regularly:
 
-.. code-block:: haskell
+::
 
         x_local = <expression>
         x_exported = tick<x> x_local
 
 Which we want to become:
 
-.. code-block:: haskell
+::
 
         x_exported =  tick<x> <expression>
 
@@ -185,8 +199,12 @@ ticks. More often than not, other references will be unfoldings of
 x_exported, and therefore carry the tick anyway.
 
 
+
 Note [Transferring IdInfo]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplCore.hs#L995>`__
+
 If we have
      lcl_id = e; exp_id = lcl_id
 

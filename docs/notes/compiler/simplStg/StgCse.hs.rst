@@ -1,17 +1,19 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/StgCse.hs>`_
 
-====================
-compiler/simplStg/StgCse.hs.rst
-====================
+compiler/simplStg/StgCse.hs
+===========================
+
 
 Note [All alternatives are the binder]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/StgCse.hs#L428>`__
 
 When all alternatives simply refer to the case binder, then we do not have
 to bother with the case expression at all (#13588). CoreSTG does this as well,
 but sometimes, types get into the way:
 
-.. code-block:: haskell
+::
 
     newtype T = MkT Int
     f :: (Int, Int) -> (T, Int)
@@ -19,7 +21,7 @@ but sometimes, types get into the way:
 
 Core cannot just turn this into
 
-.. code-block:: haskell
+::
 
     f p = p
 
@@ -30,9 +32,12 @@ we can.
 
 Note [Trivial case scrutinee]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/StgCse.hs#L446>`__
+
 We want to be able to handle nested reconstruction of constructors as in
 
-.. code-block:: haskell
+::
 
     nested :: Either Int (Either Int a) -> Either Bool (Either Bool a)
     nested (Right (Right v)) = Right (Right v)
@@ -40,7 +45,7 @@ We want to be able to handle nested reconstruction of constructors as in
 
 So if we come across
 
-.. code-block:: haskell
+::
 
     case x of r1
       Right a -> case a of r2
@@ -58,6 +63,9 @@ works out.
 
 Note [Free variables of an StgClosure]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplStg/StgCse.hs#L468>`__
+
 StgClosures (function and thunks) have an explicit list of free variables:
 
 foo [x] =

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs>`_
 
-====================
-compiler/specialise/Specialise.hs.rst
-====================
+compiler/specialise/Specialise.hs
+=================================
+
 
 Note [Wrap bindings returned by specImports]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L614>`__
+
 'specImports' returns a set of specialized bindings. However, these are lacking
 necessary floated dictionary bindings, which are returned by
 UsageDetails(ud_binds). These dictionaries need to be brought into scope with
@@ -14,9 +17,11 @@ for instance, the 'specImports' call in 'specProgram'.
 
 
 
-
 Note [Disabling cross-module specialisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L623>`__
+
 Since GHC 7.10 we have performed specialisation of INLINABLE bindings living
 in modules outside of the current module. This can sometimes uncover user code
 which explodes in size when aggressively optimized. The
@@ -26,8 +31,12 @@ bitten by such instances to revert to the pre-7.10 behavior.
 See #10491
 
 
+
 Note [Warning about missed specialisations]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L772>`__
+
 Suppose
  * In module Lib, you carefully mark a function 'foo' INLINABLE
  * Import Lib(foo) into another module M
@@ -47,6 +56,9 @@ ToDo: warn about missed opportunities for local functions.
 
 Note [Specialise imported INLINABLE things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L789>`__
+
 What imported functions do we specialise?  The basic set is
  * DFuns and things with INLINABLE pragmas.
 but with -fspecialise-aggressively we add
@@ -63,6 +75,9 @@ unfolding-template will probably have been inlined already.
 
 Note [Glom the bindings if imported functions are specialised]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L803>`__
+
 Suppose we have an imported, *recursive*, INLINABLE function
    f :: Eq a => a -> a
    f = /\a \d x. ...(f a d)...
@@ -83,9 +98,11 @@ the specialisations for imported bindings recursive.
 
 
 
-
 Note [Avoiding recursive specialisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L824>`__
+
 When we specialise 'f' we may find new overloaded calls to 'g', 'h' in
 'f's RHS.  So we want to specialise g,h.  But we don't want to
 specialise f any more!  It's possible that f's RHS might have a
@@ -98,6 +115,9 @@ Avoiding this recursive specialisation loop is the reason for the
 
 Note [Floating dictionaries out of cases]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L998>`__
+
 Consider
    g = \d. case d of { MkD sc ... -> ...(f sc)... }
 Naively we can't float d2's binding out of the case expression,
@@ -130,7 +150,10 @@ to substitute sc -> sc_flt in the RHS
 
 
 Note [Account for casts in binding]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1369>`__
+
 Consider
    f :: Eq a => a -> IO ()
    {-# INLINABLE f
@@ -148,7 +171,10 @@ defeated specialisation!  Hence the use of collectBindersPushingCo.
 
 
 Note [Evidence foralls]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1385>`__
+
 Suppose (#12212) that we are specialising
    f :: forall a b. (Num a, F a ~ F b) => blah
 with a=b=Int. Then the RULE will be something like
@@ -171,6 +197,9 @@ complicated Refl coercions with Refl pretty aggressively.
 
 Note [Orphans and auto-generated rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1405>`__
+
 When we specialise an INLINABLE function, or when we have
 -fspecialise-aggressively, we auto-generate RULES that are orphans.
 We don't want to warn about these, or we'd generate a lot of warnings.
@@ -188,8 +217,12 @@ module M will be used in other modules only if M.hi has been read for
 some other reason, which is actually pretty likely.
 
 
+
 Note [Make the new dictionaries interesting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1461>`__
+
 Important!  We're going to substitute dx_id1 for d
 and we want it to look "interesting", else we won't gather *any*
 consequential calls. E.g.
@@ -201,13 +234,15 @@ We want that consequent call to look interesting
 
 
 
-
 Note [From non-recursive to recursive]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1473>`__
+
 Even in the non-recursive case, if any dict-binds depend on 'fn' we might
 have built a recursive knot
 
-.. code-block:: haskell
+::
 
       f a d x = <blah>
       MkUD { ud_binds = NonRec d7  (MkD ..f..)
@@ -215,7 +250,7 @@ have built a recursive knot
 
 The we generate
 
-.. code-block:: haskell
+::
 
      Rec { fs x = <blah>[T/a, d7/d]
            f a d x = <blah>
@@ -243,10 +278,13 @@ In general, we need only make this Rec if
 
 Note [Avoiding loops]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1506>`__
+
 When specialising /dictionary functions/ we must be very careful to
 avoid building loops. Here is an example that bit us badly: #3591
 
-.. code-block:: haskell
+::
 
      class Eq a => C a
      instance Eq [a] => C [a]
@@ -255,7 +293,7 @@ This translates to
      dfun :: Eq [a] -> C [a]
      dfun a d = MkD a d (meth d)
 
-.. code-block:: haskell
+::
 
      d4 :: Eq [T] = <blah>
      d2 ::  C [T] = dfun T d4
@@ -265,7 +303,7 @@ This translates to
 None of these definitions is recursive. What happened was that we
 generated a specialisation:
 
-.. code-block:: haskell
+::
 
      RULE forall d. dfun T d = dT  :: C [T]
      dT = (MkD a d (meth d)) [T/a, d1/d]
@@ -273,7 +311,7 @@ generated a specialisation:
 
 But now we use the RULE on the RHS of d2, to get
 
-.. code-block:: haskell
+::
 
     d2 = dT = MkD d1 (meth d1)
     d1 = $p1 d2
@@ -303,7 +341,7 @@ Specialising call to 'f' gives dict bindings
    $dMonoid_1 :: Monoid [Integer]
    $dMonoid_1 = M.$p1C @ [Integer] $fC[]Integer
 
-.. code-block:: haskell
+::
 
    $dC_1 :: C [Integer] (Node [Integer] Integer)
    $dC_1 = M.$fCvNode @ [Integer] $dMonoid_1
@@ -315,7 +353,7 @@ Specialising that call gives
    $dMonoid_2  :: Monoid [Integer]
    $dMonoid_2  = M.$p1C @ [Integer] $dC_1
 
-.. code-block:: haskell
+::
 
    $dC_2 :: C [Integer] (Node [Integer] Integer)
    $dC_2 = M.$fCvNode @ [Integer] $dMonoid_2
@@ -327,7 +365,7 @@ Now we have two calls to the imported function
 But we must /not/ use the call (M.$fCvNode @ [Integer] $dMonoid_2)
 for specialisation, else we get:
 
-.. code-block:: haskell
+::
 
   $dC_1 = M.$fCvNode @ [Integer] $dMonoid_1
   $dMonoid_2 = M.$p1C @ [Integer] $dC_1
@@ -340,28 +378,28 @@ and we get a loop!
 --------------
 Here's yet another example
 
-.. code-block:: haskell
+::
 
   class C a where { foo,bar :: [a] -> [a] }
 
-.. code-block:: haskell
+::
 
   instance C Int where
      foo x = r_bar x
      bar xs = reverse xs
 
-.. code-block:: haskell
+::
 
   r_bar :: C a => [a] -> [a]
   r_bar xs = bar (xs ++ xs)
 
 That translates to:
 
-.. code-block:: haskell
+::
 
     r_bar a (c::C a) (xs::[a]) = bar a d (xs ++ xs)
 
-.. code-block:: haskell
+::
 
     Rec { $fCInt :: C Int = MkC foo_help reverse
           foo_help (xs::[Int]) = r_bar Int $fCInt xs }
@@ -371,17 +409,17 @@ The call (r_bar $fCInt) mentions $fCInt,
                         which mentions r_bar
 But we DO want to specialise r_bar at Int:
 
-.. code-block:: haskell
+::
 
     Rec { $fCInt :: C Int = MkC foo_help reverse
           foo_help (xs::[Int]) = r_bar Int $fCInt xs
 
-.. code-block:: haskell
+::
 
           r_bar a (c::C a) (xs::[a]) = bar a d (xs ++ xs)
             RULE r_bar Int _ = r_bar_Int
 
-.. code-block:: haskell
+::
 
           r_bar_Int xs = bar Int $fCInt (xs ++ xs)
            }
@@ -391,9 +429,11 @@ group.  (In this case it'll unravel a short moment later.)
 
 
 
-
 Note [Specialising a recursive group]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1625>`__
+
 Consider
     let rec { f x = ...g x'...
             ; g y = ...f y'.... }
@@ -426,6 +466,9 @@ This plan is implemented in the Rec case of specBindItself.
 
 Note [Specialisations already covered]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1655>`__
+
 We obviously don't want to generate two specialisations for the same
 argument pattern.  There are two wrinkles
 
@@ -447,11 +490,14 @@ one.  (See the call to lookupRule in already_covered.)  Reasons:
 
 Note [Auto-specialisation and RULES]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1674>`__
+
 Consider:
    g :: Num a => a -> a
    g = ...
 
-.. code-block:: haskell
+::
 
    f :: (Int -> Int) -> Int
    f w = ...
@@ -482,6 +528,9 @@ thing so not much point in generating a specialisation at all.
 
 Note [Specialisation shape]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1705>`__
+
 We only specialise a function if it has visible top-level lambdas
 corresponding to its overloading.  E.g. if
         f :: forall a. Eq a => ....
@@ -494,12 +543,12 @@ substitute dexp for d, and pick up specialised calls in the body of f.
 This doesn't always work.  One example I came across was this:
         newtype Gen a = MkGen{ unGen :: Int -> a }
 
-.. code-block:: haskell
+::
 
         choose :: Eq a => a -> Gen a
         choose n = MkGen (\r -> n)
 
-.. code-block:: haskell
+::
 
         oneof = choose (1::Int)
 
@@ -524,6 +573,9 @@ So we suppress the WARN if the rhs is trivial.
 
 Note [Inline specialisations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1741>`__
+
 Here is what we do with the InlinePragma of the original function
   * Activation/RuleMatchInfo: both transferred to the
                               specialised function
@@ -561,7 +613,7 @@ all they should be inlined, right?  Two reasons:
       {-# INLINE replicateM_ #-}
       replicateM_ d x ma = case x of I# x' -> $wreplicateM_ d x' ma
 
-.. code-block:: haskell
+::
 
       $wreplicateM_ :: (Monad m) => Int# -> m a -> m ()
       {-# INLINABLE $wreplicateM_ #-}
@@ -593,29 +645,31 @@ INLINABLE.  See #4874.
 
 
 
-
 Note [Floated dictionary bindings]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L1835>`__
+
 We float out dictionary bindings for the reasons described under
 "Dictionary floating" above.  But not /just/ dictionary bindings.
 Consider
 
-.. code-block:: haskell
+::
 
    f :: Eq a => blah
    f a d = rhs
 
-.. code-block:: haskell
+::
 
    $c== :: T -> T -> Bool
    $c== x y = ...
 
-.. code-block:: haskell
+::
 
    $df :: Eq T
    $df = Eq $c== ...
 
-.. code-block:: haskell
+::
 
    gurgle = ...(f @T $df)...
 
@@ -629,8 +683,12 @@ So the DictBinds in (ud_binds :: Bag DictBind) may contain
 non-dictionary bindings too.
 
 
+
 Note [Type determines value]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L2016>`__
+
 Only specialise if all overloading is on non-IP *class* params,
 because these are the ones whose *type* determines their *value*.  In
 parrticular, with implicit params, the type args *don't* say what the
@@ -654,6 +712,9 @@ See #7785.
 
 Note [Interesting dictionary arguments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Specialise.hs#L2037>`__
+
 Consider this
          \a.\d:Eq a.  let f = ... in ...(f d)...
 There really is not much point in specialising f wrt the dictionary d,

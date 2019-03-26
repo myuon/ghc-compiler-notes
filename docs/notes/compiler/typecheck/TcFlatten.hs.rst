@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs>`_
 
-====================
-compiler/typecheck/TcFlatten.hs.rst
-====================
+compiler/typecheck/TcFlatten.hs
+===============================
+
 
 Note [The flattening story]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L36>`__
+
 * A CFunEqCan is either of form
      [G] <F xis> : F xis ~ fsk   -- fsk is a FlatSkolTv
      [W]       x : F xis ~ fmv   -- fmv is a FlatMetaTv
@@ -44,7 +47,7 @@ Note [The flattening story]
   and it would risk wanted/wanted interactions. The only way we
   learn information about fsk is when the CFunEqCan takes a step.
 
-.. code-block:: haskell
+::
 
   However we *do* substitute in the LHS of a CFunEqCan (else it
   would never get to fire!)
@@ -60,7 +63,7 @@ Note [The flattening story]
   Why? We make a fresh fsk/fmv when the constraint is born;
   and we never rewrite the RHS of a CFunEqCan.
 
-.. code-block:: haskell
+::
 
   In contrast a [D] CFunEqCan /shares/ its fmv with its partner [W],
   but does not "own" it.  If we reduce a [D] F Int ~ fmv, where
@@ -121,7 +124,7 @@ Why given-fsks, alone, doesn't work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Could we get away with only flatten meta-tyvars, with no flatten-skolems? No.
 
-.. code-block:: haskell
+::
 
   [W] w : alpha ~ [F alpha Int]
 
@@ -146,7 +149,7 @@ Why flatten-meta-vars, alone doesn't work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Look at Simple13, with unification-fmvs only
 
-.. code-block:: haskell
+::
 
   [G] g : a ~ [F a]
 
@@ -164,7 +167,7 @@ And now we have an evidence cycle between g' and x!
 
 If we used a given instead (ie current story)
 
-.. code-block:: haskell
+::
 
   [G] g : a ~ [F a]
 
@@ -195,7 +198,7 @@ Here we get (F Int ~ Int, F Int ~ Bool), which flattens to
   (fmv ~ Int, fmv ~ Bool)
 But there are really TWO separate errors.
 
-.. code-block:: haskell
+::
 
   ** We must not complain about Int~Bool. **
 
@@ -207,12 +210,15 @@ v:alpha in common envt).)
 
 Note [Unflattening can force the solver to iterate]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L223>`__
+
 Look at #10340:
    type family Any :: *   -- No instances
    get :: MonadState s m => m s
    instance MonadState s (State s) where ...
 
-.. code-block:: haskell
+::
 
    foo :: State Any Any
    foo = get
@@ -239,9 +245,11 @@ iteration only happens in pretty obscure circumstances.
 
 
 
-
 Note [The flattening work list]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L611>`__
+
 The "flattening work list", held in the fe_work field of FlattenEnv,
 is a list of CFunEqCans generated during flattening.  The key idea
 is this.  Consider flattening (Eq (F (G Int) (H Bool)):
@@ -293,6 +301,9 @@ it onto wl_fun_eqs at the end.
 
 Note [Flattener EqRels]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L660>`__
+
 When flattening, we need to know which equality relation -- nominal
 or representation -- we should be respecting. The only difference is
 that we rewrite variables by representational equalities when fe_eq_rel
@@ -303,6 +314,9 @@ representational equality.
 
 Note [Flattener CtLoc]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L668>`__
+
 The flattener does eager type-family reduction.
 Type families might loop, and we
 don't want GHC to do so. A natural solution is to have a bounded depth
@@ -325,6 +339,9 @@ will be baffling, unpredictable errors.
 
 Note [Lazy flattening]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L688>`__
+
 The idea of FM_Avoid mode is to flatten less aggressively.  If we have
        a ~ [F Int]
 there seems to be no great merit in lifting out (F Int).  But if it was
@@ -353,6 +370,9 @@ Note: T5321Fun got faster when I disabled FM_Avoid
 
 Note [Phantoms in the flattener]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L714>`__
+
 Suppose we have
 
 data Proxy p = Proxy
@@ -369,6 +389,9 @@ yields a better error message anyway.)
 
 Note [No derived kind equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L728>`__
+
 A kind-level coercion can appear in types, via mkCastTy. So, whenever
 we are generating a coercion in a dependent context (in other words,
 in a kind) we need to make sure that our flavour is never Derived
@@ -378,8 +401,11 @@ changes the flavour from Derived just for this purpose.
 
 
 Note [Flattening]
-~~~~~~~~~~~~~~~~~~~~
-  flatten ty  ==>   (xi, co)
+~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L792>`__
+
+flatten ty  ==>   (xi, co)
     where
       xi has no type functions, unless they appear under ForAlls
          has no skolems that are mapped in the inert set
@@ -402,7 +428,7 @@ Because flattening zonks and the returned coercion ("co" above) is also
 zonked, it's possible that (co :: xi ~ ty) isn't quite true. So, instead,
 we can rely on this fact:
 
-.. code-block:: haskell
+::
 
   (F1) tcTypeKind(xi) succeeds and returns a fully zonked kind
 
@@ -421,7 +447,7 @@ TcCanonical.canEqTyVar).
 Flattening is always homogeneous. That is, the kind of the result of flattening is
 always the same as the kind of the input, modulo zonking. More formally:
 
-.. code-block:: haskell
+::
 
   (F2) tcTypeKind(xi) `eqType` zonk(tcTypeKind(ty))
 
@@ -456,6 +482,9 @@ unexpanded synonym.
 
 Note [flatten_args performance]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L863>`__
+
 In programs with lots of type-level evaluation, flatten_args becomes
 part of a tight loop. For example, see test perf/compiler/T9872a, which
 calls flatten_args a whopping 7,106,808 times. It is thus important
@@ -490,6 +519,8 @@ faster. This doesn't seem quite worth it, yet.
 Note [flatten_exact_fam_app_fully performance]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L894>`__
+
 The refactor of GRefl seems to cause performance trouble for T9872x: the allocation of flatten_exact_fam_app_fully_performance increased. See note [Generalized reflexive coercion] in TyCoRep for more information about GRefl and #15192 for the current state.
 
 The explicit pattern match in homogenise_result helps with T9872a, b, c.
@@ -502,6 +533,9 @@ TODO: a step-by-step replay of the refactor to analyze the performance.
 
 Note [Flattening synonyms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L1260>`__
+
 Not expanding synonyms aggressively improves error messages, and
 keeps types smaller. But we need to take care.
 
@@ -519,9 +553,11 @@ to the flattener.
 
 
 
-
 Note [Flattening under a forall]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L1278>`__
+
 Under a forall, we
   (a) MUST apply the inert substitution
   (b) MUST NOT flatten type family applications
@@ -540,7 +576,10 @@ and we have not begun to think about how to make that work!
 
 
 Note [Reduce type family applications eagerly]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L1470>`__
+
 If we come across a type-family application like (Append (Cons x Nil) t),
 then, rather than flattening to a skolem etc, we may as well just reduce
 it on the spot to (Cons x t).  This saves a lot of intermediate steps.
@@ -553,13 +592,13 @@ the allocation amounts for the T9872{a,b,c} tests by half.
 
 An example of where the early reduction appears helpful:
 
-.. code-block:: haskell
+::
 
   type family Last x where
     Last '[x]     = x
     Last (h ': t) = Last t
 
-.. code-block:: haskell
+::
 
   workitem: (x ~ Last '[1,2,3,4,5,6])
 
@@ -588,6 +627,9 @@ have any knowledge as to *why* these facts are true.
 
 Note [An alternative story for the inert substitution]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L1599>`__
+
 (This entire note is just background, left here in case we ever want
  to return the previous state of affairs)
 
@@ -610,47 +652,47 @@ This is significantly harder to think about. It can save a LOT of work
 in occurs-check cases, but we don't care about them much.  #5837
 is an example; all the constraints here are Givens
 
-.. code-block:: haskell
+::
 
              [G] a ~ TF (a,Int)
     -->
     work     TF (a,Int) ~ fsk
     inert    fsk ~ a
 
-.. code-block:: haskell
+::
 
     --->
     work     fsk ~ (TF a, TF Int)
     inert    fsk ~ a
 
-.. code-block:: haskell
+::
 
     --->
     work     a ~ (TF a, TF Int)
     inert    fsk ~ a
 
-.. code-block:: haskell
+::
 
     ---> (attempting to flatten (TF a) so that it does not mention a
     work     TF a ~ fsk2
     inert    a ~ (fsk2, TF Int)
     inert    fsk ~ (fsk2, TF Int)
 
-.. code-block:: haskell
+::
 
     ---> (substitute for a)
     work     TF (fsk2, TF Int) ~ fsk2
     inert    a ~ (fsk2, TF Int)
     inert    fsk ~ (fsk2, TF Int)
 
-.. code-block:: haskell
+::
 
     ---> (top-level reduction, re-orient)
     work     fsk2 ~ (TF fsk2, TF Int)
     inert    a ~ (fsk2, TF Int)
     inert    fsk ~ (fsk2, TF Int)
 
-.. code-block:: haskell
+::
 
     ---> (attempt to flatten (TF fsk2) to get rid of fsk2
     work     TF fsk2 ~ fsk3
@@ -658,7 +700,7 @@ is an example; all the constraints here are Givens
     inert    a   ~ (fsk2, TF Int)
     inert    fsk ~ (fsk2, TF Int)
 
-.. code-block:: haskell
+::
 
     --->
     work     TF fsk2 ~ fsk3
@@ -672,10 +714,12 @@ casee, so we don't care.
 
 
 
-
 Note [Unflatten using funeqs first]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    [W] G a ~ Int
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcFlatten.hs#L1837>`__
+
+[W] G a ~ Int
     [W] F (G a) ~ G a
 
 do not want to end up with
@@ -683,7 +727,7 @@ do not want to end up with
 because that might actually hold!  Better to end up with the two above
 unsolved constraints.  The flat form will be
 
-.. code-block:: haskell
+::
 
     G a ~ fmv1     (CFunEqCan)
     F fmv1 ~ fmv2  (CFunEqCan)

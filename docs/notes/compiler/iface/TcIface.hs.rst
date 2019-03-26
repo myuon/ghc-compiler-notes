@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/TcIface.hs>`_
 
-====================
-compiler/iface/TcIface.hs.rst
-====================
+compiler/iface/TcIface.hs
+=========================
+
 
 Note [Knot-tying typecheckIface]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/TcIface.hs#L116>`__
+
 Suppose we are typechecking an interface A.hi, and we come across
 a Name for another entity defined in A.hi.  How do we get the
 'TyCon', in this case?  There are three cases:
@@ -39,18 +42,22 @@ knots are tied through the EPS.  No problem!
 Clients of this function be careful, see Note [Knot-tying typecheckIface]
 
 
+
 Note [Role merging]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/TcIface.hs#L239>`__
+
 First, why might it be necessary to do a non-trivial role
 merge?  It may rescue a merge that might otherwise fail:
 
-.. code-block:: haskell
+::
 
      signature A where
          type role T nominal representational
          data T a b
 
-.. code-block:: haskell
+::
 
      signature A where
          type role T representational nominal
@@ -66,13 +73,13 @@ doing this, because role subtyping is *conditional* on
 the supertype being NOT representationally injective, e.g.,
 if we have instead:
 
-.. code-block:: haskell
+::
 
      signature A where
          type role T nominal representational
          data T a b = T a b
 
-.. code-block:: haskell
+::
 
      signature A where
          type role T representational nominal
@@ -87,8 +94,12 @@ Thus, merging only occurs when BOTH TyCons in question are
 representationally injective.  If they're not, no merge.
 
 
+
 Note [Resolving never-exported Names in TcIface]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/TcIface.hs#L440>`__
+
 For the high-level overview, see
 Note [Handling never-exported TyThings under Backpack]
 
@@ -124,6 +135,9 @@ coercions first before type families, but that seemed more fragile.
 
 Note [Synonym kind loop]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/TcIface.hs#L991>`__
+
 Notice that we eagerly grab the *kind* from the interface file, but
 build a forkM thunk for the *rhs* (and family stuff).  To see why,
 consider this (#2412)
@@ -144,6 +158,9 @@ look at it.
 
 Note [Tying the knot]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/TcIface.hs#L1616>`__
+
 The if_rec_types field is used when we are compiling M.hs, which indirectly
 imports Foo.hi, which mentions M.T Then we look up M.T in M's type
 environment, which is splatted into if_rec_types after we've built M's type
@@ -159,13 +176,17 @@ of moving parts.  Interested readers should also look at:
 
 There is also a wiki page on the subject, see:
 
-.. code-block:: haskell
+::
 
      https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/TyingTheKnot
 
 
+
 Note [Knot-tying fallback on boot]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/TcIface.hs#L1635>`__
+
 Suppose that you are typechecking A.hs, which transitively imports,
 via B.hs, A.hs-boot. When we poke on B.hs and discover that it
 has a reference to a type T from A, what TyThing should we wire

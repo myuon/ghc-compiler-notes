@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs>`_
 
-====================
-compiler/typecheck/TcSimplify.hs.rst
-====================
+compiler/typecheck/TcSimplify.hs
+================================
+
 
 Note [Fail fast if there are insoluble kind equalities]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L176>`__
+
 Rather like in simplifyInfer, fail fast if there is an insoluble
 constraint.  Otherwise we'll just succeed in kind-checking a nonsense
 type, with a cascade of follow-up errors.
@@ -17,8 +20,12 @@ failing, because they are what will ulimately lead to the error
 messsage!
 
 
+
 Note [Fail fast on kind errors]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L309>`__
+
 solveEqualities is used to solve kind equalities when kind-checking
 user-written types. If solving fails we should fail outright, rather
 than just accumulate an error message, for two reasons:
@@ -42,6 +49,9 @@ So it's important to use 'checkNoErrs' here!
 
 Note [When to do type-class defaulting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L330>`__
+
 In GHC 7.6 and 7.8.2, we did type-class defaulting only if insolubleWC
 was false, on the grounds that defaulting can't help solve insoluble
 constraints.  But if we *don't* do defaulting we may report a whole
@@ -71,6 +81,9 @@ too drastic.
 
 Note [Must simplify after defaulting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L357>`__
+
 We may have a deeply buried constraint
     (t:*) ~ (a:Open)
 which we couldn't solve because of the kind incompatibility, and 'a' is free.
@@ -82,6 +95,9 @@ errors, because it isn't an error!  #7967 was due to this.
 
 Note [Top-level Defaulting Plan]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L366>`__
+
 We have considered two design choices for where/when to apply defaulting.
    (i) Do it in SimplCheck mode only /whenever/ you try to solve some
        simple constraints, maybe deep inside the context of implications.
@@ -125,6 +141,9 @@ More details in Note [DefaultTyVar].
 
 Note [Safe Haskell Overlapping Instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L407>`__
+
 In Safe Haskell, we apply an extra restriction to overlapping instances. The
 motive is to prevent untrusted code provided by a third-party, changing the
 behavior of trusted code through type-classes. This is due to the global and
@@ -167,6 +186,8 @@ than one path, this alternative doesn't work.
 Note [Safe Haskell Overlapping Instances Implementation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L446>`__
+
 How is this implemented? It's complicated! So we'll step through it all:
 
  1) `InstEnv.lookupInstEnv` -- Performs instance resolution, so this is where
@@ -188,7 +209,7 @@ How is this implemented? It's complicated! So we'll step through it all:
      compilation should fail. These are handled as normal constraint resolution
      failures from here-on (see step 6).
 
-.. code-block:: haskell
+::
 
      Otherwise, we may be inferring safety (or using `-Wunsafe`), and
      compilation should succeed, but print warnings and/or mark the compiled module
@@ -235,6 +256,9 @@ How is this implemented? It's complicated! So we'll step through it all:
 
 Note [No defaulting in the ambiguity check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L511>`__
+
 When simplifying constraints for the ambiguity check, we use
 solveWantedsAndDrop, not simpl_top, so that we do no defaulting.
 #11947 was an example:
@@ -245,8 +269,12 @@ warning, but no error.
 ----------------
 
 
+
 Note [Superclasses and satisfiability]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L617>`__
+
 Expand superclasses before starting, because (Int ~ Bool), has
 (Int ~~ Bool) as a superclass, which in turn has (Int ~N# Bool)
 as a superclass, and it's the latter that is insoluble.  See
@@ -269,6 +297,9 @@ step does nothing.
 
 Note [tcNormalise]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L637>`__
+
 tcNormalise is a rather atypical entrypoint to the constraint solver. Whereas
 most invocations of the constraint solver are intended to simplify a set of
 constraints or to decide if a particular set of constraints is satisfiable,
@@ -291,6 +322,9 @@ return that.
 
 Note [Inferring the type of a let-bound variable]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L663>`__
+
 Consider
    f x = rhs
 
@@ -311,7 +345,10 @@ the let binding.
 
 
 Note [Emitting the residual implication in simplifyInfer]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L861>`__
+
 Consider
    f = e
 where f's type is inferred to be something like (a, Proxy k (Int |> co))
@@ -340,6 +377,9 @@ All rather subtle; see #14584.
 
 Note [Add signature contexts as givens]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L887>`__
+
 Consider this (#11016):
   f2 :: (?x :: Int) => _
   f2 = ?x
@@ -368,6 +408,9 @@ type signatures.
 
 Note [Deciding quantification]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L919>`__
+
 If the monomorphism restriction does not apply, then we quantify as follows:
 
 * Step 1. Take the global tyvars, and "grow" them using the equality
@@ -377,12 +420,12 @@ If the monomorphism restriction does not apply, then we quantify as follows:
           beta, because alpha fixes beta, and beta is effectively free in
           the environment too
 
-.. code-block:: haskell
+::
 
   We also account for the monomorphism restriction; if it applies,
   add the free vars of all the constraints.
 
-.. code-block:: haskell
+::
 
   Result is mono_tvs; we will not quantify over these.
 
@@ -390,7 +433,7 @@ If the monomorphism restriction does not apply, then we quantify as follows:
   not going to become further constrained), and re-simplify the
   candidate constraints.
 
-.. code-block:: haskell
+::
 
   Motivation for re-simplification (#7857): imagine we have a
   constraint (C (a->b)), where 'a :: TYPE l1' and 'b :: TYPE l2' are
@@ -398,7 +441,7 @@ If the monomorphism restriction does not apply, then we quantify as follows:
   (a -> b) The instance doesn't match while l1,l2 are polymorphic, but
   it will match when we default them to LiftedRep.
 
-.. code-block:: haskell
+::
 
   This is all very tiresome.
 
@@ -411,7 +454,7 @@ If the monomorphism restriction does not apply, then we quantify as follows:
     careful to close over kinds, and to skolemise the quantified tyvars.
     (This actually unifies each quantifies meta-tyvar with a fresh skolem.)
 
-.. code-block:: haskell
+::
 
   Result is qtvs.
 
@@ -422,7 +465,10 @@ If the monomorphism restriction does not apply, then we quantify as follows:
 
 
 Note [Promote momomorphic tyvars]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L1235>`__
+
 Promote any type variables that are free in the environment.  Eg
    f :: forall qtvs. bound_theta => zonked_tau
 The free vars of f's type become free in the envt, and hence will show
@@ -440,7 +486,10 @@ NB: promoteTyVar ignores coercion variables
 
 
 Note [Quantification and partial signatures]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L1251>`__
+
 When choosing type variables to quantify, the basic plan is to
 quantify over all type variables that are
  * free in the tau_tvs, and
@@ -480,7 +529,7 @@ sure to quantify over them.  This leads to several wrinkles:
      f :: Eq alpha => Int -> Int
   which isn't ambiguous but is still very wrong.
 
-.. code-block:: haskell
+::
 
   Bottom line: Try to quantify over any variable free in psig_theta,
   just like the tau-part of the type.
@@ -499,7 +548,7 @@ sure to quantify over them.  This leads to several wrinkles:
         g :: forall b. Num b => _ -> b
         g y = xxx + y
 
-.. code-block:: haskell
+::
 
   In the signature for 'g', we cannot quantify over 'b' because it turns out to
   get unified with 'a', which is free in g's environment.  So we carefully
@@ -510,6 +559,9 @@ sure to quantify over them.  This leads to several wrinkles:
 
 Note [Growing the tau-tvs using constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L1314>`__
+
 (growThetaTyVars insts tvs) is the result of extending the set
     of tyvars, tvs, using all conceivable links from pred
 
@@ -524,6 +576,9 @@ Notice that
 
 Note [Quantification with errors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L1326>`__
+
 If we find that the RHS of the definition has some absolutely-insoluble
 constraints (including especially "variable not in scope"), we
 
@@ -560,6 +615,9 @@ it before doing the isInsolubleWC test!  (#8262)
 
 Note [Default while Inferring]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L1360>`__
+
 Our current plan is that defaulting only happens at simplifyTop and
 not simplifyInfer.  This may lead to some insoluble deferred constraints.
 Example:
@@ -594,10 +652,11 @@ we don't do it for now.
 
 
 
-
-
 Note [Minimize by Superclasses]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L1396>`__
+
 When we quantify over a constraint, in simplifyInfer we need to
 quantify over a constraint that is minimal in some sense: For
 instance, if the final wanted constraint is (Eq alpha, Ord alpha),
@@ -608,10 +667,12 @@ to check the original wanted.
 
 
 
-
 Note [Avoid unnecessary constraint simplification]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    -------- NB NB NB (Jun 12) -------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L1407>`__
+
+-------- NB NB NB (Jun 12) -------------
     This note not longer applies; see the notes with #4361.
     But I'm leaving it in here so we remember the issue.)
     ----------------------------------------
@@ -620,7 +681,7 @@ try to avoid unnecessarily simplifying class constraints.
 Doing so aids sharing, but it also helps with delicate
 situations like
 
-.. code-block:: haskell
+::
 
    instance C t => C [t] where ..
 
@@ -637,7 +698,10 @@ This only half-works, but then let-generalisation only half-works.
 
 
 Note [Delete dead Given evidence bindings]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L1844>`__
+
 As a result of superclass expansion, we speculatively
 generate evidence bindings for Givens. E.g.
    f :: (a ~ b) => a -> b -> Bool
@@ -662,7 +726,7 @@ code, but:
    code that has to be zonked, only to be discarded later.  Better not
    to generate it in the first place.
 
-.. code-block:: haskell
+::
 
    Moreover, if we simplify this implication more than once
    (e.g. because we can't solve it completely on the first iteration
@@ -682,6 +746,9 @@ see #15205.
 
 Note [Tracking redundant constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L1884>`__
+
 With Opt_WarnRedundantConstraints, GHC can report which
 constraints of a type signature (or instance declaration) are
 redundant, and can be omitted.  Here is an overview of how it
@@ -764,7 +831,7 @@ works:
         - TcBinds.tcSpecPrag
         - TcBinds.tcTySig
 
-.. code-block:: haskell
+::
 
   This decision is taken in setImplicationStatus, rather than TcErrors
   so that we can discard implication constraints that we don't need.
@@ -782,9 +849,11 @@ really not easy to detect that!
 
 
 
-
 Note [Cutting off simpl_loop]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L1983>`__
+
 It is very important not to iterate in simpl_loop unless there is a chance
 of progress.  #8474 is a classic example:
 
@@ -812,8 +881,12 @@ we'll get more Givens (a unification is like adding a Given) to
 allow the implication to make progress.
 
 
+
 Note [ApproximateWC]
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2092>`__
+
 approximateWC takes a constraint, typically arising from the RHS of a
 let-binding whose type we are *inferring*, and extracts from it some
 *simple* constraints that we might plausibly abstract over.  Of course
@@ -832,11 +905,11 @@ There is one caveat:
          TInt :: T Int
          MkT :: T a
 
-.. code-block:: haskell
+::
 
        f TInt = 3::Int
 
-.. code-block:: haskell
+::
 
     We get the implication (a ~ Int => res ~ Int), where so far we've decided
       f :: T a -> res
@@ -846,7 +919,7 @@ There is one caveat:
     float out of such implications, which meant it would happily infer
     non-principal types.)
 
-.. code-block:: haskell
+::
 
    HOWEVER (#12797) in findDefaultableGroups we are not worried about
    the most-general type; and we /do/ want to float out of equalities.
@@ -865,7 +938,7 @@ There used to be a second caveat, driven by #8155
       rather than
           Can't solve  Integral (F a)
 
-.. code-block:: haskell
+::
 
       Moreover, floating out these "contaminated" constraints doesn't help
       when generalising either. If we generalise over (Integral b), we still
@@ -882,14 +955,16 @@ contamination stuff.  There was zero effect on the testsuite (not even
 
 
 
-
 Note [DefaultTyVar]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2153>`__
+
 defaultTyVar is used on any un-instantiated meta type variables to
 default any RuntimeRep variables to LiftedRep.  This is important
 to ensure that instance declarations match.  For example consider
 
-.. code-block:: haskell
+::
 
      instance Show (a->b)
      foo x = show (\_ -> True)
@@ -910,16 +985,19 @@ the RuntimeRep variable to LiftedRep, but this seems unnecessarily indirect.
 
 Note [Promote _and_ default when inferring]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2174>`__
+
 When we are inferring a type, we simplify the constraint, and then use
 approximateWC to produce a list of candidate constraints.  Then we MUST
 
-.. code-block:: haskell
+::
 
   a) Promote any meta-tyvars that have been floated out by
      approximateWC, to restore invariant (WantedInv) described in
      Note [TcLevel and untouchable type variables] in TcType.
 
-.. code-block:: haskell
+::
 
   b) Default the kind of any meta-tyvars that are not mentioned in
      in the environment.
@@ -935,6 +1013,9 @@ should!  If we don't solve the constraint, we'll stupidly quantify over
 
 Note [Promoting unification variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2193>`__
+
 When we float an equality out of an implication we must "promote" free
 unification variables of the equality, in order to maintain Invariant
 (WantedInv) from Note [TcLevel and untouchable type variables] in
@@ -943,12 +1024,12 @@ TcType.  for the leftover implication.
 This is absolutely necessary. Consider the following example. We start
 with two implications and a class with a functional dependency.
 
-.. code-block:: haskell
+::
 
     class C x y | x -> y
     instance C [a] [a]
 
-.. code-block:: haskell
+::
 
     (I1)      [untch=beta]forall b. 0 => F Int ~ [beta]
     (I2)      [untch=beta]forall c. 0 => F Int ~ [[alpha]] /\ C beta [c]
@@ -959,30 +1040,30 @@ the leftover of I2 to get (C [alpha] [a]) which, using the FunDep, will mean tha
 (alpha := a). In the end we will have the skolem 'b' escaping in the untouchable
 beta! Concrete example is in indexed_types/should_fail/ExtraTcsUntch.hs:
 
-.. code-block:: haskell
+::
 
     class C x y | x -> y where
      op :: x -> y -> ()
 
-.. code-block:: haskell
+::
 
     instance C [a] [a]
 
-.. code-block:: haskell
+::
 
     type family F a :: *
 
-.. code-block:: haskell
+::
 
     h :: F Int -> ()
     h = undefined
 
-.. code-block:: haskell
+::
 
     data TEx where
       TEx :: a -> TEx
 
-.. code-block:: haskell
+::
 
     f (x::beta) =
         let g1 :: forall b. b -> ()
@@ -992,10 +1073,11 @@ beta! Concrete example is in indexed_types/should_fail/ExtraTcsUntch.hs:
 
 
 
-
-
 Note [Float Equalities out of Implications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2242>`__
+
 For ordinary pattern matches (including existentials) we float
 equalities out of implications, for instance:
      data T where
@@ -1009,18 +1091,18 @@ longer untouchable, to solve the implication!
 But we cannot float equalities out of implications whose givens may
 yield or contain equalities:
 
-.. code-block:: haskell
+::
 
       data T a where
         T1 :: T Int
         T2 :: T Bool
         T3 :: T a
 
-.. code-block:: haskell
+::
 
       h :: T a -> a -> Int
 
-.. code-block:: haskell
+::
 
       f x y = case x of
                 T1 -> y::Int
@@ -1046,8 +1128,12 @@ no evidence for a fundep equality), but equality superclasses do matter (since
 they carry evidence).
 
 
+
 Note [Float equalities from under a skolem binding]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2389>`__
+
 Which of the simple equalities can we float out?  Obviously, only
 ones that don't mention the skolem-bound variables.  But that is
 over-eager. Consider
@@ -1073,6 +1159,9 @@ TcSimplify prior to Oct 2014).
 
 Note [Which equalities to float]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2412>`__
+
 Which equalities should we float?  We want to float ones where there
 is a decent chance that floating outwards will allow unification to
 happen.  In particular, float out equalities that are:
@@ -1090,7 +1179,7 @@ happen.  In particular, float out equalities that are:
   derived kind equality again, which might create duplicate error
   messages.
 
-.. code-block:: haskell
+::
 
   Instead, we do float out the kind equality (if it's worth floating
   out, as above). If/when we solve it, we'll be able to rewrite the
@@ -1106,6 +1195,9 @@ happen.  In particular, float out equalities that are:
 
 Note [Skolem escape]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2441>`__
+
 You might worry about skolem escape with all this floating.
 For example, consider
     [2] forall a. (a ~ F beta[2] delta,
@@ -1124,6 +1216,9 @@ to beta[1], and that means the (a ~ beta[1]) will be stuck, as it should be.
 
 Note [What prevents a constraint from floating]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2457>`__
+
 What /prevents/ a constraint from floating?  If it mentions one of the
 "bound variables of the implication".  What are they?
 
@@ -1156,9 +1251,11 @@ subtle than we'd realised at first.  See #14584.
 
 
 
-
 Note [Avoiding spurious errors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2642>`__
+
 When doing the unification for defaulting, we check for skolem
 type variables, and simply don't default them.  For example:
    f = (*)      -- Monomorphic
@@ -1174,32 +1271,35 @@ already been unified with the rigid variable from g's type sig.
 
 Note [Multi-parameter defaults]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSimplify.hs#L2655>`__
+
 With -XExtendedDefaultRules, we default only based on single-variable
 constraints, but do not exclude from defaulting any type variables which also
 appear in multi-variable constraints. This means that the following will
 default properly:
 
-.. code-block:: haskell
+::
 
    default (Integer, Double)
 
-.. code-block:: haskell
+::
 
    class A b (c :: Symbol) where
       a :: b -> Proxy c
 
-.. code-block:: haskell
+::
 
    instance A Integer c where a _ = Proxy
 
-.. code-block:: haskell
+::
 
    main = print (a 5 :: Proxy "5")
 
 Note that if we change the above instance ("instance A Integer") to
 "instance A Double", we get an error:
 
-.. code-block:: haskell
+::
 
    No instance for (A Integer "5")
 

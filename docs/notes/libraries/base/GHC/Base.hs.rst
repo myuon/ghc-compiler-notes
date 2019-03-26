@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Base.hs>`_
 
-====================
-libraries/base/GHC/Base.hs.rst
-====================
+libraries/base/GHC/Base.hs
+==========================
+
 
 Note [Depend on GHC.Integer]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Base.hs#L158>`__
+
 The Integer type is special because TidyPgm uses
 GHC.Integer.Type.mkInteger to construct Integer literal values
 Currently it reads the interface file whether or not the current
@@ -32,6 +35,9 @@ else either depends on GHC.Base, or does not have NoImplicitPrelude
 
 Note [Depend on GHC.Tuple]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Base.hs#L182>`__
+
 Similarly, tuple syntax (or ()) creates an implicit dependency on
 GHC.Tuple, so we use the same rule as for Integer --- see Note [Depend on
 GHC.Integer] --- to explain this to the build system.  We make GHC.Base
@@ -40,17 +46,23 @@ depend on GHC.Tuple, and everything else depends on GHC.Base or Prelude.
 
 
 Note [Depend on GHC.Natural]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Base.hs#L189>`__
+
 Similar to GHC.Integer.
 
 
+
 Note [Recursive bindings for Applicative/Monad]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Base.hs#L667>`__
 
 The original Applicative/Monad proposal stated that after
 implementation, the designated implementation of (>>) would become
 
-.. code-block:: haskell
+::
 
   (>>) :: forall a b. m a -> m b -> m b
   (>>) = (*>)
@@ -69,20 +81,23 @@ original default.
 
 
 Note [The rules for map]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Base.hs#L1105>`__
+
 The rules for map work like this.
 
 * Up to (but not including) phase 1, we use the "map" rule to
   rewrite all saturated applications of map with its build/fold
   form, hoping for fusion to happen.
 
-.. code-block:: haskell
+::
 
   In phase 1 and 0, we switch off that rule, inline build, and
   switch on the "mapList" rule, which rewrites the foldr/mapFB
   thing back into plain map.
 
-.. code-block:: haskell
+::
 
   It's important that these two rules aren't both active at once
   (along with build's unfolding) else we'd get an infinite loop
@@ -91,7 +106,7 @@ The rules for map work like this.
 * This same pattern is followed by many other functions:
   e.g. append, filter, iterate, repeat, etc. in GHC.List
 
-.. code-block:: haskell
+::
 
   See also Note [Inline FB functions] in GHC.List
 

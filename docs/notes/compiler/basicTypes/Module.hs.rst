@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Module.hs>`_
 
-====================
-compiler/basicTypes/Module.hs.rst
-====================
+compiler/basicTypes/Module.hs
+=============================
+
 
 Note [The identifier lexicon]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Module.hs#L175>`__
+
 Unit IDs, installed package IDs, ABI hashes, package names,
 versions, there are a *lot* of different identifiers for closely
 related things.  What do they all mean? Here's what.  (See also
@@ -78,8 +81,12 @@ assign different "PackageKeys" to components from the same package.
 UnitKeys).
 
 
+
 Note [UnitId to InstalledUnitId improvement]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Module.hs#L797>`__
+
 Just because a UnitId is definite (has no holes) doesn't
 mean it's necessarily a InstalledUnitId; it could just be
 that over the course of renaming UnitIds on the fly
@@ -103,8 +110,11 @@ unit id if the new unit id is part of the 'preloadClosure'; i.e., the
 closure of all the packages which were explicitly specified.
 
 
+
 Note [Wired-in packages]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Module.hs#L1056>`__
 
 Certain packages are known to the compiler, in that we know about certain
 entities that reside in these packages, and the compiler needs to
@@ -135,8 +145,12 @@ For `integer-gmp`/`integer-simple` we also change the base name to
 See Note [The integer library] in PrelNames.
 
 
+
 Note [Representation of module/name variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Module.hs#L1115>`__
+
 In our ICFP'16, we use <A> to represent module holes, and {A.T} to represent
 name holes.  This could have been represented by adding some new cases
 to the core data types, but this would have made the existing 'nameModule'
@@ -145,7 +159,7 @@ to existing code.
 
 Instead, we adopted the following encoding scheme:
 
-.. code-block:: haskell
+::
 
      <A>   ===> hole:A
      {A.T} ===> hole:A.T
@@ -158,8 +172,12 @@ and 'renameHoleUnitId' assume they are NOT operating on a
 'Name'; 'NameShape' handles name substitutions exclusively.
 
 
+
 Note [ModuleEnv performance and determinism]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Module.hs#L1158>`__
+
 To prevent accidental reintroduction of nondeterminism the Ord instance
 for Module was changed to not depend on Unique ordering and to use the
 lexicographic order. This is potentially expensive, but when measured

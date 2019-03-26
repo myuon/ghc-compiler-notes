@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnBinds.hs>`_
 
-====================
-compiler/rename/RnBinds.hs.rst
-====================
+compiler/rename/RnBinds.hs
+==========================
+
 
 Note [Pattern bindings that bind no variables]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnBinds.hs#L524>`__
+
 Generally, we want to warn about pattern bindings like
   Just _ = e
 because they don't do anything!  But we have three exceptions:
@@ -32,6 +35,9 @@ because they don't do anything!  But we have three exceptions:
 
 Note [Free-variable space leak]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnBinds.hs#L548>`__
+
 We have
     fvs' = trim fvs
 and we seq fvs' before turning it as part of a record.
@@ -42,8 +48,11 @@ and we don't want to retain the list bound_names. This showed up in
 trac ticket #1136.
 
 
+
 Note [Renaming pattern synonym variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnBinds.hs#L746>`__
 
 We rename pattern synonym declaractions backwards to normal to reuse
 the logic already implemented for renaming patterns.
@@ -76,6 +85,9 @@ See #13470 for the original report.
 
 Note [Pattern synonym builders don't yield dependencies]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnBinds.hs#L776>`__
+
 When renaming a pattern synonym that has an explicit builder,
 references in the builder definition should not be used when
 calculating dependencies. For example, consider the following pattern
@@ -109,13 +121,17 @@ So:
    unused-variable warnings (#12548)
 
 
+
 Note [Orphan COMPLETE pragmas]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnBinds.hs#L1049>`__
+
 We define a COMPLETE pragma to be a non-orphan if it includes at least
 one conlike defined in the current module. Why is this sufficient?
 Well if you have a pattern match
 
-.. code-block:: haskell
+::
 
   case expr of
     P1 -> ...

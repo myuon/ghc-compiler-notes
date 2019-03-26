@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/TmOracle.hs>`_
 
-====================
-compiler/deSugar/TmOracle.hs.rst
-====================
+compiler/deSugar/TmOracle.hs
+============================
+
 
 Note [Deep equalities]
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/TmOracle.hs#L249>`__
+
 Solving nested equalities is the most difficult part. The general strategy
 is the following:
 

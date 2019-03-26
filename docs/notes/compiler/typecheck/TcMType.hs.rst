@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs>`_
 
-====================
-compiler/typecheck/TcMType.hs.rst
-====================
+compiler/typecheck/TcMType.hs
+=============================
+
 
 Note [ExpType]
 ~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L367>`__
 
 An ExpType is used as the "expected type" when type-checking an expression.
 An ExpType can hold a "hole" that can be filled in by the type-checker.
@@ -29,14 +31,17 @@ See also [wiki:Typechecking]
 
 Note [TcLevel of ExpType]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L388>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
   data G a where
     MkG :: G Bool
 
-.. code-block:: haskell
+::
 
   foo MkG = True
 
@@ -53,8 +58,12 @@ test gadt/gadt-escape1.
 actual data definition is in TcType
 
 
+
 Note [Skolemising type variables]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L596>`__
+
 The tcInstSkolTyVars family of functions instantiate a list of TyVars
 to fresh skolem TcTyVars. Important notes:
 
@@ -80,6 +89,9 @@ d) The resulting skolems are
 
 Note [Kind substitution when instantiating]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L619>`__
+
 When we instantiate a bunch of kind and type variables, first we
 expect them to be topologically sorted.
 Then we have to instantiate the kind variables, build a substitution
@@ -95,9 +107,10 @@ instead of the buggous
 
 
 
-
 Note [TyVarTv]
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L643>`__
 
 A TyVarTv can unify with type *variables* only, including other TyVarTvs and
 skolems. Sometimes, they can unify with type variables that the user would
@@ -117,8 +130,12 @@ The remaining uses of newTyVarTyVars are
 * In partial type signatures, see Note [Quantified variables in partial type signatures]
 
 
+
 Note [Name of an instantiated type variable]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L678>`__
+
 At the moment we give a unification variable a System Name, which
 influences the way it is tidied; see TypeRep.tidyTyVarBndr.
 
@@ -126,11 +143,14 @@ influences the way it is tidied; see TypeRep.tidyTyVarBndr.
 
 Note [Unification variables need fresh Names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L683>`__
+
 Whenever we allocate a unification variable (MetaTyVar) we give
 it a fresh name.   #16221 is a very tricky case that illustrates
 why this is important:
 
-.. code-block:: haskell
+::
 
    data SameKind :: k -> k -> *
    data T0 a = forall k2 (b :: k2). MkT0 (SameKind a b) !Int
@@ -151,8 +171,12 @@ And there no reason /not/ to clone the Name when making a
 unification variable.  So that's what we do.
 
 
+
 Note [Level check when unifying]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L900>`__
+
 When unifying
      alpha:lvl := ty
 we expect that the TcLevel of 'ty' will be <= lvl.
@@ -163,8 +187,12 @@ See Note [TcLevel assignment] in TcType.
 % Generating fresh variables for pattern match check
 
 
+
 Note [Never need to instantiate coercion variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L923>`__
+
 With coercion variables sloshing around in types, it might seem that we
 sometimes need to instantiate coercion variables. This would be problematic,
 because coercion variables inhabit unboxed equality (~#), and the constraint
@@ -177,8 +205,12 @@ coercion variables, except for the special case of the promoted Eq#. But,
 that can't ever appear in user code, so we're safe!
 
 
+
 Note [Dependent type variables]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L1024>`__
+
 In Haskell type inference we quantify over type variables; but we only
 quantify over /kind/ variables when -XPolyKinds is on.  Without -XPolyKinds
 we default the kind variables to *.
@@ -193,7 +225,7 @@ variables appear:
 
   - "Kind variables" appear in the kind of some other free variable
 
-.. code-block:: haskell
+::
 
      These are the ones we default to * if -XPolyKinds is off
 
@@ -230,13 +262,16 @@ Note that
 
 Note [CandidatesQTvs determinism and order]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L1071>`__
+
 * Determinism: when we quantify over type variables we decide the
   order in which they appear in the final type. Because the order of
   type variables in the type can end up in the interface file and
   affects some optimizations like worker-wrapper, we want this order to
   be deterministic.
 
-.. code-block:: haskell
+::
 
   To achieve that we use deterministic sets of variables that can be
   converted to lists in a deterministic order. For more information
@@ -252,10 +287,13 @@ Note [CandidatesQTvs determinism and order]
 
 Note [Naughty quantification candidates]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L1089>`__
+
 Consider (#14880, dependent/should_compile/T14880-2), suppose
 we are trying to generalise this type:
 
-.. code-block:: haskell
+::
 
   forall arg. ... (alpha[tau]:arg) ...
 
@@ -295,7 +333,10 @@ what skolems are in scope.
 
 
 Note [Order of accumulation]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L1326>`__
+
 You might be tempted (like I was) to use unitDVarSet and mappend
 rather than extendDVarSet.  However, the union algorithm for
 deterministic sets depends on (roughly) the size of the sets. The
@@ -315,17 +356,21 @@ Note that the unitDVarSet/mappend implementation would not be wrong
 against any specification -- just suboptimal and confounding to users.
 
 
+
 Note [Defaulting with -XNoPolyKinds]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L1632>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
   data Compose f g a = Mk (f (g a))
 
 We infer
 
-.. code-block:: haskell
+::
 
   Compose :: forall k1 k2. (k2 -> *) -> (k1 -> k2) -> k1 -> *
   Mk :: forall k1 k2 (f :: k2 -> *) (g :: k1 -> k2) (a :: k1).
@@ -344,6 +389,9 @@ The code is in defaultKindVar.
 
 Note [What is a meta variable?]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L1653>`__
+
 A "meta type-variable", also know as a "unification variable" is a placeholder
 introduced by the typechecker for an as-yet-unknown monotype.
 
@@ -374,6 +422,9 @@ Vytiniotis, Weirich and Shields. J. Functional Programming. 2011).
 
 Note [What is zonking?]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L1681>`__
+
 GHC relies heavily on mutability in the typechecker for efficient operation.
 For this reason, throughout much of the type checking process meta type
 variables (the MetaTv constructor of TcTyVarDetails) are represented by mutable
@@ -397,22 +448,25 @@ There are two ways to zonk a Type:
 
 Note [Zonking to Skolem]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L1702>`__
+
 We used to zonk quantified type variables to regular TyVars.  However, this
 leads to problems.  Consider this program from the regression test suite:
 
-.. code-block:: haskell
+::
 
   eval :: Int -> String -> String -> String
   eval 0 root actual = evalRHS 0 root actual
 
-.. code-block:: haskell
+::
 
   evalRHS :: Int -> a
   evalRHS 0 root actual = eval 0 root actual
 
 It leads to the deferral of an equality (wrapped in an implication constraint)
 
-.. code-block:: haskell
+::
 
   forall a. () => ((String -> String -> String) ~ a)
 
@@ -436,15 +490,18 @@ simplifier knows how to deal with.
 
 Note [Silly Type Synonyms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L1733>`__
+
 Consider this:
         type C u a = u  -- Note 'a' unused
 
-.. code-block:: haskell
+::
 
         foo :: (forall a. C u a -> C u a) -> u
         foo x = ...
 
-.. code-block:: haskell
+::
 
         bar :: Num u => u
         bar = foo (\t -> t + t)
@@ -476,7 +533,10 @@ a \/\a in the final result but all the occurrences of a will be zonked to ()
 
 
 Note [zonkCt behaviour]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L1882>`__
+
 zonkCt tries to maintain the canonical form of a Ct.  For example,
   - a CDictCan should stay a CDictCan;
   - a CTyEqCan should stay a CTyEqCan (if the LHS stays as a variable.).
@@ -503,8 +563,12 @@ are actually in the inert set carry all the guarantees. So it is okay if zonkCt
 creates e.g. a CDictCan where the cc_tyars are /not/ function free.
 
 
+
 Note [Sharing in zonking]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMType.hs#L2063>`__
+
 Suppose we have
    alpha :-> beta :-> gamma :-> ty
 where the ":->" means that the unification variable has been

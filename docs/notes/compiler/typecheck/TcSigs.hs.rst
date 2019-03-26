@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSigs.hs>`_
 
-====================
-compiler/typecheck/TcSigs.hs.rst
-====================
+compiler/typecheck/TcSigs.hs
+============================
+
 
 Note [Scoped tyvars]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSigs.hs#L102>`__
+
 The -XScopedTypeVariables flag brings lexically-scoped type variables
 into scope for any explicitly forall-quantified type variables:
         f :: forall a. a -> a
@@ -20,7 +23,10 @@ However, we do *not* support this
 
 
 Note [Binding scoped type variables]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSigs.hs#L115>`__
+
 The type variables *brought into lexical scope* by a type signature
 may be a subset of the *quantified type variables* of the signatures,
 for two reasons:
@@ -46,7 +52,10 @@ errors were dealt with by the renamer.
 
 
 Note [Fail eagerly on bad signatures]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSigs.hs#L305>`__
+
 If a type signature is wrong, fail immediately:
 
  * the type sigs may bind type variables, so proceeding without them
@@ -67,8 +76,12 @@ So it's a bit awkward to get better error recovery, and no one
 has complained!
 
 
+
 Note [Pattern bindings and complete signatures]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSigs.hs#L524>`__
+
 Consider
       data T a = MkT a a
       f :: forall a. a->a

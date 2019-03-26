@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/UniqDFM.hs>`_
 
-====================
-compiler/utils/UniqDFM.hs.rst
-====================
+compiler/utils/UniqDFM.hs
+=========================
+
 
 Note [Deterministic UniqFM]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/UniqDFM.hs#L76>`__
+
 A @UniqDFM@ is just like @UniqFM@ with the following additional
 property: the function `udfmToList` returns the elements in some
 deterministic order not depending on the Unique key for those elements.
@@ -34,7 +37,7 @@ values when asked to convert to a list.
 
 An alternative would be to have
 
-.. code-block:: haskell
+::
 
   data UniqDFM ele = UDFM (M.IntMap ele) [ele]
 
@@ -45,8 +48,12 @@ Deletion can probably be done in amortized fashion when the size of the
 list is twice the size of the set.
 
 
+
 Note [Overflow on plusUDFM]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/UniqDFM.hs#L205>`__
+
 There are multiple ways of implementing plusUDFM.
 The main problem that needs to be solved is overlap on times of
 insertion between different keys in two maps.

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FunDeps.hs>`_
 
-====================
-compiler/typecheck/FunDeps.hs.rst
-====================
+compiler/typecheck/FunDeps.hs
+=============================
+
 
 Note [Coverage condition]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FunDeps.hs#L337>`__
+
 Example
       class C a b | a -> b
       instance theta => C t1 t2
@@ -17,12 +20,12 @@ For the coverage condition, we check
 The liberal version  ensures the self-consistency of the instance, but
 it does not guarantee termination. Example:
 
-.. code-block:: haskell
+::
 
    class Mul a b c | a b -> c where
         (.*.) :: a -> b -> c
 
-.. code-block:: haskell
+::
 
    instance Mul Int Int Int where (.*.) = (*)
    instance Mul Int Float Float where x .*. y = fromIntegral x * y
@@ -37,8 +40,12 @@ makes instance inference go into a loop, because it requires the constraint
         Mul a [b] b
 
 
+
 Note [Closing over kinds in coverage]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FunDeps.hs#L423>`__
+
 Suppose we have a fundep  (a::k) -> b
 Then if 'a' is instantiated to (x y), where x:k2->*, y:k2,
 then fixing x really fixes k2 as well, and so k2 should be added to
@@ -49,14 +56,14 @@ Example (#8391), using liberal coverage
       class Bar a b | a -> b
       instance Bar a (Foo a)
 
-.. code-block:: haskell
+::
 
     In the instance decl, (a:k) does fix (Foo k a), but only if we notice
     that (a:k) fixes k.  #10109 is another example.
 
 Here is a more subtle example, from HList-0.4.0.0 (#10564)
 
-.. code-block:: haskell
+::
 
   class HasFieldM (l :: k) r (v :: Maybe *)
         | l r -> v where ...
@@ -65,12 +72,12 @@ Here is a more subtle example, from HList-0.4.0.0 (#10564)
   class HMemberM (e1 :: k) (l :: [k]) (r :: Maybe [k])
         | e1 l -> r
 
-.. code-block:: haskell
+::
 
   data Label :: k -> *
   type family LabelsOf (a :: [*]) ::  *
 
-.. code-block:: haskell
+::
 
   instance (HMemberM (Label {k} (l::k)) (LabelsOf xs) b,
             HasFieldM1 b l (r xs) v)
@@ -95,7 +102,7 @@ Is the instance OK? Does {l,r,xs} determine v?  Well:
 However, we must closeOverKinds whenever augmenting the seed set
 in oclose!  Consider #10109:
 
-.. code-block:: haskell
+::
 
   data Succ a   -- Succ :: forall k. k -> *
   class Add (a :: k1) (b :: k2) (ab :: k3) | a b -> ab
@@ -117,6 +124,9 @@ Bottom line:
 
 Note [The liberal coverage condition]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FunDeps.hs#L489>`__
+
 (oclose preds tvs) closes the set of type variables tvs,
 wrt functional dependencies in preds.  The result is a superset
 of the argument set.  For example, if we have
@@ -137,6 +147,9 @@ an instance declaration
 
 Note [Equality superclasses]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FunDeps.hs#L507>`__
+
 Suppose we have
   class (a ~ [b]) => C a b
 
@@ -153,6 +166,9 @@ Hence the EqPred handling in oclose.  See #10778.
 
 Note [Care with type functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FunDeps.hs#L521>`__
+
 Consider (#12803)
   class C x y | x -> y
   type family F a b

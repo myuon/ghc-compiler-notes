@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Stack/Types.hs>`_
 
-====================
-libraries/base/GHC/Stack/Types.hs.rst
-====================
+libraries/base/GHC/Stack/Types.hs
+=================================
+
 
 Note [Definition of CallStack]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Stack/Types.hs#L162>`__
+
 CallStack is defined very early in base because it is
 used by error and undefined. At this point in the dependency graph,
 we do not have enough functionality to (conveniently) write a nice

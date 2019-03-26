@@ -1,32 +1,35 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs>`_
 
-====================
-compiler/coreSyn/CoreArity.hs.rst
-====================
+compiler/coreSyn/CoreArity.hs
+=============================
+
 
 Note [exprArity invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L159>`__
+
 exprArity has the following invariant:
 
-.. code-block:: haskell
+::
 
   (1) If typeArity (exprType e) = n,
       then manifestArity (etaExpand e n) = n
 
-.. code-block:: haskell
+::
 
       That is, etaExpand can always expand as much as typeArity says
       So the case analysis in etaExpand and in typeArity must match
 
-.. code-block:: haskell
+::
 
   (2) exprArity e <= typeArity (exprType e)
 
-.. code-block:: haskell
+::
 
   (3) Hence if (exprArity e) = n, then manifestArity (etaExpand e n) = n
 
-.. code-block:: haskell
+::
 
       That is, if exprArity says "the arity is n" then etaExpand really
       can get "n" manifest lambdas to the top.
@@ -46,7 +49,10 @@ in exprArity.  That is a less local change, so I'm going to leave it for today!
 
 Note [Newtype classes and eta expansion]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    NB: this nasty special case is no longer required, because
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L187>`__
+
+NB: this nasty special case is no longer required, because
     for newtype classes we don't use the class-op rule mechanism
     at all.  See Note [Single-method classes] in TcInstDcls. SLPJ May 2013
 
@@ -55,7 +61,7 @@ We have to be careful when eta-expanding through newtypes.  In general
 it's a good idea, but annoyingly it interacts badly with the class-op
 rule mechanism.  Consider
 
-.. code-block:: haskell
+::
 
    class C a where { op :: a -> a }
    instance C b => C [b] where
@@ -63,16 +69,16 @@ rule mechanism.  Consider
 
 These translate to
 
-.. code-block:: haskell
+::
 
    co :: forall a. (a->a) ~ C a
 
-.. code-block:: haskell
+::
 
    $copList :: C b -> [b] -> [b]
    $copList d x = ...
 
-.. code-block:: haskell
+::
 
    $dfList :: C b -> C [b]
    {-# DFunUnfolding = [$copList] #-}
@@ -80,11 +86,11 @@ These translate to
 
 Now suppose we have:
 
-.. code-block:: haskell
+::
 
    dCInt :: C Int
 
-.. code-block:: haskell
+::
 
    blah :: [Int] -> [Int]
    blah = op ($dfList dCInt)
@@ -95,7 +101,7 @@ Now we want the built-in op/$dfList rule will fire to give
 But with eta-expansion 'blah' might (and in #3772, which is
 slightly more complicated, does) turn into
 
-.. code-block:: haskell
+::
 
    blah = op (\eta. ($dfList dCInt |> sym co) eta)
 
@@ -108,9 +114,11 @@ The test simplCore/should_compile/T3722 is an excellent example.
 
 
 
-
 Note [exprArity for applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L236>`__
+
 When we come to an application we check that the arg is trivial.
    eg  f (fac x) does not have arity 2,
                  even if f has arity 3!
@@ -127,16 +135,18 @@ When we come to an application we check that the arg is trivial.
 
 
 
-
 Note [Definition of arity]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L259>`__
+
 The "arity" of an expression 'e' is n if
    applying 'e' to *fewer* than n *value* arguments
    converges rapidly
 
 Or, to put it another way
 
-.. code-block:: haskell
+::
 
    there is no work lost in duplicating the partial
    application (e x1 .. x(n-1))
@@ -146,7 +156,7 @@ is evaluated once, that's the end of the program.
 
 Or, to put it another way, in any context C
 
-.. code-block:: haskell
+::
 
    C[ (\x1 .. xn. e x1 .. xn) ]
          is as efficient as
@@ -158,6 +168,9 @@ It's all a bit more subtle than it looks:
 
 Note [One-shot lambdas]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L281>`__
+
 Consider one-shot lambdas
                 let x = expensive in \y z -> E
 We want this to have arity 1 if the \y-abstraction is a 1-shot lambda.
@@ -166,9 +179,12 @@ We want this to have arity 1 if the \y-abstraction is a 1-shot lambda.
 
 Note [Dealing with bottom]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L287>`__
+
 A Big Deal with computing arities is expressions like
 
-.. code-block:: haskell
+::
 
    f = \x -> case x of
                True  -> \s -> e1
@@ -202,13 +218,13 @@ So these two transformations aren't always the Right Thing, and we
 have several tickets reporting unexpected behaviour resulting from
 this transformation.  So we try to limit it as much as possible:
 
-.. code-block:: haskell
+::
 
  (1) Do NOT move a lambda outside a known-bottom case expression
        case undefined of { (a,b) -> \y -> e }
      This showed up in #5557
 
-.. code-block:: haskell
+::
 
  (2) Do NOT move a lambda outside a case if all the branches of
      the case are known to return bottom.
@@ -217,7 +233,7 @@ this transformation.  So we try to limit it as much as possible:
      going to diverge eventually anyway then getting the best arity
      isn't an issue, so we might as well play safe
 
-.. code-block:: haskell
+::
 
  (3) Do NOT move a lambda outside a case unless
      (a) The scrutinee is ok-for-speculation, or
@@ -231,7 +247,7 @@ Of course both (1) and (2) are readily defeated by disguising the bottoms.
 Non-recursive newtypes are transparent, and should not get in the way.
 We do (currently) eta-expand recursive newtypes too.  So if we have, say
 
-.. code-block:: haskell
+::
 
         newtype T = MkT ([T] -> Int)
 
@@ -243,7 +259,7 @@ that is, etaExpandArity looks through the coerce.
 When we eta-expand e to arity 1: eta_expand 1 e T
 we want to get:                  coerce T (\x::[T] -> (coerce ([T]->Int) e) x)
 
-.. code-block:: haskell
+::
 
   HOWEVER, note that if you use coerce bogusly you can ge
         coerce Int negate
@@ -254,6 +270,9 @@ we want to get:                  coerce T (\x::[T] -> (coerce ([T]->Int) e) x)
 
 Note [The state-transformer hack]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L361>`__
+
 Suppose we have
         f = e
 where e has arity n.  Then, if we know from the context that f has
@@ -276,17 +295,20 @@ See also Id.isOneShotBndr.
 
 Note [State hack and bottoming functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L381>`__
+
 It's a terrible idea to use the state hack on a bottoming function.
 Here's what happens (#2861):
 
-.. code-block:: haskell
+::
 
   f :: String -> IO T
   f = \p. error "..."
 
 Eta-expand, using the state hack:
 
-.. code-block:: haskell
+::
 
   f = \p. (\s. ((error "...") |> g1) s) |> g2
   g1 :: IO T ~ (S -> (S,T))
@@ -294,21 +316,21 @@ Eta-expand, using the state hack:
 
 Extrude the g2
 
-.. code-block:: haskell
+::
 
   f' = \p. \s. ((error "...") |> g1) s
   f = f' |> (String -> g2)
 
 Discard args for bottomming function
 
-.. code-block:: haskell
+::
 
   f' = \p. \s. ((error "...") |> g1 |> g3
   g3 :: (S -> (S,T)) ~ (S,T)
 
 Extrude g1.g3
 
-.. code-block:: haskell
+::
 
   f'' = \p. \s. (error "...")
   f' = f'' |> (String -> S -> g1.g3)
@@ -318,20 +340,20 @@ state hack to a function which then swallows the argument.
 
 This arose in another guise in #3959.  Here we had
 
-.. code-block:: haskell
+::
 
      catch# (throw exn >> return ())
 
 Note that (throw :: forall a e. Exn e => e -> a) is called with [a = IO ()].
 After inlining (>>) we get
 
-.. code-block:: haskell
+::
 
      catch# (\_. throw {IO ()} exn)
 
 We must *not* eta-expand to
 
-.. code-block:: haskell
+::
 
      catch# (\_ _. throw {...} exn)
 
@@ -343,9 +365,11 @@ but not to introduce a new lambda.
 
 
 
-
 Note [ArityType]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L433>`__
+
 ArityType is the result of a compositional analysis on expressions,
 from which we can decide the real arity of the expression (extracted
 with function exprEtaExpandArity).
@@ -356,7 +380,7 @@ ArityType 'at', then
  * If at = ABot n, then (f x1..xn) definitely diverges. Partial
    applications to fewer than n args may *or may not* diverge.
 
-.. code-block:: haskell
+::
 
    We allow ourselves to eta-expand bottoming functions, even
    if doing so may lose some `seq` sharing,
@@ -368,7 +392,7 @@ ArityType 'at', then
    assuming the calls of f respect the one-shot-ness of
    its definition.
 
-.. code-block:: haskell
+::
 
    NB 'f' is an arbitrary expression, eg (f = g e1 e2).  This 'f'
    can have ArityType as ATop, with length as > 0, only if e1 e2 are
@@ -398,11 +422,15 @@ Then  f             :: AT [False,False] ATop
 See Note [ArityType]
 
 
+
 Note [Arity analysis]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L580>`__
+
 The motivating example for arity analysis is this:
 
-.. code-block:: haskell
+::
 
   f = \x. let g = f (x+1)
           in \y. ...g...
@@ -429,9 +457,11 @@ mutual recursion.  But the self-recursive case is the important one.
 
 
 
-
 Note [Eta expanding through dictionaries]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L608>`__
+
 If the experimental -fdicts-cheap flag is on, we eta-expand through
 dictionary bindings.  This improves arities. Thereby, it also
 means that full laziness is less prone to floating out the
@@ -441,7 +471,7 @@ can thereby lose opportunities for fusion.  Example:
      foo = /\a \(d:Ord a). let d' = ...d... in \(x:a). ....
         -- So foo has arity 1
 
-.. code-block:: haskell
+::
 
      f = \x. foo dInt $ bar x
 
@@ -458,6 +488,9 @@ isDictLikeTy here rather than isDictTy
 
 Note [Eta expanding thunks]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L630>`__
+
 We don't eta-expand
    * Trivial RHSs     x = y
    * PAPs             x = map g
@@ -475,8 +508,12 @@ which we might not want.  After all, INLINE pragmas say "inline only
 when saturated" so we don't want to be too gung-ho about saturating!
 
 
+
 Note [ABot branches: use max]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L679>`__
+
 Consider   case x of
              True  -> \x.  error "urk"
              False -> \xy. error "urk2"
@@ -488,6 +525,9 @@ So we need (ABot 2) for the whole thing, the /max/ of the ABot arities.
 
 Note [Combining case branches]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L688>`__
+
 Consider
   go = \x. let z = go e0
                go2 = \x. case x of
@@ -506,8 +546,12 @@ basis that if we know one branch is one-shot, then they all must be.
 -------------------------
 
 
+
 Note [No crap in eta-expanded code]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L829>`__
+
 The eta expander is careful not to introduce "crap".  In particular,
 given a CoreExpr satisfying the 'CpeRhs' invariant (in CorePrep), it
 returns a CoreExpr satisfying the same invariant. See Note [Eta
@@ -522,6 +566,9 @@ means you can't really use it in CorePrep, which is painful.
 
 Note [Eta expansion for join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L841>`__
+
 The no-crap rule is very tiresome to guarantee when
 we have join points. Consider eta-expanding
    let j :: Int -> Int -> Bool
@@ -551,6 +598,9 @@ it does, then CoreToStg.myCollectArgs will fall over.
 
 Note [Eta expansion and SCCs]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L868>`__
+
 Note that SCCs are not treated specially by etaExpand.  If we have
         etaExpand 2 (\x -> scc "foo" e)
         = (\xy -> (scc "foo" e) y)
@@ -560,21 +610,23 @@ So the costs of evaluating 'e' (not 'e y') are attributed to "foo"
 
 Note [Eta expansion and source notes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreArity.hs#L875>`__
+
 CorePrep puts floatable ticks outside of value applications, but not
 type applications. As a result we might be trying to eta-expand an
 expression like
 
-.. code-block:: haskell
+::
 
   (src<...> v) @a
 
 which we want to lead to code like
 
-.. code-block:: haskell
+::
 
   \x -> src<...> v @a x
 
 This means that we need to look through type applications and be ready
 to re-add floats on the top.
-
 

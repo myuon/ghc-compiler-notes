@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs>`_
 
-====================
-compiler/typecheck/TcHsType.hs.rst
-====================
+compiler/typecheck/TcHsType.hs
+==============================
+
 
 Note [Wildcards in visible type application]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L386>`__
 
 A HsWildCardBndrs's hswc_ext now only includes named wildcards, so any unnamed
 wildcards stay unchanged in hswc_body and when called in tcHsTypeApp, tcCheckLHsType
@@ -21,7 +23,10 @@ and Note [The wildcard story for types] in HsTypes.hs
 
 
 Note [Dealing with :kind]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L451>`__
+
 Consider this GHCi command
   ghci> type family F :: Either j k
   ghci> :kind F
@@ -42,14 +47,16 @@ applications.  Actually the common case is a bare variable, as above.
 
 
 
-
 Note [Bidirectional type checking]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L508>`__
+
 In expressions, whenever we see a polymorphic identifier, say `id`, we are
 free to instantiate it with metavariables, knowing that we can always
 re-generalize with type-lambdas when necessary. For example:
 
-.. code-block:: haskell
+::
 
   rank2 :: (forall a. a -> a) -> ()
   x = rank2 id
@@ -84,6 +91,9 @@ that *can* be kind-polymorphic, we implement just the "up" (functions with
 
 Note [Future-proofing the type checker]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L543>`__
+
 As discussed in Note [Bidirectional type checking], each HsType form is
 handled in *either* tc_infer_hs_type *or* tc_hs_type. These functions
 are mutually recursive, so that either one can work for any type former.
@@ -94,8 +104,12 @@ missing any patterns.
 ----------------------------------------
 
 
+
 Note [Wildcards in visible kind application]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L850>`__
+
 There are cases where users might want to pass in a wildcard as a visible kind
 argument, for instance:
 
@@ -119,15 +133,18 @@ Note [The wildcard story for types] in HsTypes.hs
 
 
 Note [The Purely Kinded Type Invariant (PKTI)]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1212>`__
+
 During type inference, we maintain this invariant
 
-.. code-block:: haskell
+::
 
  (PKTI) It is legal to call 'tcTypeKind' on any Type ty,
         on any sub-term of ty, /without/ zonking ty
 
-.. code-block:: haskell
+::
 
         Moreover, any such returned kind
         will itself satisfy (PKTI)
@@ -165,6 +182,9 @@ The calls to mkAppTyM is the other place we are very careful.
 
 Note [mkAppTyM]
 ~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1251>`__
+
 mkAppTyM is trying to guaranteed the Purely Kinded Type Invariant
 (PKTI) for its result type (fun arg).  There are two ways it can go wrong:
 
@@ -183,7 +203,7 @@ mkAppTyM is trying to guaranteed the Purely Kinded Type Invariant
   (ff aa), and /that/ does not satisfy (PKTI).  E.g. perhaps
   (ff :: kappa), where 'kappa' has already been unified with (*->*).
 
-.. code-block:: haskell
+::
 
   We check for nasty case 2 on the final argument of a type synonym.
 
@@ -191,8 +211,12 @@ Notice that in both cases the trickiness only happens if the
 bound variable has a pi-type.  Hence isTrickyTvBinder.
 
 
+
 Note [saturateFamApp]
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1295>`__
+
 Consider
    type family F :: Either j k
    type instance F @Type = Right Maybe
@@ -216,13 +240,16 @@ It's not just type instances where we need to saturate those
 unsaturated arguments: see #11246.  Hence doing this in tcInferApps.
 
 
+
 Note [GADT kind self-reference]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1459>`__
 
 A promoted type cannot be used in the body of that type's declaration.
 #11554 shows this example, which made GHC loop:
 
-.. code-block:: haskell
+::
 
   import Data.Kind
   data P (x :: k) = Q
@@ -242,6 +269,9 @@ its constructors. This would allow the example above to pass.
 
 Note [Body kind of a HsForAllTy]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1479>`__
+
 The body of a forall is usually a type, but in principle
 there's no reason to prohibit *unlifted* types.
 In fact, GHC can itself construct a function with an
@@ -254,7 +284,7 @@ kind Constraint.
 It's tempting to check that the body kind is either * or #. But this is
 wrong. For example:
 
-.. code-block:: haskell
+::
 
   class C a b
   newtype N = Mk Foo deriving (C a)
@@ -268,6 +298,9 @@ convenient. Bottom line: don't check for * or # here.
 
 Note [Body kind of a HsQualTy]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1501>`__
+
 If ctxt is non-empty, the HsQualTy really is a /function/, so the
 kind of the result really is '*', and in that case the kind of the
 body-type can be lifted or unlifted.
@@ -297,6 +330,9 @@ parameter, but that seemed like a sledgehammer to crack a nut.)
 
 Note [Inferring tuple kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1528>`__
+
 Give a tuple type (a,b,c), which the parser labels as HsBoxedOrConstraintTuple,
 we try to figure out whether it's a tuple of kind * or Constraint.
   Step 1: look at the expected kind
@@ -309,7 +345,7 @@ the arguments to give good error messages in
 
 Note that we will still fail to infer the correct kind in this case:
 
-.. code-block:: haskell
+::
 
   type T a = ((a,a), D a)
   type family D :: Constraint -> Constraint
@@ -321,6 +357,9 @@ kind of T to * -> *. It works if we annotate `a` with kind `Constraint`.
 
 Note [Desugaring types]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1548>`__
+
 The type desugarer is phase 2 of dealing with HsTypes.  Specifically:
 
   * It transforms from HsType to Type
@@ -355,6 +394,9 @@ Moreover
 
 Note [Kind of a type splice]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1580>`__
+
 Consider these terms, each with TH type splice inside:
      [| e1 :: Maybe $(..blah..) |]
      [| e2 :: $(..blah..) |]
@@ -371,8 +413,12 @@ Help functions for type applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
 Note [Keeping scoped variables in order: Explicit]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1614>`__
+
 When the user writes `forall a b c. blah`, we bring a, b, and c into
 scope and then check blah. In the process of checking blah, we might
 learn the kinds of a, b, and c, and these kinds might indicate that
@@ -398,6 +444,9 @@ we can report a suggested ordering to the user if there is a problem.
 
 Note [Keeping scoped variables in order: Implicit]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1637>`__
+
 When the user implicitly quantifies over variables (say, in a type
 signature), we need to come up with some ordering on these variables.
 This is done by bumping the TcLevel, bringing the tyvars into scope,
@@ -418,6 +467,9 @@ these variables.
 
 Note [Recipe for checking a signature]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1655>`__
+
 Checking a user-written signature requires several steps:
 
  1. Generate constraints.
@@ -440,7 +492,7 @@ in the type may have a bumped TcLevel, because explicit foralls
 raise the TcLevel. To avoid these variables from ever being visible
 in the surrounding context, we must obey the following dictum:
 
-.. code-block:: haskell
+::
 
   Every metavariable in a type must either be
     (A) promoted
@@ -471,8 +523,12 @@ To avoid the double-zonk, we do two things:
     gathers free variables. So this way effectively sidesteps step 3.
 
 
+
 Note [The initial kind of a type constructor]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1734>`__
+
 kcLHsQTyVars is responsible for getting the initial kind of
 a type constructor.
 
@@ -491,8 +547,12 @@ It has two cases:
 ----------------------------
 
 
+
 Note [No polymorphic recursion]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1901>`__
+
 Should this kind-check?
   data T ka (a::ka) b  = MkT (T Type           Int   Bool)
                              (T (Type -> Type) Maybe Bool)
@@ -518,7 +578,7 @@ But notice that (#16322 comment:3)
 * The algorithm successfully kind-checks this declaration:
     data T2 ka (a::ka) = MkT2 (T2 Type a)
 
-.. code-block:: haskell
+::
 
   Starting with (getInitialKinds)
     T2 :: (kappa1 :: kappa2 :: *) -> (kappa3 :: kappa4 :: *) -> *
@@ -526,17 +586,17 @@ But notice that (#16322 comment:3)
     kappa4 := kappa1   -- from the (a:ka) kind signature
     kappa1 := Type     -- From application T2 Type
 
-.. code-block:: haskell
+::
 
   These constraints are soluble so generaliseTcTyCon gives
     T2 :: forall (k::Type) -> k -> *
 
-.. code-block:: haskell
+::
 
   But now the /typechecking/ (aka desugaring, tcTyClDecl) phase
   fails, because the call (T2 Type a) in the RHS is ill-kinded.
 
-.. code-block:: haskell
+::
 
   We'd really prefer all errors to show up in the kind checking
   phase.
@@ -549,7 +609,10 @@ But notice that (#16322 comment:3)
 
 
 Note [Kind-checking tyvar binders for associated types]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1948>`__
+
 When kind-checking the type-variable binders for associated
    data/newtype decls
    family decls
@@ -570,9 +633,12 @@ Hence the use of tcImplicitQTKBndrs in tcFamTyPatsAndGen.
 
 Note [Kind variable ordering for associated types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L1966>`__
+
 What should be the kind of `T` in the following example? (#15591)
 
-.. code-block:: haskell
+::
 
   class C (a :: Type) where
     type T (x :: f a)
@@ -584,7 +650,7 @@ T alone, since its variable `a` actually occurs /before/ `f` if you consider
 the fact that `a` was previously bound by the parent class `C`. That is to say,
 the kind of `T` should end up being:
 
-.. code-block:: haskell
+::
 
   T :: forall a f. f a -> Type
 
@@ -595,13 +661,13 @@ visible kind application.)
 In contrast, if `T` were redefined to be a top-level type family, like `T2`
 below:
 
-.. code-block:: haskell
+::
 
   type family T2 (x :: f (a :: Type))
 
 Then `a` first appears /after/ `f`, so the kind of `T2` should be:
 
-.. code-block:: haskell
+::
 
   T2 :: forall f a. f a -> Type
 
@@ -611,8 +677,12 @@ the class-bound variables in hand, we can ensure that we always quantify
 these first.
 
 
+
 Note [Levels and generalisation]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L2276>`__
+
 Consider
   f x = e
 with no type signature. We are currently at level i.
@@ -635,6 +705,9 @@ All of this happens for types too.  Consider
 
 Note [Kind generalisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L2296>`__
+
 We do kind generalisation only at the outer level of a type signature.
 For example, consider
   T :: forall k. k -> *
@@ -658,6 +731,9 @@ higher-rank in its kind. But only by explicit request.
 
 Note [Kinds of quantified type variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L2317>`__
+
 tcTyVarBndrsGen quantifies over a specified list of type variables,
 *and* over the kind variables mentioned in the kinds of those tyvars.
 
@@ -678,8 +754,12 @@ Hence using zonked_kinds when forming tvs'.
 ---------------------------------
 
 
+
 Note [TyConBinders for the result kind signature of a data type]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L2418>`__
+
 Given
   data T (a::*) :: * -> forall k. k -> *
 we want to generate the extra TyConBinders for T, so we finally get
@@ -691,7 +771,7 @@ We need to take care to give the TyConBinders
   (a) OccNames that are fresh (because the TyConBinders of a TyCon
       must have distinct OccNames
 
-.. code-block:: haskell
+::
 
   (b) Uniques that are fresh (obviously)
 
@@ -712,6 +792,9 @@ done.
 
 Note [Avoid name clashes for associated data types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L2446>`__
+
 Consider    class C a b where
                data D b :: * -> *
 When typechecking the decl for D, we'll invent an extra type variable
@@ -728,9 +811,11 @@ It isn't essential for correctness.
 
 
 
-
 Note [Extra-constraint holes in partial type signatures]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L2548>`__
+
 Consider
   f :: (_) => a -> a
   f x = ...
@@ -770,18 +855,20 @@ Result works fine, but it may eventually bite us.
 
 
 
-
 Note [Pattern signature binders]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcHsType.hs#L2710>`__
+
 See also Note [Type variables in the type environment] in TcRnTypes.
 Consider
 
-.. code-block:: haskell
+::
 
   data T where
     MkT :: forall a. a -> (a -> Int) -> T
 
-.. code-block:: haskell
+::
 
   f :: T -> ...
   f (MkT x (f :: b -> c)) = <blah>
@@ -820,6 +907,4 @@ For RULE binders, though, things are a bit different (yuk).
 Here this really is the binding site of the type variable so we'd like
 to use a skolem, so that we get a complaint if we unify two of them
 together.  Hence the new_tv function in tcHsPatSigType.
-
-
 

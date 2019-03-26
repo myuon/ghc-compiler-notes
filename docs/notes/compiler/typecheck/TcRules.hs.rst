@@ -1,26 +1,29 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRules.hs>`_
 
-====================
-compiler/typecheck/TcRules.hs.rst
-====================
+compiler/typecheck/TcRules.hs
+=============================
+
 
 Note [Typechecking rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRules.hs#L39>`__
+
 We *infer* the typ of the LHS, and use that type to *check* the type of
 the RHS.  That means that higher-rank rules work reasonably well. Here's
 an example (test simplCore/should_compile/rule2.hs) produced by Roman:
 
-.. code-block:: haskell
+::
 
    foo :: (forall m. m a -> m b) -> m a -> m b
    foo f = ...
 
-.. code-block:: haskell
+::
 
    bar :: (forall m. m a -> m a) -> m a -> m a
    bar f = ...
 
-.. code-block:: haskell
+::
 
    {-# RULES "foo/bar" foo = bar #-}
 
@@ -30,13 +33,20 @@ He wanted the rule to typecheck.
 
 Note [TcLevel in type checking rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRules.hs#L55>`__
+
 Bringing type variables into scope naturally bumps the TcLevel. Thus, we type
 check the term-level binders in a bumped level, and we must accordingly bump
 the level whenever these binders are in scope.
 
 
+
 Note [The SimplifyRule Plan]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRules.hs#L220>`__
+
 Example.  Consider the following left-hand side of a rule
         f (x == y) (y > z) = ...
 If we typecheck this expression we get constraints
@@ -110,12 +120,15 @@ revert to SimplCheck when going under an implication.
 
 Note [Solve order for RULES]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRules.hs#L291>`__
+
 In step 1 above, we need to be a bit careful about solve order.
 Consider
    f :: Int -> T Int
    type instance T Int = Bool
 
-.. code-block:: haskell
+::
 
    RULE f 3 = True
 
@@ -126,13 +139,13 @@ where 'alpha' is the type that connects the two.  If we glom them
 all together, and solve the RHS constraint first, we might solve
 with alpha := Bool.  But then we'd end up with a RULE like
 
-.. code-block:: haskell
+::
 
     RULE: f 3 |> (co :: T Int ~ Bool) = True
 
 which is terrible.  We want
 
-.. code-block:: haskell
+::
 
     RULE: f 3 = True |> (sym co :: Bool ~ T Int)
 
@@ -143,9 +156,11 @@ tcRule.
 
 
 
-
 Note [RULE quantification over equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRules.hs#L319>`__
+
 Deciding which equalities to quantify over is tricky:
  * We do not want to quantify over insoluble equalities (Int ~ Bool)
     (a) because we prefer to report a LHS type error
@@ -163,6 +178,9 @@ and if so refrain from quantifying over *any* equalities.
 
 Note [Quantifying over coercion holes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRules.hs#L334>`__
+
 Equality constraints from the LHS will emit coercion hole Wanteds.
 These don't have a name, so we can't quantify over them directly.
 Instead, because we really do want to quantify here, invent a new
@@ -173,12 +191,14 @@ impedance matching, really.
 
 
 Note [Simplify cloned constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRules.hs#L343>`__
+
 At this stage, we're simplifying constraints only for insolubility
 and for unification. Note that all the evidence is quickly discarded.
 We use a clone of the real constraint. If we don't do this,
 then RHS coercion-hole constraints get filled in, only to get filled
 in *again* when solving the implications emitted from tcRule. That's
 terrible, so we avoid the problem by cloning the constraints.
-
 

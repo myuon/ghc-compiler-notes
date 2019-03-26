@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/GhcMake.hs>`_
 
-====================
-compiler/main/GhcMake.hs.rst
-====================
+compiler/main/GhcMake.hs
+========================
+
 
 Note [Missing home modules]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/GhcMake.hs#L150>`__
+
 Sometimes user doesn't want GHC to pick up modules, not explicitly listed
 in a command line. For example, cabal may want to enable this warning
 when building a library, so that GHC warns user about modules, not listed
@@ -20,8 +23,12 @@ about module "C" not being listed in a command line.
 The warning in enabled by `-Wmissing-home-modules`. See #13129
 
 
+
 Note [-fno-code mode]
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/GhcMake.hs#L1563>`__
+
 GHC offers the flag -fno-code for the purpose of parsing and typechecking a
 program without generating object files. This is intended to be used by tooling
 and IDEs to provide quick feedback on any parser or type errors as cheaply as
@@ -83,8 +90,12 @@ Potential TODOS:
   generating temporary ones.
 
 
+
 Note [Recompilation checking in -fno-code mode]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/GhcMake.hs#L1626>`__
+
 If we are compiling with -fno-code -fwrite-interface, there won't
 be any object code that we can compare against, nor should there
 be: we're *just* generating interface files.  In this case, we

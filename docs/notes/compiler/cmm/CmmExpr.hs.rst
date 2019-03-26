@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmExpr.hs>`_
 
-====================
-compiler/cmm/CmmExpr.hs.rst
-====================
+compiler/cmm/CmmExpr.hs
+=======================
+
 
 Note [Old Area]
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmExpr.hs#L87>`__
+
 There is a single call area 'Old', allocated at the extreme old
 end of the stack frame (ie just younger than the return address)
 which holds:
@@ -18,11 +21,15 @@ Its size is the max of all these requirements.  On entry, the stack
 pointer will point to the youngest incoming parameter, which is not
 necessarily at the young end of the Old area.
 
-End of note 
+End of note
+
 
 
 Note [CmmStackSlot aliasing]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmExpr.hs#L104>`__
+
 When do two CmmStackSlots alias?
 
  - T[old+N] aliases with U[young(L)+M] for all T, U, L, N and M
@@ -36,12 +43,12 @@ semantics of stack areas is described below.
 
 e.g. if we had
 
-.. code-block:: haskell
+::
 
     x = Sp[old + 8]
     y = Sp[old + 16]
 
-.. code-block:: haskell
+::
 
     Sp[young(L) + 8]  = L
     Sp[young(L) + 16] = y
@@ -50,7 +57,7 @@ e.g. if we had
 
 if areas semantically do not overlap, then we might optimise this to
 
-.. code-block:: haskell
+::
 
     Sp[young(L) + 8]  = L
     Sp[young(L) + 16] = Sp[old + 8]
@@ -65,7 +72,7 @@ are doomed to use more stack.
 
 so young(L)+8 == old+24 and we get
 
-.. code-block:: haskell
+::
 
     Sp[-8]  = L
     Sp[-16] = Sp[8]
@@ -78,12 +85,12 @@ semantics, then we cannot commute any loads/stores of old with
 young(L), and we will be able to re-use both old+8 and old+16 for
 young(L).
 
-.. code-block:: haskell
+::
 
     x = Sp[8]
     y = Sp[0]
 
-.. code-block:: haskell
+::
 
     Sp[8] = L
     Sp[0] = y
@@ -93,7 +100,7 @@ young(L).
 
 Now, the assignments of y go away,
 
-.. code-block:: haskell
+::
 
     x = Sp[8]
     Sp[8] = L

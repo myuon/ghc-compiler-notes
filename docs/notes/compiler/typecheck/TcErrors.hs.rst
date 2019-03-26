@@ -1,24 +1,27 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs>`_
 
-====================
-compiler/typecheck/TcErrors.hs.rst
-====================
+compiler/typecheck/TcErrors.hs
+==============================
+
 
 Note [Deferring coercion errors to runtime]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L84>`__
+
 While developing, sometimes it is desirable to allow compilation to succeed even
 if there are type errors in the code. Consider the following case:
 
-.. code-block:: haskell
+::
 
   module Main where
 
-.. code-block:: haskell
+::
 
   a :: Int
   a = 'a'
 
-.. code-block:: haskell
+::
 
   main = print "b"
 
@@ -30,12 +33,12 @@ we run into a type mismatch in TcUnify, we normally just emit an error. But it
 is always safe to defer the mismatch to the main constraint solver. If we do
 that, `a` will get transformed into
 
-.. code-block:: haskell
+::
 
   co :: Int ~ Char
   co = ...
 
-.. code-block:: haskell
+::
 
   a :: Int
   a = 'a' `cast` co
@@ -52,8 +55,12 @@ and does not fail if -fdefer-type-errors is on, so that we can continue
 compilation. The errors are turned into warnings in `reportUnsolved`.
 
 
+
 Note [Suppressing error messages]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L367>`__
+
 The cec_suppress flag says "don't report any errors".  Instead, just create
 evidence bindings (as usual).  It's used when more important errors have occurred.
 
@@ -78,8 +85,12 @@ error into a warning may allow subsequent warnings to appear that were
 previously suppressed.   (e.g. partial-sigs/should_fail/T14584)
 
 
+
 Note [Redundant constraints in instance decls]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L497>`__
+
 For instance declarations, we don't report unused givens if
 they can give rise to improvement.  Example (#10100):
     class Add a b ab | a b -> ab, a ab -> b
@@ -95,21 +106,25 @@ But without the context we won't find beta := Zero.
 This only matters in instance declarations..
 
 
+
 Note [Given errors]
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L745>`__
+
 Given constraints represent things for which we have (or will have)
 evidence, so they aren't errors.  But if a Given constraint is
 insoluble, this code is inaccessible, and we might want to at least
 warn about that.  A classic case is
 
-.. code-block:: haskell
+::
 
    data T a where
      T1 :: T Int
      T2 :: T a
      T3 :: T Bool
 
-.. code-block:: haskell
+::
 
    f :: T Int -> Bool
    f T1 = ...
@@ -133,8 +148,12 @@ pattern match which binds some equality constraints.  If we
 find one, we report the insoluble Given.
 
 
+
 Note [Always warn with -fdefer-type-errors]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L997>`__
+
 When -fdefer-type-errors is on we warn about *all* type errors, even
 if cec_suppress is on.  This can lead to a lot more warnings than you
 would get errors without -fdefer-type-errors, but if we suppress any of
@@ -154,6 +173,9 @@ With #10283, you can now opt out of deferred type error warnings.
 
 Note [Deferred errors for coercion holes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L1014>`__
+
 Suppose we need to defer a type error where the destination for the evidence
 is a coercion hole. We can't just put the error in the hole, because we can't
 make an erroneous coercion. (Remember that coercions are erased for runtime.)
@@ -166,6 +188,9 @@ coercion.
 
 Note [Do not report derived but soluble errors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L1024>`__
+
 The wc_simples include Derived constraints that have not been solved,
 but are not insoluble (in that case they'd be reported by 'report1').
 We do not want to report these as errors:
@@ -183,7 +208,7 @@ We do not want to report these as errors:
   f, namely   f (MkT [True]) :: T Bool, in which b=d.  So we should
   not reject the program.
 
-.. code-block:: haskell
+::
 
   For wanteds, something similar
       data T a where
@@ -200,7 +225,7 @@ derived superclasses between iterations of the solver.)
 For functional dependencies, here is a real example,
 stripped off from libraries/utf8-string/Codec/Binary/UTF8/Generic.hs
 
-.. code-block:: haskell
+::
 
   class C a b | a -> b
   g :: C a b => a -> b -> ()
@@ -219,20 +244,22 @@ solve it.
 
 
 
-
 Note [Constraints include ...]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L1291>`__
+
 'givenConstraintsMsg' returns the "Constraints include ..." message enabled by
 -fshow-hole-constraints. For example, the following hole:
 
-.. code-block:: haskell
+::
 
     foo :: (Eq a, Show a) => a -> String
     foo x = _
 
 would generate the message:
 
-.. code-block:: haskell
+::
 
     Constraints include
       Eq a (from foo.hs:1:1-36)
@@ -243,32 +270,34 @@ outermost. There's currently no filtering or elimination of duplicates.
 
 
 
-
 Note [OutOfScope exact matches]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L1309>`__
+
 When constructing an out-of-scope error message, we not only generate a list of
 possible in-scope alternatives but also search for an exact, unambiguous match
 in a later inter-splice group.  If we find such a match, we report its presence
 (and indirectly, its scope) in the message.  For example, if a module A contains
 the following declarations,
 
-.. code-block:: haskell
+::
 
    foo :: Int
    foo = x
 
-.. code-block:: haskell
+::
 
    $(return [])  -- Empty top-level splice
 
-.. code-block:: haskell
+::
 
    x :: Int
    x = 23
 
 we will issue an error similar to
 
-.. code-block:: haskell
+::
 
    A.hs:6:7: error:
        • Variable not in scope: x :: Int
@@ -292,24 +321,24 @@ where the match to x is NOT in scope.  Why not simply state where the match IS
 in scope?  It most cases, this would be just as easy and perhaps a little
 clearer for the user.  But now consider the following example:
 
-.. code-block:: haskell
+::
 
     {-# LANGUAGE TemplateHaskell #-}
 
-.. code-block:: haskell
+::
 
     module A where
 
-.. code-block:: haskell
+::
 
     import Language.Haskell.TH
     import Language.Haskell.TH.Syntax
 
-.. code-block:: haskell
+::
 
     foo = x
 
-.. code-block:: haskell
+::
 
     $(do -------------------------------------------------
         ds <- [d| ok1 = x
@@ -317,7 +346,7 @@ clearer for the user.  But now consider the following example:
         addTopDecls ds
         return [])
 
-.. code-block:: haskell
+::
 
     bar = $(do
             ds <- [d| x = 23
@@ -326,17 +355,17 @@ clearer for the user.  But now consider the following example:
             addTopDecls ds
             litE $ stringL "hello")
 
-.. code-block:: haskell
+::
 
     $(return []) -----------------------------------------
 
-.. code-block:: haskell
+::
 
     ok3 = x
 
 Here, x is out-of-scope in the declaration of foo, and so we report
 
-.. code-block:: haskell
+::
 
     A.hs:8:7: error:
         • Variable not in scope: x
@@ -357,7 +386,7 @@ then x must precede S; otherwise, it would be in scope.  But when dealing with
 addTopDecls, this check serves a practical purpose.  Consider the following
 declarations:
 
-.. code-block:: haskell
+::
 
     $(do
         ds <- [d| ok = x
@@ -366,7 +395,7 @@ declarations:
         addTopDecls ds
         return [])
 
-.. code-block:: haskell
+::
 
     foo = x
 
@@ -378,14 +407,18 @@ reported that x is not in scope before the splice.  While correct, such an error
 message is more likely to confuse than to enlighten.
 
 
+
 Note [Inaccessible code]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L1420>`__
+
 Consider
    data T a where
      T1 :: T a
      T2 :: T Bool
 
-.. code-block:: haskell
+::
 
    f :: (a ~ Int) => T a -> Int
    f T1 = 3
@@ -402,6 +435,9 @@ enclosing implication.
 
 Note [Error messages for untouchables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L1438>`__
+
 Consider (#9109)
   data G a where { GBool :: G Bool }
   foo x = case x of GBool -> True
@@ -417,14 +453,18 @@ Don't have multiple equality errors from the same location
 E.g.   (Int,Bool) ~ (Bool,Int)   one error will do!
 
 
+
 Note [Suppress redundant givens during error reporting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L1838>`__
+
 When GHC is unable to solve a constraint and prints out an error message, it
 will print out what given constraints are in scope to provide some context to
 the programmer. But we shouldn't print out /every/ given, since some of them
 are not terribly helpful to diagnose type errors. Consider this example:
 
-.. code-block:: haskell
+::
 
   foo :: Int :~: Int -> a :~: b -> a :~: c
   foo Refl Refl = Refl
@@ -439,7 +479,7 @@ the `ic_no_eqs` field of the Implication).
 But this is not enough to avoid all redundant givens! Consider this example,
 from #15361:
 
-.. code-block:: haskell
+::
 
   goo :: forall (a :: Type) (b :: Type) (c :: Type).
          a :~~: b -> a :~~: c
@@ -457,8 +497,12 @@ addition to superclasses (see Note [Remove redundant provided dicts]
 in TcPatSyn).
 
 
+
 Note [Insoluble occurs check wins]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2107>`__
+
 Consider [G] a ~ [a],  [W] a ~ [a] (#13674).  The Given is insoluble
 so we don't use it for rewriting.  The Wanted is also insoluble, and
 we don't solve it from the Given.  It's very confusing to say
@@ -478,6 +522,8 @@ want to be as draconian with them.)
 Note [Expanding type synonyms to make types similar]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2123>`__
+
 In type error messages, if -fprint-expanded-types is used, we want to expand
 type synonyms to make expected and found types as similar as possible, but we
 shouldn't expand types too much to make type messages even more verbose and
@@ -495,7 +541,7 @@ only as much as necessary. Given two types t1 and t2:
     same, then it applies the same procedure to arguments of C1 and arguments of
     C2 to make them as similar as possible.
 
-.. code-block:: haskell
+::
 
     Most important thing here is to keep number of synonym expansions at
     minimum. For example, if t1 is `T (T3, T5, Int)` and t2 is `T (T5, T3,
@@ -523,14 +569,18 @@ has top-layer type synonyms completely expanded. (in this case the inner types
 are not expanded at all, as the current form already shows the type error)
 
 
+
 Note [Suggest adding a type signature]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2305>`__
+
 The OutsideIn algorithm rejects GADT programs that don't have a principal
 type, and indeed some that do.  Example:
    data T a where
      MkT :: Int -> T Int
 
-.. code-block:: haskell
+::
 
    f (MkT n) = n
 
@@ -546,12 +596,18 @@ This initially came up in #8968, concerning pattern synonyms.
 
 Note [Disambiguating (X ~ X) errors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2322>`__
+
 See #8278
 
 
 
 Note [Reporting occurs-check errors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2326>`__
+
 Given (a ~ [a]), if 'a' is a rigid type variable bound by a user-supplied
 type signature, then the best thing is to report that we can't unify
 a with [a], because a is a skolem variable.  That avoids the confusing
@@ -573,6 +629,9 @@ So isUserSkolem distinguishes the two.
 
 Note [Non-injective type functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2345>`__
+
 It's very confusing to get a message like
      Couldn't match expected type `Depend s'
             against inferred type `Depend s1'
@@ -583,9 +642,11 @@ Warn of loopy local equalities that were dropped.
 
 
 
-
 Note [Report candidate instances]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2663>`__
+
 If we have an unsolved (Num Int), where `Int` is not the Prelude Int,
 but comes from some other module, then it may be helpful to point out
 that there are some similarly named instances elsewhere.  So we get
@@ -615,12 +676,15 @@ the constraint from being solved.
 
 
 Note [discardProvCtxtGivens]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2691>`__
+
 In most situations we call all enclosing implications "useful". There is one
 exception, and that is when the constraint that causes the error is from the
 "provided" context of a pattern synonym declaration:
 
-.. code-block:: haskell
+::
 
   pattern Pat :: (Num a, Eq a) => Show a   => a -> Maybe a
              --  required      => provided => type
@@ -653,7 +717,7 @@ possible fix that suggests to add a "provided" constraint to the
 For example, without this distinction the above code gives a bad error
 message (showing both problems):
 
-.. code-block:: haskell
+::
 
   error: Could not deduce (Show a) ... from the context: (Eq a)
          ... Possible fix: add (Show a) to the context of
@@ -662,7 +726,10 @@ message (showing both problems):
 
 
 Note [Displaying potential instances]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2799>`__
+
 When showing a list of instances for
   - overlapping instances (show ones that match)
   - no such instance (show ones that could match)
@@ -681,8 +748,12 @@ we want to give it a bit of structure.  Here's the plan
   summary with the full list
 
 
+
 Note [Flattening in error message generation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2820>`__
+
 Consider (C (Maybe (F x))), where F is a type function, and we have
 instances
                 C (Maybe Int) and C (Maybe a)
@@ -701,9 +772,12 @@ the TcS monad, and we are in TcM here.
 
 Note [Kind arguments in error messages]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L2836>`__
+
 It can be terribly confusing to get an error message like (#9171)
 
-.. code-block:: haskell
+::
 
     Couldn't match expected type ‘GetParam Base (GetParam Base Int)’
                 with actual type ‘GetParam Base (GetParam Base Int)’
@@ -715,7 +789,7 @@ To mitigate this, GHC attempts to enable the -fprint-explicit-kinds flag
 whenever any error message arises due to a kind mismatch. This means that
 the above error message would instead be displayed as:
 
-.. code-block:: haskell
+::
 
     Couldn't match expected type
                   ‘GetParam @* @k2 @* Base (GetParam @* @* @k2 Base Int)’
@@ -725,10 +799,13 @@ the above error message would instead be displayed as:
 Which makes it clearer that the culprit is the mismatch between `k2` and `k20`.
 
 
+
 Note [Runtime skolems]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcErrors.hs#L3079>`__
+
 We want to give a reasonably helpful error message for ambiguity
 arising from *runtime* skolems in the debugger.  These
 are created by in RtClosureInspect.zonkRTTIType.
-
 

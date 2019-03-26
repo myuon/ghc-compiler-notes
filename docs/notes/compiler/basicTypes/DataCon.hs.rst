@@ -1,14 +1,17 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs>`_
 
-====================
-compiler/basicTypes/DataCon.hs.rst
-====================
+compiler/basicTypes/DataCon.hs
+==============================
+
 
 Note [Data Constructor Naming]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs#L128>`__
+
 Each data constructor C has two, and possibly up to four, Names associated with it:
 
-.. code-block:: haskell
+::
 
                    OccName   Name space   Name of   Notes
  ---------------------------------------------------------------------------
@@ -59,6 +62,9 @@ The "wrapper Id", \$WC, goes as follows
 
 Note [Data constructor workers and wrappers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs#L177>`__
+
 * Algebraic data types
   - Always have a worker, with no unfolding
   - May or may not have a wrapper; see Note [The need for a wrapper]
@@ -89,6 +95,9 @@ Note [Data constructor workers and wrappers]
 
 Note [The need for a wrapper]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs#L205>`__
+
 Why might the wrapper have anything to do?  The full story is
 in wrapper_reqd in MkId.mkDataConRep.
 
@@ -103,13 +112,13 @@ in wrapper_reqd in MkId.mkDataConRep.
 * Equality constraints for GADTs
         data T a where { MkT :: a -> T [a] }
 
-.. code-block:: haskell
+::
 
   The worker gets a type with explicit equality
   constraints, thus:
         MkT :: forall a b. (a=[b]) => b -> T a
 
-.. code-block:: haskell
+::
 
   The wrapper has the programmer-specified type:
         \$wMkT :: a -> T [a]
@@ -124,19 +133,21 @@ in wrapper_reqd in MkId.mkDataConRep.
 
 
 
-
 Note [The stupid context]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs#L237>`__
+
 Data types can have a context:
 
-.. code-block:: haskell
+::
 
         data (Eq a, Ord b) => T a b = T1 a b | T2 a
 
 and that makes the constructors have a context too
 (notice that T2's context is "thinned"):
 
-.. code-block:: haskell
+::
 
         T1 :: (Eq a, Ord b) => a -> b -> T a b
         T2 :: (Eq a) => a -> T a b
@@ -153,7 +164,7 @@ I say the context is "stupid" because the dictionaries passed
 are immediately discarded -- they do nothing and have no benefit.
 It's a flaw in the language.
 
-.. code-block:: haskell
+::
 
         Up to now [March 2002] I have put this stupid context into the
         type of the "wrapper" constructors functions, T1 and T2, but
@@ -161,13 +172,13 @@ It's a flaw in the language.
         record update, and other functions that build values of type T
         (because they don't have suitable dictionaries available).
 
-.. code-block:: haskell
+::
 
         So now I've taken the stupid context out.  I simply deal with
         it separately in the type checker on occurrences of a
         constructor, either in an expression or in a pattern.
 
-.. code-block:: haskell
+::
 
         [May 2003: actually I think this decision could easily be
         reversed now, and probably should be.  Generics could be
@@ -181,7 +192,7 @@ what the "stupid context" is.  Consider
         C :: forall a. Ord a => a -> a -> T (Foo a)
 Does the C constructor in Core contain the Ord dictionary?  Yes, it must:
 
-.. code-block:: haskell
+::
 
         f :: T b -> Ordering
         f = /\b. \x:T b.
@@ -194,6 +205,9 @@ Note that (Foo a) might not be an instance of Ord.
 
 Note [TyVarBinders in DataCons]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs#L477>`__
+
 For the TyVarBinders in a DataCon and PatSyn:
 
  * Each argument flag is Inferred or Specified.
@@ -211,18 +225,20 @@ order in which TyVarBinders appear in a DataCon.
 
 
 Note [Existential coercion variables]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs#L493>`__
 
 For now (Aug 2018) we can't write coercion quantifications in source Haskell, but
 we can in Core. Consider having:
 
-.. code-block:: haskell
+::
 
   data T :: forall k. k -> k -> Constraint where
     MkT :: forall k (a::k) (b::k). forall k' (c::k') (co::k'~k). (b~(c|>co))
         => T k a b
 
-.. code-block:: haskell
+::
 
   dcUnivTyVars       = [k,a,b]
   dcExTyCoVars       = [k',c,co]
@@ -232,7 +248,7 @@ we can in Core. Consider having:
   dcOrigArgTys       = []
   dcRepTyCon         = T
 
-.. code-block:: haskell
+::
 
   Function call 'dataConKindEqSpec' returns [k'~k]
 
@@ -240,6 +256,9 @@ we can in Core. Consider having:
 
 Note [DataCon arities]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs#L513>`__
+
 dcSourceArity does not take constraints into account,
 but dcRepArity does.  For example:
    MkT :: Ord a => a -> T a
@@ -250,12 +269,15 @@ but dcRepArity does.  For example:
 
 Note [DataCon user type variable binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs#L521>`__
+
 In System FC, data constructor type signatures always quantify over all of
 their universal type variables, followed by their existential type variables.
 Normally, this isn't a problem, as most datatypes naturally quantify their type
 variables in this order anyway. For example:
 
-.. code-block:: haskell
+::
 
   data T a b = forall c. MkT b c
 
@@ -268,7 +290,7 @@ perfectly reasonable order to use, as the syntax of H98-style datatypes
 Things become more complicated when GADT syntax enters the picture. Consider
 this example:
 
-.. code-block:: haskell
+::
 
   data X a where
     MkX :: forall b a. b -> Proxy a -> X a
@@ -277,7 +299,7 @@ If we adopt the earlier approach of quantifying all the universal variables
 followed by all the existential ones, GHC would come up with this type
 signature for MkX:
 
-.. code-block:: haskell
+::
 
   MkX :: forall {k} (a :: k) (b :: *). b -> Proxy a -> X a
 
@@ -286,13 +308,13 @@ TypeApplications on MkX, they would expect to instantiate `b` before `a`,
 as that's the order in which they were written in the `forall`. (See #11721.)
 Instead, we'd like GHC to come up with this type signature:
 
-.. code-block:: haskell
+::
 
   MkX :: forall {k} (b :: *) (a :: k). b -> Proxy a -> X a
 
 In fact, even if we left off the explicit forall:
 
-.. code-block:: haskell
+::
 
   data X a where
     MkX :: b -> Proxy a -> X a
@@ -338,8 +360,12 @@ dataConUserType), and as a result, it's what matters from a TypeApplications
 perspective.
 
 
+
 Note [Bangs on data constructor arguments]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs#L719>`__
+
 Consider
   data T = MkT !Int {-# UNPACK #-} !Int Bool
 
@@ -379,13 +405,16 @@ Terminology:
 
 Note [Data con representation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/DataCon.hs#L756>`__
+
 The dcRepType field contains the type of the representation of a constructor
 This may differ from the type of the constructor *Id* (built
 by MkId.mkDataConId) for two reasons:
         a) the constructor Id may be overloaded, but the dictionary isn't stored
            e.g.    data Eq a => T a = MkT a a
 
-.. code-block:: haskell
+::
 
         b) the constructor may store an unboxed version of a strict field.
 
@@ -396,7 +425,4 @@ Here
 but the rep type is
         Trep :: Int# -> a -> T a
 Actually, the unboxed part isn't implemented yet!
-
-
-
 

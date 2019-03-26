@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/utils/ghc-pkg/Main.hs>`_
 
-====================
-utils/ghc-pkg/Main.hs.rst
-====================
+utils/ghc-pkg/Main.hs
+=====================
+
 
 Note [Recompute abi-depends]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/utils/ghc-pkg/Main.hs#L1289>`__
 
 Like most fields, `ghc-pkg` relies on who-ever is performing package
 registration to fill in fields; this includes the `abi-depends` field present
@@ -35,5 +37,4 @@ See #14381, and Cabal issue #4728.
 Additionally, because we are throwing away the original (declared) ABI deps, we
 return a boolean that indicates whether any abi-depends were actually
 overridden.
-
 

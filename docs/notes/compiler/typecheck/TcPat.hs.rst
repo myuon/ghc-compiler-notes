@@ -1,15 +1,18 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPat.hs>`_
 
-====================
-compiler/typecheck/TcPat.hs.rst
-====================
+compiler/typecheck/TcPat.hs
+===========================
+
 
 Note [Subsumption check at pattern variables]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPat.hs#L239>`__
+
 When we come across a variable with a type signature, we need to do a
 subsumption, not equality, check against the context type.  e.g.
 
-.. code-block:: haskell
+::
 
     data T = MkT (forall a. a->a)
       f :: forall b. [b]->[b]
@@ -22,9 +25,11 @@ to witness the instantiation.
 
 
 
-
 Note [Nesting]
 ~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPat.hs#L260>`__
+
 tcPat takes a "thing inside" over which the pattern scopes.  This is partly
 so that tcPat can extend the environment for the thing_inside, but also
 so that constraints arising in the thing_inside can be discharged by the
@@ -36,17 +41,21 @@ Hence the getErrCtxt/setErrCtxt stuff in tcMultiple
 ------------------
 
 
+
 Note [NPlusK patterns]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPat.hs#L544>`__
+
 From
 
-.. code-block:: haskell
+::
 
   case v of x + 5 -> blah
 
 we get
 
-.. code-block:: haskell
+::
 
   if v >= 5 then (\x -> blah) (v - 5) else ...
 
@@ -68,8 +77,12 @@ AST is used for the subtraction operation.
 See Note [NPlusK patterns]
 
 
+
 Note [Hopping the LIE in lazy patterns]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPat.hs#L620>`__
+
 In a lazy pattern, we must *not* discharge constraints from the RHS
 from dictionaries bound in the pattern.  E.g.
         f ~(C x) = 3
@@ -92,9 +105,11 @@ because they won't be in scope when we do the desugaring
 
 
 
-
 Note [Matching constructor patterns]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPat.hs#L930>`__
+
 Suppose (coi, tys) = matchExpectedConType data_tc pat_ty
 
  * In the simple case, pat_ty = tc tys
@@ -111,22 +126,26 @@ Suppose (coi, tys) = matchExpectedConType data_tc pat_ty
               data T7 p q = A p | B q
               axiom coT7 p q :: T (p,q) ~ T7 p q
 
-.. code-block:: haskell
+::
 
        So if pat_ty = T (ty1,ty2), we return (coi, [ty1,ty2]) such that
            coi = coi2 . coi1 : T7 t ~ pat_ty
            coi1 : T (ty1,ty2) ~ pat_ty
            coi2 : T7 ty1 ty2 ~ T (ty1,ty2)
 
-.. code-block:: haskell
+::
 
    For families we do all this matching here, not in the unifier,
    because we never want a whisper of the data_tycon to appear in
    error messages; it's a purely internal thing
 
 
+
 Note [Arrows and patterns]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPat.hs#L1048>`__
+
 (Oct 07) Arrow notation has the odd property that it involves
 "holes in the scope". For example:
   expr :: Arrow a => a () Int
@@ -153,6 +172,9 @@ simplification step.
 
 Note [Existential check]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPat.hs#L1139>`__
+
 Lazy patterns can't bind existentials.  They arise in two ways:
   * Let bindings      let { C a b = e } in b
   * Twiddle patterns  f ~(C a b) = e

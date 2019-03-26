@@ -1,20 +1,23 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/template-haskell/Language/Haskell/TH/Syntax.hs>`_
 
-====================
-libraries/template-haskell/Language/Haskell/TH/Syntax.hs.rst
-====================
+libraries/template-haskell/Language/Haskell/TH/Syntax.hs
+========================================================
+
 
 Note [Role of TExp]
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/template-haskell/Language/Haskell/TH/Syntax.hs#L255>`__
+
 TExp's argument must have a nominal role, not phantom as would
 be inferred (#8459).  Consider
 
-.. code-block:: haskell
+::
 
   e :: TExp Age
   e = MkAge 3
 
-.. code-block:: haskell
+::
 
   foo = $(coerce e) + 4::Int
 
@@ -23,23 +26,31 @@ The splice will evaluate to (MkAge 3) and you can't add that to
  Packaged versions for the programmer, hiding the Quasi-ness
 
 
+
 Note [Name lookup]
 ~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/template-haskell/Language/Haskell/TH/Syntax.hs#L342>`__
+
+
+
 
 Note [Data for non-algebraic types]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/template-haskell/Language/Haskell/TH/Syntax.hs#L897>`__
+
 Class Data was originally intended for algebraic data types.  But
 it is possible to use it for abstract types too.  For example, in
 package `text` we find
 
-.. code-block:: haskell
+::
 
   instance Data Text where
     ...
     toConstr _ = packConstr
 
-.. code-block:: haskell
+::
 
   packConstr :: Constr
   packConstr = mkConstr textDataType "pack" [] Prefix
@@ -56,15 +67,21 @@ function.  Two complications
   to assume it's defined in the same module as the TyCon itself.
   But nothing enforces that; #12596 shows what goes wrong if
   "pack" is defined in a different module than the data type "Text".
-  
+
 
 
 Note [Unresolved infix]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/template-haskell/Language/Haskell/TH/Syntax.hs#L1543>`__
+
+
+
 
 Note [GADT return type]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/template-haskell/Language/Haskell/TH/Syntax.hs#L2061>`__
 
 The return type of a GADT constructor does not necessarily match the name of
 the data type:
@@ -92,8 +109,12 @@ That is why we allow the return type stored by a constructor to be an
 arbitrary type. See also #11341
 
 
+
 Note [Representing concrete syntax in types]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/template-haskell/Language/Haskell/TH/Syntax.hs#L2192>`__
+
 Haskell has a rich concrete syntax for types, including
   t1 -> t2, (t1,t2), [t], and so on
 In TH we represent all of this using AppT, with a distinguished

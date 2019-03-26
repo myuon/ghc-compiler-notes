@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsUtils.hs>`_
 
-====================
-compiler/deSugar/DsUtils.hs.rst
-====================
+compiler/deSugar/DsUtils.hs
+===========================
+
 
 Note [Localise pattern binders]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsUtils.hs#L136>`__
+
 Consider     module M where
                [Just a] = e
 After renaming it looks like
@@ -47,6 +50,9 @@ See also Note [MatchIds] in Match.hs
 
 Note [mkSelectorBinds]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsUtils.hs#L531>`__
+
 mkSelectorBinds is used to desugar a pattern binding {p = e},
 in a binding group:
   let { ...; p = e; ... } in body
@@ -81,12 +87,12 @@ There are two cases.
            ; y = case t of (x,y) -> y }
        in t `seq` body
 
-.. code-block:: haskell
+::
 
   Note that we return 't' as the variable to force if the pattern
   is strict (i.e. with -XStrict or an outermost-bang-pattern)
 
-.. code-block:: haskell
+::
 
   Note that (A) /includes/ the situation where
 
@@ -124,7 +130,7 @@ There are two cases.
       t = case e of Just x -> Unit x
       x = case t of Unit x -> x
 
-.. code-block:: haskell
+::
 
     Again, forcing 't' will fail if 'e' yields Nothing.
 
@@ -133,7 +139,7 @@ work out well:
 
 * One binder, not -XStrict:
 
-.. code-block:: haskell
+::
 
     let Just (Just v) = e in body
   ==>
@@ -185,8 +191,12 @@ work out well:
   which is better.
 
 
+
 Note [Failure thunks and CPR]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsUtils.hs#L861>`__
+
 (This note predates join points as formal entities (hence the quotation marks).
 We can't use actual join points here (see above); if we did, this would also
 solve the CPR problem, since join points don't get CPR'd. See Note [Don't CPR
@@ -195,7 +205,7 @@ join points] in WorkWrap.)
 When we make a failure point we ensure that it
 does not look like a thunk. Example:
 
-.. code-block:: haskell
+::
 
    let fail = \rw -> error "urk"
    in case x of
@@ -212,9 +222,11 @@ the tail call property.  For example, see #3403.
 
 
 
-
 Note [decideBangHood]
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsUtils.hs#L912>`__
+
 With -XStrict we may make /outermost/ patterns more strict.
 E.g.
        let (Just x) = e in ...

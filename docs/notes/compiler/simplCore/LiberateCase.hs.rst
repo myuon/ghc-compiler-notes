@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs>`_
 
-====================
-compiler/simplCore/LiberateCase.hs.rst
-====================
+compiler/simplCore/LiberateCase.hs
+==================================
+
 
 Note [Scrutinee with cast]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs#L62>`__
+
 Consider this:
     f = \ t -> case (v `cast` co) of
                  V a b -> a : f t
@@ -42,9 +45,11 @@ and the level of @h@ is zero (NB not one).
 
 
 
-
 Note [Not bottoming Ids]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs#L164>`__
+
 Do not specialise error-functions (this is unusual, but I once saw it,
 (acually in Data.Typable.Internal)
 
@@ -52,15 +57,18 @@ Do not specialise error-functions (this is unusual, but I once saw it,
 
 Note [Only functions!]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs#L169>`__
+
 Consider the following code
 
-.. code-block:: haskell
+::
 
        f = g (case v of V a b -> a : t f)
 
 where g is expensive. If we aren't careful, liberate case will turn this into
 
-.. code-block:: haskell
+::
 
        f = g (case v of
                V a b -> a : t (letrec f = g (case v of V a b -> a : f t)
@@ -76,6 +84,9 @@ Solution: make sure that we only do the liberate-case thing on *functions*
 
 Note [Small enough]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs#L187>`__
+
 Consider
   \fv. letrec
          f = \x. BIG...(case fv of { (a,b) -> ...g.. })...
@@ -90,6 +101,9 @@ ask for the whole group to be small enough.
 
 Note [Need to localiseId in libCaseBind]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs#L199>`__
+
 The call to localiseId is needed for two subtle reasons
 (a)  Reset the export flags on the binders so
         that we don't get name clashes on exported things if the
@@ -105,8 +119,12 @@ Expressions
 ~~~~~~~~~~~
 
 
+
 Note [When to specialise]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs#L292>`__
+
 Consider
   f = \x. letrec g = \y. case x of
                            True  -> ... (f a) ...
@@ -131,6 +149,9 @@ Here the bind-level of 'x' (=1) is <= the bind-level of 'g' (=1).
 
 Note [Avoiding fruitless liberate-case]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/LiberateCase.hs#L314>`__
+
 Consider also:
   f = \x. case top_lvl_thing of
                 I# _ -> let g = \y. ... g ...
@@ -142,10 +163,8 @@ to 'g' because all the structure in its free variables is already
 visible at the definition site for g.  Hence, when considering specialising
 an occurrence of 'g', we want to check that there's a scruted-var v st
 
-.. code-block:: haskell
+::
 
    a) v's binding site is *outside* g
    b) v's scrutinisation site is *inside* g
-
-
 

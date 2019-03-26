@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/SysTools.hs>`_
 
-====================
-compiler/main/SysTools.hs.rst
-====================
+compiler/main/SysTools.hs
+=========================
+
 
 Note [How GHC finds toolchain utilities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/SysTools.hs#L62>`__
 
 SysTools.initSysProgs figures out exactly where all the auxiliary programs
 are, and initialises mutable variables to make it easy to call them.
@@ -14,7 +16,7 @@ file containing variables whose value is figured out by the build system.
 
 Config.hs contains two sorts of things
 
-.. code-block:: haskell
+::
 
   cGCC,         The *names* of the programs
   cCPP            e.g.  cGCC = gcc
@@ -22,7 +24,7 @@ Config.hs contains two sorts of things
   etc           They do *not* include paths
 
 
-.. code-block:: haskell
+::
 
   cUNLIT_DIR   The *path* to the directory containing unlit, split etc
   cSPLIT_DIR   *relative* to the root of the build tree,
@@ -56,6 +58,8 @@ stuff.
 
 Note [-Bsymbolic assumptions by GHC]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/SysTools.hs#L599>`__
 
 GHC has a few assumptions about interaction of relocations in NCG and linker:
 

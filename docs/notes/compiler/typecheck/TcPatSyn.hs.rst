@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs>`_
 
-====================
-compiler/typecheck/TcPatSyn.hs.rst
-====================
+compiler/typecheck/TcPatSyn.hs
+==============================
+
 
 Note [Pattern synonym error recovery]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L107>`__
+
 If type inference for a pattern synonym fails, we can't continue with
 the rest of tc_patsyn_finish, because we may get knock-on errors, or
 even a crash.  E.g. from
@@ -33,7 +36,10 @@ pattern.) But it'll do for now.
 
 
 Note [Remove redundant provided dicts]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L265>`__
+
 Recall that
    HRefl :: forall k1 k2 (a1:k1) (a2:k2). (k1 ~ k2, a1 ~ a2)
                                        => a1 :~~: a2
@@ -58,6 +64,9 @@ need one.  Agian mkMimimalWithSCs removes the redundant one.
 
 Note [Equality evidence in pattern synonyms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L287>`__
+
 Consider
   data X a where
      MkX :: Eq a => [a] -> X (Maybe a)
@@ -84,6 +93,9 @@ See also Note [Lift equality constaints when quantifying] in TcType
 
 Note [Coercions that escape]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L311>`__
+
 #14507 showed an example where the inferred type of the matcher
 for the pattern synonym was somethign like
    $mSO :: forall (r :: TYPE rep) kk (a :: k).
@@ -111,8 +123,12 @@ in the types of any of the arguments to the matcher.  The error message
 is not very helpful, but at least we don't get a Lint error.
 
 
+
 Note [The pattern-synonym signature splitting rule]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L452>`__
+
 Given a pattern signature, we must split
      the kind-generalised variables, and
      the implicitly-bound variables
@@ -127,7 +143,7 @@ into universal and existential.  The rule is this
 
 For example
 
-.. code-block:: haskell
+::
 
    pattern P :: () => b -> T a
    pattern P x = ...
@@ -135,7 +151,7 @@ For example
 Here 'a' is universal, and 'b' is existential.  But there is a wrinkle:
 how do we split the arg_tys from req_ty?  Consider
 
-.. code-block:: haskell
+::
 
    pattern Q :: () => b -> S c -> T a
    pattern Q x = ...
@@ -159,21 +175,23 @@ for example, in hs-boot file, we may need to think what to do...
 
 
 
-
 Note [Checking against a pattern signature]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L495>`__
+
 When checking the actual supplied pattern against the pattern synonym
 signature, we need to be quite careful.
 
 ----- Provided constraints
 Example
 
-.. code-block:: haskell
+::
 
     data T a where
       MkT :: Ord a => a -> T a
 
-.. code-block:: haskell
+::
 
     pattern P :: () => Eq a => a -> [T a]
     pattern P x = [MkT x]
@@ -188,12 +206,12 @@ And yes, (Eq a) is derivable from the (Ord a) bound by P's rhs.
 Unusually, we instantiate the existential tyvars of the pattern with
 *meta* type variables.  For example
 
-.. code-block:: haskell
+::
 
     data S where
       MkS :: Eq a => [a] -> S
 
-.. code-block:: haskell
+::
 
     pattern P :: () => Eq x => x -> S
     pattern P x <- MkS x
@@ -203,7 +221,7 @@ list inside it.  The client just thinks it's a type 'x'.  So we must
 unify x := [a] during type checking, and then use the instantiating type
 [a] (called ex_tys) when building the matcher.  In this case we'll get
 
-.. code-block:: haskell
+::
 
    $mP :: S -> (forall x. Ex x => x -> r) -> r -> r
    $mP x k = case x of
@@ -223,7 +241,7 @@ a pattern synonym.  What about the /building/ side?
   tcPatSynBuilderBind, by converting the pattern to an expression and
   typechecking it.
 
-.. code-block:: haskell
+::
 
   At one point, for ImplicitBidirectional I used TyVarTvs (instead of
   TauTvs) in tcCheckPatSynDecl.  But (a) strengthening the check here
@@ -235,8 +253,12 @@ a pattern synonym.  What about the /building/ side?
   a bad idea.
 
 
+
 Note [Builder for a bidirectional pattern synonym]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L1017>`__
+
 For a bidirectional pattern synonym we need to produce an /expression/
 that matches the supplied /pattern/, given values for the arguments
 of the pattern synonym.  For example
@@ -257,9 +279,11 @@ We can't always do this:
 
 
 
-
 Note [Redundant constraints for builder]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L1038>`__
+
 The builder can have redundant constraints, which are awkard to eliminate.
 Consider
    pattern P = Just 34
@@ -271,17 +295,20 @@ sig_warn_redundant to False.
 
 Note [As-patterns in pattern synonym definitions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L1053>`__
+
 The rationale for rejecting as-patterns in pattern synonym definitions
 is that an as-pattern would introduce nonindependent pattern synonym
 arguments, e.g. given a pattern synonym like:
 
-.. code-block:: haskell
+::
 
         pattern K x y = x@(Just y)
 
 one could write a nonsensical function like
 
-.. code-block:: haskell
+::
 
         f (K Nothing x) = ...
 
@@ -292,6 +319,9 @@ or
 
 Note [Type signatures and the builder expression]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L1068>`__
+
 Consider
    pattern L x = Left x :: Either [a] [b]
 
@@ -313,11 +343,13 @@ simply discard the signature.
 
 
 Note [Record PatSyn Desugaring]
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcPatSyn.hs#L1088>`__
+
 It is important that prov_theta comes before req_theta as this ordering is used
 when desugaring record pattern synonym updates.
 
 Any change to this ordering should make sure to change deSugar/DsExpr.hs if you
 want to avoid difficult to decipher core lint errors!
- 
 

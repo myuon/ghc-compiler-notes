@@ -1,14 +1,17 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmLayoutStack.hs>`_
 
-====================
-compiler/cmm/CmmLayoutStack.hs.rst
-====================
+compiler/cmm/CmmLayoutStack.hs
+==============================
+
 
 Note [Always false stack check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmLayoutStack.hs#L943>`__
+
 We can optimise stack checks of the form
 
-.. code-block:: haskell
+::
 
   if ((Sp + x) - y < SpLim) then .. else ..
 

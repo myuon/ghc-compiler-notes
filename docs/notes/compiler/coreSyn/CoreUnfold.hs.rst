@@ -1,18 +1,25 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs>`_
 
-====================
-compiler/coreSyn/CoreUnfold.hs.rst
-====================
+compiler/coreSyn/CoreUnfold.hs
+==============================
+
 
 Note [Top-level flag on inline rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L90>`__
+
 Slight hack: note that mk_inline_rules conservatively sets the
 top-level flag to True.  It gets set more accurately by the simplifier
 Simplify.simplUnfolding.
 
 
+
 Note [Specialising unfoldings]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L214>`__
+
 When we specialise a function for some given type-class arguments, we use
 specUnfolding to specialise its unfolding.  Some important points:
 
@@ -31,12 +38,12 @@ specUnfolding to specialise its unfolding.  Some important points:
   enough to inline at a call site. This happens with Control.Monad.liftM3,
   and can cause a lot more allocation as a result (nofib n-body shows this).
 
-.. code-block:: haskell
+::
 
   Moreover, keeping the INLINABLE thing isn't much help, because
   the specialised function (probaby) isn't overloaded any more.
 
-.. code-block:: haskell
+::
 
   Conclusion: drop the INLINEALE pragma.  In practice what this means is:
      if a stable unfolding has UnfoldingGuidance of UnfWhen,
@@ -47,21 +54,24 @@ specUnfolding to specialise its unfolding.  Some important points:
 
 
 Note [Honour INLINE on 0-ary bindings]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L243>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
    x = <expensive>
    {-# INLINE x #-}
 
-.. code-block:: haskell
+::
 
    f y = ...x...
 
 The semantics of an INLINE pragma is
 
-.. code-block:: haskell
+::
 
   inline x at every call site, provided it is saturated;
   that is, applied to at least as many arguments as appear
@@ -106,6 +116,9 @@ That's a problem for another day.
 
 Note [INLINE pragmas and boring contexts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L293>`__
+
 An INLINE pragma uses mkInlineUnfoldingWithArity to build the
 unfolding.  That sets the ug_boring_ok flag to False if the function
 is not tiny (inlineBoringOK), so that even INLINE functions are not
@@ -121,8 +134,12 @@ I'm a bit worried that it's possible for the same kind of problem
 to arise for non-0-ary functions too, but let's wait and see.
 
 
+
 Note [Occurrence analysis of unfoldings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L349>`__
+
 We do occurrence-analysis of unfoldings once and for all, when the
 unfolding is built, rather than each time we inline them.
 
@@ -146,11 +163,14 @@ see Note [No binder swap in unfoldings].
 
 Note [No binder swap in unfoldings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L370>`__
+
 The binder swap can temporarily violate Core Lint, by assinging
 a LocalId binding to a GlobalId. For example, if A.foo{r872}
 is a GlobalId with unique r872, then
 
-.. code-block:: haskell
+::
 
  case A.foo{r872} of bar {
    K x -> ...(A.foo{r872})...
@@ -158,7 +178,7 @@ is a GlobalId with unique r872, then
 
 gets transformed to
 
-.. code-block:: haskell
+::
 
   case A.foo{r872} of bar {
     K x -> let foo{r872} = bar
@@ -167,7 +187,7 @@ gets transformed to
 This is usually not a problem, because the simplifier will transform
 this to:
 
-.. code-block:: haskell
+::
 
   case A.foo{r872} of bar {
     K x -> ...(bar)...
@@ -184,6 +204,9 @@ See #16288 and #16296 for further plans.
 
 Note [Calculate unfolding guidance on the non-occ-anal'd expression]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L400>`__
+
 Notice that we give the non-occur-analysed expression to
 calcUnfoldingGuidance.  In some ways it'd be better to occur-analyse
 first; for example, sometimes during simplification, there's a large
@@ -207,9 +230,11 @@ let-bound things that are dead are usually caught by preInlineUnconditionally
 
 
 
-
 Note [Computing the size of an expression]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L498>`__
+
 The basic idea of sizeExpr is obvious enough: count nodes.  But getting the
 heuristics right has taken a long time.  Here's the basic strategy:
 
@@ -248,6 +273,9 @@ result of #4978.
 
 Note [Do not inline top-level bottoming functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L534>`__
+
 The FloatOut pass has gone to some trouble to float out calls to 'error'
 and similar friends.  See Note [Bottoming floats] in SetLevels.
 Do not re-inline them!  But we *do* still inline if they are very small
@@ -257,6 +285,9 @@ Do not re-inline them!  But we *do* still inline if they are very small
 
 Note [INLINE for small functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L541>`__
+
 Consider        {-# INLINE f #-}
                 f x = Just x
                 g y = f y
@@ -275,7 +306,7 @@ Things to note:
       x     --> g 3               -- NO
       x     --> Just v            -- NO
 
-.. code-block:: haskell
+::
 
     It's very important not to unconditionally replace a variable by
     a non-atomic term.
@@ -305,15 +336,19 @@ Things to note:
     every occurrence of x with (y +# z).  So we only do the
     unconditional-inline thing for *trivial* expressions.
 
-.. code-block:: haskell
+::
 
     NB: you might think that PostInlineUnconditionally would do this
     but it doesn't fire for top-level things; see SimplUtils
     Note [Top level and postInlineUnconditionally]
 
 
+
 Note [Constructor size and result discount]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L894>`__
+
 Treat a constructors application as size 10, regardless of how many
 arguments it has; we are keen to expose them (and we charge separately
 for their args).  We can't treat them as size zero, else we find that
@@ -337,6 +372,9 @@ terrible code bloat: see #6099.
 
 Note [Unboxed tuple size and result discount]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L915>`__
+
 However, unboxed tuples count as size zero. I found occasions where we had
         f x y z = case op# x y z of { s -> (# s, () #) }
 and f wasn't getting inlined.
@@ -356,6 +394,9 @@ didn't adopt the idea.
 
 Note [Function and non-function discounts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L932>`__
+
 We want a discount if the function is applied. A good example is
 monadic combinators with continuation arguments, where inlining is
 quite important.
@@ -377,9 +418,11 @@ Conclusion:
 
 
 
-
 Note [Literal integer size]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L954>`__
+
 Literal integers *can* be big (mkInteger [...coefficients...]), but
 need not be (S# n).  We just use an arbitrary big-ish constant here
 so that, in particular, we don't inline top-level defns like
@@ -390,8 +433,12 @@ that mention a literal Integer, because the float-out pass will float
 all those constants to top level.
 
 
+
 Note [addAltSize result discounts]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L995>`__
+
 When adding the size of alternatives, we *add* the result discounts
 too, rather than take the *maximum*.  For a multi-branch case, this
 gives a discount for each branch that returns a constructor, making us
@@ -403,6 +450,9 @@ binary sizes shrink significantly either.
 
 Note [Discounts and thresholds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1004>`__
+
 Constants for discounts and thesholds are defined in main/DynFlags,
 all of form ufXxxx.   They are:
 
@@ -437,9 +487,11 @@ ufVeryAggressive
 
 
 
-
 Note [Function applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1039>`__
+
 In a function application (f a b)
 
   - If 'f' is an argument to the function being analysed,
@@ -453,8 +505,12 @@ In a function application (f a b)
 Code for manipulating sizes
 
 
+
 Note [certainlyWillInline: be careful of thunks]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1169>`__
+
 Don't claim that thunks will certainly inline, because that risks work
 duplication.  Even if the work duplication is not great (eg is_cheap
 holds), it can make a big difference in an inner loop In #5623 we
@@ -466,6 +522,9 @@ was certainlyWillInline, so the addition got duplicated.
 
 Note [certainlyWillInline: INLINABLE]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1178>`__
+
 certainlyWillInline /must/ return Nothing for a large INLINABLE thing,
 even though we have a stable inlining, so that strictness w/w takes
 place.  It makes a big difference to efficiency, and the w/w pass knows
@@ -475,7 +534,10 @@ Note [Worker-wrapper for INLINABLE functions]
 
 
 Note [Unfold into lazy contexts], Note [RHS of lets]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1362>`__
+
 When the call is the argument of a function with a RULE, or the RHS of a let,
 we are a little bit keener to inline.  For example
      f y = (y,y,y)
@@ -492,11 +554,14 @@ So we treat the RHS of a let as not-totally-boring.
 
 Note [Unsaturated applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1376>`__
+
 When a call is not saturated, we *still* inline if one of the
 arguments has interesting structure.  That's sometimes very important.
 A good example is the Ord instance for Bool in Base:
 
-.. code-block:: haskell
+::
 
  Rec {
     $fOrdBool =GHC.Classes.D:Ord
@@ -504,7 +569,7 @@ A good example is the Ord instance for Bool in Base:
                  ...
                  $cmin_ajX
 
-.. code-block:: haskell
+::
 
     $cmin_ajX [Occ=LoopBreaker] :: Bool -> Bool -> Bool
     $cmin_ajX = GHC.Classes.$dmmin @ Bool $fOrdBool
@@ -512,7 +577,7 @@ A good example is the Ord instance for Bool in Base:
 
 But the defn of GHC.Classes.$dmmin is:
 
-.. code-block:: haskell
+::
 
   $dmmin :: forall a. GHC.Classes.Ord a => a -> a -> a
     {- Arity: 3, HasNoCafRefs, Strictness: SLL,
@@ -525,9 +590,11 @@ order to unravel the recursion.
 
 
 
-
 Note [Things to watch]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1404>`__
+
 *   { y = I# 3; x = y `cast` co; ...case (x `cast` co) of ... }
     Assume x is exported, so not inlined unconditionally.
     Then we want x to inline unconditionally; no reason for it
@@ -541,6 +608,9 @@ Note [Things to watch]
 
 Note [Inlining an InlineRule]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1415>`__
+
 An InlineRules is used for
   (a) programmer INLINE pragmas
   (b) inlinings from worker/wrapper
@@ -557,6 +627,9 @@ require saturation.
 
 Note [Nested functions]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1429>`__
+
 At one time we treated a call of a non-top-level function as
 "interesting" (regardless of how boring the context) in the hope
 that inlining it would eliminate the binding, and its allocation.
@@ -571,6 +644,9 @@ special case
 
 Note [Cast then apply]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1441>`__
+
 Consider
    myIndex = __inline_me ( (/\a. <blah>) |> co )
    co :: (forall a. a -> a) ~ (forall a. T a)
@@ -583,6 +659,9 @@ no value arguments.  The ValAppCtxt gives it enough incentive to inline.
 
 Note [Inlining in ArgCtxt]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1451>`__
+
 The condition (arity > 0) here is very important, because otherwise
 we end up inlining top-level stuff into useless places; eg
    x = I# 3#
@@ -645,7 +724,7 @@ However, watch out:
    important: in the NDP project, 'bar' generates a closure data
    structure rather than a list.
 
-.. code-block:: haskell
+::
 
    So the non-inlining of lone_variables should only apply if the
    unfolding is regarded as cheap; because that is when exprIsConApp_maybe
@@ -657,7 +736,7 @@ However, watch out:
         case $fMonadST @ RealWorld of { :DMonad a b c -> c }
    We had better inline that sucker!  The case won't see through it.
 
-.. code-block:: haskell
+::
 
    For now, I'm treating treating a variable applied to types
    in a *lazy* context "lone". The motivating example was
@@ -669,7 +748,10 @@ However, watch out:
 
 
 Note [Interaction of exprIsWorkFree and lone variables]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreUnfold.hs#L1532>`__
+
 The lone-variable test says "don't inline if a case expression
 scrutinises a lone variable whose unfolding is cheap".  It's very
 important that, under these circumstances, exprIsConApp_maybe
@@ -685,12 +767,10 @@ expression responds True to exprIsHNF, which is what sets is_value.
 
 This kind of thing can occur if you have
 
-.. code-block:: haskell
+::
 
         {-# INLINE foo #-}
         foo = let x = e in (x,x)
 
 which Roman did.
-
-
 

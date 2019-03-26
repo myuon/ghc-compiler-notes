@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs>`_
 
-====================
-compiler/typecheck/TcCanonical.hs.rst
-====================
+compiler/typecheck/TcCanonical.hs
+=================================
+
 
 Note [Canonicalization]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L58>`__
 
 Canonicalization converts a simple constraint to a canonical form. It is
 unary (i.e. treats individual constraints one at a time).
@@ -14,7 +16,7 @@ Constraints originating from user-written code come into being as
 CNonCanonicals (except for CHoleCans, arising from holes). We know nothing
 about these constraints. So, first:
 
-.. code-block:: haskell
+::
 
      Classify CNonCanoncal constraints, depending on whether they
      are equalities, class predicates, or other.
@@ -31,8 +33,12 @@ Top-level canonicalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
 Note [The superclass story]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L222>`__
+
 We need to add superclass constraints for two reasons:
 
 * For givens [G], they give us a route to proof.  E.g.
@@ -62,7 +68,7 @@ Givens and Wanteds. But:
 * (Major) if we want recursive superclasses, there would be an infinite
   number of them.  Here is a real-life example (#10318);
 
-.. code-block:: haskell
+::
 
      class (Frac (Frac a) ~ Frac a,
             Fractional (Frac a),
@@ -70,7 +76,7 @@ Givens and Wanteds. But:
          => IntegralDomain a where
       type Frac a :: *
 
-.. code-block:: haskell
+::
 
   Notice that IntegralDomain has an associated type Frac, and one
   of IntegralDomain's superclasses is another IntegralDomain constraint.
@@ -82,7 +88,7 @@ So here's the plan:
    This is done using mkStrictSuperClasses in canClassNC, when
    we take a non-canonical Given constraint and cannonicalise it.
 
-.. code-block:: haskell
+::
 
    However stop if you encounter the same class twice.  That is,
    mkStrictSuperClasses expands eagerly, but has a conservative
@@ -92,7 +98,7 @@ So here's the plan:
    superclasses for canonical CDictCans in solveSimpleGivens or
    solveSimpleWanteds; Note [Danger of adding superclasses during solving]
 
-.. code-block:: haskell
+::
 
    However, /do/ continue to eagerly expand superlasses for new /given/
    /non-canonical/ constraints (canClassNC does this).  As #12175
@@ -106,7 +112,7 @@ So here's the plan:
    superclasses again.  See the calls to expandSuperClasses in
    TcSimplify.simpl_loop and solveWanteds.
 
-.. code-block:: haskell
+::
 
    This may succeed in generating (a finite number of) extra Givens,
    and extra Deriveds. Both may help the proof.
@@ -144,6 +150,9 @@ as a CDictCan, we set the cc_pend_sc flag to False.
 
 Note [Superclass loops]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L321>`__
+
 Suppose we have
   class C a => D a
   class D a => C a
@@ -164,6 +173,9 @@ TcInteract.  So d3 dies a quick, happy death.
 
 Note [Eagerly expand given superclasses]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L339>`__
+
 In step (1) of Note [The superclass story], why do we eagerly expand
 Given superclasses by one layer?  (By "one layer" we mean expand transitively
 until you meet the same class again -- the conservative criterion embodied
@@ -171,11 +183,11 @@ in expandSuperClasses.  So a "layer" might be a whole stack of superclasses.)
 We do this eagerly for Givens mainly because of some very obscure
 cases like this:
 
-.. code-block:: haskell
+::
 
    instance Bad a => Eq (T a)
 
-.. code-block:: haskell
+::
 
    f :: (Ord (T a)) => blah
    f x = ....needs Eq (T a), Ord (T a)....
@@ -189,7 +201,7 @@ Note [Instance and Given overlap] in TcInteract.
 
 We also want to do this if we have
 
-.. code-block:: haskell
+::
 
    f :: F (T a) => blah
 
@@ -204,9 +216,12 @@ expansion for Givens happens in canClassNC.
 
 Note [Why adding superclasses can help]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L371>`__
+
 Examples of how adding superclasses can help:
 
-.. code-block:: haskell
+::
 
     --- Example 1
         class C a b | a -> b
@@ -215,7 +230,7 @@ Examples of how adding superclasses can help:
          [W] C a beta
     Then adding [D] beta~b will let us solve it.
 
-.. code-block:: haskell
+::
 
     -- Example 2 (similar but using a type-equality superclass)
         class (F a ~ b) => C a b
@@ -227,19 +242,19 @@ Examples of how adding superclasses can help:
          [D] F a ~ beta
     Now we get [D] beta ~ b, and can solve that.
 
-.. code-block:: haskell
+::
 
     -- Example (tcfail138)
       class L a b | a -> b
       class (G a, L a b) => C a b
 
-.. code-block:: haskell
+::
 
       instance C a b' => G (Maybe a)
       instance C a b  => C (Maybe a) a
       instance L (Maybe a) a
 
-.. code-block:: haskell
+::
 
     When solving the superclasses of the (C (Maybe a) a) instance, we get
       [G] C a b, and hance by superclasses, [G] G a, [G] L a b
@@ -255,9 +270,12 @@ Examples of how adding superclasses can help:
 
 Note [Danger of adding superclasses during solving]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L410>`__
+
 Here's a serious, but now out-dated example, from #4497:
 
-.. code-block:: haskell
+::
 
    class Num (RealOf t) => Normed t
    type family RealOf x
@@ -281,11 +299,14 @@ happen.
 
 Mind you, now that Wanteds cannot rewrite Derived, I think this particular
 situation can't happen.
-  
+
 
 
 Note [Equality superclasses in quantified constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L583>`__
+
 Consider (#15359, #15593, #15625)
   f :: (forall a. theta => a ~ b) => stuff
 
@@ -322,16 +343,18 @@ See also Note [Evidence for quantified constraints] in Type.
 
 
 
-
 Note [Quantified constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L657>`__
+
 The -XQuantifiedConstraints extension allows type-class contexts like this:
 
-.. code-block:: haskell
+::
 
   data Rose f x = Rose x (f (Rose f x))
 
-.. code-block:: haskell
+::
 
   instance (Eq a, forall b. Eq b => Eq (f b))
         => Eq (Rose f a)  where
@@ -400,8 +423,12 @@ type signature.
 Note that we implement
 
 
+
 Note [Solving a Wanted forall-constraint]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L785>`__
+
 Solving a wanted forall (quantified) constraint
   [W] df :: forall ab. (Eq a, Ord b) => C x a b
 is delightfully easy.   Just build an implication constraint
@@ -415,6 +442,9 @@ All the machinery is to hand; there is little to do.
 
 Note [Solving a Given forall-constraint]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L796>`__
+
 For a Given constraint
   [G] df :: forall ab. (Eq a, Ord b) => C x a b
 we just add it to TcS's local InstEnv of known instances,
@@ -423,9 +453,11 @@ we'll find a match in the InstEnv.
 
 
 
-
 Note [Canonicalising equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L811>`__
+
 In order to canonicalise an equality, we look at the structure of the
 two types at hand, looking for similarities. A difficulty is that the
 types may look dissimilar before flattening but similar after flattening.
@@ -439,14 +471,16 @@ is flattened, but this is left as future work. (Mar '15)
 
 
 
-
 Note [FunTy and decomposing tycon applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L825>`__
+
 When can_eq_nc' attempts to decompose a tycon application we haven't yet zonked.
 This means that we may very well have a FunTy containing a type of some unknown
 kind. For instance, we may have,
 
-.. code-block:: haskell
+::
 
     FunTy (a :: k) Int
 
@@ -460,8 +494,12 @@ Zonking should fill the variable k, meaning that decomposition will succeed the
 second time around.
 
 
+
 Note [Unsolved equalities]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L961>`__
+
 If we have an unsolved equality like
   (a b ~R# Int)
 that is not necessarily insoluble!  Maybe 'a' will turn out to be a newtype.
@@ -470,18 +508,22 @@ Missing this point is what caused #15431
 -------------------------------
 
 
+
 Note [Newtypes can blow the stack]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1203>`__
+
 Suppose we have
 
-.. code-block:: haskell
+::
 
   newtype X = MkX (Int -> X)
   newtype Y = MkY (Int -> Y)
 
 and now wish to prove
 
-.. code-block:: haskell
+::
 
   [W] X ~R Y
 
@@ -496,15 +538,18 @@ though, because we check our depth when unwrapping newtypes.
 
 Note [Eager reflexivity check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1221>`__
+
 Suppose we have
 
-.. code-block:: haskell
+::
 
   newtype X = MkX (Int -> X)
 
 and
 
-.. code-block:: haskell
+::
 
   [W] X ~R X
 
@@ -529,13 +574,17 @@ E.] am worried that it would slow down the common case.)
 ----------------------
 
 
+
 Note [Use canEqFailure in canDecomposableTyConApp]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1391>`__
+
 We must use canEqFailure, not canEqHardFailure here, because there is
 the possibility of success if working with a representational equality.
 Here is one case:
 
-.. code-block:: haskell
+::
 
   type family TF a where TF Char = Bool
   data family DF a
@@ -547,7 +596,7 @@ that `a` is, in fact, Char, and then the equality succeeds.
 
 Here is another case:
 
-.. code-block:: haskell
+::
 
   [G] Age ~R Int
 
@@ -556,11 +605,11 @@ an "inaccessible code" error in the context of this Given!
 
 For example, see typecheck/should_compile/T10493, repeated here:
 
-.. code-block:: haskell
+::
 
   import Data.Ord (Down)  -- no constructor
 
-.. code-block:: haskell
+::
 
   foo :: Coercible (Down Int) Int => Down Int -> Int
   foo = coerce
@@ -572,6 +621,9 @@ canEqHardFailure.
 
 Note [Decomposing equality]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1422>`__
+
 If we have a constraint (of any flavour and role) that looks like
 T tys1 ~ T tys2, what can we conclude about tys1 and tys2? The answer,
 of course, is "it depends". This Note spells it all out.
@@ -663,6 +715,9 @@ and the MAYBE entries above.
 
 Note [Decomposing newtypes at representational role]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1511>`__
+
 This note discusses the 'newtype' line in the REPRESENTATIONAL table
 in Note [Decomposing equality]. (At nominal role, newtypes are fully
 decomposable.)
@@ -670,7 +725,7 @@ decomposable.)
 Here is a representative example of why representational equality over
 newtypes is tricky:
 
-.. code-block:: haskell
+::
 
   newtype Nt a = Mk Bool         -- NB: a is not used in the RHS,
   type role Nt representational  -- but the user gives it an R role anyway
@@ -679,12 +734,12 @@ If we have [W] Nt alpha ~R Nt beta, we *don't* want to decompose to
 [W] alpha ~R beta, because it's possible that alpha and beta aren't
 representationally equal. Here's another example.
 
-.. code-block:: haskell
+::
 
   newtype Nt a = MkNt (Id a)
   type family Id a where Id a = a
 
-.. code-block:: haskell
+::
 
   [W] Nt Int ~R Nt Age
 
@@ -712,11 +767,11 @@ that IO is a newtype.
 
 However we must be careful.  Consider
 
-.. code-block:: haskell
+::
 
   type role Nt representational
 
-.. code-block:: haskell
+::
 
   [G] Nt a ~R Nt b       (1)
   [W] NT alpha ~R Nt b   (2)
@@ -733,8 +788,12 @@ Conclusion:
     later solve it.
 
 
+
 Note [Decomposing TyConApps]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1655>`__
+
 If we see (T s1 t1 ~ T s2 t2), then we can just decompose to
   (s1 ~ s2, t1 ~ t2)
 and push those back into the work list.  But if
@@ -750,6 +809,9 @@ unifyWanted etc to short-cut that work.
 
 Note [Canonicalising type applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1668>`__
+
 Given (s1 t1) ~ ty2, how should we proceed?
 The simple things is to see if ty2 is of form (s2 t2), and
 decompose.  By this time s1 and s2 can't be saturated type
@@ -776,6 +838,9 @@ decompose it.
 
 Note [Make sure that insolubles are fully rewritten]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1692>`__
+
 When an equality fails, we still want to rewrite the equality
 all the way down, so that it accurately reflects
  (a) the mutable reference substitution in force at start of solving
@@ -788,16 +853,21 @@ that has in fact been substituted.
 
 
 Note [Do not decompose Given polytype equalities]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1703>`__
+
 Consider [G] (forall a. t1 ~ forall a. t2).  Can we decompose this?
 No -- what would the evidence look like?  So instead we simply discard
 this given evidence.
 
 
 
-
 Note [Combining insoluble constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1710>`__
+
 As this point we have an insoluble constraint, like Int~Bool.
 
  * If it is Wanted, delete it from the cache, so that subsequent
@@ -814,9 +884,12 @@ As this point we have an insoluble constraint, like Int~Bool.
 
 Note [No top-level newtypes on RHS of representational equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1724>`__
+
 Suppose we're in this situation:
 
-.. code-block:: haskell
+::
 
  work item:  [W] c1 : a ~R b
      inert:  [G] c2 : b ~R Id a
@@ -833,6 +906,9 @@ the tyvar check in can_eq_nc.
 
 Note [Occurs check error]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1739>`__
+
 If we have an occurs check error, are we necessarily hosed? Say our
 tyvar is tv1 and the type it appears in is xi2. Because xi2 is function
 free, then if we're computing w.r.t. nominal equality, then, yes, we're
@@ -851,6 +927,9 @@ See also #10715, which induced this addition.
 
 Note [canCFunEqCan]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L1755>`__
+
 Flattening the arguments to a type family can change the kind of the type
 family application. As an easy example, consider (Any k) where (k ~ Type)
 is in the inert set. The original (Any k :: k) becomes (Any Type :: Type).
@@ -870,8 +949,12 @@ though the coercion was homo-kinded, `kind_co` was not `Refl`, so we
 made a new (identical) CFunEqCan, and then the entire process repeated.
 
 
+
 Note [Canonical orientation for tyvar/tyvar equality constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L2047>`__
+
 When we have a ~ b where both 'a' and 'b' are TcTyVars, which way
 round should be oriented in the CTyEqCan?  The rules, implemented by
 canEqTyVarTyVar, are these
@@ -901,9 +984,12 @@ canEqTyVarTyVar, are these
 
 Note [Equalities with incompatible kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L2074>`__
+
 What do we do when we have an equality
 
-.. code-block:: haskell
+::
 
   (tv :: k1) ~ (rhs :: k2)
 
@@ -914,27 +1000,27 @@ a tyvar will flatten its kind (Note [Flattening] in TcFlatten); flattening
 the kind might introduce a cast. So we might have a casted tyvar on the
 left. We thus revise our test case to
 
-.. code-block:: haskell
+::
 
   (tv |> co :: k1) ~ (rhs :: k2)
 
 We must proceed differently here depending on whether we have a Wanted
 or a Given. Consider this:
 
-.. code-block:: haskell
+::
 
  [W] w :: (alpha :: k) ~ (Int :: Type)
 
 where k is a skolem. One possible way forward is this:
 
-.. code-block:: haskell
+::
 
  [W] co :: k ~ Type
  [W] w :: (alpha :: k) ~ (Int |> sym co :: k)
 
 The next step will be to unify
 
-.. code-block:: haskell
+::
 
   alpha := Int |> sym co
 
@@ -947,7 +1033,7 @@ The reason for this odd behavior is much the same as
 Note [Wanteds do not rewrite Wanteds] in TcRnTypes: note that the
 new `co` is a Wanted.
 
-.. code-block:: haskell
+::
 
    The solution is then not to use `co` to "rewrite" -- that is, cast
    -- `w`, but instead to keep `w` heterogeneous and
@@ -983,6 +1069,9 @@ just like any other heterogeneous Wanted.
 
 Note [Type synonyms and canonicalization]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L2142>`__
+
 We treat type synonym applications as xi types, that is, they do not
 count as type function applications.  However, we do need to be a bit
 careful with type synonyms: like type functions they may not be
@@ -1001,27 +1090,27 @@ of type application on the other, we simply must expand out the type
 synonyms in order to continue decomposing the equality constraint into
 primitive equality constraints.  For example, suppose we have
 
-.. code-block:: haskell
+::
 
   type F a = [Int]
 
 and we encounter the equality
 
-.. code-block:: haskell
+::
 
   F a ~ [b]
 
 In order to continue we must expand F a into [Int], giving us the
 equality
 
-.. code-block:: haskell
+::
 
   [Int] ~ [b]
 
 which we can then decompose into the more primitive equality
 constraint
 
-.. code-block:: haskell
+::
 
   Int ~ b.
 
@@ -1035,6 +1124,9 @@ as possible.  Hence the ps_ty1, ps_ty2 argument passed to canEqTyVar.
 
 Note [Rewriting with Refl]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L2251>`__
+
 If the coercion is just reflexivity then you may re-use the same
 variable.  But be careful!  Although the coercion is Refl, new_pred
 may reflect the result of unification alpha := ty, so new_pred might
@@ -1043,11 +1135,14 @@ using new_pred.
 
 qThe flattener preserves type synonyms, so they should appear in new_pred
 as well as in old_pred; that is important for good error messages.
- 
+
 
 
 Note [unifyWanted and unifyDerived]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcCanonical.hs#L2358>`__
+
 When decomposing equalities we often create new wanted constraints for
 (s ~ t).  But what if s=t?  Then it'd be faster to return Refl right away.
 Similar remarks apply for Derived.

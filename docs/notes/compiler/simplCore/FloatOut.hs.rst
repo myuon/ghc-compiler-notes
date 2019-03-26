@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatOut.hs>`_
 
-====================
-compiler/simplCore/FloatOut.hs.rst
-====================
+compiler/simplCore/FloatOut.hs
+==============================
+
 
 Note [Join points]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatOut.hs#L111>`__
+
 Every occurrence of a join point must be a tail call (see Note [Invariants on
 join points] in CoreSyn), so we must be careful with how far we float them. The
 mechanism for doing so is the *join ceiling*, detailed in Note [Join ceiling]
@@ -13,7 +16,7 @@ in SetLevels. For us, the significance is that a binder might be marked to be
 dropped at the nearest boundary between tail calls and non-tail calls. For
 example:
 
-.. code-block:: haskell
+::
 
   (< join j = ... in
      let x = < ... > in
@@ -32,7 +35,7 @@ other benefit of floating is making RHSes small, and this can have a significant
 impact. In particular, stream fusion has been known to produce nested loops like
 this:
 
-.. code-block:: haskell
+::
 
   joinrec j1 x1 =
     joinrec j2 x2 =
@@ -47,7 +50,7 @@ Here j1 and j2 are wholly superfluous---each of them merely forwards its
 argument to j3. Since j3 only refers to x3, we can float j2 and j3 to make
 everything one big mutual recursion:
 
-.. code-block:: haskell
+::
 
   joinrec j1 x1 = jump j2 x1
           j2 x2 = jump j3 x2
@@ -61,6 +64,9 @@ Without floating, we're stuck with three loops instead of one.
 
 Note [Floating out of Rec rhss]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatOut.hs#L296>`__
+
 Consider   Rec { f<1,0> = \xy. body }
 From the body we may get some floats. The ones with level <1,0> must
 stay here, since they may mention f.  Ideally we'd like to make them
@@ -89,7 +95,7 @@ calls, so we can safely pull them out and keep them non-recursive.
 The case that came up in testing was that f *and* the unlifted binding were
 getting floated *to the same place*:
 
-.. code-block:: haskell
+::
 
   \x<2,0> ->
     ... <3,0>
@@ -111,6 +117,9 @@ important.)
 
 Note [floatBind for top level]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatOut.hs#L342>`__
+
 We may have a *nested* binding whose destination level is (FloatMe tOP_LEVEL), thus
          letrec { foo <0,0> = .... (let bar<0,0> = .. in ..) .... }
 The binding for bar will be in the "tops" part of the floating binds,
@@ -127,22 +136,25 @@ but this case works just as well.
 ************************************************************************
 
 
+
 Note [Floating past breakpoints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatOut.hs#L372>`__
 
 We used to disallow floating out of breakpoint ticks (see #10052). However, I
 think this is too restrictive.
 
 Consider the case of an expression scoped over by a breakpoint tick,
 
-.. code-block:: haskell
+::
 
   tick<...> (let x = ... in f x)
 
 In this case it is completely legal to float out x, despite the fact that
 breakpoint ticks are scoped,
 
-.. code-block:: haskell
+::
 
   let x = ... in (tick<...>  f x)
 
@@ -153,6 +165,9 @@ expression is entered since the tick still scopes over the RHS.
 
 Note [Avoiding unnecessary floating]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatOut.hs#L508>`__
+
 In general we want to avoid floating a let unnecessarily, because
 it might worsen strictness:
     let
@@ -194,6 +209,9 @@ So now we do the partition right at the (Let..) itself.
 
 Note [Representation of FloatBinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatOut.hs#L588>`__
+
 The FloatBinds types is somewhat important.  We can get very large numbers
 of floating bindings, often all destined for the top level.  A typical example
 is     x = [4,2,5,2,5, .... ]

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcBackpack.hs>`_
 
-====================
-compiler/typecheck/TcBackpack.hs.rst
-====================
+compiler/typecheck/TcBackpack.hs
+================================
+
 
 Note [Error reporting bad reexport]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcBackpack.hs#L177>`__
+
 NB: You want to be a bit careful about what location you report on reexports.
 If the name was declared in the hsig file, 'nameSrcSpan name' is indeed the
 correct source location.  However, if it was *reexported*, obviously the name
@@ -13,8 +16,12 @@ is not going to have the right location.  In this case, we need to grovel in
 tcg_rn_exports to figure out where the reexport came from.
 
 
+
 Note [Blank hsigs for all requirements]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcBackpack.hs#L410>`__
+
 One invariant that a client of GHC must uphold is that there
 must be an hsig file for every requirement (according to
 @-this-unit-id@); this ensures that for every interface
@@ -32,9 +39,13 @@ inheritedSigPvpWarning =
           "library of its own and add that library as a dependency."
 
 
+
 Note [Handling never-exported TyThings under Backpack]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  DEFINITION: A "never-exported TyThing" is a TyThing whose 'Name' will
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcBackpack.hs#L431>`__
+
+DEFINITION: A "never-exported TyThing" is a TyThing whose 'Name' will
   never be mentioned in the export list of a module (mi_avails).
   Unlike implicit TyThings (Note [Implicit TyThings]), non-exported
   TyThings DO have a standalone IfaceDecl declaration in their
@@ -58,14 +69,14 @@ we need to watch out for:
    non-exported DFunId.  In this case, 'checkBootDeclM' directly compares the
    embedded 'DFunId' in 'is_dfun'.
 
-.. code-block:: haskell
+::
 
    For this to work at all, we must ensure that pointers in 'is_dfun' refer
    to DISTINCT 'DFunId's, even though the 'Name's (may) be the same.
    Unfortunately, this is the OPPOSITE of how we treat most other references
    to 'Name's, so this case needs to be handled specially.
 
-.. code-block:: haskell
+::
 
    The details are in the documentation for 'typecheckIfacesForMerging'.
    and the Note [Resolving never-exported Names in TcIface].
@@ -77,7 +88,7 @@ we need to watch out for:
    *consistently*, so that 'typecheckIfacesForMerging' can wire them
    up as needed.
 
-.. code-block:: haskell
+::
 
    The details are in Note [rnIfaceNeverExported] in 'RnModIface'.
 

@@ -1,26 +1,29 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnFixity.hs>`_
 
-====================
-compiler/rename/RnFixity.hs.rst
-====================
+compiler/rename/RnFixity.hs
+===========================
+
 
 Note [Fixity signature lookup]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnFixity.hs#L40>`__
+
 A fixity declaration like
 
-.. code-block:: haskell
+::
 
     infixr 2 ?
 
 can refer to a value-level operator, e.g.:
 
-.. code-block:: haskell
+::
 
     (?) :: String -> String -> String
 
 or a type-level operator, like:
 
-.. code-block:: haskell
+::
 
     data (?) a b = A a | B b
 

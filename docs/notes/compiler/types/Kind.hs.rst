@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Kind.hs>`_
 
-====================
-compiler/types/Kind.hs.rst
-====================
+compiler/types/Kind.hs
+======================
+
 
 Note [Kind Constraint and kind Type]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Kind.hs#L37>`__
+
 The kind Constraint is the kind of classes and other type constraints.
 The special thing about types of kind Constraint is that
  * They are displayed with double arrow:

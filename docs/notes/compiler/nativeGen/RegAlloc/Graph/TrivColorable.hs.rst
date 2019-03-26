@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs>`_
 
-====================
-compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs.rst
-====================
+compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs
+==================================================
+
 
 Note [accSqueeze]
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs#L70>`__
+
 BL 2007/09
 Doing a nice fold over the UniqSet makes trivColorable use
 32% of total compile time and 42% of total alloc when compiling SHA1.hs from darcs.

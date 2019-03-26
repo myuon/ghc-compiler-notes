@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Literal.hs>`_
 
-====================
-compiler/basicTypes/Literal.hs.rst
-====================
+compiler/basicTypes/Literal.hs
+==============================
+
 
 Note [Integer literals]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Literal.hs#L170>`__
+
 An Integer literal is represented using, well, an Integer, to make it
 easier to write RULEs for them. They also contain the Integer type, so
 that e.g. literalType can return the right Type for them.
@@ -25,12 +28,17 @@ in TcIface.
 
 Note [Natural literals]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Literal.hs#L187>`__
+
 Similar to Integer literals.
 
 
 
 Note [String literals]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Literal.hs#L191>`__
 
 String literals are UTF-8 encoded and stored into ByteStrings in the following
 ASTs: Haskell, Core, Stg, Cmm. TH can also emit ByteString based string literals
@@ -46,7 +54,10 @@ for more details.
 
 
 Note [Word/Int underflow/overflow]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Literal.hs#L290>`__
+
 According to the Haskell Report 2010 (Sections 18.1 and 23.1 about signed and
 unsigned integral types): "All arithmetic is performed modulo 2^n, where n is
 the number of bits in the type."
@@ -63,8 +74,12 @@ doesn't yield a warning. Instead we simply squash the value into the *target*
 Int/Word range.
 
 
+
 Note [Printing of literals in Core]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Literal.hs#L744>`__
+
 The function `add_par` is used to wrap parenthesis around negative integers
 (`LitInteger`) and labels (`LitLabel`), if they occur in a context requiring
 an atomic thing (for example function application).
@@ -103,6 +118,9 @@ LitRubbish      "__RUBBISH"
 
 Note [Rubbish literals]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Literal.hs#L780>`__
+
 During worker/wrapper after demand analysis, where an argument
 is unused (absent) we do the following w/w split (supposing that
 y is absent):
@@ -149,13 +167,13 @@ Here are the moving parts:
   value. The important thing is that it is a heap pointer,
   which the garbage collector can follow if it encounters it.
 
-.. code-block:: haskell
+::
 
   We considered maintaining LitRubbish in STG, and lowering
   it in the code genreators, but it seems simpler to do it
   once and for all in CoreToSTG.
 
-.. code-block:: haskell
+::
 
   In ByteCodeAsm we just lower it as a 0 literal, because
   it's all boxed and lifted to the host GC anyway.

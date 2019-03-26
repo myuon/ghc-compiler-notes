@@ -1,16 +1,18 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenFunctor.hs>`_
 
-====================
-compiler/typecheck/TcGenFunctor.hs.rst
-====================
+compiler/typecheck/TcGenFunctor.hs
+==================================
+
 
 Note [Deriving null]
 ~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenFunctor.hs#L609>`__
+
 In some cases, deriving the definition of 'null' can produce much better
 results than the default definition. For example, with
 
-.. code-block:: haskell
+::
 
   data SnocList a = Nil | Snoc (SnocList a) a
 
@@ -21,37 +23,37 @@ so 'null' can return False immediately if it matches on Snoc. When we
 derive 'null', we keep track of things that cannot be null. The interesting
 case is type application. Given
 
-.. code-block:: haskell
+::
 
   data Wrap a = Wrap (Foo (Bar a))
 
 we use
 
-.. code-block:: haskell
+::
 
   null (Wrap fba) = all null fba
 
 but if we see
 
-.. code-block:: haskell
+::
 
   data Wrap a = Wrap (Foo a)
 
 we can just use
 
-.. code-block:: haskell
+::
 
   null (Wrap fa) = null fa
 
 Indeed, we allow this to happen even for tuples:
 
-.. code-block:: haskell
+::
 
   data Wrap a = Wrap (Foo (a, Int))
 
 produces
 
-.. code-block:: haskell
+::
 
   null (Wrap fa) = null fa
 
@@ -60,12 +62,16 @@ could surprise users if they switch to other types, but Ryan Scott seems to
 think it's okay to do it for now.
 
 
+
 Note [DeriveFoldable with ExistentialQuantification]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenFunctor.hs#L983>`__
+
 Functor and Traversable instances can only be derived for data types whose
 last type parameter is truly universally polymorphic. For example:
 
-.. code-block:: haskell
+::
 
   data T a b where
     T1 ::                 b   -> T a b   -- YES, b is unconstrained
@@ -80,7 +86,7 @@ For Foldable instances, however, we can completely lift the constraint that
 the last type parameter be truly universally polymorphic. This means that T
 (as defined above) can have a derived Foldable instance:
 
-.. code-block:: haskell
+::
 
   instance Foldable (T a) where
     foldr f z (T1 b)   = f b z
@@ -90,7 +96,7 @@ the last type parameter be truly universally polymorphic. This means that T
     foldr f z (T5 a b) = f b z
     foldr f z (T6 a)   = z
 
-.. code-block:: haskell
+::
 
     foldMap f (T1 b)   = f b
     foldMap f (T2 b)   = f b
@@ -104,7 +110,7 @@ parameter that is not truly universally polymorphic. However, there is a bit
 of subtlety in determining what is actually an occurrence of a type parameter.
 T3 and T4, as defined above, provide one example:
 
-.. code-block:: haskell
+::
 
   data T a b where
     ...
@@ -112,7 +118,7 @@ T3 and T4, as defined above, provide one example:
     T4 ::            Int -> T a Int
     ...
 
-.. code-block:: haskell
+::
 
   instance Foldable (T a) where
     ...
@@ -131,7 +137,7 @@ particular data constructor. See foldDataConArgs for how this is implemented.
 As another example, consider the following data type. The argument of each
 constructor has the same type as the last type parameter:
 
-.. code-block:: haskell
+::
 
   data E a where
     E1 :: (a ~ Int) => a   -> E a
@@ -151,6 +157,9 @@ for a more in-depth explanation.
 
 Note [FFoldType and functorLikeTraverse]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenFunctor.hs#L1058>`__
+
 Deriving Functor, Foldable, and Traversable all require generating expressions
 which perform an operation on each argument of a data constructor depending
 on the argument's type. In particular, a generated operation can be different
@@ -190,7 +199,7 @@ a is the last type variable in a given datatype):
               did, it would fall under ft_bad_app). The Type argument to
               ft_ty_app represents the applied type.
 
-.. code-block:: haskell
+::
 
               Note that functions, tuples, and foralls are distinct cases
               and take precedence of ft_ty_app. (For example, (Int -> a) would
@@ -226,18 +235,21 @@ uses foldDataConArgs. See Note [degenerate use of FFoldType] in TcGenGenerics.
 
 Note [Generated code for DeriveFoldable and DeriveTraversable]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenFunctor.hs#L1129>`__
+
 We adapt the algorithms for -XDeriveFoldable and -XDeriveTraversable based on
 that of -XDeriveFunctor. However, there an important difference between deriving
 the former two typeclasses and the latter one, which is best illustrated by the
 following scenario:
 
-.. code-block:: haskell
+::
 
   data WithInt a = WithInt a Int# deriving (Functor, Foldable, Traversable)
 
 The generated code for the Functor instance is straightforward:
 
-.. code-block:: haskell
+::
 
   instance Functor WithInt where
     fmap f (WithInt a i) = WithInt (f a) i
@@ -245,12 +257,12 @@ The generated code for the Functor instance is straightforward:
 But if we use too similar of a strategy for deriving the Foldable and
 Traversable instances, we end up with this code:
 
-.. code-block:: haskell
+::
 
   instance Foldable WithInt where
     foldMap f (WithInt a i) = f a <> mempty
 
-.. code-block:: haskell
+::
 
   instance Traversable WithInt where
     traverse f (WithInt a i) = fmap WithInt (f a) <*> pure i
@@ -285,19 +297,19 @@ as follows:
      do not mention the last type parameter. Note that [i, ..., k] is a
      strictly increasing—but not necessarily consecutive—integer sequence.
 
-.. code-block:: haskell
+::
 
      For example, the datatype
 
-.. code-block:: haskell
+::
 
        data Foo a = Foo Int a Int a
 
-.. code-block:: haskell
+::
 
      would generate the following Traversable instance:
 
-.. code-block:: haskell
+::
 
        instance Traversable Foo where
          traverse f (Foo a1 a2 a3 a4) =
@@ -312,27 +324,27 @@ decide not to do so because:
 2. There would be certain datatypes for which the above strategy would
    generate Functor code that would fail to typecheck. For example:
 
-.. code-block:: haskell
+::
 
      data Bar f a = Bar (forall f. Functor f => f a) deriving Functor
 
-.. code-block:: haskell
+::
 
    With the conventional algorithm, it would generate something like:
 
-.. code-block:: haskell
+::
 
      fmap f (Bar a) = Bar (fmap f a)
 
-.. code-block:: haskell
+::
 
    which typechecks. But with the strategy mentioned above, it would generate:
 
-.. code-block:: haskell
+::
 
      fmap f (Bar a) = (\b -> Bar b) (fmap f a)
 
-.. code-block:: haskell
+::
 
    which does not typecheck, since GHC cannot unify the rank-2 type variables
    in the types of b and (fmap f a).
@@ -342,10 +354,12 @@ decide not to do so because:
 Note [Phantom types with Functor, Foldable, and Traversable]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenFunctor.hs#L1214>`__
+
 Given a type F :: * -> * whose type argument has a phantom role, we can always
 produce lawful Functor and Traversable instances using
 
-.. code-block:: haskell
+::
 
     fmap _ = coerce
     traverse _ = pure . coerce
@@ -362,7 +376,7 @@ freedom in implementing it. At a minimum, we would like to ensure that
 a derived foldMap is always at least as good as foldMapDefault with a
 derived traverse. To accomplish that, we must define
 
-.. code-block:: haskell
+::
 
    foldMap _ _ = mempty
 
@@ -371,13 +385,13 @@ in these cases.
 This may have different strictness properties from a standard derivation.
 Consider
 
-.. code-block:: haskell
+::
 
    data NotAList a = Nil | Cons (NotAList a) deriving Foldable
 
 The usual deriving mechanism would produce
 
-.. code-block:: haskell
+::
 
    foldMap _ Nil = mempty
    foldMap f (Cons x) = foldMap f x
@@ -388,7 +402,7 @@ Final point: why do we even care about such types? Users will rarely if ever
 map, fold, or traverse over such things themselves, but other derived
 instances may:
 
-.. code-block:: haskell
+::
 
    data Hasn'tAList a = NotHere a (NotAList a) deriving Foldable
 
@@ -397,17 +411,19 @@ instances may:
 Note [EmptyDataDecls with Functor, Foldable, and Traversable]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcGenFunctor.hs#L1257>`__
+
 There are some slightly tricky decisions to make about how to handle
 Functor, Foldable, and Traversable instances for types with no constructors.
 For fmap, the two basic options are
 
-.. code-block:: haskell
+::
 
    fmap _ _ = error "Sorry, no constructors"
 
 or
 
-.. code-block:: haskell
+::
 
    fmap _ z = case z of
 
@@ -418,25 +434,25 @@ that exception than in the fact that there aren't any constructors.
 In order to match the semantics for phantoms (see note above), we need to
 be a bit careful about 'traverse'. The obvious definition would be
 
-.. code-block:: haskell
+::
 
    traverse _ z = case z of
 
 but this is stricter than the one for phantoms. We instead use
 
-.. code-block:: haskell
+::
 
    traverse _ z = pure $ case z of
 
 For foldMap, the obvious choices are
 
-.. code-block:: haskell
+::
 
    foldMap _ _ = mempty
 
 or
 
-.. code-block:: haskell
+::
 
    foldMap _ z = case z of
 

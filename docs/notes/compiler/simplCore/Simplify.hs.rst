@@ -1,14 +1,17 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs>`_
 
-====================
-compiler/simplCore/Simplify.hs.rst
-====================
+compiler/simplCore/Simplify.hs
+==============================
+
 
 Note [The big picture]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L64>`__
+
 The general shape of the simplifier is this:
 
-.. code-block:: haskell
+::
 
   simplExpr :: SimplEnv -> InExpr -> SimplCont -> SimplM (SimplFloats, OutExpr)
   simplBind :: SimplEnv -> InBind -> SimplM (SimplFloats, SimplEnv)
@@ -38,21 +41,23 @@ The general shape of the simplifier is this:
        There may be auxiliary bindings too; see prepareRhs
      - An environment suitable for simplifying the scope of the binding
 
-.. code-block:: haskell
+::
 
    The floats may also be empty, if the binding is inlined unconditionally;
    in that case the returned SimplEnv will have an augmented substitution.
 
-.. code-block:: haskell
+::
 
    The returned floats and env both have an in-scope set, and they are
    guaranteed to be the same.
 
 
 
-
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L103>`__
+
 The simplifier used to guarantee that the output had no shadowing, but
 it does not do so any more.   (Actually, it never did!)  The reason is
 documented with simplifyArgs.
@@ -62,7 +67,7 @@ Eta expansion
 ~~~~~~~~~~~~~~
 For eta expansion, we want to catch things like
 
-.. code-block:: haskell
+::
 
         case e of (a,b) -> \x -> case a of (p,q) -> \y -> r
 
@@ -75,6 +80,9 @@ expansion at a let RHS can concentrate solely on the PAP case.
 
 Note [Float coercions]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L462>`__
+
 When we find the binding
         x = e `cast` co
 we'd like to transform it to
@@ -84,12 +92,12 @@ There's a chance that e will be a constructor application or function, or someth
 like that, so moving the coercion to the usage site may well cancel the coercions
 and lead to further optimisation.  Example:
 
-.. code-block:: haskell
+::
 
      data family T a :: *
      data instance T Int = T Int
 
-.. code-block:: haskell
+::
 
      foo :: Int -> Int -> Int
      foo m n = ...
@@ -103,6 +111,9 @@ and lead to further optimisation.  Example:
 
 Note [Preserve strictness when floating coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L484>`__
+
 In the Note [Float coercions] transformation, keep the strictness info.
 Eg
         f = e `cast` co    -- f has strictness SSL
@@ -116,10 +127,13 @@ Its not wrong to drop it on the floor, but better to keep it.
 
 Note [Float coercions (unlifted)]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L495>`__
+
 BUT don't do [Float coercions] if 'e' has an unlifted type.
 This *can* happen:
 
-.. code-block:: haskell
+::
 
      foo :: Int = (error (# Int,Int #) "urk")
                   `cast` CoUnsafe (# Int,Int #) Int
@@ -133,8 +147,12 @@ These strange casts can happen as a result of case-of-case
                 (# p,q #) -> p+q
 
 
+
 Note [Trivial after prepareRhs]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L569>`__
+
 If we call makeTrival on (e |> co), the recursive use of prepareRhs
 may leave us with
    { a1 = e }  and   (a1 |> co)
@@ -144,10 +162,13 @@ Now the latter is trivial, so we don't want to let-bind it.
 
 Note [Cannot trivialise]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L576>`__
+
 Consider:
    f :: Int -> Addr#
 
-.. code-block:: haskell
+::
 
    foo :: Bar
    foo = Bar (f 3)
@@ -161,13 +182,13 @@ simplifier loop.  Better not to ANF-ise it at all.
 
 Literal strings are an exception.
 
-.. code-block:: haskell
+::
 
    foo = Ptr "blob"#
 
 We want to turn this into:
 
-.. code-block:: haskell
+::
 
    foo1 = "blob"#
    foo = Ptr foo1
@@ -177,7 +198,10 @@ See Note [CoreSyn top-level string literals] in CoreSyn.
 
 
 Note [Arity decrease]
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L708>`__
+
 Generally speaking the arity of a binding should not decrease.  But it *can*
 legitimately happen because of RULES.  Eg
         f = g Int
@@ -186,18 +210,18 @@ where g has arity 2, will have arity 2.  But if there's a rewrite rule
 where h has arity 1, then f's arity will decrease.  Here's a real-life example,
 which is in the output of Specialise:
 
-.. code-block:: haskell
+::
 
      Rec {
         $dm {Arity 2} = \d.\x. op d
         {-# RULES forall d. $dm Int d = $s$dm #-}
 
-.. code-block:: haskell
+::
 
         dInt = MkD .... opInt ...
         opInt {Arity 1} = $dm dInt
 
-.. code-block:: haskell
+::
 
         $s$dm {Arity 0} = \x. op dInt }
 
@@ -209,6 +233,9 @@ on specialised functions too.
 
 Note [Bottoming bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L731>`__
+
 Suppose we have
    let x = error "urk"
    in ...(case x of <alts>)...
@@ -230,7 +257,10 @@ This showed up in #12150; see comment:16.
 
 
 Note [Setting the demand info]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L751>`__
+
 If the unfolding is a value, the demand info may
 go pear-shaped, so we nuke it.  Example:
      let x = (a,b) in
@@ -247,9 +277,11 @@ The solution here is a bit ad hoc...
 
 
 
-
 Note [Avoiding space leaks in OutType]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L939>`__
+
 Since the simplifier is run for multiple iterations, we need to ensure
 that any thunks in the output of one simplifier iteration are forced
 by the evaluation of the next simplifier iteration. Otherwise we may
@@ -261,7 +293,7 @@ input Core program, because any expression may contain binders, which
 we must find in order to extend the SimplEnv accordingly. But types
 do not contain binders and so it is tempting to write things like
 
-.. code-block:: haskell
+::
 
     simplExpr env (Type ty) = return (Type (substTy env ty))   -- Bad!
 
@@ -273,7 +305,7 @@ line above is not strict in ty.
 So instead our strategy is for the simplifier to fully evaluate
 OutTypes when it emits them into the output Core program, for example
 
-.. code-block:: haskell
+::
 
     simplExpr env (Type ty) = do { ty' <- simplType env ty     -- Good
                                  ; return (Type ty') }
@@ -302,8 +334,12 @@ work. T5631 is a good example of this.
  (though this is unlikely). See Note [Case-of-case and join points].
 
 
+
 Note [Optimising reflexivity]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L1218>`__
+
 It's important (for compiler performance) to get rid of reflexivity as soon
 as it appears.  See #11735, #14737, and #15019.
 
@@ -330,8 +366,12 @@ In investigating this I saw missed opportunities for on-the-fly
 coercion shrinkage. See #15090.
 
 
+
 Note [Avoiding exponential behaviour]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L1461>`__
+
 One way in which we can get exponential behaviour is if we simplify a
 big expression, and the re-simplify it -- and then this happens in a
 deeply-nested way.  So we must be jolly careful about re-simplifying
@@ -360,9 +400,11 @@ simplify BIG True; maybe good things happen.  That is why
 
 
 
-
 Note [Zap unfolding when beta-reducing]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L1490>`__
+
 Lambda-bound variables can have stable unfoldings, such as
    $j = \x. \b{Unf=Just x}. e
 See Note [Case binders and join points] below; the unfolding for lets
@@ -377,10 +419,13 @@ Here it'd be far better to drop the unfolding and use the actual RHS.
 
 
 Note [Rules and unfolding for join points]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L1509>`__
+
 Suppose we have
 
-.. code-block:: haskell
+::
 
    simplExpr (join j x = rhs                         ) cont
              (      {- RULE j (p:ps) = blah -}       )
@@ -400,14 +445,18 @@ is a join point, and what 'cont' is, in a value of type MaybeJoinCont
 of a SpecConstr-generated RULE for a join point.
 
 
+
 Note [Join points and case-of-case]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L1618>`__
+
 When we perform the case-of-case transform (or otherwise push continuations
 inward), we want to treat join points specially. Since they're always
 tail-called and we want to maintain this invariant, we can do this (for any
 evaluation context E):
 
-.. code-block:: haskell
+::
 
   E[join j = e
     in case ... of
@@ -415,11 +464,11 @@ evaluation context E):
          B -> jump j 2
          C -> f 3]
 
-.. code-block:: haskell
+::
 
     -->
 
-.. code-block:: haskell
+::
 
   join j = E[e]
   in case ... of
@@ -440,12 +489,14 @@ with mkDuableCont.
 
 
 
-
 Note [Join points wih -fno-case-of-case]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L1651>`__
+
 Supose case-of-case is switched off, and we are simplifying
 
-.. code-block:: haskell
+::
 
     case (join j x = <j-rhs> in
           case y of
@@ -457,7 +508,7 @@ Usually, we'd push the outer continuation (case . of <outer-alts>) into
 both the RHS and the body of the join point j.  But since we aren't doing
 case-of-case we may then end up with this totally bogus result
 
-.. code-block:: haskell
+::
 
     join x = case <j-rhs> of <outer-alts> in
     case (case y of
@@ -470,7 +521,7 @@ a join point.  We can only do the "push contination into the RHS of the
 join point j" if we also push the contination right down to the /jumps/ to
 j, so that it can evaporate there.  If we are doing case-of-case, we'll get to
 
-.. code-block:: haskell
+::
 
     join x = case <j-rhs> of <outer-alts> in
     case y of
@@ -487,9 +538,11 @@ outside.  Surprisingly tricky!
 
 
 
-
 Note [Trying rewrite rules]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L1870>`__
+
 Consider an application (f e1 e2 e3) where the e1,e2,e3 are not yet
 simplified.  We want to simplify enough arguments to allow the rules
 to apply, but it's more efficient to avoid simplifying e2,e3 if e1 alone
@@ -511,9 +564,11 @@ So we try to apply rules if either
 
 
 
-
 Note [RULES apply to simplified arguments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L1892>`__
+
 It's very desirable to try RULES once the arguments have been simplified, because
 doing so ensures that rule cascades work in one pass.  Consider
    {-# RULES g (h x) = k x
@@ -529,6 +584,9 @@ We want all this to unravel in one sweep.
 
 Note [Avoid redundant simplification]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L1905>`__
+
 Because RULES apply to simplified arguments, there's a danger of repeatedly
 simplifying already-simplified arguments.  An important example is that of
         (>>=) d e1 e2
@@ -540,6 +598,9 @@ re-simplifying them.
 
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L1914>`__
+
 This part of the simplifier may break the no-shadowing invariant
 Consider
         f (...(\a -> e)...) (case y of (a,b) -> e')
@@ -564,9 +625,11 @@ all this at once is TOO HARD!
 
 
 
-
 Note [User-defined RULES for seq]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2063>`__
+
 Given
    case (scrut |> co) of _ -> rhs
 look for rules that match the expression
@@ -584,12 +647,15 @@ See Note [User-defined RULES for seq] in MkId.
 
 
 Note [Occurrence-analyse after rule firing]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2079>`__
+
 After firing a rule, we occurrence-analyse the instantiated RHS before
 simplifying it.  Usually this doesn't make much difference, but it can
 be huge.  Here's an example (simplCore/should_compile/T7785)
 
-.. code-block:: haskell
+::
 
   map f (map f (map f xs)
 
@@ -644,18 +710,20 @@ nasty performance problem described above.
 
 
 
-
 Note [Optimising tagToEnum#]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2137>`__
+
 If we have an enumeration data type:
 
-.. code-block:: haskell
+::
 
   data Foo = A | B | C
 
 Then we want to transform
 
-.. code-block:: haskell
+::
 
    case tagToEnum# x of   ==>    case x of
      A -> e1                       DEFAULT -> e1
@@ -672,6 +740,9 @@ See #8317.
 
 Note [Rules for recursive functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2156>`__
+
 You might think that we shouldn't apply rules for a loop breaker:
 doing so might give rise to an infinite loop, because a RULE is
 rather like an extra equation for the function:
@@ -686,13 +757,15 @@ So it's up to the programmer: rules can cause divergence
 
 
 
-
 Note [Case elimination]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2177>`__
+
 The case-elimination transformation discards redundant case expressions.
 Start with a simple situation:
 
-.. code-block:: haskell
+::
 
         case x# of      ===>   let y# = x# in e
           y# -> e
@@ -705,7 +778,7 @@ The code in SimplUtils.prepareAlts has the effect of generalise this
 idea to look for a case where we're scrutinising a variable, and we
 know that only the default case can match.  For example:
 
-.. code-block:: haskell
+::
 
         case x of
           0#      -> ...
@@ -719,7 +792,7 @@ really only shows up in eliminating error-checking code.
 
 Note that SimplUtils.mkCase combines identical RHSs.  So
 
-.. code-block:: haskell
+::
 
         case e of       ===> case e of DEFAULT -> r
            True  -> r
@@ -737,11 +810,14 @@ comparison operations (e.g. in (>=) for Int.Int32)
 
 Note [Case to let transformation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2217>`__
+
 If a case over a lifted type has a single alternative, and is being
 used as a strict 'let' (all isDeadBinder bndrs), we may want to do
 this transformation:
 
-.. code-block:: haskell
+::
 
     case e of r       ===>   let r = e in ...r...
       _ -> ...r...
@@ -754,7 +830,7 @@ We treat the unlifted and lifted cases separately:
   into           let r = a +# b in ...r...
   and thence     .....(a +# b)....
 
-.. code-block:: haskell
+::
 
   However, if we have
       case indexArray# a i of r -> ...r...
@@ -771,14 +847,14 @@ We treat the unlifted and lifted cases separately:
         create a thunk (call by need) instead of evaluating it
         right away (call by value)
 
-.. code-block:: haskell
+::
 
   However, we can turn the case into a /strict/ let if the 'r' is
   used strictly in the body.  Then we won't lose divergence; and
   we won't build a thunk because the let is strict.
   See also Note [Case-to-let for strictly-used binders]
 
-.. code-block:: haskell
+::
 
   NB: absentError satisfies exprIsHNF: see Note [aBSENT_ERROR_ID] in MkCore.
   We want to turn
@@ -788,9 +864,11 @@ We treat the unlifted and lifted cases separately:
 
 
 
-
 Note [Case-to-let for strictly-used binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2261>`__
+
 If we have this:
    case <scrut> of r { _ -> ..r.. }
 
@@ -823,14 +901,14 @@ There have been various earlier versions of this patch:
 * By Sept 18 the code looked like this:
      || scrut_is_demanded_var scrut
 
-.. code-block:: haskell
+::
 
     scrut_is_demanded_var :: CoreExpr -> Bool
     scrut_is_demanded_var (Cast s _) = scrut_is_demanded_var s
     scrut_is_demanded_var (Var _)    = isStrictDmd (idDemandInfo case_bndr)
     scrut_is_demanded_var _          = False
 
-.. code-block:: haskell
+::
 
   This only fired if the scrutinee was a /variable/, which seems
   an unnecessary restriction. So in #15631 I relaxed it to allow
@@ -840,7 +918,7 @@ There have been various earlier versions of this patch:
 * Previously, in Jan 13 the code looked like this:
      || case_bndr_evald_next rhs
 
-.. code-block:: haskell
+::
 
     case_bndr_evald_next :: CoreExpr -> Bool
       -- See Note [Case binder next]
@@ -850,7 +928,7 @@ There have been various earlier versions of this patch:
     case_bndr_evald_next (Case e _ _ _)  = case_bndr_evald_next e
     case_bndr_evald_next _               = False
 
-.. code-block:: haskell
+::
 
   This patch was part of fixing #7542. See also
   Note [Eta reduction of an eval'd function] in CoreUtils.)
@@ -879,20 +957,20 @@ f x y = if x < 0 then jtos x
 
 At a particular call site we have (f v 1).  So we inline to get
 
-.. code-block:: haskell
+::
 
         if v < 0 then jtos x
         else if 1==0 then "" else jtos x
 
 Now simplify the 1==0 conditional:
 
-.. code-block:: haskell
+::
 
         if v<0 then jtos v else jtos v
 
 Now common-up the two branches of the case:
 
-.. code-block:: haskell
+::
 
         case (v<0) of DEFAULT -> jtos v
 
@@ -903,9 +981,11 @@ I don't really know how to improve this situation.
 
 
 
-
 Note [FloatBinds from constructor wrappers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2360>`__
+
 If we have FloatBinds coming from the constructor wrapper
 (as in Note [exprIsConApp_maybe on data constructors with wrappers]),
 ew cannot float past them. We'd need to float the FloatBind
@@ -926,8 +1006,12 @@ extra complication is not clear.
       Eliminate the case if possible
 
 
+
 Note [knownCon occ info]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2529>`__
+
 If the case binder is not dead, then neither are the pattern bound
 variables:
         case <any> of x { (a,b) ->
@@ -942,6 +1026,9 @@ the case binder is guaranteed dead.
 
 Note [Case alternative occ info]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2541>`__
+
 When we are simply reconstructing a case (the common case), we always
 zap the occurrence info on the binders in the alternatives.  Even
 if the case binder is dead, the scrutinee is usually a variable, and *that*
@@ -951,7 +1038,10 @@ See Note [Add unfolding for scrutinee]
 
 
 Note [Improving seq]
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2549>`__
+
 Consider
         type family F :: * -> *
         type instance F Int = Int
@@ -968,7 +1058,7 @@ so that 'rhs' can take advantage of the form of x'.  Notice that Note
 
 We'd also like to eliminate empty types (#13468). So if
 
-.. code-block:: haskell
+::
 
     data Void
     type instance F Bool = Void
@@ -1000,16 +1090,20 @@ robust here.  (Otherwise, there's a danger that we'll simply drop the
 'seq' altogether, before LiberateCase gets to see it.)
 
 
+
 Note [Adding evaluatedness info to pattern-bound variables]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2684>`__
+
 addEvals records the evaluated-ness of the bound variables of
 a case pattern.  This is *important*.  Consider
 
-.. code-block:: haskell
+::
 
      data T = T !Int !Int
 
-.. code-block:: haskell
+::
 
      case x of { T a b -> T (a+1) b }
 
@@ -1023,7 +1117,7 @@ In addition to handling data constructor fields with !s, addEvals
 also records the fact that the result of seq# is always in WHNF.
 See Note [seq# magic] in PrelRules.  Example (#15226):
 
-.. code-block:: haskell
+::
 
   case seq# v s of
     (# s', v' #) -> E
@@ -1035,8 +1129,12 @@ do it here).  The right thing is to do some kind of binder-swap;
 see #15226 for discussion.
 
 
+
 Note [Case binder evaluated-ness]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2788>`__
+
 We pin on a (OtherCon []) unfolding to the case-binder of a Case,
 even though it'll be over-ridden in every case alternative with a more
 informative unfolding.  Why?  Because suppose a later, less clever, pass
@@ -1055,6 +1153,9 @@ This showed up in #13027.
 
 Note [Add unfolding for scrutinee]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2804>`__
+
 In general it's unlikely that a variable scrutinee will appear
 in the case alternatives   case x of { ...x unlikely to appear... }
 because the binder-swap in OccAnal has got rid of all such occurrences
@@ -1089,9 +1190,11 @@ respective RHSs.
 
 
 
-
 Note [Bottom alternatives]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L2971>`__
+
 When we have
      case (case x of { A -> error .. ; B -> e; C -> error ..)
        of alts
@@ -1101,14 +1204,18 @@ join points and inlining them away.  See #4930.
 ------------------
 
 
+
 Note [Fusing case continuations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L3182>`__
+
 It's important to fuse two successive case continuations when the
 first has one alternative.  That's why we call prepareCaseCont here.
 Consider this, which arises from thunk splitting (see Note [Thunk
 splitting] in WorkWrap):
 
-.. code-block:: haskell
+::
 
       let
         x* = case (case v of {pn -> rn}) of
@@ -1138,6 +1245,9 @@ See #4957 a fuller example.
 
 Note [Case binders and join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L3213>`__
+
 Consider this
    case (case .. ) of c {
      I# c# -> ....c....
@@ -1147,7 +1257,7 @@ If we make a join point with c but not c# we get
 
 But if later inlining scrutinises the c, thus
 
-.. code-block:: haskell
+::
 
   $j = \c -> ... case c of { I# y -> ... } ...
 
@@ -1157,7 +1267,7 @@ difference to allocation.
 
 An alternative plan is this:
 
-.. code-block:: haskell
+::
 
    $j = \c# -> let c = I# c# in ...c....
 
@@ -1166,7 +1276,7 @@ but that is bad if 'c' is *not* later scrutinised.
 So instead we do both: we pass 'c' and 'c#' , and record in c's inlining
 (a stable unfolding) that it's really I# c#, thus
 
-.. code-block:: haskell
+::
 
    $j = \c# -> \c[=I# c#] -> ...c....
 
@@ -1187,6 +1297,9 @@ and c is unused.
 
 Note [Duplicated env]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L3254>`__
+
 Some of the alternatives are simplified, but have not been turned into a join point
 So they *must* have a zapped subst-env.  So we can't use completeNonRecX to
 bind the join point, because it might to do PostInlineUnconditionally, and
@@ -1198,6 +1311,9 @@ at worst delays the join-point inlining.
 
 Note [Small alternative rhs]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L3263>`__
+
 It is worth checking for a small RHS because otherwise we
 get extra let bindings that may cause an extra iteration of the simplifier to
 inline back in place.  Quite often the rhs is just a variable or constructor.
@@ -1217,7 +1333,10 @@ Rather than do this we simply agree to re-simplify the original (small) thing la
 
 
 Note [Funky mkLamTypes]
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L3281>`__
+
 Notice the funky mkLamTypes.  If the constructor has existentials
 it's possible that the join point will be abstracted over
 type variables as well as term variables.
@@ -1237,6 +1356,9 @@ type variables as well as term variables.
 
 Note [Duplicating StrictArg]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L3298>`__
+
 We make a StrictArg duplicable simply by making all its
 stored-up arguments (in sc_fun) trivial, by let-binding
 them.  Thus:
@@ -1290,9 +1412,11 @@ Which is a Very Bad Thing
 
 
 
-
 Note [Duplicating StrictBind]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L3352>`__
+
 We make a StrictBind duplicable in a very similar way to
 that for case expressions.  After all,
    let x* = e in b   is similar to    case e of x -> b
@@ -1327,7 +1451,7 @@ for several reasons
   Consider:       let j = if .. then I# 3 else I# 4
                   in case .. of { A -> j; B -> j; C -> ... }
 
-.. code-block:: haskell
+::
 
   Now CPR doesn't w/w j because it's a thunk, so
   that means that the enclosing function can't w/w either,
@@ -1359,10 +1483,11 @@ because we don't know its usage in each RHS separately
 
 
 
-
-
 Note [Force bottoming field]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L3513>`__
+
 We need to force bottoming, or the new unfolding holds
 on to the old unfolding (which is part of the id).
 
@@ -1370,6 +1495,9 @@ on to the old unfolding (which is part of the id).
 
 Note [Setting the new unfolding]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L3518>`__
+
 * If there's an INLINE pragma, we simplify the RHS gently.  Maybe we
   should do nothing at all, but simplifying gently might get rid of
   more crap.
@@ -1388,6 +1516,9 @@ user did say 'INLINE'.  May need to revisit this choice.
 
 Note [Rules in a letrec]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/Simplify.hs#L3540>`__
+
 After creating fresh binders for the binders of a letrec, we
 substitute the RULES and add them back onto the binders; this is done
 *before* processing any of the RHSs.  This is important.  Manuel found

@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/llvmGen/LlvmCodeGen/CodeGen.hs>`_
 
-====================
-compiler/llvmGen/LlvmCodeGen/CodeGen.hs.rst
-====================
+compiler/llvmGen/LlvmCodeGen/CodeGen.hs
+=======================================
+
 
 Note [Literals and branch conditions]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/llvmGen/LlvmCodeGen/CodeGen.hs#L1039>`__
 
 It is important that whenever we generate branch conditions for
 literals like '1', they are properly narrowed to an LLVM expression of
@@ -16,7 +18,7 @@ responsible for this, in the case of literal integers.
 
 Often, we won't see direct statements like:
 
-.. code-block:: haskell
+::
 
     if(1) {
       ...
@@ -31,7 +33,7 @@ which will eliminate the expression entirely.
 However, it's certainly possible and reasonable for this to occur in
 hand-written C-- code. Consider something like:
 
-.. code-block:: haskell
+::
 
     #if !defined(SOME_CONDITIONAL)
     #define CHECK_THING(x) 1
@@ -39,11 +41,11 @@ hand-written C-- code. Consider something like:
     #define CHECK_THING(x) some_operation((x))
     #endif
 
-.. code-block:: haskell
+::
 
     f() {
 
-.. code-block:: haskell
+::
 
       if (CHECK_THING(xyz)) {
         ...
@@ -51,7 +53,7 @@ hand-written C-- code. Consider something like:
         ...
       }
 
-.. code-block:: haskell
+::
 
     }
 
@@ -61,5 +63,4 @@ particular was #define'd. So we must be sure to properly narrow the
 literal in this case to i1 as it won't be eliminated beforehand.
 
 For a real example of this, see ./rts/StgStdThunks.cmm
-
 

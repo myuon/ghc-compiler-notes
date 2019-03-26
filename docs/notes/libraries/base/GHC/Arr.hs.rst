@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Arr.hs>`_
 
-====================
-libraries/base/GHC/Arr.hs.rst
-====================
+libraries/base/GHC/Arr.hs
+=========================
+
 
 Note [Inlining index]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Arr.hs#L124>`__
+
 We inline the 'index' operation,
 
  * Partly because it generates much faster code
@@ -20,22 +23,25 @@ If you make a per-instance index method, you may consider inlining it.
 
 Note [Double bounds-checking of index values]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Arr.hs#L136>`__
+
 When you index an array, a!x, there are two possible bounds checks we might make:
 
-.. code-block:: haskell
+::
 
   (A) Check that (inRange (bounds a) x) holds.
 
-.. code-block:: haskell
+::
 
       (A) is checked in the method for 'index'
 
-.. code-block:: haskell
+::
 
   (B) Check that (index (bounds a) x) lies in the range 0..n,
       where n is the size of the underlying array
 
-.. code-block:: haskell
+::
 
       (B) is checked in the top-level function (!), in safeIndex.
 
@@ -58,6 +64,9 @@ For 1-d, 2-d, and 3-d arrays of Int we have specialised instances to avoid this.
 
 Note [Out-of-bounds error messages]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Arr.hs#L164>`__
+
 The default method for 'index' generates hoplelessIndexError, because
 Ix doesn't have Show as a superclass.  For particular base types we
 can do better, so we override the default method for index.
@@ -65,11 +74,15 @@ Abstract these errors from the relevant index functions so that
 the guts of the function will be small enough to inline.
 
 
+
 Note [amap]
-~~~~~~~~~~~~~~
+~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/Arr.hs#L775>`__
+
 amap was originally defined like this:
 
-.. code-block:: haskell
+::
 
  amap f arr@(Array l u n _) =
      unsafeArray' (l,u) n [(i, f (unsafeAt arr i)) | i <- [0 .. n - 1]]

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/Hoopl/Dataflow.hs>`_
 
-====================
-compiler/cmm/Hoopl/Dataflow.hs.rst
-====================
+compiler/cmm/Hoopl/Dataflow.hs
+==============================
+
 
 Note [Unreachable blocks]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/Hoopl/Dataflow.hs#L227>`__
+
 A block that is not in the domain of tfb_fbase is "currently unreachable".
 A currently-unreachable block is not even analyzed.  Reason: consider
 constant prop and this graph, with entry point L1:

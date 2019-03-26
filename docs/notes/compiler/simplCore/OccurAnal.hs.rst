@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs>`_
 
-====================
-compiler/simplCore/OccurAnal.hs.rst
-====================
+compiler/simplCore/OccurAnal.hs
+===============================
+
 
 Note [Plugin rules]
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L125>`__
+
 Conal Elliott (#11651) built a GHC plugin that added some
 BuiltinRules (for imported Ids) to the mg_rules field of ModGuts, to
 do some domain-specific transformations that could not be expressed
@@ -17,8 +20,12 @@ So we simply assume that BuiltinRules have no dependencies, and filter
 them out from the imp_rule_edges comprehension.
 
 
+
 Note [Recursive bindings: the grand plan]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L145>`__
+
 When we come across a binding group
   Rec { x1 = r1; ...; xn = rn }
 we treat it like this (occAnalRecBind):
@@ -26,7 +33,7 @@ we treat it like this (occAnalRecBind):
 1. Occurrence-analyse each right hand side, and build a
    "Details" for each binding to capture the results.
 
-.. code-block:: haskell
+::
 
    Wrap the details in a Node (details, node-id, dep-node-ids),
    where node-id is just the unique of the binder, and
@@ -34,7 +41,7 @@ we treat it like this (occAnalRecBind):
    We'll call these the "scope edges".
    See Note [Forming the Rec groups].
 
-.. code-block:: haskell
+::
 
    All this is done by makeNode.
 
@@ -52,12 +59,12 @@ we treat it like this (occAnalRecBind):
    have both more and fewer dependencies than the scope edges
    (see Note [Choosing loop breakers])
 
-.. code-block:: haskell
+::
 
    More edges: if f calls g, and g has an active rule that mentions h
                then we add an edge from f -> h
 
-.. code-block:: haskell
+::
 
    Fewer edges: we only include dependencies on active rules, on rule
                 RHSs (not LHSs) and if there is an INLINE pragma only
@@ -74,10 +81,13 @@ we treat it like this (occAnalRecBind):
 
 Note [Dead code]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L190>`__
+
 Dropping dead code for a cyclic Strongly Connected Component is done
 in a very simple way:
 
-.. code-block:: haskell
+::
 
         the entire SCC is dropped if none of its binders are mentioned
         in the body; otherwise the whole thing is kept.
@@ -88,7 +98,7 @@ original term's binding groups.
 
 Thus 'occAnalBind' does indeed drop 'f' in an example like
 
-.. code-block:: haskell
+::
 
         letrec f = ...g...
                g = ...(...g...)...
@@ -102,8 +112,12 @@ when 'g' no longer uses 'f' at all (eg 'f' does not occur in a RULE in
 ------------------------------------------------------------
 
 
+
 Note [Forming Rec groups]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L214>`__
+
 We put bindings {f = ef; g = eg } in a Rec group if "f uses g"
 and "g uses f", no matter how indirectly.  We do a SCC analysis
 with an edge f -> g if "f uses g".
@@ -128,7 +142,7 @@ always in scope.
     (because it isn't referenced any more), then the children will die
     too (unless they are already referenced directly).
 
-.. code-block:: haskell
+::
 
     To that end, we build a Rec group for each cyclic strongly
     connected component,
@@ -139,7 +153,7 @@ always in scope.
         (b) f's RULES
     These are rec_edges.
 
-.. code-block:: haskell
+::
 
     Under (b) we include variables free in *either* LHS *or* RHS of
     the rule.  The former might seems silly, but see Note [Rule
@@ -166,7 +180,7 @@ always in scope.
     group.  E.g. in Note [Specialisation rules] we want f' rule
     to be visible in both f's RHS, and fs's RHS.
 
-.. code-block:: haskell
+::
 
     This means that we must simplify the RULEs first, before looking
     at any of the definitions.  This is done by Simplify.simplRecBind,
@@ -175,8 +189,12 @@ always in scope.
 ------------------------------------------------------------
 
 
+
 Note [Choosing loop breakers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L279>`__
+
 Loop breaking is surprisingly subtle.  First read the section 4 of
 "Secrets of the GHC inliner".  This describes our basic plan.
 We avoid infinite inlinings by choosing loop breakers, and
@@ -243,7 +261,7 @@ That's why we compute
          {-# INLINE [1] tagZeroes #-}
          tagZero xs = pmap (\x -> fromBool (x==0)) xs
 
-.. code-block:: haskell
+::
 
          {-# RULES "tagZero" [~1] forall xs n.
              pmap fromBool <blah blah> = tagZero xs #-}
@@ -251,7 +269,7 @@ That's why we compute
     However, tagZero can only be inlined in phase 1 and later, while
     the RULE is only active *before* phase 1.  So there's no problem.
 
-.. code-block:: haskell
+::
 
     To make this work, we look for the RHS free vars only for
     *active* rules. That's the reason for the occ_rule_act field
@@ -261,24 +279,24 @@ That's why we compute
     ~~~~~~~~~~~~~~~~~~~~~~~~~
     There is a last nasty wrinkle.  Suppose we have
 
-.. code-block:: haskell
+::
 
         Rec { f = f_rhs
               RULE f [] = g
 
-.. code-block:: haskell
+::
 
               h = h_rhs
               g = h
               ...more...
         }
 
-.. code-block:: haskell
+::
 
     Remember that we simplify the RULES before any RHS (see Note
     [Rules are visible in their own rec group] above).
 
-.. code-block:: haskell
+::
 
     So we must *not* postInlineUnconditionally 'g', even though
     its RHS turns out to be trivial.  (I'm assuming that 'g' is
@@ -286,7 +304,7 @@ That's why we compute
     drop the binding for 'g', which leaves it out of scope in the
     RULE!
 
-.. code-block:: haskell
+::
 
     Here's a somewhat different example of the same thing
         Rec { g = h
@@ -298,34 +316,34 @@ That's why we compute
     might rewrite to     h = ...g...
     So g must remain in scope in the output program!
 
-.. code-block:: haskell
+::
 
     We "solve" this by:
 
-.. code-block:: haskell
+::
 
         Make g a "weak" loop breaker (OccInfo = IAmLoopBreaker True)
         iff g is a "missing free variable" of the Rec group
 
-.. code-block:: haskell
+::
 
     A "missing free variable" x is one that is mentioned in an RHS or
     INLINE or RULE of a binding in the Rec group, but where the
     dependency on x may not show up in the loop_breaker_nodes (see
     note [Choosing loop breakers} above).
 
-.. code-block:: haskell
+::
 
     A normal "strong" loop breaker has IAmLoopBreaker False.  So
 
-.. code-block:: haskell
+::
 
                                     Inline  postInlineUnconditionally
    strong   IAmLoopBreaker False    no      no
    weak     IAmLoopBreaker True     yes     no
             other                   yes     yes
 
-.. code-block:: haskell
+::
 
     The **sole** reason for this kind of loop breaker is so that
     postInlineUnconditionally does not fire.  Ugh.  (Typically it'll
@@ -336,6 +354,9 @@ That's why we compute
 
 Note [Rules for imported functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L410>`__
+
 Consider this
    f = /\a. B.g a
    RULE B.g Int = 1 + f Int
@@ -369,16 +390,19 @@ and the example above is just a more complicated version.
 
 Note [Preventing loops due to imported functions rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L441>`__
+
 Consider:
   import GHC.Base (foldr)
 
-.. code-block:: haskell
+::
 
   {-# RULES "filterList" forall p. foldr (filterFB (:) p) [] = filter p #-}
   filter p xs = build (\c n -> foldr (filterFB c p) n xs)
   filterFB c p = ...
 
-.. code-block:: haskell
+::
 
   f = filter p xs
 
@@ -395,26 +419,26 @@ mark GHC.List.filter as INLINABLE) is as follows. Say I have this module:
   {-# LANGUAGE RankNTypes #-}
   module GHCList where
 
-.. code-block:: haskell
+::
 
   import Prelude hiding (filter)
   import GHC.Base (build)
 
-.. code-block:: haskell
+::
 
   {-# INLINABLE filter #-}
   filter :: (a -> Bool) -> [a] -> [a]
   filter p [] = []
   filter p (x:xs) = if p x then x : filter p xs else filter p xs
 
-.. code-block:: haskell
+::
 
   {-# NOINLINE [0] filterFB #-}
   filterFB :: (a -> b -> b) -> (a -> Bool) -> a -> b -> b
   filterFB c p x r | p x       = x `c` r
                    | otherwise = r
 
-.. code-block:: haskell
+::
 
   {-# RULES
   "filter"     [~1] forall p xs.  filter p xs = build (\c n -> foldr
@@ -436,7 +460,7 @@ marked as a strong loop breaker. Therefore at a use site in another module:
                  (x:xs) -> if p x then x : build (\c n -> foldr (filterFB c p) n xs)
                                   else     build (\c n -> foldr (filterFB c p) n xs)
 
-.. code-block:: haskell
+::
 
   build (\c n -> foldr (filterFB c p) n xs)
     = {inline} foldr (filterFB (:) p) [] xs
@@ -483,11 +507,14 @@ To avoid this,
 
 Note [Glomming]
 ~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L539>`__
+
 RULES for imported Ids can make something at the top refer to something at the bottom:
         f = \x -> B.g (q x)
         h = \y -> 3
 
-.. code-block:: haskell
+::
 
         RULE:  B.g (q x) = h x
 
@@ -518,8 +545,12 @@ Solution:
 ------------------------------------------------------------
 
 
+
 Note [Inline rules]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L572>`__
+
 None of the above stuff about RULES applies to Inline Rules,
 stored in a CoreUnfolding.  The unfolding, if any, is simplified
 at the same time as the regular RHS of the function (ie *not* like
@@ -539,19 +570,19 @@ There is a danger that we'll be sub-optimal if we see this
 where f is recursive, but the INLINE is not. This can just about
 happen with a sufficiently odd set of rules; eg
 
-.. code-block:: haskell
+::
 
         foo :: Int -> Int
         {-# INLINE [1] foo #-}
         foo x = x+1
 
-.. code-block:: haskell
+::
 
         bar :: Int -> Int
         {-# INLINE [1] bar #-}
         bar x = foo x + 1
 
-.. code-block:: haskell
+::
 
         {-# RULES "foo" [~1] forall x. foo x = bar x #-}
 
@@ -572,18 +603,18 @@ Example [eftInt]
 ~~~~~~~~~~~~~~~
 Example (from GHC.Enum):
 
-.. code-block:: haskell
+::
 
   eftInt :: Int# -> Int# -> [Int]
   eftInt x y = ...(non-recursive)...
 
-.. code-block:: haskell
+::
 
   {-# INLINE [0] eftIntFB #-}
   eftIntFB :: (Int -> r -> r) -> r -> Int# -> Int# -> r
   eftIntFB c n x y = ...(non-recursive)...
 
-.. code-block:: haskell
+::
 
   {-# RULES
   "eftInt"  [~1] forall x y. eftInt x y = build (\ c n -> eftIntFB c n x y)
@@ -594,9 +625,12 @@ Example (from GHC.Enum):
 
 Note [Specialisation rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L632>`__
+
 Consider this group, which is typical of what SpecConstr builds:
 
-.. code-block:: haskell
+::
 
    fs a = ....f (C a)....
    f  x = ....f (C a)....
@@ -614,8 +648,12 @@ This showed up when compiling Control.Concurrent.Chan.getChanContents.
 ------------------------------------------------------------
 
 
+
 Note [Finding join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L650>`__
+
 It's the occurrence analyser's job to find bindings that we can turn into join
 points, but it doesn't perform that transformation right away. Rather, it marks
 the eligible bindings as part of their occurrence data, leaving it to the
@@ -637,9 +675,11 @@ rest of 'OccInfo' until it goes on the binder.
 Note [Rules and join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L668>`__
+
 Things get fiddly with rules. Suppose we have:
 
-.. code-block:: haskell
+::
 
   let j :: Int -> Int
       j y = 2 * y
@@ -653,7 +693,7 @@ Thus we would like to make them both join points. The rule complicates matters,
 though, as its RHS has an unapplied occurrence of j. *However*, if we were to
 eta-expand the rule, all would be well:
 
-.. code-block:: haskell
+::
 
   {-# RULES "SPEC k 0" forall a. k 0 a = j a #-}
 
@@ -674,12 +714,16 @@ statistics to be sure.
 ------------------------------------------------------------
 
 
+
 Note [Adjusting right-hand sides]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L702>`__
+
 There's a bit of a dance we need to do after analysing a lambda expression or
 a right-hand side. In particular, we need to
 
-.. code-block:: haskell
+::
 
   a) call 'markAllInsideLam' *unless* the binding is for a thunk, a one-shot
      lambda, or a non-recursive join point; and
@@ -688,7 +732,7 @@ a right-hand side. In particular, we need to
 Some examples, with how the free occurrences in e (assumed not to be a value
 lambda) get marked:
 
-.. code-block:: haskell
+::
 
                              inside lam    non-tail-called
   ------------------------------------------------------------
@@ -722,8 +766,11 @@ Thus the overall sequence taking place in 'occAnalNonRecBind' and
 ----------------------------------------------------------------
 
 
+
 Note [Unfoldings and join points]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L824>`__
 
 We assume that anything in an unfolding occurs multiple times, since unfoldings
 are often copied (that's the whole point!). But we still need to track tail
@@ -731,8 +778,12 @@ calls for the purpose of finding join points.
 ---------------------------
 
 
+
 Note [Complexity of loop breaking]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1005>`__
+
 The loop-breaking algorithm knocks out one binder at a time, and
 performs a new SCC analysis on the remaining binders.  That can
 behave very badly in tightly-coupled groups of bindings; in the
@@ -754,7 +805,7 @@ more likely.  Here's a real example from #1969:
         {-# RULES forall d. $dm Int d  = $s$dm1
                   forall d. $dm Bool d = $s$dm2 #-}
 
-.. code-block:: haskell
+::
 
         dInt = MkD .... opInt ...
         dInt = MkD .... opBool ...
@@ -771,7 +822,10 @@ linear in the number of instance declarations.
 
 
 Note [Loop breakers and INLINE/INLINABLE pragmas]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1040>`__
+
 Avoid choosing a function with an INLINE pramga as the loop breaker!
 If such a function is mutually-recursive with a non-INLINE thing,
 then the latter should be the loop-breaker.
@@ -784,7 +838,7 @@ and then worker/wrapper it through strictness analysis, we'll get
    Rec { {-# INLINABLE $wf #-}
          $wf p q = let x = (p,q) in ...f...
 
-.. code-block:: haskell
+::
 
          {-# INLINE f #-}
          f x = case x of (p,q) -> $wf p q }
@@ -796,6 +850,9 @@ inline 'f' in '$wf'.
 
 Note [DFuns should not be loop breakers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1060>`__
+
 It's particularly bad to make a DFun into a loop breaker.  See
 Note [How instance declarations are translated] in TcInstDcls
 
@@ -804,7 +861,7 @@ if there's a choice we want the DFun to be the non-loop breaker. Eg
 
 rec { sc = /\ a \$dC. $fBWrap (T a) ($fCT @ a $dC)
 
-.. code-block:: haskell
+::
 
       $fCT :: forall a_afE. (Roman.C a_afE) => Roman.C (Roman.T a_afE)
       {-# DFUN #-}
@@ -818,10 +875,13 @@ if we can't unravel the DFun first.
 
 Note [Constructor applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1078>`__
+
 It's really really important to inline dictionaries.  Real
 example (the Enum Ordering instance from GHC.Base):
 
-.. code-block:: haskell
+::
 
      rec     f = \ x -> case d of (p,q,r) -> p x
              g = \ x -> case d of (p,q,r) -> q x
@@ -838,28 +898,31 @@ the loops in static numeric dictionaries, see GHC.Float.
 
 Note [Closure conversion]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1094>`__
+
 We treat (\x. C p q) as a high-score candidate in the letrec scoring algorithm.
 The immediate motivation came from the result of a closure-conversion transformation
 which generated code like this:
 
-.. code-block:: haskell
+::
 
     data Clo a b = forall c. Clo (c -> a -> b) c
 
-.. code-block:: haskell
+::
 
     ($:) :: Clo a b -> a -> b
     Clo f env $: x = f env x
 
-.. code-block:: haskell
+::
 
     rec { plus = Clo plus1 ()
 
-.. code-block:: haskell
+::
 
         ; plus1 _ n = Clo plus2 n
 
-.. code-block:: haskell
+::
 
         ; plus2 Zero     n = n
         ; plus2 (Succ m) n = Succ (plus $: m $: n) }
@@ -881,9 +944,11 @@ ToDo: try using the occurrence info for the inline'd binder.
 
 
 
-
 Note [Self-recursion and loop breakers]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1422>`__
+
 If we have
    rec { f = ...f...g...
        ; g = .....f...   }
@@ -901,13 +966,16 @@ choose h.  Finding the minimal set of loop breakers is hard.
 
 Note [Loop breakers, node scoring, and stability]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1437>`__
+
 To choose a loop breaker, we give a NodeScore to each node in the SCC,
 and pick the one with the best score (according to 'betterLB').
 
 We need to be jolly careful (#12425, #12234) about the stability
 of this choice. Suppose we have
 
-.. code-block:: haskell
+::
 
     let rec { f = ...g...g...
             ; g = ...f...f... }
@@ -923,7 +991,7 @@ breaker. That means it is free to inline f.
 Suppose that GHC decides to inline f in the branches of the case, but
 (for some reason; eg it is not saturated) in the rhs of g. So we get
 
-.. code-block:: haskell
+::
 
     let rec { f = ...g...g...
             ; g = ...f...f... }
@@ -937,7 +1005,7 @@ analyser chooses f as the loop breaker, so it can freely inline g. And
 again for some reason the simplifier inlines g at its calls in the case
 branches, but not in the RHS of f. Then we get
 
-.. code-block:: haskell
+::
 
     let rec { f = ...g...g...
             ; g = ...f...f... }
@@ -968,7 +1036,10 @@ Hence the is_lb field of NodeScore
 
 
 Note [Join point RHSs]
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1606>`__
+
 Consider
    x = e
    join j = Just x
@@ -983,6 +1054,9 @@ thing to do.  See #14137.
 
 Note [Cascading inlines]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1618>`__
+
 By default we use an rhsCtxt for the RHS of a binding.  This tells the
 occ anal n that it's looking at an RHS, which has an effect in
 occAnalApp.  In particular, for constructor applications, it makes
@@ -1027,15 +1101,21 @@ for the various clauses.
 
 
 
-
 Note [Gather occurrences of coercion variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1690>`__
+
 We need to gather info about what coercion variables appear, so that
 we can sort them into the right place when doing dependency analysis.
 
 
+
 Note [Arguments of let-bound constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1825>`__
+
 Consider
     f x = let y = expensive x in
           let z = (True,y) in
@@ -1047,46 +1127,50 @@ If we aren't careful we duplicate the (expensive x) call!
 Constructors are rather like lambdas in this way.
 
 
+
 Note [Sources of one-shot information]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1894>`__
+
 The occurrence analyser obtains one-shot-lambda information from two sources:
 
 A:  Saturated applications:  eg   f e1 .. en
 
-.. code-block:: haskell
+::
 
     In general, given a call (f e1 .. en) we can propagate one-shot info from
     f's strictness signature into e1 .. en, but /only/ if n is enough to
     saturate the strictness signature. A strictness signature like
 
-.. code-block:: haskell
+::
 
           f :: C1(C1(L))LS
 
-.. code-block:: haskell
+::
 
     means that *if f is applied to three arguments* then it will guarantee to
     call its first argument at most once, and to call the result of that at
     most once. But if f has fewer than three arguments, all bets are off; e.g.
 
-.. code-block:: haskell
+::
 
           map (f (\x y. expensive) e2) xs
 
-.. code-block:: haskell
+::
 
     Here the \x y abstraction may be called many times (once for each element of
     xs) so we should not mark x and y as one-shot. But if it was
 
-.. code-block:: haskell
+::
 
           map (f (\x y. expensive) 3 2) xs
 
-.. code-block:: haskell
+::
 
     then the first argument of f will be called at most once.
 
-.. code-block:: haskell
+::
 
     The one-shot info, derived from f's strictness signature, is
     computed by 'argsOneShots', called in occAnalApp.
@@ -1094,7 +1178,7 @@ A:  Saturated applications:  eg   f e1 .. en
 A': Non-obviously saturated applications: eg    build (f (\x y -> expensive))
     where f is as above.
 
-.. code-block:: haskell
+::
 
     In this case, f is only manifestly applied to one argument, so it does not
     look saturated. So by the previous point, we should not use its strictness
@@ -1102,12 +1186,12 @@ A': Non-obviously saturated applications: eg    build (f (\x y -> expensive))
     build is fully applied, so we may use its strictness signature; and from
     that we learn that build calls its argument with two arguments *at most once*.
 
-.. code-block:: haskell
+::
 
     So there is really only one call to f, and it will have three arguments. In
     that sense, f is saturated, and we may proceed as described above.
 
-.. code-block:: haskell
+::
 
     Hence the computation of 'guaranteed_val_args' in occAnalApp, using
     '(occ_one_shots env)'.  See also #13227, comment:9
@@ -1115,12 +1199,12 @@ A': Non-obviously saturated applications: eg    build (f (\x y -> expensive))
 B:  Let-bindings:  eg   let f = \c. let ... in \n -> blah
                         in (build f, build f)
 
-.. code-block:: haskell
+::
 
     Propagate one-shot info from the demanand-info on 'f' to the
     lambdas in its RHS (which may not be syntactically at the top)
 
-.. code-block:: haskell
+::
 
     This information must have come from a previous run of the demanand
     analyser.
@@ -1133,6 +1217,9 @@ saner.
 
 Note [OneShots]
 ~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1950>`__
+
 When analysing an expression, the occ_one_shots argument contains information
 about how the function is being used. The length of the list indicates
 how many arguments will eventually be passed to the analysed expression,
@@ -1140,11 +1227,11 @@ and the OneShotInfo indicates whether this application is once or multiple times
 
 Example:
 
-.. code-block:: haskell
+::
 
  Context of f                occ_one_shots when analysing f
 
-.. code-block:: haskell
+::
 
  f 1 2                       [OneShot, OneShot]
  map (f 1)                   [OneShot, NoOneShotInfo]
@@ -1155,6 +1242,9 @@ Example:
 
 Note [Binders in case alternatives]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L1966>`__
+
 Consider
     case x of y { (a,b) -> f y }
 We treat 'a', 'b' as dead, because they don't physically occur in the
@@ -1168,18 +1258,22 @@ life, beause it binds 'y' to (a,b) (imagine got inlined and
 scrutinised y).
 
 
+
 Note [Binder swap]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L2211>`__
+
 The "binder swap" tranformation swaps occurence of the
 scrutinee of a case for occurrences of the case-binder:
 
-.. code-block:: haskell
+::
 
  (1)  case x of b { pi -> ri }
          ==>
       case x of b { pi -> let x=b in ri }
 
-.. code-block:: haskell
+::
 
  (2)  case (x |> co) of b { pi -> ri }
         ==>
@@ -1211,7 +1305,7 @@ There are two reasons for making this swap:
        case x of b { I# v ->
        ...(let b2 = b in rhs)...
 
-.. code-block:: haskell
+::
 
     The same can happen even if the scrutinee is a variable
     with a cast: see Note [Case of cast]
@@ -1262,6 +1356,9 @@ I think this is just too bad.  CSE will recover some of it.
 
 Note [Case of cast]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L2295>`__
+
 Consider        case (x `cast` co) of b { I# ->
                 ... (case (x `cast` co) of {...}) ...
 We'd like to eliminate the inner case.  That is the motivation for
@@ -1272,16 +1369,19 @@ inline x, cancel the casts, and away we go.
 
 Note [Binder swap on GlobalId scrutinees]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L2303>`__
+
 When the scrutinee is a GlobalId we must take care in two ways
 
-.. code-block:: haskell
+::
 
  i) In order to *know* whether 'x' occurs free in the RHS, we need its
     occurrence info. BUT, we don't gather occurrence info for
     GlobalIds.  That's the reason for the (small) occ_gbl_scrut env in
     OccEnv is for: it says "gather occurrence info for these".
 
-.. code-block:: haskell
+::
 
  ii) We must call localiseId on 'x' first, in case it's a GlobalId, or
      has an External Name. See, for example, SimplEnv Note [Global Ids in
@@ -1291,6 +1391,9 @@ When the scrutinee is a GlobalId we must take care in two ways
 
 Note [Zap case binders in proxy bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L2316>`__
+
 From the original
      case x of cb(dead) { p -> ...x... }
 we will get
@@ -1323,59 +1426,59 @@ Historical note [Suppressing the case binder-swap]
 This old note describes a problem that is also fixed by doing the
 binder-swap in OccAnal:
 
-.. code-block:: haskell
+::
 
     There is another situation when it might make sense to suppress the
     case-expression binde-swap. If we have
 
-.. code-block:: haskell
+::
 
         case x of w1 { DEFAULT -> case x of w2 { A -> e1; B -> e2 }
                        ...other cases .... }
 
-.. code-block:: haskell
+::
 
     We'll perform the binder-swap for the outer case, giving
 
-.. code-block:: haskell
+::
 
         case x of w1 { DEFAULT -> case w1 of w2 { A -> e1; B -> e2 }
                        ...other cases .... }
 
-.. code-block:: haskell
+::
 
     But there is no point in doing it for the inner case, because w1 can't
     be inlined anyway.  Furthermore, doing the case-swapping involves
     zapping w2's occurrence info (see paragraphs that follow), and that
     forces us to bind w2 when doing case merging.  So we get
 
-.. code-block:: haskell
+::
 
         case x of w1 { A -> let w2 = w1 in e1
                        B -> let w2 = w1 in e2
                        ...other cases .... }
 
-.. code-block:: haskell
+::
 
     This is plain silly in the common case where w2 is dead.
 
-.. code-block:: haskell
+::
 
     Even so, I can't see a good way to implement this idea.  I tried
     not doing the binder-swap if the scrutinee was already evaluated
     but that failed big-time:
 
-.. code-block:: haskell
+::
 
             data T = MkT !Int
 
-.. code-block:: haskell
+::
 
             case v of w  { MkT x ->
             case x of x1 { I# y1 ->
             case x of x2 { I# y2 -> ...
 
-.. code-block:: haskell
+::
 
     Notice that because MkT is strict, x is marked "evaluated".  But to
     eliminate the last case, we must either make sure that x (as well as
@@ -1387,8 +1490,11 @@ binder-swap unconditionally and still get occurrence analysis
 information right.
 
 
+
 Note [UsageDetails and zapping]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L2431>`__
 
 On many occasions, we must modify all gathered occurrence data at once. For
 instance, all occurrences underneath a (non-one-shot) lambda set the
@@ -1404,8 +1510,12 @@ info then simply means setting the corresponding zapped set to the whole
 'OccInfoEnv', a fast O(1) operation.
 
 
+
 Note [Do not mark CoVars as dead]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L2553>`__
+
 It's obviously wrong to mark CoVars as dead if they are used.
 Currently we don't traverse types to gather usase info for CoVars,
 so we had better treat them as having noOccInfo.
@@ -1425,8 +1535,12 @@ I have no idea how we managed to avoid this pitfall for so long!
  Auxiliary functions for UsageDetails implementation
 
 
+
 Note [Join points and INLINE pragmas]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/OccurAnal.hs#L2816>`__
+
 Consider
    f x = let g = \x. not  -- Arity 1
              {-# INLINE g #-}
@@ -1453,6 +1567,4 @@ unravels; so ignoring INLINE pragmas on recursive things isn't good
 either.
 
 See Invariant 2a of Note [Invariants on join points] in CoreSyn
-
-
 

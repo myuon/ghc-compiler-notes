@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/FieldLabel.hs>`_
 
-====================
-compiler/basicTypes/FieldLabel.hs.rst
-====================
+compiler/basicTypes/FieldLabel.hs
+=================================
+
 
 Note [Why selector names include data constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/FieldLabel.hs#L42>`__
 
 As explained above, a selector name includes the name of the first
 data constructor in the type, so that the same label can appear
@@ -18,5 +20,4 @@ constructor name generated until relatively late in the typechecking
 process.
 
 Of course, datatypes with no constructors cannot have any fields.
-
 

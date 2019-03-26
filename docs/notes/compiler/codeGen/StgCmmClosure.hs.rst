@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmClosure.hs>`_
 
-====================
-compiler/codeGen/StgCmmClosure.hs.rst
-====================
+compiler/codeGen/StgCmmClosure.hs
+=================================
+
 
 Note [Data constructor dynamic tags]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmClosure.hs#L350>`__
 
 The family size of a data type (the number of constructors
 or the arity of a function) can be either:
@@ -18,8 +20,12 @@ We don't have very many tag bits: for example, we have 2 bits on
 x86-32 and 3 bits on x86-64.
 
 
+
 Note [GC recovery]
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmClosure.hs#L470>`__
+
 If we a have a local let-binding (function or thunk)
    let f = <body> in ...
 AND <body> allocates, then the heap-overflow check needs to know how
@@ -63,11 +69,15 @@ Known fun (>1 arg), fvs     & yes & yes & registers & node
 0 arg, fvs \u               & yes & yes & n/a       & node
 
 When black-holing, single-entry closures could also be entered via node
-(rather than directly) to catch double-entry. 
+(rather than directly) to catch double-entry.
+
 
 
 Note [Black-holing non-updatable thunks]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmClosure.hs#L732>`__
+
 We must not black-hole non-updatable (single-entry) thunks otherwise
 we run into issues like #10414. Specifically:
 
@@ -96,13 +106,13 @@ Here is and example due to Reid Barton (#10414):
     x = \u []  concat [[1], []]
 with the following definitions,
 
-.. code-block:: haskell
+::
 
     concat x = case x of
         []       -> []
         (:) x xs -> (++) x (concat xs)
 
-.. code-block:: haskell
+::
 
     (++) xs ys = case xs of
         []         -> ys
@@ -112,7 +122,7 @@ Where we use the syntax @\u []@ to denote an updatable thunk and @\s []@ to
 denote a single-entry (i.e. non-updatable) thunk. After a thread evaluates @x@
 to WHNF and calls @(++)@ the heap will contain the following thunks,
 
-.. code-block:: haskell
+::
 
     x = 1 : y
     y = \u []  (++) [] z

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/LoadIface.hs>`_
 
-====================
-compiler/iface/LoadIface.hs.rst
-====================
+compiler/iface/LoadIface.hs
+===========================
+
 
 Note [Loading instances for wired-in things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/LoadIface.hs#L175>`__
+
 We need to make sure that we have at least *read* the interface files
 for any module with an instance decl or RULE that we might want.
 
@@ -31,8 +34,12 @@ All of this is done by the type checker. The renamer plays no role.
 (It used to, but no longer.)
 
 
+
 Note [Loading your own hi-boot file]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/LoadIface.hs#L531>`__
+
 Generally speaking, when compiling module M, we should not
 load M.hi boot into the EPS.  After all, we are very shortly
 going to have full information about M.  Moreover, see
@@ -81,8 +88,12 @@ We know that none of the interfaces below here can refer to
 home-package modules however, so it's safe for the HPT to be empty.
 
 
+
 Note [Home module load error]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/LoadIface.hs#L862>`__
+
 If the sought-for interface is in the current package (as determined
 by -package-name flag) then it jolly well should already be in the HPT
 because we process home-package modules in dependency order.  (Except
@@ -101,8 +112,11 @@ This actually happened with P=base, Q=ghc-prim, via the AMP warnings.
 See #8320.
 
 
+
 Note [Name qualification with --show-iface]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/LoadIface.hs#L1085>`__
 
 In order to disambiguate between identifiers from different modules, we qualify
 all names that don't originate in the current module. In order to keep visual

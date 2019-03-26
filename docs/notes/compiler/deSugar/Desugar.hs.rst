@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Desugar.hs>`_
 
-====================
-compiler/deSugar/Desugar.hs.rst
-====================
+compiler/deSugar/Desugar.hs
+===========================
+
 
 Note [Top-level evidence]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Desugar.hs#L248>`__
+
 Top-level evidence bindings may be mutually recursive with the top-level value
 bindings, so we must put those in a Rec.  But we can't put them *all* in a Rec
 because the occurrence analyser doesn't take account of type/coercion variables
@@ -15,8 +18,12 @@ So we pull out the type/coercion variables (which are in dependency order),
 and Rec the rest.
 
 
+
 Note [Adding export flags]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Desugar.hs#L328>`__
+
 Set the no-discard flag if either
         a) the Id is exported
         b) it's mentioned in the RHS of an orphan rule
@@ -35,7 +42,10 @@ I didn't want to pass in yet another mapping.
 
 
 Note [Attach rules to local ids]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Desugar.hs#L345>`__
+
 Find the rules for locally-defined Ids; then we can attach them
 to the binders in the top-level bindings
 
@@ -54,9 +64,11 @@ Reason
 
 
 
-
 Note [Desugaring RULE left hand sides]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Desugar.hs#L483>`__
+
 For the LHS of a RULE we do *not* want to desugar
     [x]   to    build (\cn. x `c` n)
 We want to leave explicit lists simply as chains
@@ -73,6 +85,9 @@ the rule is precisely to optimise them:
 
 Note [Desugaring coerce as cast]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Desugar.hs#L497>`__
+
 We want the user to express a rule saying roughly “mapping a coercion over a
 list can be replaced by a coercion”. But the cast operator of Core (▷) cannot
 be written in Haskell. So we use `coerce` for that (#2110). The user writes
@@ -90,6 +105,9 @@ See also Note [Getting the map/coerce RULE to work] in CoreSubst.
 
 Note [Rules and inlining/other rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Desugar.hs#L512>`__
+
 If you have
   f x = ...
   g x = ...

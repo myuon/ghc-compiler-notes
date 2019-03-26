@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/OccName.hs>`_
 
-====================
-compiler/basicTypes/OccName.hs.rst
-====================
+compiler/basicTypes/OccName.hs
+==============================
+
 
 Note [Suppressing uniques in OccNames]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/OccName.hs#L292>`__
+
 This is a hack to de-wobblify the OccNames that contain uniques from
 Template Haskell that have been turned into a string in the OccName.
 See Note [Unique OccNames from Template Haskell] in Convert.hs
@@ -14,6 +17,9 @@ See Note [Unique OccNames from Template Haskell] in Convert.hs
 
 Note [The Unique of an OccName]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/OccName.hs#L375>`__
+
 They are efficient, because FastStrings have unique Int# keys.  We assume
 this key is less than 2^24, and indeed FastStrings are allocated keys
 sequentially starting at 0.
@@ -24,8 +30,12 @@ where 'ns' is a Char representing the name space.  This in turn makes it
 easy to build an OccEnv.
 
 
+
 Note [TidyOccEnv]
 ~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/OccName.hs#L771>`__
+
 type TidyOccEnv = UniqFM Int
 
 * Domain = The OccName's FastString. These FastStrings are "taken";
@@ -63,27 +73,28 @@ after we allocate a new one.
 
 
 
-
 Note [Tidying multiple names at once]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/OccName.hs#L809>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
     > :t (id,id,id)
 
 Every id contributes a type variable to the type signature, and all of them are
 "a". If we tidy them one by one, we get
 
-.. code-block:: haskell
+::
 
     (id,id,id) :: (a2 -> a2, a1 -> a1, a -> a)
 
 which is a bit unfortunate, as it unfairly renames only one of them. What we
 would like to see is
 
-.. code-block:: haskell
+::
 
     (id,id,id) :: (a3 -> a3, a2 -> a2, a1 -> a1)
 
@@ -96,5 +107,4 @@ This prepared TidyEnv can then be used with tidyOccName. See tidyTyCoVarBndrs
 for an example where this is used.
 
 This is #12382.
-
 
