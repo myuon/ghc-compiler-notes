@@ -112,12 +112,10 @@ executable ghc-compiler-notes
   hs-source-dirs: app
   main-is: Comment.hs
 
--- This will cause a fail in CircleCI build
---
--- executable extract-notes
---   import: general, exec
---   hs-source-dirs: app
---   main-is: ExtractNotes.hs
+executable extract-notes
+  import: general, exec
+  hs-source-dirs: app
+  main-is: ExtractNotes.hs
 
 test-suite unit-tests
   import: general, exec

@@ -1,14 +1,37 @@
-version: 2.1
+version: 2
 
-orbs:
-  haskell: haskell-works/haskell-build@1.6.3
+jobs:
+  build-test-8_6_3:
+    working_directory: ~/workspace
+    docker:
+      - image: haskell:8.6.3
+    steps:
+      - checkout
+      - run: cabal new-update
+      - run: make build
+      - run: make test
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  generate:
+    working_directory: ~/workspace
+    docker:
+      - image: haskell:8.6.3
+    steps:
+      - attach_workspace:
+          at: .
+      - run: make generate
+      - run: git add docs/notes/ && git commit -m 'build' && git push --force --quiet https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git master >/dev/null 2>&1
 
 workflows:
-  multiple-ghc-build:
+  version: 2
+  build:
     jobs:
-      - haskell/build:
-          name: GHC 8.6.3
-          executor: haskell/ghc-8_6_3
-          run-check: false
-          after-test:
-            - run: cabal new-test --enable-tests -fdev
+      - build-test-8_6_3
+      - generate:
+          requires:
+            - build-test-8_6_3
+          filters:
+            branches:
+              only: master
