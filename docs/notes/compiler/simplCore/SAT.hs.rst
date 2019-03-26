@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SAT.hs>`_
 
-====================
-compiler/simplCore/SAT.hs.rst
-====================
+compiler/simplCore/SAT.hs
+=========================
+
 
 Note [Shadow binding]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SAT.hs#L306>`__
+
 The calls to the inner map inside body[map] should get inlined
 by the local re-binding of 'map'.  We call this the "shadow binding".
 
@@ -20,6 +23,9 @@ as binder.  (Another alternative would be to reset the export flag.)
 
 Note [Binder type capture]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SAT.hs#L318>`__
+
 Notice that in the inner map (the "shadow function"), the static arguments
 are discarded -- it's as if they were underscores.  Instead, mentions
 of these arguments (notably in the types of dynamic arguments) are bound

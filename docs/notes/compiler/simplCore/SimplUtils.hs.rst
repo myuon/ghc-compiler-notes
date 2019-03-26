@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs>`_
 
-====================
-compiler/simplCore/SimplUtils.hs.rst
-====================
+compiler/simplCore/SimplUtils.hs
+================================
+
 
 Note [StaticEnv invariant]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L175>`__
+
 We pair up an InExpr or InAlts with a StaticEnv, which establishes the
 lexical scope for that InExpr.  When we simplify that InExpr/InAlts, we
 use
@@ -27,19 +30,26 @@ isn't big enough.
 
 Note [DupFlag invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L194>`__
+
 In both (ApplyToVal dup _ env k)
    and  (Select dup _ _ env k)
 the following invariants hold
 
-.. code-block:: haskell
+::
 
   (a) if dup = OkToDup, then continuation k is also ok-to-dup
   (b) if dup = OkToDup or Simplified, the subst-env is empty
       (and and hence no need to re-simplify)
 
 
+
 Note [The hole type in ApplyToTy]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L228>`__
+
 The sc_hole_ty field of ApplyToTy records the type of the "hole" in the
 continuation.  It is absolutely necessary to compute contHoleType, but it is
 not used for anything else (and hence may not be evaluated).
@@ -59,14 +69,17 @@ doesn't matter because we'll never compute them all.
 
 Note [Do not expose strictness if sm_inline=False]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L543>`__
+
 #15163 showed a case in which we had
 
-.. code-block:: haskell
+::
 
   {-# INLINE [1] zip #-}
   zip = undefined
 
-.. code-block:: haskell
+::
 
   {-# RULES "foo" forall as bs. stream (zip as bs) = ..blah... #-}
 
@@ -84,8 +97,12 @@ which it is on the LHS of a rule (see updModeForRules), then don't
 make use of the strictness info for the function.
 
 
+
 Note [Interesting call context]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L574>`__
+
 We want to avoid inlining an expression where there can't possibly be
 any gain, such as in an argument position.  Hence, if the continuation
 is interesting (eg. a case scrutinee, application etc.) then we
@@ -94,7 +111,7 @@ inline, otherwise we don't.
 Previously some_benefit used to return True only if the variable was
 applied to some value arguments.  This didn't work:
 
-.. code-block:: haskell
+::
 
         let x = _coerce_ (T Int) Int (I# 3) in
         case _coerce_ Int (T Int) x of
@@ -112,7 +129,7 @@ dMonadST = _/\_ t -> :Monad (g1 _@_ t, g2 _@_ t, g3 _@_ t)
 we'd really like to inline dMonadST here, but we *don't* want to
 inline if the case expression is just
 
-.. code-block:: haskell
+::
 
         case x of y { DEFAULT -> ... }
 
@@ -125,6 +142,9 @@ default case.
 
 Note [No case of case is boring]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L607>`__
+
 If we see
    case f x of <alts>
 
@@ -137,8 +157,12 @@ This made a small compile-time perf improvement in perf/compiler/T6048,
 and it looks plausible to me.
 
 
+
 Note [Interesting arguments]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L697>`__
+
 An argument is interesting if it deserves a discount for unfoldings
 with a discount in that argument position.  The idea is to avoid
 unfolding a function that is applied only to variables that have no
@@ -161,6 +185,9 @@ to now!
 
 Note [Conlike is interesting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L717>`__
+
 Consider
         f d = ...((*) d x y)...
         ... f (df d')...
@@ -170,8 +197,12 @@ rule for (*) (df d) can fire.  To do this
   b) we say that a con-like argument (eg (df d)) is interesting
 
 
+
 Note [Simplifying rules]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L819>`__
+
 When simplifying a rule LHS, refrain from /any/ inlining or applying
 of other RULES.
 
@@ -187,9 +218,12 @@ about and apply the RULES as originally written. See #10829.
 
 Note [No eta expansion in stable unfoldings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L832>`__
+
 If we have a stable unfolding
 
-.. code-block:: haskell
+::
 
   f :: Ord a => a -> IO ()
   -- Unfolding template
@@ -197,7 +231,7 @@ If we have a stable unfolding
 
 we do not want to eta-expand to
 
-.. code-block:: haskell
+::
 
   f :: Ord a => a -> IO ()
   -- Unfolding template
@@ -212,6 +246,9 @@ So we disable eta-expansion in stable unfoldings.
 
 Note [Inlining in gentle mode]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L851>`__
+
 Something is inlined if
    (i)   the sm_inline flag is on, AND
    (ii)  the thing has an INLINE pragma, AND
@@ -221,7 +258,7 @@ Example of why (iii) is important:
   {-# INLINE [~1] g #-}
   g = ...
 
-.. code-block:: haskell
+::
 
   {-# INLINE f #-}
   f x = g (g x)
@@ -253,6 +290,9 @@ unboxed tuples and suchlike.
 
 Note [Simplifying inside stable unfoldings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L888>`__
+
 We must take care with simplification inside stable unfoldings (which come from
 INLINE pragmas).
 
@@ -280,7 +320,7 @@ f's stable unfolding?  Our model is that literally <rhs> is substituted for
 f when it is inlined.  So our conservative plan (implemented by
 updModeForStableUnfoldings) is this:
 
-.. code-block:: haskell
+::
 
   -------------------------------------------------------------
   When simplifying the RHS of a stable unfolding, set the phase
@@ -289,13 +329,13 @@ updModeForStableUnfoldings) is this:
 
 That ensures that
 
-.. code-block:: haskell
+::
 
   a) Rules/inlinings that *cease* being active before p will
      not apply to the stable unfolding, consistent with it being
      inlined in its *original* form in phase p.
 
-.. code-block:: haskell
+::
 
   b) Rules/inlinings that only become active *after* p will
      not apply to the stable unfolding, again to be consistent with
@@ -305,7 +345,7 @@ For example,
         {-# INLINE f #-}
         f x = ...g...
 
-.. code-block:: haskell
+::
 
         {-# NOINLINE [1] g #-}
         g y = ...
@@ -339,8 +379,12 @@ mark it 'demanded', so when the RHS is simplified, it'll get an ArgOf
 continuation.
 
 
+
 Note [pre/postInlineUnconditionally in gentle mode]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1081>`__
+
 Even in gentle mode we want to do preInlineUnconditionally.  The
 reason is that too little clean-up happens if you don't inline
 use-once things.  Also a bit of inlining is *good* for full laziness;
@@ -354,22 +398,25 @@ inactive in the initial stages.  See Note [Gentle mode].
 
 
 Note [Stable unfoldings and preInlineUnconditionally]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1093>`__
+
 Surprisingly, do not pre-inline-unconditionally Ids with INLINE pragmas!
 Example
 
-.. code-block:: haskell
+::
 
    {-# INLINE f #-}
    f :: Eq a => a -> a
    f x = ...
 
-.. code-block:: haskell
+::
 
    fInt :: Int -> Int
    fInt = f Int dEqInt
 
-.. code-block:: haskell
+::
 
    ...fInt...fInt...fInt...
 
@@ -390,6 +437,9 @@ the stable unfolding, not the RHS.
 
 Note [Top-level bottoming Ids]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1120>`__
+
 Don't inline top-level Ids that are bottoming, even if they are used just
 once, because FloatOut has gone to some trouble to extract them out.
 Inlining them won't make the program run faster!
@@ -398,13 +448,20 @@ Inlining them won't make the program run faster!
 
 Note [Do not inline CoVars unconditionally]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1126>`__
+
 Coercion variables appear inside coercions, and the RHS of a let-binding
 is a term (not a coercion) so we can't necessarily inline the latter in
 the former.
 
 
+
 Note [Top level and postInlineUnconditionally]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1339>`__
+
 We don't do postInlineUnconditionally for top-level things (even for
 ones that are trivial):
 
@@ -421,7 +478,7 @@ ones that are trivial):
     but in *that* simplifier pass we must not do postInlineUnconditionally
     on 'ruggle' because then we'll have an unbound occurrence of 'ruggle'
 
-.. code-block:: haskell
+::
 
     If the rhs is trivial it'll be inlined by callSiteInline, and then
     the binding will be dead and discarded by the next use of OccurAnal
@@ -439,10 +496,13 @@ ones that are trivial):
 
 Note [Stable unfoldings and postInlineUnconditionally]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1369>`__
+
 Do not do postInlineUnconditionally if the Id has a stable unfolding,
 otherwise we lose the unfolding.  Example
 
-.. code-block:: haskell
+::
 
      -- f has stable unfolding with rhs (e |> co)
      --   where 'e' is big
@@ -450,7 +510,7 @@ otherwise we lose the unfolding.  Example
 
 Then there's a danger we'll optimise to
 
-.. code-block:: haskell
+::
 
      f' = e
      f = f' |> co
@@ -458,15 +518,17 @@ Then there's a danger we'll optimise to
 and now postInlineUnconditionally, losing the stable unfolding on f.  Now f'
 won't inline because 'e' is too big.
 
-.. code-block:: haskell
+::
 
     c.f. Note [Stable unfoldings and preInlineUnconditionally]
 
 
 
-
 Note [Eta expanding lambdas]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1447>`__
+
 In general we *do* want to eta-expand lambdas. Consider
    f (\x -> case x of (a,b) -> \s -> blah)
 where 's' is a state token, and hence can be eta expanded.  This
@@ -490,6 +552,9 @@ NB: We check the SimplEnv (sm_eta_expand), not DynFlags.
 
 Note [Casts and lambdas]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1468>`__
+
 Consider
         (\x. (\y. e) `cast` g1) `cast` g2
 There is a danger here that the two lambdas look separated, and the
@@ -524,6 +589,9 @@ because the latter is not well-kinded.
 
 Note [Eta-expanding at let bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1551>`__
+
 We now eta expand at let-bindings, which is where the payoff comes.
 The most significant thing is that we can do a simple arity analysis
 (in CoreArity.findRhsArity), which we can't do for free-floating lambdas
@@ -533,7 +601,7 @@ One useful consequence of not eta-expanding lambdas is this example:
    {-# INLINE genMap #-}
    genMap f xs = ...
 
-.. code-block:: haskell
+::
 
    myMap :: D a => ...
    {-# INLINE myMap #-}
@@ -552,11 +620,14 @@ arguments!
 
 Note [Do not eta-expand join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1575>`__
+
 Similarly to CPR (see Note [Don't CPR join points] in WorkWrap), a join point
 stands well to gain from its outer binding's eta-expansion, and eta-expanding a
 join point is fraught with issues like how to deal with a cast:
 
-.. code-block:: haskell
+::
 
     let join $j1 :: IO ()
              $j1 = ...
@@ -564,11 +635,11 @@ join point is fraught with issues like how to deal with a cast:
              $j2 n = if n > 0 then $j1
                               else ...
 
-.. code-block:: haskell
+::
 
     =>
 
-.. code-block:: haskell
+::
 
     let join $j1 :: IO ()
              $j1 = (\eta -> ...)
@@ -588,7 +659,7 @@ don't bother; again, any surrounding eta-expansion will improve these join
 points anyway, since an outer cast can *always* be pushed inside. By the time
 CorePrep comes around, the code is very likely to look more like this:
 
-.. code-block:: haskell
+::
 
     let join $j1 :: State# RealWorld -> (# State# RealWorld, ())
              $j1 = (...) eta
@@ -599,7 +670,10 @@ CorePrep comes around, the code is very likely to look more like this:
 
 
 Note [Do not eta-expand PAPs]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1613>`__
+
 We used to have old_arity = manifestArity rhs, which meant that we
 would eta-expand even PAPs.  But this gives no particular advantage,
 and can lead to a massive blow-up in code size, exhibited by #9020.
@@ -623,9 +697,11 @@ strictness analysis will have less to bite on?
 
 
 
-
 Note [Floating and type abstraction]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1643>`__
+
 Consider this:
         x = /\a. C e1 e2
 We'd like to float this to
@@ -637,11 +713,11 @@ for the usual reasons: we want to inline x rather vigorously.
 You may think that this kind of thing is rare.  But in some programs it is
 common.  For example, if you do closure conversion you might get:
 
-.. code-block:: haskell
+::
 
         data a :-> b = forall e. (e -> a -> b) :$ e
 
-.. code-block:: haskell
+::
 
         f_cc :: forall a. a :-> a
         f_cc = /\a. (\e. id a) :$ ()
@@ -658,7 +734,7 @@ but there is quite a bit of plumbing in simplLazyBind as well.
 
 The same transformation is good when there are lets in the body:
 
-.. code-block:: haskell
+::
 
         /\abc -> let(rec) x = e in b
    ==>
@@ -696,7 +772,7 @@ Unless the "..." is a WHNF there is really no point in doing this.
 Indeed it can make things worse.  Suppose x1 is used strictly,
 and is of the form
 
-.. code-block:: haskell
+::
 
         x1* = case f y of { (a,b) -> e }
 
@@ -711,6 +787,9 @@ it is guarded by the doFloatFromRhs call in simplLazyBind.
 
 Note [Which type variables to abstract over]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1718>`__
+
 Abstract only over the type variables free in the rhs wrt which the
 new binding is abstracted.  Note that
 
@@ -734,8 +813,12 @@ new binding is abstracted.  Note that
     which is obviously bogus.
 
 
+
 Note [Abstract over coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1833>`__
+
 If a coercion variable (g :: a ~ Int) is free in the RHS, then so is the
 type variable a.  Rather than sort this mess out, we simply bale out and abstract
 wrt all the type variables if any of them are coercion variables.
@@ -743,7 +826,7 @@ wrt all the type variables if any of them are coercion variables.
 
 Historical note: if you use let-bindings instead of a substitution, beware of this:
 
-.. code-block:: haskell
+::
 
                 -- Suppose we start with:
                 --
@@ -769,7 +852,10 @@ Historical note: if you use let-bindings instead of a substitution, beware of th
 
 Note [Merge Nested Cases]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-       case e of b {             ==>   case e of b {
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1949>`__
+
+case e of b {             ==>   case e of b {
          p1 -> rhs1                      p1 -> rhs1
          ...                             ...
          pm -> rhsm                      pm -> rhsm
@@ -789,7 +875,10 @@ variable is scrutinised multiple times.
 
 Note [Eliminate Identity Case]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        case e of               ===> e
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1967>`__
+
+case e of               ===> e
                 True  -> True;
                 False -> False
 
@@ -799,13 +888,16 @@ and similar friends.
 
 Note [Scrutinee Constant Folding]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     case x op# k# of _ {  ===> case x of _ {
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L1975>`__
+
+case x op# k# of _ {  ===> case x of _ {
         a1# -> e1                  (a1# inv_op# k#) -> e1
         a2# -> e2                  (a2# inv_op# k#) -> e2
         ...                        ...
         DEFAULT -> ed              DEFAULT -> ed
 
-.. code-block:: haskell
+::
 
      where (x op# k#) inv_op# k# == x
 
@@ -816,7 +908,7 @@ operation at runtime but to allow other transformations to apply in cascade.
 
 Example with the "Merge Nested Cases" optimization (from #12877):
 
-.. code-block:: haskell
+::
 
       main = case t of t0
          0##     -> ...
@@ -828,7 +920,7 @@ Example with the "Merge Nested Cases" optimization (from #12877):
                   0##     -> ...
                   DEFAULT -> ...
 
-.. code-block:: haskell
+::
 
   becomes:
 
@@ -867,7 +959,7 @@ There are some wrinkles
            DEFAULT -> let b = b' +# 10# in blah...b...
            34#     -> let b = 44# in blah2...b...
 
-.. code-block:: haskell
+::
 
   Note that in the non-DEFAULT cases we know what to bind 'b' to,
   whereas in the DEFAULT case we must reconstruct the original value.
@@ -877,8 +969,12 @@ There are some wrinkles
   see Note [caseRules for dataToTag] in PrelRules
 
 
+
 Note [Literal cases]
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L2215>`__
+
 If we have
   case tagToEnum (a ># b) of
      False -> e1
@@ -904,16 +1000,22 @@ in PrelRules)
 ------------------------------------------------
 
 
+
 Note [Dead binders]
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L2253>`__
+
 Note that dead-ness is maintained by the simplifier, so that it is
 accurate after simplification as well as before.
 
 
 
-
 Note [Cascading case merge]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplUtils.hs#L2259>`__
+
 Case merging should cascade in one sweep, because it
 happens bottom-up
 
@@ -942,7 +1044,7 @@ happens bottom-up
 However here's a tricky case that we still don't catch, and I don't
 see how to catch it in one pass:
 
-.. code-block:: haskell
+::
 
   case x of c1 { I# a1 ->
   case a1 of c2 ->
@@ -952,7 +1054,7 @@ see how to catch it in one pass:
 
 After occurrence analysis (and its binder-swap) we get this
 
-.. code-block:: haskell
+::
 
   case x of c1 { I# a1 ->
   let x = c1 in         -- Binder-swap addition
@@ -964,7 +1066,7 @@ After occurrence analysis (and its binder-swap) we get this
 When we simplify the inner case x, we'll see that
 x=c1=I# a1.  So we'll bind a2 to a1, and get
 
-.. code-block:: haskell
+::
 
   case x of c1 { I# a1 ->
   case a1 of c2 ->

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs>`_
 
-====================
-compiler/specialise/SpecConstr.hs.rst
-====================
+compiler/specialise/SpecConstr.hs
+=================================
+
 
 Note [Reboxing]
 ~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L122>`__
+
 We must be careful not to allocate the same constructor twice.  Consider
         f p = (...(case p of (a,b) -> e)...p...,
                ...let t = (r,s) in ...t...(f t)...)
@@ -26,7 +29,7 @@ ALTERNATIVE 2: pass both boxed and unboxed versions.  This no longer saves
 allocation, but does perhaps save evals. In the RULE we'd have
 something like
 
-.. code-block:: haskell
+::
 
   f (I# x#) = f' (I# x#) x#
 
@@ -55,9 +58,11 @@ ignore the bad potential of reboxing.
 
 
 
-
 Note [Good arguments]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L170>`__
+
 So we look for
 
 * A self-recursive function.  Ignore mutual recursion for now,
@@ -65,7 +70,7 @@ So we look for
 
 * EITHER
 
-.. code-block:: haskell
+::
 
    a) At a recursive call, one or more parameters is an explicit
       constructor application
@@ -73,11 +78,11 @@ So we look for
       That same parameter is scrutinised by a case somewhere in
       the RHS of the function
 
-.. code-block:: haskell
+::
 
   OR
 
-.. code-block:: haskell
+::
 
     b) At a recursive call, one or more parameters has an unfolding
        that is an explicit constructor application
@@ -93,13 +98,13 @@ What to abstract over
 There's a bit of a complication with type arguments.  If the call
 site looks like
 
-.. code-block:: haskell
+::
 
         f p = ...f ((:) [a] x xs)...
 
 then our specialised function look like
 
-.. code-block:: haskell
+::
 
         f_spec x xs = let p = (:) [a] x xs in ....as before....
 
@@ -111,7 +116,7 @@ Actually, (a) may hold for value arguments too, in which case
 we may not want to pass them.  Suppose 'x' is in scope at f's
 defn, but xs is not.  Then we'd like
 
-.. code-block:: haskell
+::
 
         f_spec xs = let p = (:) [a] x xs in ....as before....
 
@@ -121,7 +126,7 @@ call, no need to pass it again.
 Finally, if 'a' is not in scope at the call site, we could abstract
 it as we do the term variables:
 
-.. code-block:: haskell
+::
 
         f_spec a x xs = let p = (:) [a] x xs in ...as before...
 
@@ -142,15 +147,17 @@ in f_spec's RHS.
 
 
 
-
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L241>`__
+
 In this pass we gather up usage information that may mention variables
 that are bound between the usage site and the definition site; or (more
 seriously) may be bound to something different at the definition site.
 For example:
 
-.. code-block:: haskell
+::
 
         f x = letrec g y v = let x = ...
                              in ...(g (a,b) x)...
@@ -171,11 +178,14 @@ chew on; and it virtually guarantees no shadowing.
 
 
 Note [Specialising for constant parameters]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L264>`__
+
 This one is about specialising on a *constant* (but not necessarily
 constructor) argument
 
-.. code-block:: haskell
+::
 
     foo :: Int -> (Int -> Int) -> Int
     foo 0 f = 0
@@ -183,7 +193,7 @@ constructor) argument
 
 It produces
 
-.. code-block:: haskell
+::
 
     lvl_rmV :: GHC.Base.Int -> GHC.Base.Int
     lvl_rmV =
@@ -191,7 +201,7 @@ It produces
         case ds_dlk of wild_alH { GHC.Base.I# x_alG ->
         GHC.Base.I# (GHC.Prim.+# x_alG 1)
 
-.. code-block:: haskell
+::
 
     T.$wfoo :: GHC.Prim.Int# -> (GHC.Base.Int -> GHC.Base.Int) ->
     GHC.Prim.Int#
@@ -215,7 +225,7 @@ When is this worth it?  Call the constant 'lvl'
 - If 'lvl' has an unfolding that is a inlinable function, see if the corresponding
   parameter is applied (...to enough arguments...?)
 
-.. code-block:: haskell
+::
 
   Also do this is if the function has RULES?
 
@@ -225,14 +235,17 @@ Also
 
 Note [Specialising for lambda parameters]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    foo :: Int -> (Int -> Int) -> Int
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L307>`__
+
+foo :: Int -> (Int -> Int) -> Int
     foo 0 f = 0
     foo m f = foo (f m) (\n -> n-m)
 
 This is subtly different from the previous one in that we get an
 explicit lambda as the argument:
 
-.. code-block:: haskell
+::
 
     T.$wfoo :: GHC.Prim.Int# -> (GHC.Base.Int -> GHC.Base.Int) ->
     GHC.Prim.Int#
@@ -263,14 +276,16 @@ Looks cool, but probably rare...but it might be easy to implement.
 
 
 
-
 Note [SpecConstr for casts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L344>`__
+
 Consider
     data family T a :: *
     data instance T Int = T Int
 
-.. code-block:: haskell
+::
 
     foo n = ...
        where
@@ -286,11 +301,14 @@ That's why we have the Cast case in argToPat
 
 Note [Local recursive groups]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L360>`__
+
 For a *local* recursive group, we can see all the calls to the
 function, so we seed the specialisation loop from the calls in the
 body, not from the calls in the RHS.  Consider:
 
-.. code-block:: haskell
+::
 
   bar m n = foo n (n,n) (n,n) (n,n) (n,n)
    where
@@ -324,7 +342,10 @@ use the calls in the un-specialised RHS as seeds.  We call these
 
 
 Note [Seeding top-level recursive groups]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L395>`__
+
 This seeding is done in the binding for seed_calls in specRec.
 
 1. If all the bindings in a top-level recursive group are local (not
@@ -353,7 +374,10 @@ in Specialise.specImports. This remains to be done (#10346).
 
 
 Note [Top-level recursive groups]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L422>`__
+
 To get the call usage information from "the rest of the top level
 bindings" (c.f. Note [Seeding top-level recursive groups]), we work
 backwards through the top-level bindings so we see the usage before we
@@ -368,6 +392,9 @@ in specConstrProgram.  (Looks a bit revolting to me.)
 
 Note [Do not specialise diverging functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L434>`__
+
 Specialising a function that just diverges is a waste of code.
 Furthermore, it broke GHC (simpl014) thus:
    {-# STR Sb #-}
@@ -381,9 +408,11 @@ breaks an invariant.
 
 
 
-
 Note [Forcing specialisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L448>`__
+
 With stream fusion and in other similar cases, we want to fully
 specialise some (but not necessarily all!) loops regardless of their
 size and the number of specialisations.
@@ -402,13 +431,13 @@ available for things like a cross compiler using stage1.
 Here's a (simplified) example from the `vector` package. You may bring
 the special 'force specialization' type into scope by saying:
 
-.. code-block:: haskell
+::
 
   import GHC.Types (SPEC(..))
 
 or by defining your own type (again, deprecated):
 
-.. code-block:: haskell
+::
 
   data SPEC = SPEC | SPEC2
   {-# ANN type SPEC ForceSpecConstr #-}
@@ -418,7 +447,7 @@ without the annotation.)
 
 After that, you say:
 
-.. code-block:: haskell
+::
 
   foldl :: (a -> b -> a) -> a -> Stream b -> a
   {-# INLINE foldl #-}
@@ -510,7 +539,10 @@ this doesn't look like a specialisable call.
 
 
 Note [Limit recursive specialisation]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L567>`__
+
 It is possible for ForceSpecConstr to cause an infinite loop of specialisation.
 Because there is no limit on the number of specialisations, a recursive call with
 a recursive constructor as an argument (for example, list cons) will generate
@@ -551,6 +583,9 @@ and we lost a wonderful specialisation that we really wanted!
 
 Note [NoSpecConstr]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L605>`__
+
 The ignoreDataCon stuff allows you to say
     {-# ANN type T NoSpecConstr #-}
 to mean "don't specialise on arguments of this type".  It was added
@@ -569,7 +604,7 @@ Example 1
 ~~~~~~~~~
     data T a = T !a
 
-.. code-block:: haskell
+::
 
     foo :: Int -> T Int -> Int
     foo 0 t = 0
@@ -579,7 +614,7 @@ Example 1
 SpecConstr does no specialisation, because the second recursive call
 looks like a boxed use of the argument.  A pity.
 
-.. code-block:: haskell
+::
 
     $wfoo_sFw :: GHC.Prim.Int# -> T.T GHC.Base.Int -> GHC.Prim.Int#
     $wfoo_sFw =
@@ -600,7 +635,7 @@ Example 2
     data a :*: b = !a :*: !b
     data T a = T !a
 
-.. code-block:: haskell
+::
 
     foo :: (Int :*: T Int) -> Int
     foo (0 :*: t) = 0
@@ -610,7 +645,7 @@ Example 2
 Very similar to the previous one, except that the parameters are now in
 a strict tuple. Before SpecConstr, we have
 
-.. code-block:: haskell
+::
 
     $wfoo_sG3 :: GHC.Prim.Int# -> T.T GHC.Base.Int -> GHC.Prim.Int#
     $wfoo_sG3 =
@@ -646,6 +681,9 @@ unbox the strict fields, because T is polymorphic!)
 
 Note [Work-free values only in environment]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L735>`__
+
 The sc_vals field keeps track of in-scope value bindings, so
 that if we come across (case x of Just y ->...) we can reduce the
 case from knowing that x is bound to a pair.
@@ -660,7 +698,7 @@ This seldom happens because let-bound constructor applications are
 ANF-ised, but it can happen as a result of on-the-fly transformations in
 SpecConstr itself.  Here is #7865:
 
-.. code-block:: haskell
+::
 
         let {
           a'_shr =
@@ -692,6 +730,9 @@ leave it for now.
 
 Note [Making SpecConstr keener]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L777>`__
+
 Consider this, in (perf/should_run/T9339)
    last (filter odd [1..1000])
 
@@ -714,7 +755,7 @@ is on the cold path.
 
 Another example:
 
-.. code-block:: haskell
+::
 
    f x = ...(g x)....
 
@@ -726,8 +767,12 @@ scrutinised in the body.  True <=> ignore that, and speicalise whenever
 the function is applied to a data constructor.
 
 
+
 Note [Add scrutinee to ValueEnv too]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1034>`__
+
 Consider this:
    case x of y
      (a,b) -> case b of c
@@ -749,11 +794,14 @@ from outside the case.  See #4908 for the live example.
 
 Note [Avoiding exponential blowup]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1053>`__
+
 The sc_count field of the ScEnv says how many times we are prepared to
 duplicate a single function.  But we must take care with recursive
 specialisations.  Consider
 
-.. code-block:: haskell
+::
 
         let $j1 = let $j2 = let $j3 = ...
                             in
@@ -773,12 +821,14 @@ copies we are making at this level, including the original.
 
 
 
-
 Note [Local let bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1317>`__
+
 It is not uncommon to find this
 
-.. code-block:: haskell
+::
 
    let $j = \x. <blah> in ...$j True...$j True...
 
@@ -793,8 +843,12 @@ recursive function, but that's not essential and might even be
 harmful.  I'm not sure.
 
 
+
 Note [spec_usg includes rhs_usg]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1781>`__
+
 In calls to 'specialise', the returned ScUsage must include the rhs_usg in
 the passed-in SpecInfo, unless there are no calls at all to the function.
 
@@ -807,6 +861,9 @@ performance loss in #8852.
 
 Note [Specialise original body]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1791>`__
+
 The RhsInfo for a binding keeps the *original* body of the binding.  We
 must specialise that, *not* the result of applying specExpr to the RHS
 (which is also kept in RhsInfo). Otherwise we end up specialising a
@@ -816,7 +873,10 @@ specialised RHS, and that can lead directly to exponential behaviour.
 
 Note [Transfer activation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-  This note is for SpecConstr, but exactly the same thing
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1798>`__
+
+This note is for SpecConstr, but exactly the same thing
   happens in the overloading specialiser; see
   Note [Auto-specialisation and RULES] in Specialise.
 
@@ -838,10 +898,13 @@ so we test for that.
 
 Note [Transfer strictness]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1818>`__
+
 We must transfer strictness information from the original function to
 the specialised one.  Suppose, for example
 
-.. code-block:: haskell
+::
 
   f has strictness     SS
         and a RULE     f (a:as) b = f_spec a as b
@@ -859,6 +922,8 @@ The function calcSpecStrictness performs the calculation.
 Note [Strictness information in worker binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1834>`__
+
 After having calculated the strictness annotation for the worker (see Note
 [Transfer strictness] above), we also want to have this information attached to
 the worker’s arguments, for the benefit of later passes. The function
@@ -869,6 +934,9 @@ calcSpecStrictness and attaches them to the variables.
 
 Note [Free type variables of the qvar types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1852>`__
+
 In a call (f @a x True), that we want to specialise, what variables should
 we quantify over.  Clearly over 'a' and 'x', but what about any type variables
 free in x's type?  In fact we don't need to worry about them because (f @a)
@@ -886,6 +954,9 @@ See # 5458.  Yuk.
 
 Note [SpecConstr call patterns]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1867>`__
+
 A "call patterns" that we collect is going to become the LHS of a RULE.
 It's important that it doesn't have
      e |> Refl
@@ -905,6 +976,9 @@ is very important!
 
 Note [Choosing patterns]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1884>`__
+
 If we get lots of patterns we may not want to make a specialisation
 for each of them (code bloat), so we choose as follows, implemented
 by trim_pats.
@@ -926,9 +1000,12 @@ by trim_pats.
 
 Note [SpecConstr and casts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L1903>`__
+
 Consider (#14270) a call like
 
-.. code-block:: haskell
+::
 
     let f = e
     in ... f (K @(a |> co)) ...
@@ -936,7 +1013,7 @@ Consider (#14270) a call like
 where 'co' is a coercion variable not in scope at f's definition site.
 If we aren't caereful we'll get
 
-.. code-block:: haskell
+::
 
     let $sf a co = e (K @(a |> co))
         RULE "SC:f" forall a co.  f (K @(a |> co)) = $sf a co
@@ -965,7 +1042,7 @@ Here we definitely do want to specialise for that pair!  We do not
 match on the structre of the coercion; instead we just match on a
 coercion variable, so the RULE looks like
 
-.. code-block:: haskell
+::
 
    forall (x::Int, y::Int, co :: (Int,Int) ~R Foo)
      f ((x,y) |> co) = $sf x y co
@@ -994,8 +1071,12 @@ alternative would be to discard calls that mention coercion variables
 only in kind-casts, but I'm doing the simple thing for now.
 
 
+
 Note [Ignore type differences]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/SpecConstr.hs#L2349>`__
+
 We do not want to generate specialisations where the call patterns
 differ only in their type arguments!  Not only is it utterly useless,
 but it also means that (with polymorphic recursion) we can generate

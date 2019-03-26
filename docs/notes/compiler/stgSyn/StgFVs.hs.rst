@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/StgFVs.hs>`_
 
-====================
-compiler/stgSyn/StgFVs.hs.rst
-====================
+compiler/stgSyn/StgFVs.hs
+=========================
+
 
 Note [Tracking local binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/StgFVs.hs#L46>`__
+
 'locals' contains non-toplevel, non-imported binders.
 We maintain the set in 'expr', 'alt' and 'rhs', which are the only
 places where new local binders are introduced.

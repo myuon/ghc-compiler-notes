@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelInfo.hs>`_
 
-====================
-compiler/prelude/PrelInfo.hs.rst
-====================
+compiler/prelude/PrelInfo.hs
+============================
+
 
 Note [About wired-in things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelInfo.hs#L87>`__
+
 * Wired-in things are Ids\/TyCons that are completely known to the compiler.
   They are global values in GHC, (e.g.  listTyCon :: TyCon).
 

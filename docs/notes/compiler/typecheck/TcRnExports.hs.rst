@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnExports.hs>`_
 
-====================
-compiler/typecheck/TcRnExports.hs.rst
-====================
+compiler/typecheck/TcRnExports.hs
+=================================
+
 
 Note [Exports of data families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnExports.hs#L66>`__
+
 Suppose you see (#5306)
         module M where
           import X( F )
@@ -35,14 +38,17 @@ You just have to use an explicit export list:
 
 Note [Avails of associated data families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnExports.hs#L93>`__
+
 Suppose you have (#16077)
 
-.. code-block:: haskell
+::
 
     {-# LANGUAGE TypeFamilies #-}
     module A (module A) where
 
-.. code-block:: haskell
+::
 
     class    C a  where { data T a }
     instance C () where { data T () = D }
@@ -50,7 +56,7 @@ Suppose you have (#16077)
 Because @A@ is exported explicitly, GHC tries to produce an export list
 from the @GlobalRdrEnv@. In this case, it pulls out the following:
 
-.. code-block:: haskell
+::
 
     [ C defined at A.hs:4:1
     , T parent:C defined at A.hs:4:23
@@ -64,15 +70,15 @@ exported, but it isn't the first entry in the avail!
 We work around this issue by expanding GREs where the parent and child
 are both type constructors into two GRES.
 
-.. code-block:: haskell
+::
 
     T parent:C defined at A.hs:4:23
 
-.. code-block:: haskell
+::
 
       =>
 
-.. code-block:: haskell
+::
 
     [ T parent:C defined at A.hs:4:23
     , T defined at A.hs:4:23 ]
@@ -81,8 +87,11 @@ Then, we get  @[C{C;}, C{T;}, T{T;}, T{D;}]@, which eventually gets merged
 into @[C{C, T;}, T{T, D;}]@ (which satsifies the AvailTC invariant).
 
 
+
 Note [Modules without a module header]
---------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnExports.hs#L442>`__
 
 The Haskell 2010 report says in section 5.1:
 
@@ -128,5 +137,4 @@ identifier might be in (`choosePossibleNameSpaces`).
 Then for each namespace in turn, tries to find the correct identifier
 there returning the first positive result or the first terminating
 error.
-
 

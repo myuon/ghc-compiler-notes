@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrimOp.hs>`_
 
-====================
-compiler/prelude/PrimOp.hs.rst
-====================
+compiler/prelude/PrimOp.hs
+==========================
+
 
 Note [PrimOp can_fail and has_side_effects]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrimOp.hs#L307>`__
+
 Both can_fail and has_side_effects mean that the primop has
 some effect that is not captured entirely by its result value.
 
@@ -53,7 +56,10 @@ the scope of the test.
 
 
 Note [Transformations affected by can_fail and has_side_effects]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrimOp.hs#L353>`__
+
 The can_fail and has_side_effects properties have the following effect
 on program transformations.  Summary table is followed by details.
 
@@ -72,7 +78,7 @@ Duplicate      YES           NO
   this kind of stuff by hand (#9390).  So we (conservatively)
   never discard a has_side_effects primop.
 
-.. code-block:: haskell
+::
 
   However, it's fine to discard a can_fail primop.  For example
      case (indexIntArray# a i) of _ -> True
@@ -82,7 +88,7 @@ Duplicate      YES           NO
   effects) read effect, but we don't care about that here, and
   treat read effects as *not* has_side_effects.
 
-.. code-block:: haskell
+::
 
   Similarly (a `/#` b) can be discarded.  It can seg-fault or
   cause a hardware exception, but not a synchronous Haskell
@@ -90,7 +96,7 @@ Duplicate      YES           NO
 
 
 
-.. code-block:: haskell
+::
 
   Synchronous Haskell exceptions, e.g. from raiseIO#, are treated
   as has_side_effects and hence are not discarded.
@@ -109,7 +115,7 @@ Duplicate      YES           NO
         True  -> r +# 1
         False -> 0
 
-.. code-block:: haskell
+::
 
   Nor can you float out a has_side_effects primop.  For example:
        if blah then case writeMutVar# v True s0 of (# s1 #) -> s1
@@ -131,14 +137,14 @@ Duplicate      YES           NO
         s' = case p of (s', r) -> s'
         r  = case p of (s', r) -> r
 
-.. code-block:: haskell
+::
 
   (All these bindings are boxed.)  If we inline p at its two call
   sites, we get a catastrophe: because the read is performed once when
   s' is demanded, and once when 'r' is demanded, which may be much
   later.  Utterly wrong.  #3207 is real example of this happening.
 
-.. code-block:: haskell
+::
 
   However, it's fine to duplicate a can_fail primop.  That is really
   the only difference between can_fail and has_side_effects.
@@ -146,7 +152,10 @@ Duplicate      YES           NO
 
 
 Note [Implementation: how can_fail/has_side_effects affect transformations]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrimOp.hs#L432>`__
+
 How do we ensure that that floating/duplication/discarding are done right
 in the simplifier?
 
@@ -168,8 +177,12 @@ Two main predicates on primpops test these flags:
     has_side_effects things (very very very) not-cheap!
 
 
+
 Note [primOpIsCheap]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrimOp.hs#L476>`__
+
 @primOpIsCheap@, as used in \tr{SimplUtils.hs}.  For now (HACK
 WARNING), we just borrow some other predicates for a
 what-should-be-good-enough test.  "Cheap" means willing to call it more

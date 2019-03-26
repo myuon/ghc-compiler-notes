@@ -1,19 +1,24 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs>`_
 
-====================
-compiler/main/DynFlags.hs.rst
-====================
+compiler/main/DynFlags.hs
+=========================
+
 
 Note [Updating flag description in the User's Guide]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs#L257>`__
 
 If you modify anything in this file please make sure that your changes are
 described in the User's Guide. Please update the flag description in the
 users guide (docs/users_guide) whenever you add or change a flag.
 
 
+
 Note [Supporting CLI completion]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs#L264>`__
 
 The command line interface completion (in for example bash) is an easy way
 for the developer to learn what flags are available from GHC.
@@ -25,21 +30,24 @@ have effect, and annotate it accordingly. For Flags use defFlag, defGhcFlag,
 defGhciFlag, and for FlagSpec use flagSpec or flagGhciSpec.
 
 
+
 Note [Adding a language extension]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs#L276>`__
 
 There are a few steps to adding (or removing) a language extension,
 
  * Adding the extension to GHC.LanguageExtensions
 
-.. code-block:: haskell
+::
 
    The Extension type in libraries/ghc-boot-th/GHC/LanguageExtensions/Type.hs
    is the canonical list of language extensions known by GHC.
 
  * Adding a flag to DynFlags.xFlags
 
-.. code-block:: haskell
+::
 
    This is fairly self-explanatory. The name should be concise, memorable,
    and consistent with any previous implementations of the similar idea in
@@ -47,27 +55,27 @@ There are a few steps to adding (or removing) a language extension,
 
  * Adding the flag to the documentation
 
-.. code-block:: haskell
+::
 
    This is the same as any other flag. See
    Note [Updating flag description in the User's Guide]
 
  * Adding the flag to Cabal
 
-.. code-block:: haskell
+::
 
    The Cabal library has its own list of all language extensions supported
    by all major compilers. This is the list that user code being uploaded
    to Hackage is checked against to ensure language extension validity.
    Consequently, it is very important that this list remains up-to-date.
 
-.. code-block:: haskell
+::
 
    To this end, there is a testsuite test (testsuite/tests/driver/T4437.hs)
    whose job it is to ensure these GHC's extensions are consistent with
    Cabal.
 
-.. code-block:: haskell
+::
 
    The recommended workflow is,
 
@@ -85,7 +93,7 @@ There are a few steps to adding (or removing) a language extension,
 
  * Adding the flag to the GHC Wiki
 
-.. code-block:: haskell
+::
 
    There is a change log tracking language extension additions and removals
    on the GHC wiki:  https://ghc.haskell.org/trac/ghc/wiki/LanguagePragmaHistory
@@ -95,9 +103,13 @@ There are a few steps to adding (or removing) a language extension,
 DynFlags
 
 
+
 Note [Verbosity levels]
 ~~~~~~~~~~~~~~~~~~~~~~~
-    0   |   print errors & warnings only
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs#L2205>`__
+
+0   |   print errors & warnings only
     1   |   minimal verbosity: print "compiling M ... done." for each module.
     2   |   equivalent to -dshow-passes
     3   |   equivalent to existing "ghc -v"
@@ -105,8 +117,12 @@ Note [Verbosity levels]
     5   |   "ghc -v -ddump-all"
 
 
+
 Note [When is StarIsType enabled]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs#L4609>`__
+
 The StarIsType extension determines whether to treat '*' as a regular type
 operator or as a synonym for 'Data.Kind.Type'. Many existing pre-TypeInType
 programs expect '*' to be synonymous with 'Type', so by default StarIsType is
@@ -121,18 +137,24 @@ NoStarIsType caused too much breakage on Hackage.
 Note [Documenting optimisation flags]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs#L4621>`__
+
 If you change the list of flags enabled for particular optimisation levels
 please remember to update the User's Guide. The relevant file is:
 
-.. code-block:: haskell
+::
 
   docs/users_guide/using-optimisation.rst
 
 Make sure to note whether a flag is implied by -O0, -O or -O2.
 
 
+
 Note [Eta-reduction in -O0]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs#L4676>`__
+
 #11562 showed an example which tripped an ASSERT in CoreToStg; a
 function was marked as MayHaveCafRefs when in fact it obviously
 didn't.  Reason was:
@@ -147,19 +169,26 @@ removes an assertion failure. --------------------------------------------------
 Standard sets of warning options
 
 
+
 Note [Documenting warning flags]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs#L4694>`__
 
 If you change the list of warning enabled by default
 please remember to update the User's Guide. The relevant file is:
 
-.. code-block:: haskell
+::
 
  docs/users_guide/using-warnings.rst
 
 
+
 Note [No PIE while linking]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs#L5567>`__
+
 As of 2016 some Linux distributions (e.g. Debian) have started enabling -pie by
 default in their gcc builds. This is incompatible with -r as it implies that we
 are producing an executable. Consequently, we must manually pass -no-pie to gcc
@@ -167,8 +196,11 @@ when joining object files or linking dynamic libraries. Unless, of course, the
 user has explicitly requested a PIE executable with -pie. See #12759.
 
 
+
 Note [DynFlags consistency]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DynFlags.hs#L5683>`__
 
 There are a number of number of DynFlags configurations which either
 do not make sense or lead to unimplemented or buggy codepaths in the

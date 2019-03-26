@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Unique.hs>`_
 
-====================
-compiler/basicTypes/Unique.hs.rst
-====================
+compiler/basicTypes/Unique.hs
+=============================
+
 
 Note [Unique Determinism]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Unique.hs#L212>`__
+
 The order of allocated @Uniques@ is not stable across rebuilds.
 The main reason for that is that typechecking interface files pulls
 @Uniques@ from @UniqSupply@ and the interface file for the module being
@@ -24,6 +27,9 @@ see also wiki/DeterministicBuilds
 
 Note [Unique Determinism and code generation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Unique.hs#L228>`__
+
 The goal of the deterministic builds (wiki/DeterministicBuilds, #4012)
 is to get ABI compatible binaries given the same inputs and environment.
 The motivation behind that is that if the ABI doesn't change the
@@ -36,8 +42,12 @@ register allocation and code generation.
 To track progress on bit-for-bit determinism see #12262.
 
 
+
 Note [No Ord for Unique]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Unique.hs#L256>`__
+
 As explained in Note [Unique Determinism] the relative order of Uniques
 is nondeterministic. To prevent from accidental use the Ord Unique
 instance has been removed.

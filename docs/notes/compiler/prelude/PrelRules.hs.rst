@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs>`_
 
-====================
-compiler/prelude/PrelRules.hs.rst
-====================
+compiler/prelude/PrelRules.hs
+=============================
+
 
 Note [Constant folding]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L70>`__
+
 primOpRules generates a rewrite rule for each primop
 These rules do what is often called "constant folding"
 E.g. the rules for +# might say
@@ -20,8 +23,12 @@ where the (+#) on the rhs is done at compile time
 That is why these rules are built in here.
 
 
+
 Note [Rules for floating-point comparisons]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L331>`__
+
 We need different rules for floating-point values because for floats
 it is not true that x = x (for NaNs); so we do not want the equal_rule
 rule that mkRelOpRule uses.
@@ -46,8 +53,12 @@ see Note [The litEq rule: converting equality to case].
 So we /refrain/ from using litEq for mkFloatingRelOpRule.
 
 
+
 Note [The litEq rule: converting equality to case]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L508>`__
+
 This stuff turns
      n ==# 3#
 into
@@ -68,11 +79,15 @@ will transform to
 (modulo the usual precautions to avoid duplicating e1)
 
 
+
 Note [Guarding against silly shifts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L656>`__
+
 Consider this code:
 
-.. code-block:: haskell
+::
 
   import Data.Bits( (.|.), shiftL )
   chunkToBitmap :: [Bool] -> Word32
@@ -122,7 +137,7 @@ There are two cases:
 - Shifting fixed-width things: the primops ISll, Sll, etc
   These are handled by shiftRule.
 
-.. code-block:: haskell
+::
 
   We are happy to shift by any amount up to wordSize but no more.
 
@@ -130,7 +145,7 @@ There are two cases:
   from the 'integer' library.   These are handled by rule_shift_op,
   and match_Integer_shift_op.
 
-.. code-block:: haskell
+::
 
   Here we could in principle shift by any amount, but we arbitary
   limit the shift to 4 bits; in particualr we do not want shift by a
@@ -141,17 +156,21 @@ but that is only a historical accident.
 
 
 
-
 Note [Strength reduction]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L934>`__
 
 This rule turns floating point multiplications of the form 2.0 * x and
 x * 2.0 into x + x addition, because addition costs less than multiplication.
 See #7116
 
 
+
 Note [What's true and false]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L941>`__
 
 trueValInt and falseValInt represent true and false values returned by
 comparison primops for Char, Int, Word, Integer, Double, Float and Addr.
@@ -161,8 +180,12 @@ We still need Bool data constructors (True and False) to use in a rule
 for constant folding of equal Strings
 
 
+
 Note [tagToEnum#]
 ~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L983>`__
+
 Nasty check to ensure that tagToEnum# is applied to a type that is an
 enumeration TyCon.  Unification may refine the type later, but this
 check won't see that, alas.  It's crude but it works.
@@ -171,7 +194,7 @@ Here's are two cases that should fail
         f :: forall a. a
         f = tagToEnum# 0        -- Can't do tagToEnum# at a type variable
 
-.. code-block:: haskell
+::
 
         g :: Int
         g = tagToEnum# 0        -- Int is not an enumeration
@@ -185,8 +208,12 @@ rewrite rule rewrites a bad instance of tagToEnum# to an error call,
 and emits a warning.
 
 
+
 Note [dataToTag# magic]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L1046>`__
+
 The primop dataToTag# is unusual because it evaluates its argument.
 Only `SeqOp` shares that property.  (Other primops do not do anything
 as fancy as argument evaluation.)  The special handling for dataToTag#
@@ -216,9 +243,11 @@ See #15696 for a long saga.
 
 
 
-
 Note [seq# magic]
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L1083>`__
+
 The primop
    seq# :: forall a s . a -> State# s -> (# State# s, a #)
 
@@ -226,7 +255,7 @@ is /not/ the same as the Prelude function seq :: a -> b -> b
 as you can see from its type.  In fact, seq# is the implementation
 mechanism for 'evaluate'
 
-.. code-block:: haskell
+::
 
    evaluate :: a -> IO a
    evaluate a = IO $ \s -> seq# a s
@@ -242,18 +271,18 @@ Things to note
   why not instead say this?
       case x of { DEFAULT -> blah)
 
-.. code-block:: haskell
+::
 
   Reason (see #5129): if we saw
     catch# (\s -> case x of { DEFAULT -> raiseIO# exn s }) handler
 
-.. code-block:: haskell
+::
 
   then we'd drop the 'case x' because the body of the case is bottom
   anyway. But we don't want to do that; the whole /point/ of
   seq#/evaluate is to evaluate 'x' first in the IO monad.
 
-.. code-block:: haskell
+::
 
   In short, we /always/ evaluate the first argument and never
   just discard it.
@@ -279,27 +308,31 @@ Implementing seq#.  The compiler has magic for SeqOp in
   in Simplify
 
 
+
 Note [Scoping for Builtin rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L1156>`__
+
 When compiling a (base-package) module that defines one of the
 functions mentioned in the RHS of a built-in rule, there's a danger
 that we'll see
 
-.. code-block:: haskell
+::
 
         f = ...(eq String x)....
 
-.. code-block:: haskell
+::
 
         ....and lower down...
 
-.. code-block:: haskell
+::
 
         eqString = ...
 
 Then a rewrite would give
 
-.. code-block:: haskell
+::
 
         f = ...(eqString x)...
         ....and lower down...
@@ -314,8 +347,12 @@ rewriting so again we are fine.
 are explicit.)
 
 
+
 Note [Rewriting bitInteger]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L1509>`__
+
 For most types the bitInteger operation can be implemented in terms of shifts.
 The integer-gmp package, however, can do substantially better than this if
 allowed to provide its own implementation. However, in so doing it previously lost
@@ -330,8 +367,12 @@ should expect some funniness given that they will have at very least ignored a
 warning in this case.
 
 
+
 Note [caseRules for tagToEnum]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L2098>`__
+
 We want to transform
    case tagToEnum x of
      False -> e1
@@ -372,6 +413,9 @@ Instead, we deal with turning one branch into DEFAULT in SimplUtils
 
 Note [caseRules for dataToTag]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L2136>`__
+
 See also Note [dataToTag#] in primpops.txt.pp
 
 We want to transform
@@ -396,6 +440,9 @@ which caseRules isn't currently engineered to handle (#14680).
 
 Note [Unreachable caseRules alternatives]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/PrelRules.hs#L2158>`__
+
 Take care if we see something like
   case dataToTag x of
     DEFAULT -> e1

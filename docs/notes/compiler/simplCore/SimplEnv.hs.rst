@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs>`_
 
-====================
-compiler/simplCore/SimplEnv.hs.rst
-====================
+compiler/simplCore/SimplEnv.hs
+==============================
+
 
 Note [SimplEnv invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs#L192>`__
+
 seInScope:
         The in-scope part of Subst includes *all* in-scope TyVars and Ids
         The elements of the set may have better IdInfo than the
@@ -13,13 +16,13 @@ seInScope:
         have a correctly-substituted type.  So we use a lookup in this
         set to replace occurrences
 
-.. code-block:: haskell
+::
 
         The Ids in the InScopeSet are replete with their Rules,
         and as we gather info about the unfolding of an Id, we replace
         it in the in-scope set.
 
-.. code-block:: haskell
+::
 
         The in-scope set is actually a mapping OutVar -> OutVar, and
         in case expressions we sometimes bind
@@ -32,7 +35,7 @@ seIdSubst:
         from the substitution, when we decide not to clone a77, but it's quite
         legitimate to put the mapping in the substitution anyway.
 
-.. code-block:: haskell
+::
 
         Furthermore, consider
                 let x = case k of I# x77 -> ... in
@@ -42,7 +45,7 @@ seIdSubst:
         cancel out, mapping x77 to, well, x77!  But one is an in-Id and the
         other is an out-Id.
 
-.. code-block:: haskell
+::
 
         Of course, the substitution *must* applied! Things in its domain
         simply aren't necessarily bound in the result.
@@ -50,7 +53,7 @@ seIdSubst:
 * substId adds a binding (DoneId new_id) to the substitution if
         the Id's unique has changed
 
-.. code-block:: haskell
+::
 
   Note, though that the substitution isn't necessarily extended
   if the type of the Id changes.  Why not?  Because of the next point:
@@ -61,7 +64,7 @@ seIdSubst:
   An old Id might point to an old unfolding and so on... which gives a space
   leak.
 
-.. code-block:: haskell
+::
 
   [The DoneEx and DoneVar hits map to "new" stuff.]
 
@@ -84,6 +87,9 @@ seIdSubst:
 
 Note [Join arity in SimplIdSubst]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs#L256>`__
+
 We have to remember which incoming variables are join points: the occurrences
 may not be marked correctly yet, and we're in change of propagating the change if
 OccurAnal makes something a join point).
@@ -93,11 +99,15 @@ the in-scope set tracks only OutVars; if a binding is unconditionally
 inlined (via DoneEx), it never makes it into the in-scope set, and we
 need to know at the occurrence site that the variable is a join point
 so that we know to drop the context. Thus we remember which join
-points we're substituting. 
+points we're substituting.
+
 
 
 Note [WildCard binders]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs#L283>`__
+
 The program to be simplified may have wild binders
     case e of wild { p -> ... }
 We want to *rename* them away, so that there are no
@@ -115,8 +125,12 @@ wild-ids before doing much else.
 It's a very dark corner of GHC.  Maybe it should be cleaned up.
 
 
+
 Note [Setting the right in-scope set]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs#L362>`__
+
 Consider
   \x. (let x = e in b) arg[x]
 where the let shadows the lambda.  Really this means something like
@@ -140,25 +154,29 @@ setInScopeFromE.
 -------------------
 
 
+
 Note [LetFloats]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs#L403>`__
+
 The LetFloats is a bunch of bindings, classified by a FloatFlag.
 
 * All of them satisfy the let/app invariant
 
 Examples
 
-.. code-block:: haskell
+::
 
   NonRec x (y:ys)       FltLifted
   Rec [(x,rhs)]         FltLifted
 
-.. code-block:: haskell
+::
 
   NonRec x* (p:q)       FltOKSpec   -- RHS is WHNF.  Question: why not FltLifted?
   NonRec x# (y +# 3)    FltOkSpec   -- Unboxed, but ok-for-spec'n
 
-.. code-block:: haskell
+::
 
   NonRec x* (f y)       FltCareful  -- Strict binding; might fail or diverge
 
@@ -167,8 +185,12 @@ Can't happen:
   NonRec x# (f y)       -- Might diverge; does not satisfy let/app
 
 
+
 Note [Float when cheap or expandable]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs#L474>`__
+
 We want to float a let from a let if the residual RHS is
    a) cheap, such as (\x. blah)
    b) expandable, such as (f b) if f is CONLIKE
@@ -178,8 +200,12 @@ But there are
 so we must take the 'or' of the two.
 
 
+
 Note [Global Ids in the substitution]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs#L648>`__
+
 We look up even a global (eg imported) Id in the substitution. Consider
    case X.g_34 of b { (a,b) ->  ... case X.g_34 of { (p,q) -> ...} ... }
 The binder-swap in the occurrence analyser will add a binding
@@ -190,11 +216,15 @@ So we want to look up the inner X.g_34 in the substitution, where we'll
 find that it has been substituted by b.  (Or conceivably cloned.)
 
 
+
 Note [Return type for join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs#L698>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
    (join j :: Char -> Int -> Int) 77
    (     j x = \y. y + ord x    )
@@ -205,7 +235,7 @@ Consider
 
 The simplifier pushes the "apply to 77" continuation inwards to give
 
-.. code-block:: haskell
+::
 
    join j :: Char -> Int
         j x = (\y. y + ord x) 77
@@ -223,8 +253,12 @@ takes a (Just res_ty) argument so that it knows to do the type-changing
 thing.
 
 
+
 Note [Arity robustness]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs#L851>`__
+
 We *do* transfer the arity from from the in_id of a let binding to the
 out_id.  This is important, so that the arity of an Id is visible in
 its own RHS.  For example:
@@ -253,9 +287,11 @@ below that.
 
 
 
-
 Note [Robust OccInfo]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/SimplEnv.hs#L880>`__
+
 It's important that we *do* retain the loop-breaker OccInfo, because
 that's what stops the Id getting inlined infinitely, in the body of
 the letrec.

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcForeign.hs>`_
 
-====================
-compiler/typecheck/TcForeign.hs.rst
-====================
+compiler/typecheck/TcForeign.hs
+===============================
+
 
 Note [Don't recur in normaliseFfiType']
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcForeign.hs#L80>`__
+
 normaliseFfiType' is the workhorse for normalising a type used in a foreign
 declaration. If we have
 
@@ -26,6 +29,9 @@ an AppTy will be marshalable.
 
 Note [FFI type roles]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcForeign.hs#L98>`__
+
 The 'go' helper function within normaliseFfiType' always produces
 representational coercions. But, in the "children_only" case, we need to
 use these coercions in a TyConAppCo. Accordingly, the roles on the coercions
@@ -44,8 +50,12 @@ in scope.  We return a bag of all the newtype constructors thus found.
 Always returns a Representational coercion
 
 
+
 Note [Newtype constructor usage in foreign declarations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcForeign.hs#L201>`__
+
 GHC automatically "unwraps" newtype constructors in foreign import/export
 declarations.  In effect that means that a newtype data constructor is
 used even though it is not mentioned expclitly in the source, so we don't
@@ -64,6 +74,4 @@ So we really have wait until the type checker to decide what is used.
 That's why tcForeignImports and tecForeignExports return a (Bag GRE)
 for the newtype constructors they see. Then TcRnDriver can add them
 to the module's usages.
-
-
 

@@ -1,18 +1,21 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/PlaceHolder.hs>`_
 
-====================
-compiler/hsSyn/PlaceHolder.hs.rst
-====================
+compiler/hsSyn/PlaceHolder.hs
+=============================
+
 
 Note [Pass sensitive types]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/PlaceHolder.hs#L33>`__
+
 Since the same AST types are re-used through parsing,renaming and type
 checking there are naturally some places in the AST that do not have
 any meaningful value prior to the pass they are assigned a value.
 
 Historically these have been filled in with place holder values of the form
 
-.. code-block:: haskell
+::
 
   panic "error message"
 
@@ -24,12 +27,12 @@ with a PlaceHolder value when they do not yet have meaning.
 
 In terms of actual usage, we have the following
 
-.. code-block:: haskell
+::
 
   PostTc id Kind
   PostTc id Type
 
-.. code-block:: haskell
+::
 
   PostRn id Fixity
   PostRn id NameSet

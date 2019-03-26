@@ -1,17 +1,20 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs>`_
 
-====================
-compiler/typecheck/TcTyClsDecls.hs.rst
-====================
+compiler/typecheck/TcTyClsDecls.hs
+==================================
+
 
 Note [Grouping of type and class declarations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L88>`__
+
 tcTyAndClassDecls is called on a list of `TyClGroup`s. Each group is a strongly
 connected component of mutually dependent types and classes. We kind check and
 type check each group separately to enhance kind polymorphism. Take the
 following example:
 
-.. code-block:: haskell
+::
 
   type Id a = a
   data X = X (Id Int)
@@ -28,6 +31,9 @@ instantiate k to *.
 
 Note [Check role annotations in a second pass]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L106>`__
+
 Role inference potentially depends on the types of all of the datacons declared
 in a mutually recursive group. The validity of a role annotation, in turn,
 depends on the result of role inference. Because the types of datacons might
@@ -37,8 +43,12 @@ Thus, we take two passes over the resulting tycons, first checking for general
 validity and then checking for valid role annotations.
 
 
+
 Note [Kind checking for type and class decls]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L262>`__
+
 Kind checking is done thus:
 
    1. Make up a kind variable for each parameter of the declarations,
@@ -49,12 +59,12 @@ Kind checking is done thus:
 We need to kind check all types in the mutually recursive group
 before we know the kind of the type variables.  For example:
 
-.. code-block:: haskell
+::
 
   class C a where
      op :: D b => a -> b -> b
 
-.. code-block:: haskell
+::
 
   class D c where
      bop :: (Monad c) => ...
@@ -80,9 +90,12 @@ See tc269 for an example.
 
 Note [Skip decls with CUSKs in kcLTyClDecl]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L297>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
     data T (a :: *) = MkT (S a)   -- Has CUSK
     data S a = MkS (T Int) (S a)  -- No CUSK
@@ -118,6 +131,9 @@ See also Note [Kind checking recursive type and class declarations]
 
 Note [How TcTyCons work]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L331>`__
+
 TcTyCons are used for two distinct purposes
 
 1.  When recovering from a type error in a type declaration,
@@ -128,32 +144,32 @@ TcTyCons are used for two distinct purposes
 2.  When checking a type/class declaration (in module TcTyClsDecls), we come
     upon knowledge of the eventual tycon in bits and pieces.
 
-.. code-block:: haskell
+::
 
       S1) First, we use getInitialKinds to look over the user-provided
           kind signature of a tycon (including, for example, the number
           of parameters written to the tycon) to get an initial shape of
           the tycon's kind.  We record that shape in a TcTyCon.
 
-.. code-block:: haskell
+::
 
           For CUSK tycons, the TcTyCon has the final, generalised kind.
           For non-CUSK tycons, the TcTyCon has as its tyConBinders only
           the explicit arguments given -- no kind variables, etc.
 
-.. code-block:: haskell
+::
 
       S2) Then, using these initial kinds, we kind-check the body of the
           tycon (class methods, data constructors, etc.), filling in the
           metavariables in the tycon's initial kind.
 
-.. code-block:: haskell
+::
 
       S3) We then generalize to get the (non-CUSK) tycon's final, fixed
           kind. Finally, once this has happened for all tycons in a
           mutually recursive group, we can desugar the lot.
 
-.. code-block:: haskell
+::
 
     For convenience, we store partially-known tycons in TcTyCons, which
     might store meta-variables. These TcTyCons are stored in the local
@@ -168,7 +184,7 @@ TcTyCons are used for two distinct purposes
       - one in kcTyClDecls (to kind-check the body)
       - a final one in tcTyClDecls (to desugar)
 
-.. code-block:: haskell
+::
 
     In the latter two passes, we need to connect the user-written type
     variables in an LHsQTyVars with the variables in the tycon's
@@ -177,13 +193,13 @@ TcTyCons are used for two distinct purposes
     git history between Dec 2015 and Apr 2016 for
     TcHsType.splitTelescopeTvs!)
 
-.. code-block:: haskell
+::
 
     Instead of trying, we just store the list of type variables to
     bring into scope, in the tyConScopedTyVars field of the TcTyCon.
     These tyvars are brought into scope in TcHsType.bindTyClTyVars.
 
-.. code-block:: haskell
+::
 
     In a TcTyCon, why is tyConScopedTyVars :: [(Name,TcTyVar)] rather
     than just [TcTyVar]?  Consider these mutually-recursive decls
@@ -200,6 +216,9 @@ See also Note [Type checking recursive type and class declarations].
 
 Note [Type environment evolution]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L395>`__
+
 As we typecheck a group of declarations the type environment evolves.
 Consider for example:
   data B (a :: Type) = MkB (Proxy 'MkB)
@@ -228,7 +247,7 @@ We do the following steps:
   3. Back in tcTyDecls, extend the envt with bindings of the poly-kinded
      TcTyCons, again overriding the promotion-error bindings.
 
-.. code-block:: haskell
+::
 
      But note that the data constructor promotion errors are still in place
      so that (in our example) a use of MkB will sitll be signalled as
@@ -240,9 +259,11 @@ We do the following steps:
 
 
 
-
 Note [Missed opportunity to retain higher-rank kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L434>`__
+
 In 'kcTyClGroup', there is a missed opportunity to make kind
 inference work in a few more cases.  The idea is analogous
 to Note [Single function non-recursive binding special-case]:
@@ -264,11 +285,14 @@ Unfortunately this requires reworking a bit of the code in
 
 Note [Don't process associated types in kcLHsQTyVars]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L453>`__
+
 Previously, we processed associated types in the thing_inside in kcLHsQTyVars,
 but this was wrong -- we want to do ATs sepearately.
 The consequence for not doing it this way is #15142:
 
-.. code-block:: haskell
+::
 
   class ListTuple (tuple :: Type) (as :: [(k, Type)]) where
     type ListToTuple as :: Type
@@ -289,7 +313,10 @@ been generalized.
 
 
 Note [Required, Specified, and Inferred for types]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L658>`__
+
 Each forall'd type variable in a type or kind is one of
 
   * Required: an argument must be provided at every call site
@@ -397,7 +424,7 @@ Design alternatives
   then can specify it themselves, and it is better to be predictable and dumb
   than clever and capricious.
 
-.. code-block:: haskell
+::
 
   I (Richard) conjecture we could be fully permissive, allowing all classes
   of variables to intermix. We would have to augment ScopedSort to refuse to
@@ -417,6 +444,9 @@ Test cases (and tickets) relevant to these design decisions
 
 Note [Inferring kinds for type declarations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L781>`__
+
 This note deals with /inference/ for type declarations
 that do not have a CUSK.  Consider
   data T (a :: k1) k2 (x :: k2) = MkT (S a k2 x)
@@ -428,7 +458,7 @@ We do kind inference as follows:
   Make a unification variable for each of the Required and Specified
   type varialbes in the header.
 
-.. code-block:: haskell
+::
 
   Record the connection between the Names the user wrote and the
   fresh unification variables in the tcTyConScopedTyVars field
@@ -448,7 +478,7 @@ We do kind inference as follows:
     - Have complete fresh Names; see TcMType
       Note [Unification variables need fresh Names]
 
-.. code-block:: haskell
+::
 
   Assign initial monomorophic kinds to S, T
           S :: kk1 -> * -> kk2 -> *
@@ -459,11 +489,11 @@ We do kind inference as follows:
   and solve the resulting equalities.  The goal here is to discover
   constraints on all these unification variables.
 
-.. code-block:: haskell
+::
 
   Here we find that kk1 := kk3, and kk2 := kk4.
 
-.. code-block:: haskell
+::
 
   This is why we can't use skolems for kk1 etc; they have to
   unify with each other.
@@ -474,16 +504,16 @@ We do kind inference as follows:
   Note [Required, Specified, and Inferred for types]),
   and perform some validity checks.
 
-.. code-block:: haskell
+::
 
   This makes the utterly-final TyConBinders for the TyCon.
 
-.. code-block:: haskell
+::
 
   All this is very similar at the level of terms: see TcBinds
   Note [Quantified variables in partial type signatures]
 
-.. code-block:: haskell
+::
 
   But there some tricky corners: Note [Tricky scoping in generaliseTcTyCon]
 
@@ -513,7 +543,7 @@ There are some wrinkles
   Here we will unify k1 with k2, but this time doing so is an error,
   because k1 and k2 are bound in the same declaration.
 
-.. code-block:: haskell
+::
 
   We spot this during validity checking (findDupTyVarTvs),
   in generaliseTcTyCon.
@@ -530,7 +560,7 @@ There are some wrinkles
   generalise S. When we come to T we'll find that kk1 (now the same as
   kk3) has already been skolemised.
 
-.. code-block:: haskell
+::
 
   That's fine -- but it means that
     a) when collecting quantification candidates, in
@@ -541,12 +571,15 @@ There are some wrinkles
 
 Note [Tricky scoping in generaliseTcTyCon]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L885>`__
+
 Consider #16342
   class C (a::ka) x where
     cop :: D a x => x -> Proxy a -> Proxy a
     cop _ x = x :: Proxy (a::ka)
 
-.. code-block:: haskell
+::
 
   class D (b::kb) y where
     dop :: C b y => y -> Proxy b -> Proxy b
@@ -587,8 +620,12 @@ zonkRecTyVarBndrs we need to do knot-tying because of the need to
 apply this same substitution to the kind of each.  ------------
 
 
+
 Note [Recursion and promoting data constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L1179>`__
+
 We don't want to allow promotion in a strongly connected component
 when kind checking.
 
@@ -607,9 +644,12 @@ in tcTyClGroup.
 
 Note [Kind-checking for GADTs]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L1195>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
   data Proxy a where
     MkProxy1 :: forall k (b :: k). Proxy b
@@ -623,7 +663,7 @@ the kind-checking pass. First off, note that it's OK if the kind-checking pass
 is too permissive: we'll snag the problems in the type-checking pass later.
 (This extra permissiveness might happen with something like
 
-.. code-block:: haskell
+::
 
   data SameKind :: k -> k -> Type
   data Bad a where
@@ -661,7 +701,10 @@ and so this wrinkle need not cause anyone to lose sleep.
 
 
 Note [Type checking recursive type and class declarations]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L1250>`__
+
 At this point we have completed *kind-checking* of a mutually
 recursive group of type/class decls (done in kcTyClGroup). However,
 we discarded the kind-checked types (eg RHSs of data type decls);
@@ -688,7 +731,7 @@ kind-checking the RHS of T's decl, we *do* need to know T's kind (so
 that we can correctly elaboarate (T k f a).  How can we get T's kind
 without looking at T?  Delicate answer: during tcTyClDecl, we extend
 
-.. code-block:: haskell
+::
 
   *Global* env with T -> ATyCon (the (not yet built) final TyCon for T)
   *Local*  env with T -> ATcTyCon (TcTyCon with the polymorphic kind of T)
@@ -711,6 +754,9 @@ See also Note [Kind checking recursive type and class declarations]
 
 Note [Kind checking recursive type and class declarations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L1295>`__
+
 Before we can type-check the decls, we must kind check them. This
 is done by establishing an "initial kind", which is a rather uninformed
 guess at a tycon's kind (by counting arguments, mainly) and then
@@ -734,20 +780,26 @@ during type-checking.
 
 Note [Declarations for wired-in things]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L1316>`__
+
 For wired-in things we simply ignore the declaration
 and take the wired-in information.  That avoids complications.
 e.g. the need to make the data constructor worker name for
      a constraint tuple match the wired-in one
 
 
+
 Note [Associated type defaults]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L1435>`__
 
 The following is an example of associated type defaults:
              class C a where
                data D a
 
-.. code-block:: haskell
+::
 
                type F a b :: *
                type F a b = [a]        -- Default
@@ -756,11 +808,15 @@ Note that we can get default definitions only for type families, not data
 families.
 
 
+
 Note [Type-checking default assoc decls]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L1542>`__
+
 Consider this default declaration for an associated type
 
-.. code-block:: haskell
+::
 
    class C a where
       type F (a :: k) b :: *
@@ -789,11 +845,14 @@ but it works.
 
 Note [Instantiating a family tycon]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L1883>`__
+
 It's possible that kind-checking the result of a family tycon applied to
 its patterns will instantiate the tycon further. For example, we might
 have
 
-.. code-block:: haskell
+::
 
   type family F :: k where
     F = Int
@@ -811,6 +870,9 @@ or (Type -> Type) for the equations above) and the instantiated kind.
 
 Note [Generalising in tcFamTyPatsGuts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L1901>`__
+
 Suppose we have something like
   type instance forall (a::k) b. F t1 t2 = rhs
 
@@ -841,8 +903,12 @@ Simple, neat, but a little non-obvious!
 ------------------------
 
 
+
 Note [Constraints in patterns]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L2051>`__
+
 NB: This isn't the whole story. See comment in tcFamTyPats.
 
 At first glance, it seems there is a complicated story to tell in tcFamTyPats
@@ -855,21 +921,21 @@ case branches. There can't be global skolems.
 This means that the semantics of type-level GADT matching is a little
 different than term level. If we have
 
-.. code-block:: haskell
+::
 
   data G a where
     MkGBool :: G Bool
 
 And then
 
-.. code-block:: haskell
+::
 
   type family F (a :: G k) :: k
   type instance F MkGBool = True
 
 we get
 
-.. code-block:: haskell
+::
 
   axF : F Bool (MkGBool <Bool>) ~ True
 
@@ -892,16 +958,18 @@ them as givens when checking the RHS. TODO (RAE): Implement plan.
 
 
 
-
 Note [Quantifying over family patterns]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L2095>`__
+
 We need to quantify over two different lots of kind variables:
 
 First, the ones that come from the kinds of the tyvar args of
 tcTyVarBndrsKindGen, as usual
   data family Dist a
 
-.. code-block:: haskell
+::
 
   -- Proxy :: forall k. k -> *
   data instance Dist (Proxy a) = DP
@@ -922,6 +990,9 @@ the thing_inside of tcHsTyvarBndrsGen.
 
 Note [Quantified kind variables of a family pattern]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L2118>`__
+
 Consider   type family KindFam (p :: k1) (q :: k1)
            data T :: Maybe k1 -> k2 -> *
            type instance KindFam (a :: Maybe k) b = T a b -> Int
@@ -942,10 +1013,11 @@ that 'a' must have that kind, and to bring 'k' into scope.
 
 
 
-
-
 Note [Infix GADT constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L2413>`__
+
 We do not currently have syntax to declare an infix constructor in GADT syntax,
 but it makes a (small) difference to the Show instance.  So as a slightly
 ad-hoc solution, we regard a GADT data constructor as infix if
@@ -959,13 +1031,15 @@ For example:
 
 
 
-
 Note [Checking GADT return types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L2427>`__
+
 There is a delicacy around checking the return types of a datacon. The
 central problem is dealing with a declaration like
 
-.. code-block:: haskell
+::
 
   data T a where
     MkT :: T a -> Q a
@@ -997,8 +1071,12 @@ The representation tycon looks like this:
 In this case orig_res_ty = T (e,e)
 
 
+
 Note [mkGADTVars]
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L2537>`__
+
 Running example:
 
 data T (k1 :: *) (k2 :: *) (a :: k2) (b :: k2) where
@@ -1007,7 +1085,7 @@ data T (k1 :: *) (k2 :: *) (a :: k2) (b :: k2) where
 
 We need the rejigged type to be
 
-.. code-block:: haskell
+::
 
   MkT :: forall (x1 :: *) (k2 :: *) (a :: k2) (b :: k2).
          forall (y :: x1) (z :: *).
@@ -1040,7 +1118,7 @@ know this match will succeed because of the validity check (actually done
 later, but laziness saves us -- see Note [Checking GADT return types]).
 Thus, we get
 
-.. code-block:: haskell
+::
 
   subst := { k1 |-> x1, k2 |-> *, a |-> (Proxy x1 y, z), b |-> z }
 
@@ -1063,7 +1141,7 @@ It carries two substitutions:
 Before explaining the details of `choose`, let's just look at its operation
 on our example:
 
-.. code-block:: haskell
+::
 
   choose [] [] {} {} [k1, k2, a, b]
   -->          -- first branch of `case` statement
@@ -1141,8 +1219,11 @@ names, for example, this would be simplified. This change would almost
 certainly degrade error messages a bit, though.
 
 
+
 Note [Substitution in template variables kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L2750>`__
 
 data G (a :: Maybe k) where
   MkG :: G Nothing
@@ -1189,7 +1270,10 @@ never happen.
 
 
 Note [Recover from validity error]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L2831>`__
+
 We recover from a validity error in a type or class, which allows us
 to report multiple validity errors. In the failure case we return a
 TyCon of the right kind, but with no interesting behaviour
@@ -1231,7 +1315,7 @@ Some notes:
  module alpha conversion of the quantified type variables
  of the constructor.
 
-.. code-block:: haskell
+::
 
  Note that we allow existentials to match because the
  fields can never meet. E.g
@@ -1241,8 +1325,12 @@ Some notes:
  Here we do not complain about f1,f2 because they are existential
 
 
+
 Note [Class method constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L3338>`__
+
 Haskell 2010 is supposed to reject
   class C a where
     op :: Eq a => a -> a
@@ -1260,13 +1348,16 @@ as pointed out in #11793. So the test here rejects the program if
 
 Note [Abort when superclass cycle is detected]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L3353>`__
+
 We must avoid doing the ambiguity check for the methods (in
 checkValidClass.check_op) when there are already errors accumulated.
 This is because one of the errors may be a superclass cycle, and
 superclass cycles cause canonicalization to loop. Here is a
 representative example:
 
-.. code-block:: haskell
+::
 
   class D a => C a where
     meth :: D a => ()
@@ -1278,11 +1369,14 @@ This fixes #9415, #9739
 
 Note [Default method type signatures must align]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L3367>`__
+
 GHC enforces the invariant that a class method's default type signature
 must "align" with that of the method's non-default type signature, as per
 GHC #12918. For instance, if you have:
 
-.. code-block:: haskell
+::
 
   class Foo a where
     bar :: forall b. Context => a -> b
@@ -1291,14 +1385,14 @@ Then a default type signature for bar must be alpha equivalent to
 (forall b. a -> b). That is, the types must be the same modulo differences in
 contexts. So the following would be acceptable default type signatures:
 
-.. code-block:: haskell
+::
 
     default bar :: forall b. Context1 => a -> b
     default bar :: forall x. Context2 => a -> x
 
 But the following are NOT acceptable default type signatures:
 
-.. code-block:: haskell
+::
 
     default bar :: forall b. b -> a
     default bar :: forall x. x
@@ -1311,7 +1405,7 @@ The default type signature (default bar :: a -> Int) deserves special mention,
 since (a -> Int) is a straightforward instantiation of (forall b. a -> b). To
 write this, you need to declare the default type signature like so:
 
-.. code-block:: haskell
+::
 
     default bar :: forall b. (b ~ Int). a -> b
 
@@ -1320,13 +1414,13 @@ As noted in #12918, there are several reasons to do this:
 1. It would make no sense to have a type that was flat-out incompatible with
    the non-default type signature. For instance, if you had:
 
-.. code-block:: haskell
+::
 
      class Foo a where
        bar :: a -> Int
        default bar :: a -> Bool
 
-.. code-block:: haskell
+::
 
    Then that would always fail in an instance declaration. So this check
    nips such cases in the bud before they have the chance to produce
@@ -1347,14 +1441,14 @@ the rest of the type signature? That's because default implementations often
 rely on assumptions that the more general, non-default type signatures do not.
 For instance, in the Enum class declaration:
 
-.. code-block:: haskell
+::
 
     class Enum a where
       enum :: [a]
       default enum :: (Generic a, GEnum (Rep a)) => [a]
       enum = map to genum
 
-.. code-block:: haskell
+::
 
     class GEnum f where
       genum :: [f a]
@@ -1373,13 +1467,16 @@ See Note [Splitting nested sigma types in class type signatures].
 
 Note [Splitting nested sigma types in class type signatures]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L3444>`__
+
 Consider this type synonym and class definition:
 
-.. code-block:: haskell
+::
 
   type Traversal s t a b = forall f. Applicative f => (a -> f b) -> s -> f t
 
-.. code-block:: haskell
+::
 
   class Each s t a b where
     each         ::                                      Traversal s t a b
@@ -1390,13 +1487,13 @@ are the same, but actually getting GHC to conclude this is surprisingly tricky.
 That is because in general, the form of a class method's non-default type
 signature is:
 
-.. code-block:: haskell
+::
 
   forall a. C a => forall d. D d => E a b
 
 And the general form of a default type signature is:
 
-.. code-block:: haskell
+::
 
   forall f. F f => E a f -- The variable `a` comes from the class
 
@@ -1407,7 +1504,7 @@ will work, but Each is a bit of an exceptional case. The way `each` is written,
 it doesn't quantify any additional type variables besides those of the Each
 class itself, so the non-default type signature for `each` is actually this:
 
-.. code-block:: haskell
+::
 
   forall s t a b. Each s t a b => Traversal s t a b
 
@@ -1416,20 +1513,20 @@ forall lurking in the Traversal type synonym, so if you call tcSplitSigmaTy
 twice, you'll also go under the forall in Traversal! That is, you'll end up
 with:
 
-.. code-block:: haskell
+::
 
   (a -> f b) -> s -> f t
 
 A problem arises because you only call tcSplitSigmaTy once on the default type
 signature for `each`, which gives you
 
-.. code-block:: haskell
+::
 
   Traversal s t a b
 
 Or, equivalently:
 
-.. code-block:: haskell
+::
 
   forall f. Applicative f => (a -> f b) -> s -> f t
 
@@ -1445,11 +1542,14 @@ signature for `each`, it would return (a -> f b) -> s -> f t like we desired.
 
 Note [Checking partial record field]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcTyClsDecls.hs#L3498>`__
+
 This check checks the partial record field selector, and warns (#7169).
 
 For example:
 
-.. code-block:: haskell
+::
 
   data T a = A { m1 :: a, m2 :: a } | B { m1 :: a }
 
@@ -1460,8 +1560,7 @@ declaration of T, not at the call-sites of m2.
 The warning can be suppressed by prefixing the field-name with an underscore.
 For example:
 
-.. code-block:: haskell
+::
 
   data T a = A { m1 :: a, _m2 :: a } | B { m1 :: a }
-
 

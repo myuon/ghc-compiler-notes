@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs>`_
 
-====================
-compiler/types/FamInstEnv.hs.rst
-====================
+compiler/types/FamInstEnv.hs
+============================
+
 
 Note [FamInsts and CoAxioms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L74>`__
+
 * CoAxioms and FamInsts are just like
   DFunIds  and ClsInsts
 
@@ -20,8 +23,12 @@ Note [FamInsts and CoAxioms]
       where F is a type family
 
 
+
 Note [Arity of data families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L129>`__
+
 Data family instances might legitimately be over- or under-saturated.
 
 Under-saturation has two potential causes:
@@ -29,12 +36,12 @@ Under-saturation has two potential causes:
  U2) When the user has specified a return kind instead of written out patterns.
      Example:
 
-.. code-block:: haskell
+::
 
        data family Sing (a :: k)
        data instance Sing :: Bool -> Type
 
-.. code-block:: haskell
+::
 
      The data family tycon Sing has an arity of 2, the k and the a. But
      the data instance has only one pattern, Bool (standing in for k).
@@ -48,18 +55,18 @@ Over-saturation is also possible:
       an instance might legitimately have more arguments than the family.
       Example:
 
-.. code-block:: haskell
+::
 
         data family Fix :: (Type -> k) -> k
         data instance Fix f = MkFix1 (f (Fix f))
         data instance Fix f x = MkFix2 (f (Fix f x) x)
 
-.. code-block:: haskell
+::
 
       In the first instance here, the k in the data family kind is chosen to
       be Type. In the second, it's (Type -> Type).
 
-.. code-block:: haskell
+::
 
       However, we require that any over-saturation is eta-reducible. That is,
       we require that any extra patterns be bare unrepeated type variables;
@@ -73,8 +80,12 @@ arguments.
 Obtain the axiom of a family instance
 
 
+
 Note [Lazy axiom match]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L246>`__
+
 It is Vitally Important that mkImportedFamInst is *lazy* in its axiom
 parameter. The axiom is loaded lazily, via a forkM, in TcIface. Sometime
 later, mkImportedFamInst is called using that axiom. However, the axiom
@@ -92,8 +103,12 @@ interface file.  In particular, we get the rough match info from the iface
 (instead of computing it here).
 
 
+
 Note [FamInstEnv]
 ~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L302>`__
+
 A FamInstEnv maps a family name to the list of known instances for that family.
 
 The same FamInstEnv includes both 'data family' and 'type family' instances.
@@ -115,6 +130,9 @@ Nevertheless it is still useful to have data families in the FamInstEnv:
 
 Note [Varying number of patterns for data family axioms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L321>`__
+
 For data families, the number of patterns may vary between instances.
 For example
    data family T a b
@@ -125,7 +143,7 @@ Then we get a data type for each instance, and an axiom:
    data TInt a = T1 a | T2
    data TBoolList a = T3 a
 
-.. code-block:: haskell
+::
 
    axiom ax7   :: T Int ~ TInt   -- Eta-reduced
    axiom ax8 a :: T Bool [a] ~ TBoolList a
@@ -137,6 +155,9 @@ see Note [Eta reduction for data families]
 
 Note [FamInstEnv determinism]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L339>`__
+
 We turn FamInstEnvs into a list in some places that don't directly affect
 the ABI. That happens in family consistency checks and when producing output
 for `:info`. Unfortunately that nondeterminism is nonlocal and it's hard
@@ -148,8 +169,12 @@ UniqFM and UniqDFM.
 See Note [Deterministic UniqFM].
 
 
+
 Note [Apartness]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L409>`__
+
 In dealing with closed type families, we must be able to check that one type
 will never reduce to another. This check is called /apartness/. The check
 is always between a target (which may be an arbitrary type) and a pattern.
@@ -164,6 +189,9 @@ applications into fresh variables. (See Note [Flattening].)
 
 Note [Compatibility]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L421>`__
+
 Two patterns are /compatible/ if either of the following conditions hold:
 1) The patterns are apart.
 2) The patterns unify with a substitution S, and their right hand sides
@@ -223,6 +251,9 @@ irrelevant (clause 1 of compatible) or benign (clause 2 of compatible).
 
 Note [Compatibility of eta-reduced axioms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L478>`__
+
 In newtype instances of data families we eta-reduce the axioms,
 See Note [Eta reduction for data families] in FamInstEnv. This means that
 we sometimes need to test compatibility of two axioms that were eta-reduced to
@@ -250,8 +281,12 @@ fails anyway.
 See Note [Compatibility]
 
 
+
 Note [Tidy axioms when we build them]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L586>`__
+
 Like types and classes, we build axioms fully quantified over all
 their variables, and tidy them when we build them. For example,
 we print out axioms and don't want to print stuff like
@@ -269,9 +304,12 @@ things like injectivity errors to come out right. Danger of
 
 Note [Always number wildcard types in CoAxBranch]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L601>`__
+
 Consider the following example (from the DataFamilyInstanceLHS test case):
 
-.. code-block:: haskell
+::
 
   data family Sing (a :: k)
   data instance Sing (_ :: MyKind) where
@@ -281,7 +319,7 @@ Consider the following example (from the DataFamilyInstanceLHS test case):
 If we're not careful during tidying, then when this program is compiled with
 -ddump-types, we'll get the following information:
 
-.. code-block:: haskell
+::
 
   COERCION AXIOMS
     axiom DataFamilyInstanceLHS.D:R:SingMyKind_0 ::
@@ -293,7 +331,7 @@ gets printed above), we tidy all the variables in an env that already contains
 '_'. Thus, any variable named '_' will be renamed, giving us the nicer output
 here:
 
-.. code-block:: haskell
+::
 
   COERCION AXIOMS
     axiom DataFamilyInstanceLHS.D:R:SingMyKind_0 ::
@@ -307,8 +345,11 @@ that Note.
 all axiom roles are Nominal, as this is only used with type families
 
 
+
 Note [Verifying injectivity annotation]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L812>`__
 
 Injectivity means that the RHS of a type family uniquely determines the LHS (see
 Note [Type inference for type families with injectivity]).  User informs about
@@ -324,43 +365,43 @@ conditions hold:
 1. For each pair of *different* equations of a type family, one of the following
    conditions holds:
 
-.. code-block:: haskell
+::
 
    A:  RHSs are different.
 
-.. code-block:: haskell
+::
 
    B1: OPEN TYPE FAMILIES: If the RHSs can be unified under some substitution
        then it must be possible to unify the LHSs under the same substitution.
        Example:
 
-.. code-block:: haskell
+::
 
           type family FunnyId a = r | r -> a
           type instance FunnyId Int = Int
           type instance FunnyId a = a
 
-.. code-block:: haskell
+::
 
        RHSs of these two equations unify under [ a |-> Int ] substitution.
        Under this substitution LHSs are equal therefore these equations don't
        violate injectivity annotation.
 
-.. code-block:: haskell
+::
 
    B2: CLOSED TYPE FAMILIES: If the RHSs can be unified under some
        substitution then either the LHSs unify under the same substitution or
        the LHS of the latter equation is overlapped by earlier equations.
        Example 1:
 
-.. code-block:: haskell
+::
 
           type family SwapIntChar a = r | r -> a where
               SwapIntChar Int  = Char
               SwapIntChar Char = Int
               SwapIntChar a    = a
 
-.. code-block:: haskell
+::
 
        Say we are checking the last two equations. RHSs unify under [ a |->
        Int ] substitution but LHSs don't. So we apply the substitution to LHS
@@ -369,12 +410,12 @@ conditions hold:
        that pair of last two equations does not violate injectivity
        annotation.
 
-.. code-block:: haskell
+::
 
    A special case of B is when RHSs unify with an empty substitution ie. they
    are identical.
 
-.. code-block:: haskell
+::
 
    If any of the above two conditions holds we conclude that the pair of
    equations does not violate injectivity annotation. But if we find a pair
@@ -382,7 +423,7 @@ conditions hold:
    violates injectivity annotation because for a given RHS we don't have a
    unique LHS. (Note that (B) actually implies (A).)
 
-.. code-block:: haskell
+::
 
    Note that we only take into account these LHS patterns that were declared
    as injective.
@@ -393,12 +434,12 @@ conditions hold:
    to cover all possible patterns.  So for example this definition will be
    rejected:
 
-.. code-block:: haskell
+::
 
       type family W1 a = r | r -> a
       type instance W1 [a] = a
 
-.. code-block:: haskell
+::
 
    If it were accepted we could call `W1 [W1 Int]`, which would reduce to
    `W1 Int` and then by injectivity we could conclude that `[W1 Int] ~ Int`,
@@ -415,8 +456,12 @@ conditions hold:
 See also Note [Injective type families] in TyCon
 
 
+
 Note [Family instance overlap conflicts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L936>`__
+
 - In the case of data family instances, any overlap is fundamentally a
   conflict (as these instances imply injective type mappings).
 
@@ -432,8 +477,12 @@ Note [Family instance overlap conflicts]
  Might be a one-way match or a unifier
 
 
+
 Note [Over-saturated matches]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L1022>`__
+
 It's ok to look up an over-saturated type constructor.  E.g.
      type family F a :: * -> *
      type instance F (a,b) = Either (a->b)
@@ -467,8 +516,12 @@ inaccessible branches. If these errors go unreported, no harm done.
 This is defined here to avoid a dependency from CoAxiom to Unify
 
 
+
 Note [Normalising types]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L1194>`__
+
 The topNormaliseType function removes all occurrences of type families
 and newtypes from the top-level structure of a type. normaliseTcApp does
 the type family lookup and is fairly straightforward. normaliseType is
@@ -510,6 +563,9 @@ That's what the CoercionTy case is doing within normalise_type.
 
 Note [Normalisation and type synonyms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L1233>`__
+
 We need to be a bit careful about normalising in the presence of type
 synonyms (#13035).  Suppose S is a type synonym, and we have
    S t1 t2
@@ -526,8 +582,12 @@ which might contain redexes. I'm sure you could conjure up an exponential
 case by that route too, but it hasn't happened in practice yet!
 
 
+
 Note [Flattening]
 ~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/FamInstEnv.hs#L1544>`__
+
 As described in "Closed type families with overlapping equations"
 http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/axioms-extended.pdf
 we need to flatten core types before unifying them, when checking for "surely-apart"
@@ -539,7 +599,7 @@ c d).
 
 Here is a nice example of why it's all necessary:
 
-.. code-block:: haskell
+::
 
   type family F a b where
     F Int Bool = Char

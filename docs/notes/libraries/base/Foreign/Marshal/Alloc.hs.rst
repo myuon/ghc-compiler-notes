@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Foreign/Marshal/Alloc.hs>`_
 
-====================
-libraries/base/Foreign/Marshal/Alloc.hs.rst
-====================
+libraries/base/Foreign/Marshal/Alloc.hs
+=======================================
+
 
 Note [NOINLINE for touch#]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Foreign/Marshal/Alloc.hs#L119>`__
+
 Both allocaBytes and allocaBytesAligned use the touch#, which is notoriously
 fragile in the presence of simplification (see #14346). In particular, the
 simplifier may drop the continuation containing the touch# if it can prove

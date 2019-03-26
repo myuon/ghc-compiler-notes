@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/BlockId.hs>`_
 
-====================
-compiler/cmm/BlockId.hs.rst
-====================
+compiler/cmm/BlockId.hs
+=======================
+
 
 Note [Unique BlockId]
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/BlockId.hs#L24>`__
+
 Although a 'BlockId' is a local label, for reasons of implementation,
 'BlockId's must be unique within an entire compilation unit.  The reason
 is that each local label is mapped to an assembly-language label, and in

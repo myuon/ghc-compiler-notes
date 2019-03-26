@@ -1,15 +1,18 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/StaticPtrTable.hs>`_
 
-====================
-compiler/main/StaticPtrTable.hs.rst
-====================
+compiler/main/StaticPtrTable.hs
+===============================
+
 
 Note [Grand plan for static forms]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/StaticPtrTable.hs#L54>`__
+
 Static forms go through the compilation phases as follows.
 Here is a running example:
 
-.. code-block:: haskell
+::
 
    f x = let k = map toUpper
          in ...(static k)...
@@ -27,7 +30,7 @@ Here is a running example:
   function 'makeStatic' (defined in module GHC.StaticPtr.Internal of
   base).  So we get
 
-.. code-block:: haskell
+::
 
    f x = let k = map toUpper
          in ...fromStaticPtr (makeStatic location k)...
@@ -36,57 +39,57 @@ Here is a running example:
   to the top level. Thus the FloatOut pass is always executed, even when
   optimizations are disabled.  So we get
 
-.. code-block:: haskell
+::
 
    k = map toUpper
    static_ptr = makeStatic location k
    f x = ...fromStaticPtr static_ptr...
 
-.. code-block:: haskell
+::
 
   The FloatOut pass is careful to produce an /exported/ Id for a floated
   'makeStatic' call, so the binding is not removed or inlined by the
   simplifier.
   E.g. the code for `f` above might look like
 
-.. code-block:: haskell
+::
 
     static_ptr = makeStatic location k
     f x = ...(case static_ptr of ...)...
 
-.. code-block:: haskell
+::
 
   which might be simplified to
 
-.. code-block:: haskell
+::
 
     f x = ...(case makeStatic location k of ...)...
 
-.. code-block:: haskell
+::
 
   BUT the top-level binding for static_ptr must remain, so that it can be
   collected to populate the Static Pointer Table.
 
-.. code-block:: haskell
+::
 
   Making the binding exported also has a necessary effect during the
   CoreTidy pass.
 
 * The CoreTidy pass replaces all bindings of the form
 
-.. code-block:: haskell
+::
 
   b = /\ ... -> makeStatic location value
 
-.. code-block:: haskell
+::
 
   with
 
-.. code-block:: haskell
+::
 
   b = /\ ... -> StaticPtr key (StaticPtrInfo "pkg key" "module" location) value
 
-.. code-block:: haskell
+::
 
   where a distinct key is generated for each binding.
 

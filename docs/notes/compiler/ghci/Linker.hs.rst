@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/Linker.hs>`_
 
-====================
-compiler/ghci/Linker.hs.rst
-====================
+compiler/ghci/Linker.hs
+=======================
+
 
 Note [Crash early load_dyn and locateLib]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/Linker.hs#L1346>`__
+
 If a package is "normal" (exposes it's code from more than zero Haskell
 modules, unlike e.g. that in ghcilink004) and is built "dyn" way, then
 it has it's code compiled and linked into the DLL, which GHCi linker picks
@@ -50,8 +53,12 @@ can be passed directly to loadDLL.  They are either fully-qualified
 loadDLL is going to search the system paths to find the library.
 
 
+
 Note [Fork/Exec Windows]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/ghci/Linker.hs#L1580>`__
+
 fork/exec is expensive on Windows, for each time we ask GCC for a library we
 have to eat the cost of af least 3 of these: gcc -> real_gcc -> cc1.
 So instead get a list of location that GCC would search and use findDirs

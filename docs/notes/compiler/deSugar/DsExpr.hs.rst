@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsExpr.hs>`_
 
-====================
-compiler/deSugar/DsExpr.hs.rst
-====================
+compiler/deSugar/DsExpr.hs
+==========================
+
 
 Note [Desugaring vars]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsExpr.hs#L318>`__
+
 In one situation we can get a *coercion* variable in a HsVar, namely
 the support method for an equality superclass:
    class (a~b) => C a b where ...
@@ -14,7 +17,7 @@ Then we get
    $dfCT :: forall ab. blah => C (T a) (T b)
    $dfCT ab blah = MkC ($c$p1C a blah) ($cop a blah)
 
-.. code-block:: haskell
+::
 
    $c$p1C :: forall ab. blah => (T a ~ T b)
    $c$p1C ab blah = let ...; g :: T a ~ T b = ... } in g
@@ -44,8 +47,12 @@ If \tr{expr} is actually just a variable, say, then the simplifier
 will sort it out.
 
 
+
 Note [Update for GADTs]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsExpr.hs#L575>`__
+
 Consider
    data T a b where
      T1 :: { f1 :: a } -> T a Int
@@ -60,6 +67,9 @@ So we need to cast (T a Int) to (T a b).  Sigh.
 
 Note [Desugaring explicit lists]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsExpr.hs#L787>`__
+
 Explicit lists are desugared in a cleverer way to prevent some
 fruitless allocations.  Essentially, whenever we see a list literal
 [x_1, ..., x_n] we generate the corresponding expression in terms of
@@ -78,7 +88,7 @@ beneficial. This is a bit of a trade-off,
  * when it works, fusion can be a significant win. Allocations are reduced
    by up to 25% in some nofib programs. Specifically,
 
-.. code-block:: haskell
+::
 
         Program           Size    Allocs   Runtime  CompTime
         rewrite          +0.0%    -26.3%      0.02     -1.8%
@@ -98,8 +108,12 @@ Unfortunately, determining "static-ness" reliably is a bit tricky and the
 heuristic at times produced surprising behavior (see #11710) so it was dropped.
 
 
+
 Note [Detecting forced eta expansion]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsExpr.hs#L1094>`__
+
 We cannot have levity polymorphic function arguments. See
 Note [Levity polymorphism invariants] in CoreSyn. But we *can* have
 functions that take levity polymorphism arguments, as long as these
@@ -140,5 +154,4 @@ without a wrapper, then that is surely problem and we can reject.
 We thus have a parameter to `dsExpr` that tracks whether or not we are
 directly in an HsWrap. If we find a levity-polymorphic hasNoBinding Id when
 we're not directly in an HsWrap, reject.
-
 

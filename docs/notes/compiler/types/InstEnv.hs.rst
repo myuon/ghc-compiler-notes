@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs>`_
 
-====================
-compiler/types/InstEnv.hs.rst
-====================
+compiler/types/InstEnv.hs
+=========================
+
 
 Note [ClsInst laziness and the rough-match fields]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L118>`__
+
 Suppose we load 'instance A.C B.T' from A.hi, but suppose that the type B.T is
 otherwise unused in the program. Then it's stupid to load B.hi, the data type
 declaration for B.T -- and perhaps further instance declarations!
@@ -25,7 +28,7 @@ We avoid this as follows:
   inside the DFunId. The rough-match fields allow us to say "definitely does not
   match", based only on Names.
 
-.. code-block:: haskell
+::
 
   This laziness is very important; see #12367. Try hard to avoid pulling on
   the structured fields unless you really need the instance.
@@ -36,7 +39,7 @@ We avoid this as follows:
 * In is_tcs,
     Nothing  means that this type arg is a type variable
 
-.. code-block:: haskell
+::
 
     (Just n) means that this type arg is a
                 TyConApp with a type constructor of n.
@@ -46,8 +49,12 @@ We avoid this as follows:
                 NB: newtypes are not transparent, though!
 
 
+
 Note [Template tyvars are fresh]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L157>`__
+
 The is_tvs field of a ClsInst has *completely fresh* tyvars.
 That is, they are
   * distinct from any other ClsInst
@@ -61,7 +68,10 @@ The invariant is checked by the ASSERT in lookupInstEnv'.
 
 
 Note [Proper-match fields]
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L169>`__
+
 The is_tvs, is_cls, is_tys fields are simply cached values, pulled
 out (lazily) from the dfun id. They are cached here simply so
 that we don't need to decompose the DFunId each time we want
@@ -78,6 +88,9 @@ However, note that:
 
 Note [Haddock assumptions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L183>`__
+
 For normal user-written instances, Haddock relies on
 
  * the SrcSpan of
@@ -92,21 +105,25 @@ being equal to
   * the InstDecl used to construct the Instance.
 
 
+
 Note [When exactly is an instance decl an orphan?]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  (see MkIface.instanceToIfaceInst, which implements this)
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L321>`__
+
+(see MkIface.instanceToIfaceInst, which implements this)
 Roughly speaking, an instance is an orphan if its head (after the =>)
 mentions nothing defined in this module.
 
 Functional dependencies complicate the situation though. Consider
 
-.. code-block:: haskell
+::
 
   module M where { class C a b | a -> b }
 
 and suppose we are compiling module X:
 
-.. code-block:: haskell
+::
 
   module X where
         import M
@@ -120,12 +137,12 @@ use anything from X.
 
 More precisely, an instance is an orphan iff
 
-.. code-block:: haskell
+::
 
   If there are no fundeps, then at least of the names in
   the instance head is locally defined.
 
-.. code-block:: haskell
+::
 
   If there are fundeps, then for every fundep, at least one of the
   names free in a *non-determined* part of the instance head is
@@ -136,9 +153,11 @@ defined.)
 
 
 
-
 Note [InstEnv determinism]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L376>`__
+
 We turn InstEnvs into a list in some places that don't directly affect
 the ABI. That happens when we create output for `:info`.
 Unfortunately that nondeterminism is nonlocal and it's hard to tell what it
@@ -149,13 +168,17 @@ Testing with nofib and validate detected no difference between UniqFM and
 UniqDFM. See also Note [Deterministic UniqFM]
 
 
+
 Note [Instance lookup and orphan instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L509>`__
+
 Suppose we are compiling a module M, and we have a zillion packages
 loaded, and we are looking up an instance for C (T W).  If we find a
 match in module 'X' from package 'p', should be "in scope"; that is,
 
-.. code-block:: haskell
+::
 
   is p:X in the transitive closure of modules imported from M?
 
@@ -174,7 +197,7 @@ There are two cases:
     So we keep track of the set of orphan modules transitively below M;
     this is the ie_visible field of InstEnvs, of type VisibleOrphanModules.
 
-.. code-block:: haskell
+::
 
     If module p:X is in this set, then we can use the instance, otherwise
     we can't.
@@ -183,6 +206,9 @@ There are two cases:
 
 Note [Rules for instance lookup]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L535>`__
+
 These functions implement the carefully-written rules in the user
 manual section on "overlapping instances". At risk of duplication,
 here are the rules.  If the rules change, change this text and the
@@ -249,13 +275,13 @@ Overlap is permitted, but only in such a way that one can make
 a unique choice when looking up.  That is, overlap is only permitted if
 one template matches the other, or vice versa.  So this is ok:
 
-.. code-block:: haskell
+::
 
   [a]  [Int]
 
 but this is not
 
-.. code-block:: haskell
+::
 
   (Int,a)  (b,Int)
 
@@ -273,17 +299,17 @@ Consider this little program:
      class C a        where c :: a
      class C a => D a where d :: a
 
-.. code-block:: haskell
+::
 
      instance C Int where c = 17
      instance D Int where d = 13
 
-.. code-block:: haskell
+::
 
      instance C a => C [a] where c = [c]
      instance ({- C [a], -} D a) => D [a] where d = c
 
-.. code-block:: haskell
+::
 
      instance C [Int] where c = [37]
 
@@ -338,7 +364,7 @@ optimization' ;-)
 So, what's the fix?  I think hugs has it right.  Here's why.  Let's try
 something else out with ghc-4.04.  Let's add the following line:
 
-.. code-block:: haskell
+::
 
     d' :: D a => [a]
     d' = c
@@ -378,8 +404,12 @@ But still x and y might subsequently be unified so they *do* match.
 Simple story: unify, don't match.
 
 
+
 Note [DFunInstType: instantiating types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L735>`__
+
 A successful match is a ClsInst, together with the types at which
         the dfun_id in the ClsInst should be instantiated
 The instantiating types are (Either TyVar Type)s because the dfun
@@ -392,18 +422,22 @@ where the 'Nothing' indicates that 'b' can be freely instantiated.
  presumably later become fixed via functional dependencies.)
 
 
+
 Note [Incoherent instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L946>`__
+
 For some classes, the choice of a particular instance does not matter, any one
 is good. E.g. consider
 
-.. code-block:: haskell
+::
 
         class D a b where { opD :: a -> b -> String }
         instance D Int b where ...
         instance D a Int where ...
 
-.. code-block:: haskell
+::
 
         g (x::Int) = opD x x  -- Wanted: D Int Int
 
@@ -441,10 +475,11 @@ incoherent instances as long as there are others.
 
 
 
-
-
 Note [Binding when looking up instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/InstEnv.hs#L1004>`__
+
 When looking up in the instance environment, or family-instance environment,
 we are careful about multiple matches, as described above in
 Note [Overlapping instances]

@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IO/Unsafe.hs>`_
 
-====================
-libraries/base/GHC/IO/Unsafe.hs.rst
-====================
+libraries/base/GHC/IO/Unsafe.hs
+===============================
+
 
 Note [unsafeDupableInterleaveIO should not be inlined]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IO/Unsafe.hs#L117>`__
 
 We used to believe that INLINE on unsafeInterleaveIO was safe,
 because the state from this IO thread is passed explicitly to the
@@ -17,7 +19,7 @@ longer be shared in the way the programmer was probably expecting,
 but can be performed many times.  In #5943, this broke our
 definition of fixIO, which contains
 
-.. code-block:: haskell
+::
 
    ans <- unsafeInterleaveIO (takeMVar m)
 

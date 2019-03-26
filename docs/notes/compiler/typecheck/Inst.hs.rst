@@ -1,23 +1,26 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/Inst.hs>`_
 
-====================
-compiler/typecheck/Inst.hs.rst
-====================
+compiler/typecheck/Inst.hs
+==========================
+
 
 Note [Deep skolemisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/Inst.hs#L109>`__
+
 deeplySkolemise decomposes and skolemises a type, returning a type
 with all its arrows visible (ie not buried under foralls)
 
 Examples:
 
-.. code-block:: haskell
+::
 
   deeplySkolemise (Int -> forall a. Ord a => blah)
     =  ( wp, [a], [d:Ord a], Int -> blah )
     where wp = \x:Int. /\a. \(d:Ord a). <hole> x
 
-.. code-block:: haskell
+::
 
   deeplySkolemise  (forall a. Ord a => Maybe a -> forall b. Eq b => blah)
     =  ( wp, [a,b], [d1:Ord a,d2:Eq b], Maybe a -> blah )
@@ -34,8 +37,12 @@ ToDo: this eta-abstraction plays fast and loose with termination,
       fix this
 
 
+
 Note [Handling boxed equality]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/Inst.hs#L319>`__
+
 The solver deals entirely in terms of unboxed (primitive) equality.
 There should never be a boxed Wanted equality. Ever. But, what if
 we are calling `foo :: forall a. (F a ~ Bool) => ...`? That equality
@@ -46,8 +53,12 @@ So we simply check for this case and make the right boxing of evidence.
 --------------
 
 
+
 Note [Signature files and type class instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/Inst.hs#L759>`__
+
 Instances in signature files do not have an effect when compiling:
 when you compile a signature against an implementation, you will
 see the instances WHETHER OR NOT the instance is declared in
@@ -63,12 +74,12 @@ some instance exists, in case downstream code uses it.
 Implementing this is a little tricky.  Consider the following
 situation (sigof03):
 
-.. code-block:: haskell
+::
 
  module A where
      instance C T where ...
 
-.. code-block:: haskell
+::
 
  module ASig where
      instance C T
@@ -79,7 +90,7 @@ we should ignore it for the purpose of doing a duplicate check,
 since it's not actually a duplicate. But don't skip the check
 entirely, we still want this to fail (tcfail221):
 
-.. code-block:: haskell
+::
 
  module ASig where
      instance C T
@@ -90,7 +101,7 @@ class instances may not have been loaded yet at all.  The usual
 situation when A imports another module which provides the
 instances (sigof02m):
 
-.. code-block:: haskell
+::
 
  module A(module B) where
      import B
@@ -98,5 +109,4 @@ instances (sigof02m):
 See also Note [Signature lazy interface loading].  We can't
 rely on this, however, since sometimes we'll have spurious
 type class instances in the EPS, see #9422 (sigof02dm)
-
 

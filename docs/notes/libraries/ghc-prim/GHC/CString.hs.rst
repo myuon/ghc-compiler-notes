@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/ghc-prim/GHC/CString.hs>`_
 
-====================
-libraries/ghc-prim/GHC/CString.hs.rst
-====================
+libraries/ghc-prim/GHC/CString.hs
+=================================
+
 
 Note [Inlining unpackCString#]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/ghc-prim/GHC/CString.hs#L37>`__
+
 There's really no point in ever inlining things like unpackCString# as the loop
 doesn't specialise in an interesting way and we can't deforest the list
 constructors (we'd want to use unpackFoldrCString# for this). Moreover, it's

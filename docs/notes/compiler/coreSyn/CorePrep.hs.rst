@@ -1,26 +1,29 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs>`_
 
-====================
-compiler/coreSyn/CorePrep.hs.rst
-====================
+compiler/coreSyn/CorePrep.hs
+============================
+
 
 Note [CorePrep invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L140>`__
+
 Here is the syntax of the Core produced by CorePrep:
 
-.. code-block:: haskell
+::
 
     Trivial expressions
        arg ::= lit |  var
               | arg ty  |  /\a. arg
               | truv co  |  /\c. arg  |  arg |> co
 
-.. code-block:: haskell
+::
 
     Applications
        app ::= lit  |  var  |  app arg  |  app ty  | app co | app |> co
 
-.. code-block:: haskell
+::
 
     Expressions
        body ::= app
@@ -29,7 +32,7 @@ Here is the syntax of the Core produced by CorePrep:
               | /\a. body | /\c. body
               | body |> co
 
-.. code-block:: haskell
+::
 
     Right hand sides (only place where value lambdas can occur)
        rhs ::= /\a.rhs  |  \x.rhs  |  body
@@ -38,8 +41,12 @@ We define a synonym for each of these non-terminals.  Functions
 with the corresponding name produce a result in that syntax.
 
 
+
 Note [Floating out of top level bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L253>`__
+
 NB: we do need to float out of top-level bindings
 Consider        x = length [True,False]
 We want to get
@@ -58,6 +65,9 @@ And then x will actually end up case-bound
 
 Note [CafInfo and floating]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L269>`__
+
 What happens when we try to float bindings to the top level?  At this
 point all the CafInfo is supposed to be correct, and we must make certain
 that is true of the new top-level bindings.  There are two cases
@@ -78,12 +88,12 @@ b) The top-level binding is marked NoCafRefs.  This really happens
       sat [NoCafRefs] = \xy. retry x y
       $fApplicativeSTM [NoCafRefs] = D:Alternative sat ...blah...
 
-.. code-block:: haskell
+::
 
    So, gruesomely, we must set the NoCafRefs flag on the sat bindings,
    *and* substitute the modified 'sat' into the old RHS.
 
-.. code-block:: haskell
+::
 
    It should be the case that 'sat' is itself [NoCafRefs] (a value, no
    cafs) else the original top-level binding would not itself have been
@@ -98,9 +108,12 @@ Meanwhile this horrible hack works.
 
 Note [Join points and floating]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L303>`__
+
 Join points can float out of other join points but not out of value bindings:
 
-.. code-block:: haskell
+::
 
   let z =
     let  w = ... in -- can float
@@ -126,10 +139,13 @@ stage.
 
 Note [Data constructor workers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L327>`__
+
 Create any necessary "implicit" bindings for data con workers.  We
 create the rather strange (non-recursive!) binding
 
-.. code-block:: haskell
+::
 
         $wC = \x y -> $wC x y
 
@@ -145,12 +161,14 @@ partial applications. But it's easier to let them through.
 
 
 
-
 Note [Dead code in CorePrep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L345>`__
+
 Imagine that we got an input program like this (see #4962):
 
-.. code-block:: haskell
+::
 
   f :: Show b => Int -> (Int, b -> Maybe Int -> Int)
   f x = (g True (Just x) + g () (Just x), g)
@@ -161,7 +179,7 @@ Imagine that we got an input program like this (see #4962):
 
 After specialisation and SpecConstr, we would get something like this:
 
-.. code-block:: haskell
+::
 
   f :: Show b => Int -> (Int, b -> Maybe Int -> Int)
   f x = (g$Bool_True_Just x + g$Unit_Unit_Just x, g)
@@ -201,7 +219,7 @@ don't show up in the free variables any longer. So if you run the
 occurrence analyser on the output of CoreTidy (or later) you e.g. turn
 this program:
 
-.. code-block:: haskell
+::
 
   Rec {
   f = ... f ...
@@ -209,7 +227,7 @@ this program:
 
 Into this one:
 
-.. code-block:: haskell
+::
 
   f = ... f ...
 
@@ -217,9 +235,11 @@ Into this one:
 
 
 
-
 Note [Silly extra arguments]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L545>`__
+
 Suppose we had this
         f{arity=1} = \x\y. e
 We *must* match the arity on the Id, so we have to generate
@@ -234,15 +254,19 @@ it seems good for CorePrep to be robust.
 -------------
 
 
+
 Note [Arity and join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L582>`__
+
 Up to now, we've allowed a join point to have an arity greater than its join
 arity (minus type arguments), since this is what's useful for eta expansion.
 However, for code gen purposes, its arity must be exactly the number of value
 arguments it will be called with, and it must have exactly that many value
 lambdas. Hence if there are extra lambdas we must let-bind the body of the RHS:
 
-.. code-block:: haskell
+::
 
   join j x y z = \w -> ... in ...
     =>
@@ -255,8 +279,12 @@ for us to mess with the arity because a join point is never exported.
 ---------------------------------------------------------------------------
 
 
+
 Note [runRW arg]
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L789>`__
+
 If we got, say
    runRW# (case bot of {})
 which happened in #11291, we do /not/ want to turn it into
@@ -266,12 +294,16 @@ only variables in function position.  But if we are sure to make
 runRW# strict (which we do in MkId), this can't happen
 
 
+
 Note [runRW magic]
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L948>`__
+
 Some definitions, for instance @runST@, must have careful control over float out
 of the bindings in their body. Consider this use of @runST@,
 
-.. code-block:: haskell
+::
 
     f x = runST ( \ s -> let (a, s')  = newArray# 100 [] s
                              (_, s'') = fill_in_array_or_something a x s'
@@ -279,7 +311,7 @@ of the bindings in their body. Consider this use of @runST@,
 
 If we inline @runST@, we'll get:
 
-.. code-block:: haskell
+::
 
     f x = let (a, s')  = newArray# 100 [] realWorld#{-NB-}
               (_, s'') = fill_in_array_or_something a x s'
@@ -288,7 +320,7 @@ If we inline @runST@, we'll get:
 And now if we allow the @newArray#@ binding to float out to become a CAF,
 we end up with a result that is totally and utterly wrong:
 
-.. code-block:: haskell
+::
 
     f = let (a, s')  = newArray# 100 [] realWorld#{-NB-} -- YIKES!!!
         in \ x ->
@@ -306,7 +338,7 @@ no further floating will occur. This allows us to safely inline things like
 'runRW' is defined (for historical reasons) in GHC.Magic, with a NOINLINE
 pragma.  It is levity-polymorphic.
 
-.. code-block:: haskell
+::
 
     runRW# :: forall (r1 :: RuntimeRep). (o :: TYPE r)
            => (State# RealWorld -> (# State# RealWorld, o #))
@@ -324,20 +356,22 @@ in CorePrep (and in ByteCodeGen).
 Note [ANF-ising literal string arguments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L993>`__
+
 Consider a program like,
 
-.. code-block:: haskell
+::
 
     data Foo = Foo Addr#
 
-.. code-block:: haskell
+::
 
     foo = Foo "turtle"#
 
 When we go to ANFise this we might think that we want to float the string
 literal like we do any other non-trivial argument. This would look like,
 
-.. code-block:: haskell
+::
 
     foo = u\ [] case "turtle"# of s { __DEFAULT__ -> Foo s }
 
@@ -346,7 +380,7 @@ wreaks havoc on the CAF annotations that we produce here since we the result
 above is caffy since it is updateable. Ideally at some point in the future we
 would like to just float the literal to the top level as suggested in #11312,
 
-.. code-block:: haskell
+::
 
     s = "turtle"#
     foo = Foo s
@@ -355,15 +389,19 @@ However, until then we simply add a special case excluding literals from the
 floating done by cpeArg.
 
 
+
 Note [Floating unlifted arguments]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L1049>`__
+
 Consider    C (let v* = expensive in v)
 
 where the "*" indicates "will be demanded".  Usually v will have been
 inlined by now, but let's suppose it hasn't (see #2756).  Then we
 do *not* want to get
 
-.. code-block:: haskell
+::
 
      let v* = expensive in C v
 
@@ -379,8 +417,12 @@ maybeSaturate deals with saturating primops and constructors
 The type is the type of the entire application
 
 
+
 Note [Eta expansion]
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L1096>`__
+
 Eta expand to match the arity claimed by the binder Remember,
 CorePrep must not change arity
 
@@ -403,6 +445,9 @@ NB2: we have to be careful that the result of etaExpand doesn't
 
 Note [Eta expansion and the CorePrep invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L1116>`__
+
 It turns out to be much much easier to do eta expansion
 *after* the main CorePrep stuff.  But that places constraints
 on the eta expander: given a CpeRhs, it must return a CpeRhs.
@@ -418,18 +463,26 @@ Instead CoreArity.etaExpand gives
                 f = /\a -> \y -> let s = h 3 in g s y
 
 
+
 Note [Pin demand info on floats]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L1199>`__
+
 We pin demand info on floated lets, so that we can see the one-shot thunks.
+
 
 
 Note [Inlining in CorePrep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L1400>`__
+
 There is a subtle but important invariant that must be upheld in the output
 of CorePrep: there are no "trivial" updatable thunks.  Thus, this Core
 is impermissible:
 
-.. code-block:: haskell
+::
 
      let x :: ()
          x = y
@@ -446,7 +499,7 @@ there is one case where these trivial updatable thunks can arise: when
 we are optimizing away 'lazy' (see Note [lazyId magic], and also
 'cpeRhsE'.)  Then, we could have started with:
 
-.. code-block:: haskell
+::
 
      let x :: ()
          x = lazy @ () y
@@ -475,13 +528,16 @@ binding for data constructors; see Note [Data constructor workers].
 
 Note [CorePrep inlines trivial CoreExpr not Id]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L1444>`__
+
 Why does cpe_env need to be an IdEnv CoreExpr, as opposed to an
 IdEnv Id?  Naively, we might conjecture that trivial updatable thunks
 as per Note [Inlining in CorePrep] always have the form
 'lazy @ SomeType gbl_id'.  But this is not true: the following is
 perfectly reasonable Core:
 
-.. code-block:: haskell
+::
 
      let x :: ()
          x = lazy @ (forall a. a) y @ Bool
@@ -492,8 +548,12 @@ this can easily arise with higher-rank types; thus, cpe_env must
 map to CoreExprs, not Ids.
 
 
+
 Note [Drop unfoldings and rules]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CorePrep.hs#L1600>`__
+
 We want to drop the unfolding/rules on every Id:
 
   - We are now past interface-file generation, and in the

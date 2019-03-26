@@ -1,21 +1,28 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMatches.hs>`_
 
-====================
-compiler/typecheck/TcMatches.hs.rst
-====================
+compiler/typecheck/TcMatches.hs
+===============================
+
 
 Note [Polymorphic expected type for tcMatchesFun]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMatches.hs#L66>`__
+
 tcMatchesFun may be given a *sigma* (polymorphic) type
 so it must be prepared to use tcSkolemise to skolemise it.
 See Note [sig_tau may be polymorphic] in TcPat.
 
 
+
 Note [Case branches must never infer a non-tau type]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMatches.hs#L156>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
   case ... of
     ... -> \(x :: forall a. a -> a) -> x
@@ -31,7 +38,7 @@ tau-type.
 
 An even trickier case looks like
 
-.. code-block:: haskell
+::
 
   f x True  = x undefined
   f x False = x ()
@@ -41,15 +48,19 @@ use expTypeToType on the output of matchExpectedFunTys, not the input.
 
 But we make a special case for a one-branch case. This is so that
 
-.. code-block:: haskell
+::
 
   f = \(x :: forall a. a -> a) -> x
 
 still gets assigned a polytype.
 
 
+
 Note [Treat rebindable syntax first]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMatches.hs#L944>`__
+
 When typechecking
         do { bar; ... } :: IO ()
 we want to typecheck 'bar' in the knowledge that it should be an IO thing,
@@ -76,14 +87,18 @@ e_i   :: exp_ty_i
 join :: tn -> res_ty
 
 
+
 Note [ApplicativeDo and constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcMatches.hs#L1045>`__
+
 An applicative-do is supposed to take place in parallel, so
 constraints bound in one arm can't possibly be available in another
 (#13242).  Our current rule is this (more details and discussion
 on the ticket). Consider
 
-.. code-block:: haskell
+::
 
    ...stmts...
    ApplicativeStmts [arg1, arg2, ... argN]
@@ -104,5 +119,4 @@ Now, we say that:
 
 To achieve this, we just typecheck each 'argi' separately, bring all
 the variables they bind into scope, and typecheck the thing_inside.
-
 

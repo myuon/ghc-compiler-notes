@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/parser/ApiAnnotation.hs>`_
 
-====================
-compiler/parser/ApiAnnotation.hs.rst
-====================
+compiler/parser/ApiAnnotation.hs
+================================
+
 
 Note [Api annotations]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/parser/ApiAnnotation.hs#L26>`__
+
 Given a parse tree of a Haskell module, how can we reconstruct
 the original Haskell source code, retaining all whitespace and
 source code comments?  We need to track the locations of all
@@ -47,13 +50,13 @@ So
 
 would result in the AST element
 
-.. code-block:: haskell
+::
 
   L span (HsLet (binds for x = 1) (2 * x))
 
 and the annotations
 
-.. code-block:: haskell
+::
 
   (span,AnnLet) having the location of the 'let' keyword
   (span,AnnEqual) having the location of the '=' sign

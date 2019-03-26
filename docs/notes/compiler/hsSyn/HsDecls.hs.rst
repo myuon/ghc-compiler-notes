@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs>`_
 
-====================
-compiler/hsSyn/HsDecls.hs.rst
-====================
+compiler/hsSyn/HsDecls.hs
+=========================
+
 
 Note [The Naming story]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs#L347>`__
+
 Here is the story about the implicit names that go with type, class,
 and instance decls.  It's a bit tricky, so pay attention!
 
@@ -136,8 +139,12 @@ Interface file code:
     suck in the dfun binding
 
 
+
 Note [TyVar binders for associated decls]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs#L556>`__
+
 For an /associated/ data, newtype, or type-family decl, the LHsQTyVars
 /includes/ outer binders.  For example
     class T a where
@@ -157,8 +164,12 @@ c.f. Note [Associated type tyvar names] in Class.hs
      Note [Family instance declaration binders]
 
 
+
 Note [CUSKs: complete user-supplied kind signatures]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs#L782>`__
+
 We kind-check declarations differently if they have a complete, user-supplied
 kind signature (CUSK). This is because we can safely generalise a CUSKed
 declaration before checking all of the others, supporting polymorphic recursion.
@@ -232,14 +243,18 @@ NOTE THAT
     case. (Naturally, any kind variable mentioned before the :: should
     not be bound after it.)
 
-.. code-block:: haskell
+::
 
     This last point is much more debatable than the others; see
     #15142 comment:22
 
 
+
 Note [TyClGroups and dependency analysis]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs#L870>`__
+
 A TyClGroup represents a strongly connected components of type/class/instance
 decls, together with the role annotations for the type/class declarations.
 
@@ -261,8 +276,11 @@ See Note [Dependency analsis of type, class, and instance decls]
 in RnSource for more info.
 
 
+
 Note [FamilyResultSig]
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs#L934>`__
 
 This data type represents the return signature of a type family.  Possible
 values are:
@@ -278,7 +296,7 @@ values are:
       type family Id a = r where ...
       type family Id a = (r :: *) where ...
 
-.. code-block:: haskell
+::
 
    Naming result of a type family is required if we want to provide
    injectivity annotation for a type family:
@@ -291,9 +309,11 @@ See also: Note [Injectivity annotation]
 Note [Injectivity annotation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs#L957>`__
+
 A user can declare a type family to be injective:
 
-.. code-block:: haskell
+::
 
    type family Id a = r | r -> a where ...
 
@@ -322,7 +342,7 @@ more complicated injectivity annotations. For example we could declare that
 if we know the result of Plus and one of its arguments we can determine the
 other argument:
 
-.. code-block:: haskell
+::
 
    type family Plus a b = (r :: Nat) | r a -> b, r b -> a where ...
 
@@ -332,8 +352,12 @@ conditions.
 See also Note [Injective type families] in TyCon
 
 
+
 Note [GADT abstract syntax]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs#L1354>`__
+
 There's a wrinkle in ConDeclGADT
 
 * For record syntax, it's all uniform.  Given:
@@ -345,7 +369,7 @@ There's a wrinkle in ConDeclGADT
        con_args   = RecCon <the record fields>
        con_res_ty = T a
 
-.. code-block:: haskell
+::
 
   We need the RecCon before the reanmer, so we can find the record field
   binders in HsUtils.hsConDeclsBinders.
@@ -358,7 +382,7 @@ There's a wrinkle in ConDeclGADT
   so it's hard to split up the arguments until we've done the precedence
   resolution (in the renamer).
 
-.. code-block:: haskell
+::
 
   So:  - In the parser (RdrHsSyn.mkGadtDecl), we put the whole constr
          type into the res_ty for a ConDeclGADT for now, and use
@@ -373,8 +397,12 @@ There's a wrinkle in ConDeclGADT
             con_res_ty = a :+: b
 
 
+
 Note [Type family instance declarations in HsSyn]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs#L1497>`__
+
 The data type FamEqn represents one equation of a type family instance.
 Aside from the pass, it is also parameterised over two fields:
 feqn_pats and feqn_rhs.
@@ -401,8 +429,12 @@ feqn_rhs is either an HsDataDefn (for data family instances) or an LHsType
 --------------- Type synonym family instances -------------
 
 
+
 Note [Family instance declaration binders]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsDecls.hs#L1539>`__
+
 For ordinary data/type family instances, the feqn_pats field of FamEqn stores
 the LHS type (and kind) patterns. Any type (and kind) variables contained
 in these type patterns are bound in the hsib_vars field of the HsImplicitBndrs
@@ -419,7 +451,7 @@ the hsib_vars. In the latter case, note that in particular
 
 * The hsib_vars *includes* type variables that are already in scope
 
-.. code-block:: haskell
+::
 
    Eg   class C s t where
           type F t p :: *
@@ -428,7 +460,7 @@ the hsib_vars. In the latter case, note that in particular
    The hsib_vars of the F decl are {a,b,x}, even though the F decl
    is nested inside the 'instance' decl.
 
-.. code-block:: haskell
+::
 
    However after the renamer, the uniques will match up:
         instance C w7 (a8,b9) where

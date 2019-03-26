@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs>`_
 
-====================
-compiler/typecheck/TcRnDriver.hs.rst
-====================
+compiler/typecheck/TcRnDriver.hs
+================================
+
 
 Note [DFun impedance matching]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs#L730>`__
+
 We return a list of "impedance-matching" bindings for the dfuns
 defined in the hs-boot file, such as
           $fxEqT = $fEqT
@@ -25,6 +28,9 @@ prefixed with "$fx" for boot dfuns, and "$f" for real dfuns
 
 Note [DFun knot-tying]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs#L747>`__
+
 The 'SelfBootInfo' that is fed into 'checkHiBootIface' comes from
 typechecking the hi-boot file that we are presently implementing.
 Suppose we are typechecking the module A: when we typecheck the
@@ -45,8 +51,12 @@ md_types of the SelfBootInfo.
 See #4003, #16038 for why we need to take care here.
 
 
+
 Note [Root-main Id]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs#L1820>`__
+
 The function that the RTS invokes is always :Main.main, which we call
 root_main_id.  (Because GHC allows the user to have a module not
 called Main as the main module, we can't rely on the main function
@@ -59,9 +69,11 @@ get two defns for 'main' in the interface file!
 
 
 
-
 Note [Initialising the type environment for GHCi]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs#L1921>`__
+
 Most of the Ids in ic_things, defined by the user in 'let' stmts,
 have closed types. E.g.
    ghci> let foo x y = x && not y
@@ -89,8 +101,12 @@ lead to duplicate "perhaps you meant..." suggestions (e.g. T5564).
 We don't bother with the tcl_th_bndrs environment either.
 
 
+
 Note [Deferred type errors in GHCi]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs#L2150>`__
+
 In GHCi, we ensure that type errors don't get deferred when type checking the
 naked expressions. Deferring type errors here is unhelpful because the
 expression gets evaluated right away anyway. It also would potentially emit
@@ -105,7 +121,7 @@ The interactively issued declarations, statements, as well as the modules
 loaded into GHCi, are not affected. That means, for declaration, you could
 have
 
-.. code-block:: haskell
+::
 
     Prelude> :set -fdefer-type-errors
     Prelude> x :: IO (); x = putStrLn True
@@ -119,7 +135,7 @@ have
 
 But for naked expressions, you will have
 
-.. code-block:: haskell
+::
 
     Prelude> :set -fdefer-type-errors
     Prelude> putStrLn True
@@ -131,7 +147,7 @@ But for naked expressions, you will have
           In the expression: putStrLn True
           In an equation for ‘it’: it = putStrLn True
 
-.. code-block:: haskell
+::
 
     Prelude> let x = putStrLn True
     <interactive>:2:18: warning: [-Wdeferred-type-errors]
@@ -143,8 +159,12 @@ But for naked expressions, you will have
           In an equation for ‘x’: x = putStrLn True
 
 
+
 Note [GHCi Plans]
 ~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs#L2237>`__
+
 When a user types an expression in the repl we try to print it in three different
 ways. Also, depending on whether -fno-it is set, we bind a variable called `it`
 which can be used to refer to the result of the expression subsequently in the repl.
@@ -163,32 +183,36 @@ The reason for -fno-it is explained in #14336. `it` can lead to the repl
 leaking memory as it is repeatedly queried.
 
 
+
 Note [TcRnExprMode]
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs#L2461>`__
+
 How should we infer a type when a user asks for the type of an expression e
 at the GHCi prompt? We offer 3 different possibilities, described below. Each
 considers this example, with -fprint-explicit-foralls enabled:
 
-.. code-block:: haskell
+::
 
   foo :: forall a f b. (Show a, Num b, Foldable f) => a -> f b -> String
   :type{,-spec,-def} foo @Int
 
 :type / TM_Inst
 
-.. code-block:: haskell
+::
 
   In this mode, we report the type that would be inferred if a variable
   were assigned to expression e, without applying the monomorphism restriction.
   This means we deeply instantiate the type and then regeneralize, as discussed
   in #11376.
 
-.. code-block:: haskell
+::
 
   > :type foo @Int
   forall {b} {f :: * -> *}. (Foldable f, Num b) => Int -> f b -> String
 
-.. code-block:: haskell
+::
 
   Note that the variables and constraints are reordered here, because this
   is possible during regeneralization. Also note that the variables are
@@ -196,25 +220,25 @@ considers this example, with -fprint-explicit-foralls enabled:
 
 :type +v / TM_NoInst
 
-.. code-block:: haskell
+::
 
   This mode is for the benefit of users using TypeApplications. It does no
   instantiation whatsoever, sometimes meaning that class constraints are not
   solved.
 
-.. code-block:: haskell
+::
 
   > :type +v foo @Int
   forall f b. (Show Int, Num b, Foldable f) => Int -> f b -> String
 
-.. code-block:: haskell
+::
 
   Note that Show Int is still reported, because the solver never got a chance
   to see it.
 
 :type +d / TM_Default
 
-.. code-block:: haskell
+::
 
   This mode is for the benefit of users who wish to see instantiations of
   generalized types, and in particular to instantiate Foldable and Traversable.
@@ -222,23 +246,23 @@ considers this example, with -fprint-explicit-foralls enabled:
   GHCi uses -XExtendedDefaultRules, this means that Foldable and Traversable are
   defaulted.
 
-.. code-block:: haskell
+::
 
   > :type +d foo @Int
   Int -> [Integer] -> String
 
-.. code-block:: haskell
+::
 
   Note that this mode can sometimes lead to a type error, if a type variable is
   used with a defaultable class but cannot actually be defaulted:
 
-.. code-block:: haskell
+::
 
   bar :: (Num a, Monoid a) => a -> a
   > :type +d bar
   ** error **
 
-.. code-block:: haskell
+::
 
   The error arises because GHC tries to default a but cannot find a concrete
   type in the defaulting list that is both Num and Monoid. (If this list is
@@ -248,7 +272,10 @@ considers this example, with -fprint-explicit-foralls enabled:
 
 
 Note [Kind-generalise in tcRnType]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnDriver.hs#L2519>`__
+
 We switch on PolyKinds when kind-checking a user type, so that we will
 kind-generalise the type, even when PolyKinds is not otherwise on.
 This gives the right default behaviour at the GHCi prompt, where if
@@ -267,5 +294,4 @@ We want to get `k -> Type`, not `Any -> Type`, which is what we would
 get without kind-generalisation. Note that `:k SameKind` is OK, as
 GHC will not instantiate SameKind here, and so we see its full kind
 of `forall k. k -> k -> Type`.
-
 

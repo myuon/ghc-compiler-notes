@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysWiredIn.hs>`_
 
-====================
-compiler/prelude/TysWiredIn.hs.rst
-====================
+compiler/prelude/TysWiredIn.hs
+==============================
+
 
 Note [Wiring in RuntimeRep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysWiredIn.hs#L176>`__
+
 The RuntimeRep type (and friends) in GHC.Types has a bunch of constructors,
 making it a pain to wire in. To ease the pain somewhat, we use lists of
 the different bits, like Uniques, Names, DataCons. These lists must be
@@ -17,9 +20,12 @@ to this Note, so a search for this Note's name should find all the lists.
 
 Note [Any types]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysWiredIn.hs#L314>`__
+
 The type constructor Any,
 
-.. code-block:: haskell
+::
 
     type family Any :: k where { }
 
@@ -63,13 +69,13 @@ It has these properties:
 It's used to instantiate un-constrained type variables after type checking. For
 example, 'length' has type
 
-.. code-block:: haskell
+::
 
   length :: forall a. [a] -> Int
 
 and the list datacon for the empty list has type
 
-.. code-block:: haskell
+::
 
   [] :: forall a. [a]
 
@@ -86,8 +92,12 @@ implement it merely with an empty kind polymorphic type family. See #10886 for a
 bit of history.
 
 
+
 Note [One-tuples]
 ~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysWiredIn.hs#L678>`__
+
 GHC supports both boxed and unboxed one-tuples:
  - Unboxed one-tuples are sometimes useful when returning a
    single value after CPR analysis
@@ -113,10 +123,14 @@ decl in GHC.Classes, so I think this part may not work properly. But
 it's unused I think.
 
 
+
 Note [Boxing primitive types]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/TysWiredIn.hs#L1291>`__
+
 For a handful of primitive types (Int, Char, Word, Flaot, Double),
 we can readily box and an unboxed version (Int#, Char# etc) using
 the corresponding data constructor.  This is useful in a couple
-of places, notably let-floating 
+of places, notably let-floating
 

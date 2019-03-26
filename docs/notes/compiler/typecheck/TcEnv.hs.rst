@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcEnv.hs>`_
 
-====================
-compiler/typecheck/TcEnv.hs.rst
-====================
+compiler/typecheck/TcEnv.hs
+===========================
+
 
 Note [AFamDataCon: not promoting data family constructors]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcEnv.hs#L743>`__
+
 Consider
   data family T a
   data instance T Int = MkT
@@ -29,6 +32,9 @@ different modules then all is well.
 
 Note [Don't promote pattern synonyms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcEnv.hs#L764>`__
+
 We never promote pattern synonyms.
 
 Consider this (#11265):
@@ -56,9 +62,11 @@ lookup of A won't fail.
 
 
 
-
 Note [Extended defaults]
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcEnv.hs#L906>`__
+
 In interative mode (or with -XExtendedDefaultRules) we add () as the first type we
 try when defaulting.  This has very little real impact, except in the following case.
 Consider:
@@ -76,7 +84,10 @@ varying kinds, e.g. ([] :: * -> *)  and (Integer :: *).
 
 
 Note [Out of scope might be a staging error]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcEnv.hs#L1136>`__
+
 Consider
   x = 3
   data T = MkT $(foo x)

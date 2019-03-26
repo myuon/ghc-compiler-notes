@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/MonadUtils.hs>`_
 
-====================
-compiler/utils/MonadUtils.hs.rst
-====================
+compiler/utils/MonadUtils.hs
+============================
+
 
 Note [Inline @zipWithNM@ functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/MonadUtils.hs#L68>`__
 
 The inline principle for 'zipWith3M', 'zipWith4M' and 'zipWith3M_' is the same
 as for 'zipWithM' and 'zipWithM_' in "Control.Monad", see
@@ -31,6 +33,8 @@ functions below as well.
 Note [Inline @mapAndUnzipNM@ functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/MonadUtils.hs#L124>`__
+
 The inline principle is the same as 'mapAndUnzipM' in "Control.Monad".
 The 'mapAndUnzipM' function is inlined so that the `unzip` and `traverse`
 functions with which it is defined have an opportunity to fuse, see
@@ -46,5 +50,4 @@ to fusion.
 As such, since there are not any differences between 2-ary 'mapAndUnzipM' and
 its n-ary counterparts below aside from the number of arguments, the `INLINE`
 pragma should be replicated in the @mapAndUnzipNM@ functions below as well.
-
 

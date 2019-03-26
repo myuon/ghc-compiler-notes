@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs>`_
 
-====================
-compiler/coreSyn/CoreLint.hs.rst
-====================
+compiler/coreSyn/CoreLint.hs
+============================
+
 
 Note [GHC Formalism]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L78>`__
+
 This file implements the type-checking algorithm for System FC, the "official"
 name of the Core language. Type safety of FC is heart of the claim that
 executables produced by GHC do not have segmentation faults. Thus, it is
@@ -20,6 +23,9 @@ formalism. See docs/core-spec/README for more info about how to do so.
 
 Note [check vs lint]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L90>`__
+
 This file implements both a type checking algorithm and also general sanity
 checking. For example, the "sanity checking" checks for TyConApp on the left
 of an AppTy, which should never happen. These sanity checks don't really
@@ -55,7 +61,7 @@ If we have done specialisation the we check that there are
 
 Outstanding issues:
 
-.. code-block:: haskell
+::
 
     -- Things are *not* OK if:
     --
@@ -66,9 +72,11 @@ Outstanding issues:
 
 
 
-
 Note [Linting function types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L135>`__
+
 As described in Note [Representation of function types], all saturated
 applications of funTyCon are represented with the FunTy constructor. We check
 this invariant in lintType.
@@ -77,6 +85,9 @@ this invariant in lintType.
 
 Note [Linting type lets]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L141>`__
+
 In the desugarer, it's very very convenient to be able to say (in effect)
         let a = Type Int in <body>
 That is, use a type let.   See Note [Type let] in CoreSyn.
@@ -98,11 +109,14 @@ find an occurrence of an Id, we fetch it from the in-scope set.
 
 Note [Bad unsafe coercion]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L160>`__
+
 For discussion see https://ghc.haskell.org/trac/ghc/wiki/BadUnsafeCoercions
 Linter introduces additional rules that checks improper coercion between
 different types, called bad coercions. Following coercions are forbidden:
 
-.. code-block:: haskell
+::
 
   (a) coercions between boxed and unboxed values;
   (b) coercions between unlifted values of the different sizes, here
@@ -120,12 +134,15 @@ different types, called bad coercions. Following coercions are forbidden:
 
 Note [Join points]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L178>`__
+
 We check the rules listed in Note [Invariants on join points] in CoreSyn. The
 only one that causes any difficulty is the first: All occurrences must be tail
 calls. To this end, along with the in-scope set, we remember in le_joins the
 subset of in-scope Ids that are valid join ids. For example:
 
-.. code-block:: haskell
+::
 
   join j x = ... in
   case e of
@@ -145,6 +162,8 @@ points but not the RHSes of value bindings (thunks and functions).
 Note [Linting Unfoldings from Interfaces]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L461>`__
+
 We use this to check all top-level unfoldings that come in from interfaces
 (it is very painful to catch errors otherwise).
 
@@ -156,6 +175,9 @@ hence the `TopLevelFlag` on `tcPragExpr` in TcIface.
 
 Note [Checking for INLINE loop breakers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L675>`__
+
 It's very suspicious if a strong loop breaker is marked INLINE.
 
 However, the desugarer generates instance methods with INLINE pragmas
@@ -167,6 +189,9 @@ the desugarer.
 
 Note [No alternatives lint check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L927>`__
+
 Case expressions with no alternatives are odd beasts, and it would seem
 like they would worth be looking at in the linter (cf #10180). We
 used to check two things:
@@ -183,21 +208,21 @@ either. Getting the checks right turns out to be somewhat complicated.
 
 For example, suppose we have (comment 8)
 
-.. code-block:: haskell
+::
 
   data T a where
     TInt :: T Int
 
-.. code-block:: haskell
+::
 
   absurdTBool :: T Bool -> a
   absurdTBool v = case v of
 
-.. code-block:: haskell
+::
 
   data Foo = Foo !(T Bool)
 
-.. code-block:: haskell
+::
 
   absurdFoo :: Foo -> a
   absurdFoo (Foo x) = absurdTBool x
@@ -205,7 +230,7 @@ For example, suppose we have (comment 8)
 GHC initially accepts the empty case because of the GADT conditions. But then
 we inline absurdTBool, getting
 
-.. code-block:: haskell
+::
 
   absurdFoo (Foo x) = case x of
 
@@ -219,12 +244,14 @@ much fuss when that happens.
 
 
 
-
 Note [Beta redexes]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L970>`__
+
 Consider:
 
-.. code-block:: haskell
+::
 
   join j @x y z = ... in
   (\@x y z -> jump j @x y z) @t e1 e2
@@ -252,7 +279,10 @@ simpleOptPgm so that we can forget all this ever happened.
 
 
 Note [Stupid type synonyms]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L1396>`__
+
 Consider (#14939)
    type Alg cls ob = ob
    f :: forall (cls :: * -> Constraint) (b :: Alg cls *). b
@@ -267,14 +297,18 @@ with the same problem. A single systematic solution eludes me.
 ---------------
 
 
+
 Note [Linting rules]
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L1570>`__
+
 It's very bad if simplifying a rule means that one of the template
 variables (ru_bndrs) that /is/ mentioned on the RHS becomes
 not-mentioned in the LHS (ru_args).  How can that happen?  Well, in
 #10602, SpecConstr stupidly constructed a rule like
 
-.. code-block:: haskell
+::
 
   forall x,c1,c2.
      f (x |> c1 |> c2) = ....
@@ -300,11 +334,13 @@ try to trim the forall'd binder list.
 Note [Rules for join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L1596>`__
+
 A join point cannot be partially applied. However, the left-hand side of a rule
 for a join point is effectively a *pattern*, not a piece of code, so there's an
 argument to be made for allowing a situation like this:
 
-.. code-block:: haskell
+::
 
   join $sj :: Int -> Int -> String
        $sj n m = ...
@@ -320,8 +356,12 @@ conservative view and don't allow undersaturated rules for join points. See
 Note [Rules and join points] in OccurAnal for further discussion.
 
 
+
 Note [Checking for global Ids]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L2088>`__
+
 Before CoreTidy, all locally-bound Ids must be LocalIds, even
 top-level ones. See Note [Exported LocalIds] and #9857.
 
@@ -329,6 +369,9 @@ top-level ones. See Note [Exported LocalIds] and #9857.
 
 Note [Checking StaticPtrs]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L2093>`__
+
 See Note [Grand plan for static forms] in StaticPtrTable for an overview.
 
 Every occurrence of the function 'makeStatic' should be moved to the
@@ -347,6 +390,9 @@ doesn't hold until after the first FloatOut pass.
 
 Note [Type substitution]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L2109>`__
+
 Why do we need a type substitution?  Consider
         /\(a:*). \(x:a). /\(a:*). id a x
 This is ill typed, because (renaming variables) it is really
@@ -363,6 +409,9 @@ Here we substitute 'ty' for 'a' in 'body', on the fly.
 
 Note [Linting type synonym applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreLint.hs#L2123>`__
+
 When linting a type-synonym, or type-family, application
   S ty1 .. tyn
 we behave as follows (#15057, #T15664):
@@ -372,7 +421,7 @@ we behave as follows (#15057, #T15664):
 
 * Switch off lf_report_unsat_syns, and lint ty1 .. tyn.
 
-.. code-block:: haskell
+::
 
   Reason: catch out of scope variables or other ill-kinded gubbins,
   even if S discards that argument entirely. E.g. (#15012):
@@ -382,7 +431,7 @@ we behave as follows (#15057, #T15664):
   Here 'a' is out of scope; but if we expand FakeOut, we conceal
   that out-of-scope error.
 
-.. code-block:: haskell
+::
 
   Reason for switching off lf_report_unsat_syns: with
   LiberalTypeSynonyms, GHC allows unsaturated synonyms provided they

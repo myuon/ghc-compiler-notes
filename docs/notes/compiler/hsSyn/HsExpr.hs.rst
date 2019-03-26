@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs>`_
 
-====================
-compiler/hsSyn/HsExpr.hs.rst
-====================
+compiler/hsSyn/HsExpr.hs
+========================
+
 
 Note [CmdSyntaxtable]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L153>`__
+
 Used only for arrow-syntax stuff (HsCmdTop), the CmdSyntaxTable keeps
 track of the methods needed for a Cmd.
 
@@ -39,30 +42,34 @@ is Less Cool because
     typecheck do-notation with (>>=) :: m1 a -> (a -> m2 b) -> m2 b.)
 
 
+
 Note [OutOfScope and GlobalRdrEnv]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L217>`__
+
 To understand why we bundle a GlobalRdrEnv with an out-of-scope variable,
 consider the following module:
 
-.. code-block:: haskell
+::
 
     module A where
 
-.. code-block:: haskell
+::
 
     foo :: ()
     foo = bar
 
-.. code-block:: haskell
+::
 
     bat :: [Double]
     bat = [1.2, 3.4]
 
-.. code-block:: haskell
+::
 
     $(return [])
 
-.. code-block:: haskell
+::
 
     bar = ()
     bad = False
@@ -73,7 +80,7 @@ group).  Once it has finished typechecking the entire module, the typechecker
 then generates the associated error message, which specifies both the type of
 `bar` and a list of possible in-scope alternatives:
 
-.. code-block:: haskell
+::
 
     A.hs:6:7: error:
         • Variable not in scope: bar :: ()
@@ -94,11 +101,11 @@ location information is not always sufficient for this task.  This is most
 apparent when dealing with the TH function addTopDecls, which adds its
 declarations to the FOLLOWING inter-splice group.  Consider these declarations:
 
-.. code-block:: haskell
+::
 
     ex9 = cat               -- cat is NOT in scope here
 
-.. code-block:: haskell
+::
 
     $(do -------------------------------------------------------------
         ds <- [d| f = cab   -- cat and cap are both in scope here
@@ -109,15 +116,15 @@ declarations to the FOLLOWING inter-splice group.  Consider these declarations:
             cap = True
           |])
 
-.. code-block:: haskell
+::
 
     ex10 = cat              -- cat is NOT in scope here
 
-.. code-block:: haskell
+::
 
     $(return []) -----------------------------------------------------
 
-.. code-block:: haskell
+::
 
     ex11 = cat              -- cat is in scope
 
@@ -130,8 +137,12 @@ allow the typechecker to obtain the correct GlobalRdrEnv.  Clearly, the simplest
 information to use is the GlobalRdrEnv itself.
 
 
+
 Note [Parens in HsSyn]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L804>`__
+
 HsPar (and ParPat in patterns, HsParTy in types) is used as follows
 
   * HsPar is required; the pretty printer does not add parens.
@@ -150,9 +161,11 @@ HsPar (and ParPat in patterns, HsParTy in types) is used as follows
 
 
 
-
 Note [Sections in HsSyn]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L823>`__
+
 Sections should always appear wrapped in an HsPar, thus
          HsPar (SectionR ...)
 The parser parses sections in a wider variety of situations
@@ -164,6 +177,9 @@ a special case for adding the parens round sections.
 
 Note [Rebindable if]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L832>`__
+
 The rebindable syntax for 'if' is a bit special, because when
 rebindable syntax is *off* we do not want to treat
    (if c then t else e)
@@ -179,6 +195,9 @@ So we use Nothing to mean "use the old built-in typing rule".
 
 Note [Record Update HsWrapper]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L845>`__
+
 There is a wrapper in RecordUpd which is used for the *required*
 constraints for pattern synonyms. This wrapper is created in the
 typechecking and is then directly used in the desugaring without
@@ -199,6 +218,9 @@ the RHS so that we can build the expression.
 
 Note [Located RdrNames]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L863>`__
+
 A number of syntax elements have seemingly redundant locations attached to them.
 This is deliberate, to allow transformations making use of the API Annotations
 to easily correlate a Located Name in the RenamedSource with a Located RdrName
@@ -209,8 +231,11 @@ RenamedSource that the API Annotations cannot be used directly with
 RenamedSource, so this allows a simple mapping to be used based on the location.
 
 
+
 Note [m_ctxt in Match]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L1570>`__
 
 A Match can occur in a number of contexts, such as a FunBind, HsCase, HsLam and
 so on.
@@ -236,7 +261,7 @@ the Match, when it originates from a FunBind.
 
 Example infix function definition requiring individual API Annotations
 
-.. code-block:: haskell
+::
 
     (&&&  ) [] [] =  []
     xs    &&&   [] =  xs
@@ -244,10 +269,11 @@ Example infix function definition requiring individual API Annotations
 
 
 
-
-
 Note [The type of bind in Stmts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L2005>`__
+
 Some Stmts, notably BindStmt, keep the (>>=) bind operator.
 We do NOT assume that it has type
     (>>=) :: m a -> (a -> m b) -> m b
@@ -261,6 +287,9 @@ In particular, the monad may not be uniform throughout.
 
 Note [TransStmt binder map]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L2016>`__
+
 The [(idR,idR)] in a TransStmt behaves as follows:
 
   * Before renaming: []
@@ -281,6 +310,9 @@ The [(idR,idR)] in a TransStmt behaves as follows:
 
 Note [BodyStmt]
 ~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L2034>`__
+
 BodyStmts are a bit tricky, because what they mean
 depends on the context.  Consider the following contexts:
 
@@ -316,10 +348,13 @@ Array comprehensions are handled like list comprehensions.
 
 Note [How RecStmt works]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L2067>`__
+
 Example:
    HsDo [ BindStmt x ex
 
-.. code-block:: haskell
+::
 
         , RecStmt { recS_rec_ids   = [a, c]
                   , recS_stmts     = [ BindStmt b (return (a,c))
@@ -327,7 +362,7 @@ Example:
                                      , BindStmt c ec ]
                   , recS_later_ids = [a, b]
 
-.. code-block:: haskell
+::
 
         , return (a b) ]
 
@@ -340,7 +375,7 @@ Why do we need *both* rec_ids and later_ids?  For monads they could be
 combined into a single set of variables, but not for arrows.  That
 follows from the types of the respective feedback operators:
 
-.. code-block:: haskell
+::
 
         mfix :: MonadFix m => (a -> m a) -> m a
         loop :: ArrowLoop a => a (b,d) (c,d) -> a b c
@@ -352,9 +387,12 @@ follows from the types of the respective feedback operators:
 
 Note [Typing a RecStmt]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L2095>`__
+
 A (RecStmt stmts) types as if you had written
 
-.. code-block:: haskell
+::
 
   (v1,..,vn, _, ..., _) <- mfix (\~(_, ..., _, r1, ..., rm) ->
                                  do { stmts
@@ -367,12 +405,15 @@ where v1..vn are the later_ids
 
 Note [Monad Comprehensions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L2106>`__
+
 Monad comprehensions require separate functions like 'return' and
 '>>=' for desugaring. These functions are stored in the statements
 used in monad comprehensions. For example, the 'return' of the 'LastStmt'
 expression is used to lift the body of the monad comprehension:
 
-.. code-block:: haskell
+::
 
   [ body | stmts ]
    =>
@@ -381,7 +422,7 @@ expression is used to lift the body of the monad comprehension:
 In transform and grouping statements ('then ..' and 'then group ..') the
 'return' function is required for nested monad comprehensions, for example:
 
-.. code-block:: haskell
+::
 
   [ body | stmts, then f, rest ]
    =>
@@ -390,7 +431,7 @@ In transform and grouping statements ('then ..' and 'then group ..') the
 BodyStmts require the 'Control.Monad.guard' function for boolean
 expressions:
 
-.. code-block:: haskell
+::
 
   [ body | exp, stmts ]
    =>
@@ -398,7 +439,7 @@ expressions:
 
 Parallel statements require the 'Control.Monad.Zip.mzip' function:
 
-.. code-block:: haskell
+::
 
   [ body | stmts1 | stmts2 | .. ]
    =>
@@ -413,7 +454,7 @@ Note [Applicative BodyStmt]
 (#12143) For the purposes of ApplicativeDo, we treat any BodyStmt
 as if it was a BindStmt with a wildcard pattern.  For example,
 
-.. code-block:: haskell
+::
 
   do
     x <- A
@@ -422,7 +463,7 @@ as if it was a BindStmt with a wildcard pattern.  For example,
 
 is transformed as if it were
 
-.. code-block:: haskell
+::
 
   do
     x <- A
@@ -431,7 +472,7 @@ is transformed as if it were
 
 so it transforms to
 
-.. code-block:: haskell
+::
 
   (\(x,_) -> x) <$> A <*> B
 
@@ -442,8 +483,12 @@ Bool flag that is True when the original statement was a BodyStmt, so
 that we can pretty-print it correctly.
 
 
+
 Note [Pending Splices]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsExpr.hs#L2437>`__
+
 When we rename an untyped bracket, we name and lift out all the nested
 splices, so that when the typechecker hits the bracket, it can
 typecheck those nested splices without having to walk over the untyped
@@ -451,13 +496,13 @@ bracket code.  So for example
     [| f $(g x) |]
 looks like
 
-.. code-block:: haskell
+::
 
     HsBracket (HsApp (HsVar "f") (HsSpliceE _ (g x)))
 
 which the renamer rewrites to
 
-.. code-block:: haskell
+::
 
     HsRnBracketOut (HsApp (HsVar f) (HsSpliceE sn (g x)))
                    [PendingRnSplice UntypedExpSplice sn (g x)]

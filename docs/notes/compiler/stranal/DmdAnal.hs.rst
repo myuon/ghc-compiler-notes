@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs>`_
 
-====================
-compiler/stranal/DmdAnal.hs.rst
-====================
+compiler/stranal/DmdAnal.hs
+===========================
+
 
 Note [Stamp out space leaks in demand analysis]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L86>`__
+
 The demand analysis pass outputs a new copy of the Core program in
 which binders have been annotated with demand and strictness
 information. It's tiresome to ensure that this information is fully
@@ -24,8 +27,12 @@ most memory-intensive part of the compilation process, so this added
 seqBinds makes a big difference in peak memory usage.
 
 
+
 Note [Ensure demand is strict]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L114>`__
+
 It's important not to analyse e with a lazy demand because
 a) When we encounter   case s of (a,b) ->
         we demand s with U(d1d2)... but if the overall demand is lazy
@@ -43,11 +50,15 @@ If e is complicated enough to become a thunk, its contents will be evaluated
 at most once, so oneify it.
 
 
+
 Note [IO hack in the demand analyser]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L361>`__
+
 There's a hack here for I/O operations.  Consider
 
-.. code-block:: haskell
+::
 
      case foo x s of { (# s', r #) -> y }
 
@@ -92,6 +103,9 @@ state hack:
 
 Note [Demand on the scrutinee of a product case]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L404>`__
+
 When figuring out the demand on the scrutinee of a product case,
 we use the demands of the case alternative, i.e. id_dmds.
 But note that these include the demand on the case binder;
@@ -107,6 +121,9 @@ and that'll crash.
 
 Note [Aggregated demand for cardinality]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L417>`__
+
 We use different strategies for strictness and usage/cardinality to
 "unleash" demands captured on free variables by bindings. Let us
 consider the example:
@@ -147,9 +164,10 @@ strict in |y|.
 
 
 
-
 Note [Safe abortion in the fixed-point iteration]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L568>`__
 
 Fixed-point iteration may fail to terminate. But we cannot simply give up and
 return the environment and code unchanged! We still need to do one additional
@@ -167,13 +185,17 @@ Trivial RHS
 See Note [Demand analysis for trivial right-hand sides]
 
 
+
 Note [Demand analysis for join points]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L700>`__
+
 Consider
    g :: (Int,Int) -> Int
    g (p,q) = p+q
 
-.. code-block:: haskell
+::
 
    f :: T -> Int -> Int
    f x p = g (join j y = (p,y)
@@ -204,6 +226,9 @@ Another win for join points!  #13543.
 
 Note [Demand analysis for trivial right-hand sides]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L731>`__
+
 Consider
         foo = plusInt |> co
 where plusInt is an arity-2 function with known strictness.  Clearly
@@ -221,12 +246,14 @@ test case of #8963.
 
 
 
-
 Note [Product demands for function body]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L749>`__
+
 This example comes from shootout/binary_trees:
 
-.. code-block:: haskell
+::
 
     Main.check' = \ b z ds. case z of z' { I# ip ->
                                 case ds_d13s of
@@ -252,13 +279,20 @@ a product type.
 
 Note [Do not strictify the argument dictionaries of a dfun]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L819>`__
+
 The typechecker can tie recursive knots involving dfuns, so we do the
 conservative thing and refrain from strictifying a dfun's argument
 dictionaries.
 
 
+
 Note [CPR for sum types]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L880>`__
+
 At the moment we do not do CPR for let-bindings that
    * non-top level
    * bind a sum type
@@ -287,11 +321,14 @@ guaranteed OK for products, but sums definitely lose sometimes.
 
 Note [CPR for thunks]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L906>`__
+
 If the rhs is a thunk, we usually forget the CPR info, because
 it is presumably shared (else it would have been inlined, and
 so we'd lose sharing if w/w'd it into a function).  E.g.
 
-.. code-block:: haskell
+::
 
         let r = case expensive of
                   (a,b) -> (b,a)
@@ -299,7 +336,7 @@ so we'd lose sharing if w/w'd it into a function).  E.g.
 
 If we marked r as having the CPR property, then we'd w/w into
 
-.. code-block:: haskell
+::
 
         let $wr = \() -> case expensive of
                             (a,b) -> (# b, a #)
@@ -310,7 +347,7 @@ If we marked r as having the CPR property, then we'd w/w into
 But now r is a thunk, which won't be inlined, so we are no further ahead.
 But consider
 
-.. code-block:: haskell
+::
 
         f x = let r = case expensive of (a,b) -> (b,a)
               in if foo r then r else (x,x)
@@ -356,6 +393,9 @@ NB: strictly_demanded is never true of a top-level Id, or of a recursive Id.
 
 Note [Optimistic CPR in the "virgin" case]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L967>`__
+
 Demand and strictness info are initialized by top elements. However,
 this prevents from inferring a CPR property in the first pass of the
 analyser, so we keep an explicit flag ae_virgin in the AnalEnv
@@ -381,9 +421,11 @@ by dmdAnalTopBind.
 
 
 
-
 Note [NOINLINE and strictness]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L993>`__
+
 The strictness analyser used to have a HACK which ensured that NOINLNE
 things were not strictness-analysed.  The reason was unsafePerformIO.
 Left to itself, the strictness analyser would discover this strictness
@@ -405,7 +447,7 @@ This should be strict in x.
 
 So the new plan is to define unsafePerformIO using the 'lazy' combinator:
 
-.. code-block:: haskell
+::
 
         unsafePerformIO (IO m) = lazy (case m realWorld# of (# _, r #) -> r)
 
@@ -423,7 +465,10 @@ in favour of error!
 
 
 Note [Lazy and unleashable free variables]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L1029>`__
+
 We put the strict and once-used FVs in the DmdType of the Id, so
 that at its call sites we unleash demands on its strict fvs.
 An example is 'roll' in imaginary/wheel-sieve2
@@ -437,7 +482,7 @@ go is called.   So we put the DmdEnv for x in go's DmdType.
 
 Another example:
 
-.. code-block:: haskell
+::
 
         f :: Int -> Int -> Int
         f x y = let t = x+1
@@ -452,7 +497,7 @@ that if we unleash a demand on x at the call site for t.
 Incidentally, here's a place where lambda-lifting h would
 lose the cigar --- we couldn't see the joint strictness in t/x
 
-.. code-block:: haskell
+::
 
         ON THE OTHER HAND
 
@@ -484,9 +529,11 @@ demand put on them (topDmd), and add that to the "lazy_fv" returned by "dmdFix".
 
 
 
-
 Note [Lambda-bound unfoldings]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L1086>`__
+
 We allow a lambda-bound variable to carry an unfolding, a facility that is used
 exclusively for join points; see Note [Case binders and join points].  If so,
 we must be careful to demand-analyse the RHS of the unfolding!  Example
@@ -496,9 +543,11 @@ forget that fact, otherwise we might make 'x' absent when it isn't.
 
 
 
-
 Note [CPR in a product case alternative]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L1259>`__
+
 In a case alternative for a product type, we want to give some of the
 binders the CPR property.  Specifically
 
@@ -510,14 +559,14 @@ binders the CPR property.  Specifically
                                            else I# 8 }
         f False x = I# 3
 
-.. code-block:: haskell
+::
 
    By giving 'y' the CPR property, we ensure that 'f' does too, so we get
         f b x = case fw b x of { r -> I# r }
         fw True  x = case x of y { I# x' -> if x' ==# 3 then x' else 8 }
         fw False x = 3
 
-.. code-block:: haskell
+::
 
    Of course there is the usual risk of re-boxing: we have 'x' available
    boxed and unboxed, but we return the unboxed version for the wrapper to
@@ -528,16 +577,16 @@ binders the CPR property.  Specifically
    Note [Initial CPR for strict binders].  But we can go a little
    further. Consider
 
-.. code-block:: haskell
+::
 
       data T = MkT !Int Int
 
-.. code-block:: haskell
+::
 
       f2 (MkT x y) | y>0       = f2 (MkT x (y-1))
                    | otherwise = x
 
-.. code-block:: haskell
+::
 
    For $wf2 we are going to unbox the MkT *and*, since it is strict, the
    first argument of the MkT; see Note [Add demands for strict constructors]
@@ -559,9 +608,11 @@ binders the CPR property.  Specifically
 
 
 
-
 Note [Initial CPR for strict binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L1310>`__
+
 CPR is initialized for a lambda binder in an optimistic manner, i.e,
 if the binder is used strictly and at least some of its components as
 a product are used, which is checked by the value of the absence
@@ -571,7 +622,7 @@ If the binder is marked demanded with a strict demand, then give it a
 CPR signature. Here's a concrete example ('f1' in test T10482a),
 assuming h is strict:
 
-.. code-block:: haskell
+::
 
   f1 :: Int -> Int
   f1 x = case h x of
@@ -600,18 +651,21 @@ Note that
 
 
 Note [CPR examples]
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L1345>`__
+
 Here are some examples (stranal/should_compile/T10482a) of the
 usefulness of Note [CPR in a product case alternative].  The main
 point: all of these functions can have the CPR property.
 
-.. code-block:: haskell
+::
 
     ------- f1 -----------
     -- x is used strictly by h, so it'll be available
     -- unboxed before it is returned in the True branch
 
-.. code-block:: haskell
+::
 
     f1 :: Int -> Int
     f1 x = case h x x of
@@ -619,7 +673,7 @@ point: all of these functions can have the CPR property.
             False -> f1 (x-1)
 
 
-.. code-block:: haskell
+::
 
     ------- f2 -----------
     -- x is a strict field of MkT2, so we'll pass it unboxed
@@ -628,50 +682,50 @@ point: all of these functions can have the CPR property.
     -- of the original arguments to the function, so it's
     -- a bit more delicate.
 
-.. code-block:: haskell
+::
 
     data T2 = MkT2 !Int Int
 
-.. code-block:: haskell
+::
 
     f2 :: T2 -> Int
     f2 (MkT2 x y) | y>0       = f2 (MkT2 x (y-1))
                   | otherwise = x
 
 
-.. code-block:: haskell
+::
 
     ------- f3 -----------
     -- h is strict in x, so x will be unboxed before it
     -- is rerturned in the otherwise case.
 
-.. code-block:: haskell
+::
 
     data T3 = MkT3 Int Int
 
-.. code-block:: haskell
+::
 
     f1 :: T3 -> Int
     f1 (MkT3 x y) | h x y     = f3 (MkT3 x (y-1))
                   | otherwise = x
 
 
-.. code-block:: haskell
+::
 
     ------- f4 -----------
     -- Just like f2, but MkT4 can't unbox its strict
     -- argument automatically, as f2 can
 
-.. code-block:: haskell
+::
 
     data family Foo a
     newtype instance Foo Int = Foo Int
 
-.. code-block:: haskell
+::
 
     data T4 a = MkT4 !(Foo a) Int
 
-.. code-block:: haskell
+::
 
     f4 :: T4 Int -> Int
     f4 (MkT4 x@(Foo v) y) | y>0       = f4 (MkT4 x (y-1))
@@ -679,9 +733,11 @@ point: all of these functions can have the CPR property.
 
 
 
-
 Note [Initialising strictness]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L1400>`__
+
 See section 9.2 (Finding fixpoints) of the paper.
 
 Our basic plan is to initialise the strictness of each Id in a
@@ -692,7 +748,7 @@ of A. This can be illustrated by the following example:
 
 Example:
 
-.. code-block:: haskell
+::
 
   f [] = []
   f (x:xs) = let g []     = f xs
@@ -721,9 +777,11 @@ field of the AnalEnv.
 
 
 
-
 Note [Final Demand Analyser run]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stranal/DmdAnal.hs#L1438>`__
+
 Some of the information that the demand analyser determines is not always
 preserved by the simplifier.  For example, the simplifier will happily rewrite
   \y [Demand=1*U] let x = y in x + x
@@ -742,7 +800,7 @@ generator, though.  So:
       but WITHOUT subsequent worker/wrapper and simplifier,
    right before TidyCore.  See SimplCore.getCoreToDo.
 
-.. code-block:: haskell
+::
 
    This way, correct information finds its way into the module interface
    (strictness signatures!) and the code generator (single-entry thunks!)

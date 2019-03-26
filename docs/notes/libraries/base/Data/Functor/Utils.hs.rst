@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Functor/Utils.hs>`_
 
-====================
-libraries/base/Data/Functor/Utils.hs.rst
-====================
+libraries/base/Data/Functor/Utils.hs
+====================================
+
 
 Note [Function coercion]
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Functor/Utils.hs#L95>`__
 
 Several functions here use (#.) instead of (.) to avoid potential efficiency
 problems relating to #7542. The problem, in a nutshell:

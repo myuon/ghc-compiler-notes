@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CLabel.hs>`_
 
-====================
-compiler/cmm/CLabel.hs.rst
-====================
+compiler/cmm/CLabel.hs
+======================
+
 
 Note [ticky for LNE]
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CLabel.hs#L741>`__
+
 Until 14 Feb 2013, every ticky counter was associated with a
 closure. Thus, ticky labels used IdLabel. It is odd that
 CmmBuildInfoTables.cafTransfers would consider such a ticky label
@@ -27,8 +30,12 @@ Does a CLabel need declaring before use or not?
 See wiki:Commentary/Compiler/Backends/PprC#Prototypes
 
 
+
 Note [Closure and info labels]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CLabel.hs#L1108>`__
+
 For a function 'foo, we have:
    foo_info    : Points to the info table describing foo's closure
                  (and entry code for foo with tables next to code)
@@ -44,7 +51,7 @@ For a data constructor (such as Just or Nothing), we have:
                       Just = \x -> Just x
     Just_closure:  The closure for this worker
 
-.. code-block:: haskell
+::
 
     Nothing_closure: a statically allocated closure for Nothing
     Nothing_static_info: info table for Nothing_closure
@@ -60,6 +67,9 @@ somewhat.
 
 Note [Bytes label]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CLabel.hs#L1135>`__
+
 For a top-level string literal 'foo', we have just one symbol 'foo_bytes', which
 points to a static data block containing the content of the literal.
 
@@ -67,6 +77,9 @@ points to a static data block containing the content of the literal.
 
 Note [Proc-point local block entry-points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CLabel.hs#L1140>`__
+
 A label for a proc-point local block entry-point has no "_entry" suffix. With
 `infoTblLbl` we derive an info table label from a proc-point block ID. If
 we convert such an info table label into an entry label we must produce

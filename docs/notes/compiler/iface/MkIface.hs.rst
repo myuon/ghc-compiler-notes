@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/MkIface.hs>`_
 
-====================
-compiler/iface/MkIface.hs.rst
-====================
+compiler/iface/MkIface.hs
+=========================
+
 
 Note [Fingerprinting IfaceDecls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/MkIface.hs#L418>`__
 
 The general idea here is that we first examine the 'IfaceDecl's and determine
 the recursive groups of them. We then walk these groups in dependency order,
@@ -26,23 +28,27 @@ fingerprint; in the binding case we shouldn't since it is merely the name of the
 thing that we are currently fingerprinting.
 
 
+
 Note [The ABI of an IfaceDecl]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/MkIface.hs#L830>`__
+
 The ABI of a declaration consists of:
 
-.. code-block:: haskell
+::
 
    (a) the full name of the identifier (inc. module and package,
        because these are used to construct the symbol name by which
        the identifier is known externally).
 
-.. code-block:: haskell
+::
 
    (b) the declaration itself, as exposed to clients.  That is, the
        definition of an Id is included in the fingerprint only if
        it is made available as an unfolding in the interface.
 
-.. code-block:: haskell
+::
 
    (c) the fixity of the identifier (if it exists)
    (d) for Ids: rules
@@ -55,8 +61,12 @@ the declaration itself. This is done by grouping (c)-(f) in IfaceDeclExtras,
 and fingerprinting that as part of the declaration.
 
 
+
 Note [Original module]
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/MkIface.hs#L1120>`__
+
 Consider this:
         module X where { data family T }
         module Y( T(..) ) where { import X; data instance T Int = MkT Int }
@@ -74,12 +84,13 @@ so we may need to split up a single Avail into multiple ones.
 
 Note [Internal used_names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/MkIface.hs#L1135>`__
+
 Most of the used_names are External Names, but we can have Internal
 Names too: see Note [Binders in Template Haskell] in Convert, and
 #5362 for an example.  Such Names are always
   - Such Names are always for locally-defined things, for which we
     don't gather usage info, so we can just ignore them in ent_map
   - They are always System Names, hence the assert, just as a double check.
-
-
 

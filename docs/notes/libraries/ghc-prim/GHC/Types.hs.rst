@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/ghc-prim/GHC/Types.hs>`_
 
-====================
-libraries/ghc-prim/GHC/Types.hs.rst
-====================
+libraries/ghc-prim/GHC/Types.hs
+===============================
+
 
 Note [Kind-changing of (~) and Coercible]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/ghc-prim/GHC/Types.hs#L206>`__
 
 (~) and Coercible are tricky to define. To the user, they must appear as
 constraints, but we cannot define them as such in Haskell. But we also cannot
@@ -19,18 +21,22 @@ So we define them as regular data types in GHC.Types, and do magic in TysWiredIn
 inside GHC, to change the kind and type.
 
 
+
 Note [Optimizing isTrue#]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/ghc-prim/GHC/Types.hs#L302>`__
+
 Current definition of isTrue# is a temporary workaround. We would like to
 have functions isTrue# and isFalse# defined like this:
 
-.. code-block:: haskell
+::
 
     isTrue# :: Int# -> Bool
     isTrue# 1# = True
     isTrue# _  = False
 
-.. code-block:: haskell
+::
 
     isFalse# :: Int# -> Bool
     isFalse# 0# = True
@@ -77,8 +83,12 @@ just make isTrue# an alias to tagToEnum#. This is a temporary solution (if
 you're reading this in 2023 then things went wrong). See #8326.
 
 
+
 Note [Runtime representation of modules and tycons]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/ghc-prim/GHC/Types.hs#L438>`__
+
 We generate a binding for M.$modName and M.$tcT for every module M and
 data type T.  Things to think about
 

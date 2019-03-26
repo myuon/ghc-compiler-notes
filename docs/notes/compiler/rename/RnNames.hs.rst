@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs>`_
 
-====================
-compiler/rename/RnNames.hs.rst
-====================
+compiler/rename/RnNames.hs
+==========================
+
 
 Note [Tracking Trust Transitively]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L82>`__
+
 When we import a package as well as checking that the direct imports are safe
 according to the rules outlined in the Note [HscMain . Safe Haskell Trust Check]
 we must also check that these rules hold transitively for all dependent modules
@@ -39,9 +42,11 @@ how its handled.
 
 
 
-
 Note [Trust Own Package]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L116>`__
+
 There is a corner case of package trust checking that the usual transitive check
 doesn't cover. (For how the usual check operates see the Note [Tracking Trust
 Transitively] below). The case is when you import a -XSafe module M and M
@@ -58,9 +63,11 @@ is trustworthy.
 
 
 
-
 Note [Trust Transitive Property]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L133>`__
+
 So there is an interesting design question in regards to transitive trust
 checking. Say I have a module B compiled with -XSafe. B is dependent on a bunch
 of modules and packages, some packages it requires to be trusted as its using
@@ -88,8 +95,12 @@ trust network' to get everything working. Due to this invasive nature of going
 with yes we have gone with no for now.
 
 
+
 Note [Combining ImportAvails]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L205>`__
+
 imp_finsts in ImportAvails is a list of family instance modules
 transitively depended on by an import. imp_finsts for a currently
 compiled module is a union of all the imp_finsts of imports.
@@ -129,8 +140,12 @@ Running generateModules from #14693 with DEPTH=16, WIDTH=30 finishes in
 23s before, and 11s after.
 
 
+
 Note [Top-level Names in Template Haskell decl quotes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L501>`__
+
 See also: Note [Interactively-bound Ids in GHCi] in HscTypes
           Note [Looking up Exact RdrNames] in RnEnv
 
@@ -152,11 +167,15 @@ top level binders specially in two ways
    fields of Brack, hence the error thunks in thRnBrack.
 
 
+
 Note [Looking up family names in family instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L801>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
   module M where
     type family T a :: *
@@ -173,9 +192,11 @@ the environment, and then process the type instances.
 
 
 
-
 Note [Dealing with imports]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L828>`__
+
 For import M( ies ), we take the mi_exports of M, and make
    imp_occ_env :: OccEnv (Name, AvailInfo, Maybe Name)
 One entry for each Name that M exports; the AvailInfo is the
@@ -209,11 +230,15 @@ Note that the imp_occ_env will have entries for data constructors too,
 although we never look up data constructors.
 
 
+
 Note [Children for duplicate record fields]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L1120>`__
+
 Consider the module
 
-.. code-block:: haskell
+::
 
     {-# LANGUAGE DuplicateRecordFields #-}
     module M (F(foo, MkFInt, MkFBool)) where
@@ -226,8 +251,12 @@ reason, lookupChildren builds an environment that maps the FastString
 to a list of items, rather than a single item.
 
 
+
 Note [The ImportMap]
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L1398>`__
+
 The ImportMap is a short-lived intermediate data structure records, for
 each import declaration, what stuff brought into scope by that
 declaration is actually used in the module.
@@ -246,8 +275,12 @@ It's just a cheap hack; we could equally well use the Span too.
 The [GlobalRdrElt] are the things imported from that decl.
 
 
+
 Note [Do not warn about Prelude hiding]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L1491>`__
+
 We do not warn about
    import Prelude hiding( x, y )
 because even if nothing else from Prelude is used, it may be essential to hide
@@ -257,10 +290,11 @@ x,y to avoid name-shadowing warnings.  Example (#9061)
 
 
 
-
-
 Note [Printing minimal imports]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L1502>`__
+
 To print the minimal imports we walk over the user-supplied import
 decls, and simply trim their import lists.  NB that
 
@@ -270,17 +304,21 @@ decls, and simply trim their import lists.  NB that
     from it.  Instead we just trim to an empty import list
 
 
+
 Note [Partial export]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L1603>`__
+
 Suppose we have
 
-.. code-block:: haskell
+::
 
    module A( op ) where
      class C a where
        op :: a -> a
 
-.. code-block:: haskell
+::
 
    module B where
    import A
@@ -295,18 +333,20 @@ the (x `elem` xs) test when deciding what to generate.
 
 
 
-
 Note [Overloaded field import]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnNames.hs#L1623>`__
+
 On the other hand, if we have
 
-.. code-block:: haskell
+::
 
     {-# LANGUAGE DuplicateRecordFields #-}
     module A where
       data T = MkT { foo :: Int }
 
-.. code-block:: haskell
+::
 
     module B where
       import A
@@ -316,6 +356,4 @@ then the minimal import for module B must be
     import A ( T(foo) )
 because when DuplicateRecordFields is enabled, field selectors are
 not in scope without their enclosing datatype.
-
-
 

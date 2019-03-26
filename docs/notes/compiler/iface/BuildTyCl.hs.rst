@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/BuildTyCl.hs>`_
 
-====================
-compiler/iface/BuildTyCl.hs.rst
-====================
+compiler/iface/BuildTyCl.hs
+===========================
+
 
 Note [Class newtypes and equality predicates]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/BuildTyCl.hs#L365>`__
+
 Consider
         class (a ~ F b) => C a b where
           op :: a -> b

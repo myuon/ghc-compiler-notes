@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/IdInfo.hs>`_
 
-====================
-compiler/basicTypes/IdInfo.hs.rst
-====================
+compiler/basicTypes/IdInfo.hs
+=============================
+
 
 Note [Specialisations and RULES in IdInfo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/IdInfo.hs#L385>`__
+
 Generally speaking, a GlobalId has an *empty* RuleInfo.  All their
 RULES are contained in the globally-built rule-base.  In principle,
 one could attach the to M.f the RULES for M.f that are defined in M.
@@ -24,8 +27,11 @@ In TidyPgm, when the LocalId becomes a GlobalId, its RULES are stripped off
 and put in the global list.
 
 
+
 Note [Levity info]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/IdInfo.hs#L590>`__
 
 Ids store whether or not they can be levity-polymorphic at any amount
 of saturation. This is helpful in optimizing the levity-polymorphism check

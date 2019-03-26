@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmContFlowOpt.hs>`_
 
-====================
-compiler/cmm/CmmContFlowOpt.hs.rst
-====================
+compiler/cmm/CmmContFlowOpt.hs
+==============================
+
 
 Note [What is shortcutting]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmContFlowOpt.hs#L29>`__
 
 Consider this Cmm code:
 
@@ -28,8 +30,11 @@ consequences of shortcutting is that some blocks of code may become
 unreachable (in the example above this is true for L2).
 
 
+
 Note [Control-flow optimisations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmContFlowOpt.hs#L53>`__
 
 This optimisation does three things:
 
@@ -55,8 +60,11 @@ towards the beginning, because we may be able to perform many
 shortcuts in one go.
 
 
+
 Note [Shortcut call returns]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmContFlowOpt.hs#L80>`__
 
 We are going to maintain the "current" graph (LabelMap CmmBlock) as
 we go, and also a mapping from BlockId to BlockId, representing
@@ -64,7 +72,7 @@ continuation labels that we have renamed.  This latter mapping is
 important because we might shortcut a CmmCall continuation.  For
 example:
 
-.. code-block:: haskell
+::
 
    Sp[0] = L
    call g returns to L
@@ -75,7 +83,7 @@ So when we shortcut the L block, we need to replace not only
 the continuation of the call, but also references to L in the
 code (e.g. the assignment Sp[0] = L):
 
-.. code-block:: haskell
+::
 
    Sp[0] = M
    call g returns to M
@@ -85,13 +93,16 @@ So we keep track of which labels we have renamed and apply the mapping
 at the end with replaceLabels.
 
 
+
 Note [Shortcut call returns and proc-points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/cmm/CmmContFlowOpt.hs#L106>`__
 
 Consider this code that you might get from a recursive
 let-no-escape:
 
-.. code-block:: haskell
+::
 
       goto L1
      L1:

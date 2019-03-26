@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Match.hs>`_
 
-====================
-compiler/deSugar/Match.hs.rst
-====================
+compiler/deSugar/Match.hs
+=========================
+
 
 Note [Match Ids]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Match.hs#L151>`__
+
 Most of the matching functions take an Id or [Id] as argument.  This Id
 is the scrutinee(s) of the match. The desugared expression may
 sometimes use that Id in a local binding or as a case binder.  So it
@@ -15,8 +18,12 @@ with External names (#13043).
 See also Note [Localise pattern binders] in DsUtils
 
 
+
 Note [Empty case alternatives]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Match.hs#L317>`__
+
 The list of EquationInfo can be empty, arising from
     case x of {}   or    \case {}
 In that situation we desugar to
@@ -34,9 +41,11 @@ See also Note [Case elimination: lifted case] in Simplify.
 
 
 
-
 Note [Bang patterns and newtypes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Match.hs#L566>`__
+
 For the pattern  !(Just pat)  we can discard the bang, because
 the pattern is strict anyway. But for !(N pat), where
   newtype NT = N Int
@@ -78,10 +87,13 @@ evaluation of \tr{e}.  An alternative translation (No.~2):
 
 
 Note [Don't use Literal for PgN]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Match.hs#L862>`__
+
 Previously we had, as PatGroup constructors
 
-.. code-block:: haskell
+::
 
   | ...
   | PgN   Literal       -- Overloaded literals
@@ -99,8 +111,12 @@ the PgN constructor as a Rational if numeric, and add a PgOverStr constructor
 for overloaded strings.
 
 
+
 Note [Pattern synonym groups]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Match.hs#L921>`__
+
 If we see
   f (P a) = e1
   f (P b) = e2
@@ -125,17 +141,24 @@ in PgSyn we record the instantiaing types, and use them in sameGroup.
 
 Note [Take care with pattern order]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Match.hs#L943>`__
+
 In the subGroup function we must be very careful about pattern re-ordering,
 Consider the patterns [ (True, Nothing), (False, x), (True, y) ]
 Then in bringing together the patterns for True, we must not
 swap the Nothing and y!
 
 
+
 Note [Grouping overloaded literal patterns]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/Match.hs#L1112>`__
+
 WATCH OUT!  Consider
 
-.. code-block:: haskell
+::
 
         f (n+1) = ...
         f (n+2) = ...

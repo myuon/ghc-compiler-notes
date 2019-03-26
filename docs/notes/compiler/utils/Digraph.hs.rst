@@ -1,12 +1,15 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/Digraph.hs>`_
 
-====================
-compiler/utils/Digraph.hs.rst
-====================
+compiler/utils/Digraph.hs
+=========================
+
 
 Note [Nodes, keys, vertices]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * A 'node' is a big blob of client-stuff
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/Digraph.hs#L71>`__
+
+* A 'node' is a big blob of client-stuff
 
  * Each 'node' has a unique (client) 'key', but the latter
         is in Ord and has fast comparison
@@ -15,8 +18,12 @@ Note [Nodes, keys, vertices]
         arranged densely in 0.n
 
 
+
 Note [reduceNodesIntoVertices implementations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/Digraph.hs#L158>`__
+
 reduceNodesIntoVertices is parameterized by the container type.
 This is to accomodate key types that don't have an Ord instance
 and hence preclude the use of Data.Map. An example of such type
@@ -33,8 +40,12 @@ The Uniq version should be a tiny bit more efficient since it uses
 Data.IntMap internally.
 
 
+
 Note [Deterministic SCC]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/Digraph.hs#L273>`__
+
 stronglyConnCompFromEdgedVerticesUniq,
 stronglyConnCompFromEdgedVerticesUniqR,
 stronglyConnCompFromEdgedVerticesOrd and

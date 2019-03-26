@@ -1,15 +1,17 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IORef.hs>`_
 
-====================
-libraries/base/GHC/IORef.hs.rst
-====================
+libraries/base/GHC/IORef.hs
+===========================
+
 
 Note [atomicModifyIORef' definition]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IORef.hs#L128>`__
+
 atomicModifyIORef' was historically defined
 
-.. code-block:: haskell
+::
 
    atomicModifyIORef' ref f = do
        b <- atomicModifyIORef ref $ \a ->
@@ -20,7 +22,7 @@ atomicModifyIORef' was historically defined
 The most obvious definition, now that we have atomicModifyMutVar2#,
 would be
 
-.. code-block:: haskell
+::
 
    atomicModifyIORef' ref f = do
      (_old, (!_new, !res)) <- atomicModifyIORef2 ref f
@@ -30,7 +32,7 @@ Why do we force the new value on the "inside" instead of afterwards?
 I initially thought the latter would be okay, but then I realized
 that if we write
 
-.. code-block:: haskell
+::
 
   atomicModifyIORef' ref $ \x -> (x + 5, x - 5)
 
@@ -44,7 +46,7 @@ of atomicModifyIORef), so we shouldn't lose anything. Note that
 in keeping with the historical behavior, we *don't* propagate the
 strict demand on the result inwards. In particular,
 
-.. code-block:: haskell
+::
 
   atomicModifyIORef' ref (\x -> (x + 1, undefined))
 

@@ -1,23 +1,26 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnExpr.hs>`_
 
-====================
-compiler/rename/RnExpr.hs.rst
-====================
+compiler/rename/RnExpr.hs
+=========================
+
 
 Note [Deterministic ApplicativeDo and RecursiveDo desugaring]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnExpr.hs#L660>`__
+
 Both ApplicativeDo and RecursiveDo need to create tuples not
 present in the source text.
 
 For ApplicativeDo we create:
 
-.. code-block:: haskell
+::
 
   (a,b,c) <- (\c b a -> (a,b,c)) <$>
 
 For RecursiveDo we create:
 
-.. code-block:: haskell
+::
 
   mfix (\ ~(a,b,c) -> do ...; return (a',b',c'))
 
@@ -28,8 +31,11 @@ To get a stable order we use nameSetElemsStable.
 See Note [Deterministic UniqFM] to learn more about nondeterminism.
 
 
+
 Note [Failing pattern matches in Stmts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnExpr.hs#L791>`__
 
 Many things desugar to HsStmts including monadic things like `do` and `mdo`
 statements, pattern guards, and list comprehensions (see 'HsStmtContext' for an
@@ -45,8 +51,12 @@ exhaustive list). How we deal with pattern match failure is context-dependent.
 At one point we failed to make this distinction, leading to #11216.
 
 
+
 Note [Renaming parallel Stmts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnExpr.hs#L1026>`__
+
 Renaming parallel statements is painful.  Given, say
      [ a+c | a <- as, bs <- bss
            | c <- bs, a <- ds ]
@@ -55,11 +65,11 @@ Note that
       rename each group of Stmts with a thing_inside whose FreeVars
       include at least {a,c}
 
-.. code-block:: haskell
+::
 
   (b) We want to report that 'a' is illegally bound in both branches
 
-.. code-block:: haskell
+::
 
   (c) The 'bs' in the second group must obviously not be captured by
       the binding in the first group
@@ -72,6 +82,9 @@ To satisfy (c) we reset the LocalRdrEnv each time.
 
 Note [Segmenting mdo]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnExpr.hs#L1304>`__
+
 NB. June 7 2012: We only glom segments that appear in an explicit mdo;
 and leave those found in "do rec"'s intact.  See
 https://gitlab.haskell.org/ghc/ghc/issues/4148 for the discussion
@@ -81,6 +94,9 @@ leading to this design choice.  Hence the test in segmentRecStmts.
 
 Note [Glomming segments]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnExpr.hs#L1311>`__
+
 Glomming the singleton segments of an mdo into minimal recursive groups.
 
 At first I thought this was just strongly connected components, but
@@ -115,8 +131,11 @@ glom it together with the first two groups
        r <- x }
 
 
+
 Note [Monad fail : Rebindable syntax, overloaded strings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnExpr.hs#L2119>`__
 
 Given the code
   foo x = do { Just y <- x; return y }

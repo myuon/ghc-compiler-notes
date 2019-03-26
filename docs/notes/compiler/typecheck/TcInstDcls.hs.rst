@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs>`_
 
-====================
-compiler/typecheck/TcInstDcls.hs.rst
-====================
+compiler/typecheck/TcInstDcls.hs
+================================
+
 
 Note [How instance declarations are translated]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L87>`__
+
 Here is how we translate instance declarations into Core
 
 Running example:
@@ -22,7 +25,7 @@ Running example:
         op1 = ...
         op2 = ...
 
-.. code-block:: haskell
+::
 
         -- Default methods get the 'self' dictionary as argument
         -- so they can call other methods at the same type
@@ -32,7 +35,7 @@ Running example:
                -- NB: type variables 'a' and 'b' are *both* in scope in <dm-rhs>
                -- Note [Tricky type variable scoping]
 
-.. code-block:: haskell
+::
 
         -- A top-level definition for each instance method
         -- Here op1_i, op2_i are the "instance method Ids"
@@ -44,7 +47,7 @@ Running example:
                    this = df_i a d
                      -- Note [Subtle interaction of recursion and overlap]
 
-.. code-block:: haskell
+::
 
                    local_op1 :: forall b. Ix b => [a] -> b -> b
                    local_op1 = <rhs>
@@ -52,15 +55,15 @@ Running example:
                      -- NB: Type variable 'a' (but not 'b') is in scope in <rhs>
                      -- Note [Tricky type variable scoping]
 
-.. code-block:: haskell
+::
 
                in local_op1 a d
 
-.. code-block:: haskell
+::
 
         op2_i = /\a \d:C a. $dmop2 [a] (df_i a d)
 
-.. code-block:: haskell
+::
 
         -- The dictionary function itself
         {-# NOINLINE CONLIKE df_i #-}   -- Never inline dictionary functions
@@ -69,7 +72,7 @@ Running example:
                 -- But see Note [Default methods in instances]
                 -- We can't apply the type checker to the default-method call
 
-.. code-block:: haskell
+::
 
         -- Use a RULE to short-circuit applications of the class ops
         {-# RULE "op1@C[a]" forall a, d:C a.
@@ -79,6 +82,9 @@ Running example:
 
 Note [Instances and loop breakers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L144>`__
+
 * Note that df_i may be mutually recursive with both op1_i and op2_i.
   It's crucial that df_i is not chosen as the loop breaker, even
   though op1_i has a (user-specified) INLINE pragma.
@@ -100,6 +106,9 @@ Note [Instances and loop breakers]
 
 Note [ClassOp/DFun selection]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L163>`__
+
 One thing we see a lot is stuff like
     op2 (df d1 d2)
 where 'op2' is a ClassOp and 'df' is DFun.  Now, we could inline *both*
@@ -138,10 +147,13 @@ Instead we use a cunning trick.
 
 Note [Single-method classes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L199>`__
+
 If the class has just one method (or, more accurately, just one element
 of {superclasses + methods}), then we use a different strategy.
 
-.. code-block:: haskell
+::
 
    class C a where op :: a -> a
    instance C a => C [a] where op = <blah>
@@ -150,16 +162,16 @@ We translate the class decl into a newtype, which just gives a
 top-level axiom. The "constructor" MkC expands to a cast, as does the
 class-op selector.
 
-.. code-block:: haskell
+::
 
    axiom Co:C a :: C a ~ (a->a)
 
-.. code-block:: haskell
+::
 
    op :: forall a. C a -> (a -> a)
    op a d = d |> (Co:C a)
 
-.. code-block:: haskell
+::
 
    MkC :: forall a. (a->a) -> C a
    MkC = /\a.\op. op |> (sym Co:C a)
@@ -170,14 +182,14 @@ Just <blah>.
 
 Instead, we simply rely on the fact that casts are cheap:
 
-.. code-block:: haskell
+::
 
    $df :: forall a. C a => C [a]
    {-# INLINE df #-}  -- NB: INLINE this
    $df = /\a. \d. MkC [a] ($cop_list a d)
        = $cop_list |> forall a. C a -> (sym (Co:C [a]))
 
-.. code-block:: haskell
+::
 
    $cop_list :: forall a. C a => [a] -> [a]
    $cop_list = <blah>
@@ -208,22 +220,22 @@ pragma on the dfun itself; after all, it ends up being just a cast.
 There is one more dark corner to the INLINE story, even more deeply
 buried.  Consider this (#3772):
 
-.. code-block:: haskell
+::
 
     class DeepSeq a => C a where
       gen :: Int -> a
 
-.. code-block:: haskell
+::
 
     instance C a => C [a] where
       gen n = ...
 
-.. code-block:: haskell
+::
 
     class DeepSeq a where
       deepSeq :: a -> b -> b
 
-.. code-block:: haskell
+::
 
     instance DeepSeq a => DeepSeq [a] where
       {-# INLINE deepSeq #-}
@@ -231,26 +243,26 @@ buried.  Consider this (#3772):
 
 That gives rise to these defns:
 
-.. code-block:: haskell
+::
 
     $cdeepSeq :: DeepSeq a -> [a] -> b -> b
     -- User INLINE( 3 args )!
     $cdeepSeq a (d:DS a) b (x:[a]) (y:b) = ...
 
-.. code-block:: haskell
+::
 
     $fDeepSeq[] :: DeepSeq a -> DeepSeq [a]
     -- DFun (with auto INLINE pragma)
     $fDeepSeq[] a d = $cdeepSeq a d |> blah
 
-.. code-block:: haskell
+::
 
     $cp1 a d :: C a => DeepSep [a]
     -- We don't want to eta-expand this, lest
     -- $cdeepSeq gets inlined in it!
     $cp1 a d = $fDeepSep[] a (scsel a d)
 
-.. code-block:: haskell
+::
 
     $fC[] :: C a => C [a]
     -- Ordinary DFun
@@ -265,6 +277,9 @@ on the dfun, we solve this by adding an INLINE pragma to $cp1.
 
 Note [Subtle interaction of recursion and overlap]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L296>`__
+
 Consider this
   class C a where { op1,op2 :: a -> a }
   instance C a => C [a] where
@@ -287,12 +302,12 @@ version of op1 in the first place.
 
 It might even be a bit disguised:
 
-.. code-block:: haskell
+::
 
   nullFail :: C [a] => [a] -> [a]
   nullFail x = op2 x ++ op2 x
 
-.. code-block:: haskell
+::
 
   instance C a => C [a] where
     op1 x = nullFail x
@@ -310,15 +325,17 @@ tcInstDecl2.
 
 
 
-
 Note [Tricky type variable scoping]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L338>`__
+
 In our example
         class C a where
            op1, op2 :: Ix b => a -> b -> b
            op2 = <dm-rhs>
 
-.. code-block:: haskell
+::
 
         instance C a => C [a]
            {-# INLINE [2] op1 #-}
@@ -333,10 +350,11 @@ complained if 'b' is mentioned in <rhs>.
 
 
 
-
-
 Note [Deriving inside TH brackets]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L429>`__
+
 Given a declaration bracket
   [d| data T = A | B deriving( Show ) |]
 
@@ -352,8 +370,12 @@ bindings.)  This will become moot when we shift to the new TH plan, so
 the brutal solution will do.
 
 
+
 Note [Associated type instances]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L608>`__
+
 We allow this:
   class C a where
     type T x a
@@ -371,9 +393,11 @@ for (T ty Int) elsewhere, because it's an *associated* type.
 
 
 
-
 Note [Result kind signature for a data family instance]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L846>`__
+
 The expected type might have a forall at the type. Normally, we
 can't skolemise in kinds because we don't have type-level lambda.
 But here, we're at the top-level of an instance declaration, so
@@ -385,10 +409,13 @@ Examples in indexed-types/should_compile/T12369
 
 Note [Eta-reduction for data families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L855>`__
+
 Consider
    data D :: * -> * -> * -> * -> *
 
-.. code-block:: haskell
+::
 
    data instance D [(a,b)] p q :: * -> * where
       D1 :: blah1
@@ -423,19 +450,19 @@ There are several fiddly subtleties lurking here
      data family DP a :: forall k. k -> *
      data instance DP [b] :: forall k1 k2. (k1,k2) -> *
 
-.. code-block:: haskell
+::
 
   So in type-checking the LHS (DP Int) we need to check that it is
   more polymorphic than the signature.  To do that we must skolemise
   the siganture and istantiate the call of DP.  So we end up with
      data instance DP [b] @(k1,k2) (z :: (k1,k2)) where
 
-.. code-block:: haskell
+::
 
   Note that we must parameterise the representation tycon DPrep over
   'k1' and 'k2', as well as 'b'.
 
-.. code-block:: haskell
+::
 
   The skolemise bit is done in tc_kind_sig, while the instantiate bit
   is done by tcFamTyPats.
@@ -443,7 +470,7 @@ There are several fiddly subtleties lurking here
 * Very fiddly point.  When we eta-reduce to
      axiom AxDrep forall a b. D [(a,b]] = Drep a b
 
-.. code-block:: haskell
+::
 
   we want the kind of (D [(a,b)]) to be the same as the kind of
   (Drep a b).  This ensures that applying the axiom doesn't change the
@@ -451,27 +478,27 @@ There are several fiddly subtleties lurking here
   the TyConBndrVis on Drep's arguments. In particular do we have
     (forall (k::*). blah) or (* -> blah)?
 
-.. code-block:: haskell
+::
 
   We must match whatever D does!  In #15817 we had
       data family X a :: forall k. * -> *   -- Note: a forall that is not used
       data instance X Int b = MkX
 
-.. code-block:: haskell
+::
 
   So the data instance is really
       data istance X Int @k b = MkX
 
-.. code-block:: haskell
+::
 
   The axiom will look like
       axiom    X Int = Xrep
 
-.. code-block:: haskell
+::
 
   and it's important that XRep :: forall k * -> *, following X.
 
-.. code-block:: haskell
+::
 
   To achieve this we get the TyConBndrVis flags from tcbVisibilities,
   and use those flags for any eta-reduced arguments.  Sigh.
@@ -487,7 +514,10 @@ There are several fiddly subtleties lurking here
 
 
 Note [Default methods in the type environment]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L969>`__
+
 The default method Ids are already in the type environment (see Note
 [Default method Ids and Template Haskell] in TcTyDcls), BUT they
 don't have their InlinePragmas yet.  Usually that would not matter,
@@ -500,32 +530,36 @@ So right here in tcInstDecls2 we must re-extend the type envt with
 the default method Ids replete with their INLINE pragmas.  Urk.
 
 
+
 Note [Typechecking plan for instance declarations]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L1128>`__
+
 For instance declarations we generate the following bindings and implication
 constraints.  Example:
 
-.. code-block:: haskell
+::
 
    instance Ord a => Ord [a] where compare = <compare-rhs>
 
 generates this:
 
-.. code-block:: haskell
+::
 
    Bindings:
       -- Method bindings
       $ccompare :: forall a. Ord a => a -> a -> Ordering
       $ccompare = /\a \(d:Ord a). let <meth-ev-binds> in ...
 
-.. code-block:: haskell
+::
 
       -- Superclass bindings
       $cp1Ord :: forall a. Ord a => Eq [a]
       $cp1Ord = /\a \(d:Ord a). let <sc-ev-binds>
                in dfEqList (dw :: Eq a)
 
-.. code-block:: haskell
+::
 
    Constraints:
       forall a. Ord a =>
@@ -555,7 +589,7 @@ Notice that
    into *every* method or superclass definition.  (Some of it will
    be usused in some, but dead-code elimination will drop it.)
 
-.. code-block:: haskell
+::
 
    We achieve this by putting the evidence variable for the overall
    instance implication into the AbsBinds for each method/superclass.
@@ -563,7 +597,7 @@ Notice that
    (And that in turn is why the abs_ev_binds field of AbBinds is a
    [TcEvBinds] rather than simply TcEvBinds.
 
-.. code-block:: haskell
+::
 
    This is a bit of a hack, but works very nicely in practice.
 
@@ -575,9 +609,11 @@ Notice that
 
 
 
-
 Note [Recursive superclasses]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L1258>`__
+
 See #3731, #4809, #5751, #5913, #6117, #6161, which all
 describe somewhat more complicated situations, but ones
 encountered in practice.
@@ -617,7 +653,7 @@ The basic solution is simple: be very careful about using superclass
 selection to generate a superclass witness in a dictionary function
 definition.  More precisely:
 
-.. code-block:: haskell
+::
 
   Superclass Invariant: in every class dictionary,
                         every superclass dictionary field
@@ -660,7 +696,7 @@ It would be horribly wrong to define
    dfDuperFam :: Foo a -> Duper (Fam a)  -- from (i3)
    dfDuperFam d = MkDuper (sc_sel1 (sc_sel2 d)) ...
 
-.. code-block:: haskell
+::
 
    dfFooFloat :: Foo Float               -- from (i4)
    dfFooFloat = MkFoo (dfDuperFam dfFooFloat) ...
@@ -677,6 +713,9 @@ add (Super (Fam a)) to the context of (i3).
 
 Note [Solving superclass constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L1351>`__
+
 How do we ensure that every superclass witness is generated by
 one of (sc1) (sc2) or (sc3) in Note [Recursive superclasses].
 Answer:
@@ -736,7 +775,7 @@ Notice the extra (dc :: C [a]) argument compared to the previous version.
 
 This gives us:
 
-.. code-block:: haskell
+::
 
      -----------------------------------------------------------
      DFun Superclass Invariant
@@ -763,13 +802,17 @@ DFun types are built (only) by MkId.mkDictFunId, so that is where we
 decide what silent arguments are to be added.
 
 
+
 Note [Mismatched class methods and associated type families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L1555>`__
+
 It's entirely possible for someone to put methods or associated type family
 instances inside of a class in which it doesn't belong. For instance, we'd
 want to fail if someone wrote this:
 
-.. code-block:: haskell
+::
 
   instance Eq () where
     type Rep () = Maybe
@@ -790,10 +833,13 @@ typechecker as a last resort.
 
 Note [Avoid -Winaccessible-code when deriving]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L1576>`__
+
 -Winaccessible-code can be particularly noisy when deriving instances for
 GADTs. Consider the following example (adapted from #8128):
 
-.. code-block:: haskell
+::
 
   data T a where
     MkT1 :: Int -> T Int
@@ -804,7 +850,7 @@ GADTs. Consider the following example (adapted from #8128):
 
 In the derived Ord instance, GHC will generate the following code:
 
-.. code-block:: haskell
+::
 
   instance Ord (T a) where
     compare x y
@@ -843,12 +889,16 @@ Instead, we take the much simpler approach of always disabling
 ----------------------
 
 
+
 Note [Instance method signatures]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L1778>`__
+
 With -XInstanceSigs we allow the user to supply a signature for the
 method in an instance declaration.  Here is an artificial example:
 
-.. code-block:: haskell
+::
 
        data T a = MkT a
        instance Ord a => Ord (T a) where
@@ -871,7 +921,7 @@ polymorphic than the instantiated class method type?  We just do a
 tcSubType call in tcMethodBodyHelp, and generate a nested AbsBind, like
 this (for the example above
 
-.. code-block:: haskell
+::
 
  AbsBind { abs_tvs = [a], abs_ev_vars = [d:Ord a]
          , abs_exports
@@ -894,8 +944,12 @@ Wow!  Three nested AbsBinds!
 --------------------
 
 
+
 Note [Export helper functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L1904>`__
+
 We arrange to export the "helper functions" of an instance declaration,
 so that they are not subject to preInlineUnconditionally, even if their
 RHS is trivial.  Reason: they are mentioned in the DFunUnfolding of
@@ -909,21 +963,24 @@ seems a bit simpler this way.
 
 Note [Default methods in instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L1915>`__
+
 Consider this
 
-.. code-block:: haskell
+::
 
    class Baz v x where
       foo :: x -> x
       foo y = <blah>
 
-.. code-block:: haskell
+::
 
    instance Baz Int Int
 
 From the class decl we get
 
-.. code-block:: haskell
+::
 
    $dmfoo :: forall v x. Baz v x => x -> x
    $dmfoo y = <blah>
@@ -931,7 +988,7 @@ From the class decl we get
 Notice that the type is ambiguous.  So we use Visible Type Application
 to disambiguate:
 
-.. code-block:: haskell
+::
 
    $dBazIntInt = MkBaz fooIntInt
    fooIntInt = $dmfoo @Int @Int
@@ -948,20 +1005,23 @@ generic default methods.
 
 Note [INLINE and default methods]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L1944>`__
+
 Default methods need special case.  They are supposed to behave rather like
 macros.  For example
 
-.. code-block:: haskell
+::
 
   class Foo a where
     op1, op2 :: Bool -> a -> a
 
-.. code-block:: haskell
+::
 
     {-# INLINE op1 #-}
     op1 b x = op2 (not b) x
 
-.. code-block:: haskell
+::
 
   instance Foo Int where
     -- op1 via default method
@@ -969,7 +1029,7 @@ macros.  For example
 
 The instance declaration should behave
 
-.. code-block:: haskell
+::
 
    just as if 'op1' had been defined with the
    code, and INLINE pragma, from its original
@@ -977,34 +1037,34 @@ The instance declaration should behave
 
 That is, just as if you'd written
 
-.. code-block:: haskell
+::
 
   instance Foo Int where
     op2 b x = <blah>
 
-.. code-block:: haskell
+::
 
     {-# INLINE op1 #-}
     op1 b x = op2 (not b) x
 
 So for the above example we generate:
 
-.. code-block:: haskell
+::
 
   {-# INLINE $dmop1 #-}
   -- $dmop1 has an InlineCompulsory unfolding
   $dmop1 d b x = op2 d (not b) x
 
-.. code-block:: haskell
+::
 
   $fFooInt = MkD $cop1 $cop2
 
-.. code-block:: haskell
+::
 
   {-# INLINE $cop1 #-}
   $cop1 = $dmop1 $fFooInt
 
-.. code-block:: haskell
+::
 
   $cop2 = <blah>
 
@@ -1022,7 +1082,7 @@ Note carefully:
     a) $dmop1 is not saturated in $cop1
     b) $cop1 itself has an INLINE pragma
 
-.. code-block:: haskell
+::
 
   It's vital that $dmop1 *is* inlined in this way, to allow the mutual
   recursion between $fooInt and $cop1 to be broken
@@ -1033,12 +1093,14 @@ Note carefully:
 
 
 
-
 Note [SPECIALISE instance pragmas]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcInstDcls.hs#L2014>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
    instance (Ix a, Ix b) => Ix (a,b) where
      {-# SPECIALISE instance Ix (Int,Int) #-}
@@ -1048,14 +1110,14 @@ We make a specialised version of the dictionary function, AND
 specialised versions of each *method*.  Thus we should generate
 something like this:
 
-.. code-block:: haskell
+::
 
   $dfIxPair :: (Ix a, Ix b) => Ix (a,b)
   {-# DFUN [$crangePair, ...] #-}
   {-# SPECIALISE $dfIxPair :: Ix (Int,Int) #-}
   $dfIxPair da db = Ix ($crangePair da db) (...other methods...)
 
-.. code-block:: haskell
+::
 
   $crange :: (Ix a, Ix b) -> ((a,b),(a,b)) -> [(a,b)]
   {-# SPECIALISE $crange :: ((Int,Int),(Int,Int)) -> [(Int,Int)] #-}
@@ -1063,27 +1125,27 @@ something like this:
 
 The SPECIALISE pragmas are acted upon by the desugarer, which generate
 
-.. code-block:: haskell
+::
 
   dii :: Ix Int
   dii = ...
 
-.. code-block:: haskell
+::
 
   $s$dfIxPair :: Ix ((Int,Int),(Int,Int))
   {-# DFUN [$crangePair di di, ...] #-}
   $s$dfIxPair = Ix ($crangePair di di) (...)
 
-.. code-block:: haskell
+::
 
   {-# RULE forall (d1,d2:Ix Int). $dfIxPair Int Int d1 d2 = $s$dfIxPair #-}
 
-.. code-block:: haskell
+::
 
   $s$crangePair :: ((Int,Int),(Int,Int)) -> [(Int,Int)]
   $c$crangePair = ...specialised RHS of $crangePair...
 
-.. code-block:: haskell
+::
 
   {-# RULE forall (d1,d2:Ix Int). $crangePair Int Int d1 d2 = $s$crangePair #-}
 

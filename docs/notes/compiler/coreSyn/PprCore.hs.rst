@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/PprCore.hs>`_
 
-====================
-compiler/coreSyn/PprCore.hs.rst
-====================
+compiler/coreSyn/PprCore.hs
+===========================
+
 
 Note [Print case as let]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/PprCore.hs#L327>`__
+
 Single-branch case expressions are very common:
    case x of y { I# x' ->
    case p of q { I# p' -> ... } }
@@ -20,9 +23,10 @@ and @pprCoreExpr@ functions.
 
 
 
-
 Note [Binding-site specific printing]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/PprCore.hs#L342>`__
 
 pprCoreBinder and pprTypedLamBinder receive a BindingSite argument to adjust
 the information printed.

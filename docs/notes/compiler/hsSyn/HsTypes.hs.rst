@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs>`_
 
-====================
-compiler/hsSyn/HsTypes.hs.rst
-====================
+compiler/hsSyn/HsTypes.hs
+=========================
+
 
 Note [HsBSig binder lists]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L127>`__
+
 Consider a binder (or pattern) decorated with a type or kind,
    \ (x :: a -> a). blah
    forall (a :: k -> *) (b :: k). blah
@@ -19,6 +22,9 @@ See also Note [Kind and type-variable binders] in RnTypes
 
 Note [HsType binders]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L138>`__
+
 The system for recording type and kind-variable binders in HsTypes
 is a bit complicated.  Here's how it works.
 
@@ -70,6 +76,9 @@ is a bit complicated.  Here's how it works.
 
 Note [The wildcard story for types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L187>`__
+
 Types can have wildcards in them, to support partial type signatures,
 like       f :: Int -> (_ , _a) -> _a
 
@@ -114,22 +123,25 @@ Note carefully:
 
 Note [Ordering of implicit variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L229>`__
+
 Since the advent of -XTypeApplications, GHC makes promises about the ordering
 of implicit variable quantification. Specifically, we offer that implicitly
 quantified variables (such as those in const :: a -> b -> a, without a `forall`)
 will occur in left-to-right order of first occurrence. Here are a few examples:
 
-.. code-block:: haskell
+::
 
   const :: a -> b -> a       -- forall a b. ...
   f :: Eq a => b -> a -> a   -- forall a b. ...  contexts are included
 
-.. code-block:: haskell
+::
 
   type a <-< b = b -> a
   g :: a <-< b               -- forall a b. ...  type synonyms matter
 
-.. code-block:: haskell
+::
 
   class Functor f where
     fmap :: (a -> b) -> f a -> f b   -- forall f a b. ...
@@ -138,7 +150,7 @@ will occur in left-to-right order of first occurrence. Here are a few examples:
 This simple story is complicated by the possibility of dependency: all variables
 must come after any variables mentioned in their kinds.
 
-.. code-block:: haskell
+::
 
   typeRep :: Typeable a => TypeRep (a :: k)   -- forall k a. ...
 
@@ -165,8 +177,12 @@ quantified in left-to-right order in kind signatures is nice since:
   already been established.
 
 
+
 Note [Representing type signatures]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L419>`__
+
 HsSigType is used to represent an explicit user type signature
 such as   f :: a -> a
      or   g (x :: a -> a) = x
@@ -185,8 +201,12 @@ The implicit kind variable 'k' is bound by the HsIB;
 the explicitly forall'd tyvar 'a' is bound by the HsForAllTy
 
 
+
 Note [HsForAllTy tyvar binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L747>`__
+
 After parsing:
   * Implicit => empty
     Explicit => the variables the user wrote
@@ -209,9 +229,11 @@ Example:   f :: forall (a::k1) b. T a (b::k2)
 
 
 
-
 Note [Unit tuples]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L770>`__
+
 Consider the type
     type instance F Int = ()
 We want to parse that "()"
@@ -227,6 +249,9 @@ that, but it has to work for unit tuples too.
 
 Note [Promotions (HsTyVar)]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L783>`__
+
 HsTyVar: A name in a type or kind.
   Here are the allowed namespaces for the name.
     In a type:
@@ -240,7 +265,7 @@ HsTyVar: A name in a type or kind.
       Tv: kind variable
       TcCls: kind constructor or promoted type constructor
 
-.. code-block:: haskell
+::
 
   The 'Promoted' field in an HsTyVar captures whether the type was promoted in
   the source code by prefixing an apostrophe.
@@ -249,6 +274,9 @@ HsTyVar: A name in a type or kind.
 
 Note [HsStarTy]
 ~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L801>`__
+
 When the StarIsType extension is enabled, we want to treat '*' and its Unicode
 variant identically to 'Data.Kind.Type'. Unfortunately, doing so in the parser
 would mean that when we pretty-print it back, we don't know whether the user
@@ -261,23 +289,25 @@ involved.
 
 
 
-
 Note [Promoted lists and tuples]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L814>`__
+
 Notice the difference between
    HsListTy    HsExplicitListTy
    HsTupleTy   HsExplicitListTupleTy
 
 E.g.    f :: [Int]                      HsListTy
 
-.. code-block:: haskell
+::
 
         g3  :: T '[]                   All these use
         g2  :: T '[True]                  HsExplicitListTy
         g1  :: T '[True,False]
         g1a :: T [True,False]             (can omit ' where unambiguous)
 
-.. code-block:: haskell
+::
 
   kind of T :: [Bool] -> *        This kind uses HsListTy!
 
@@ -291,9 +321,11 @@ E.g.    h :: (Int,Bool)                 HsTupleTy; f is a pair
 Note [Distinguishing tuple kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L834>`__
+
 Apart from promotion, tuples can have one of three different kinds:
 
-.. code-block:: haskell
+::
 
         x :: (Int, Bool)                -- Regular boxed tuples
         f :: Int# -> (# Int#, Int# #)   -- Unboxed tuples
@@ -306,7 +338,7 @@ because of the #. However, with -XConstraintKinds we can only distinguish
 between constraint and boxed tuples during type checking, in general. Hence the
 four constructors of HsTupleSort:
 
-.. code-block:: haskell
+::
 
         HsUnboxedTuple                  -> Produced by the parser
         HsBoxedTuple                    -> Certainly a boxed tuple
@@ -316,8 +348,11 @@ four constructors of HsTupleSort:
                                         disappears after type checking
 
 
+
 Note [ConDeclField passs]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L908>`__
 
 A ConDeclField contains a list of field occurrences: these always
 include the field label as the user wrote it.  After the renamer, it
@@ -328,7 +363,7 @@ Due to DuplicateRecordFields, the OccName of the selector function
 may have been mangled, which is why we keep the original field label
 separately.  For example, when DuplicateRecordFields is enabled
 
-.. code-block:: haskell
+::
 
     data T = MkT { x :: Int }
 
@@ -341,8 +376,12 @@ gives
 -------------------
 
 
+
 Note [Scoping of named wildcards]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L961>`__
+
 Consider
   f :: _a -> _a
   f x = let g :: _a -> _a
@@ -355,8 +394,12 @@ I don't know if this is a good idea, but there it is.
 -------------------
 
 
+
 Note [Printing KindedTyVars]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsTypes.hs#L1484>`__
+
 #3830 reminded me that we should really only print the kind
 signature on a KindedTyVar if the kind signature was put there by the
 programmer.  During kind inference GHC now adds a PostTcKind to UserTyVars,

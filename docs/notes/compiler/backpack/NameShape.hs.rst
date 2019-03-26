@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/backpack/NameShape.hs>`_
 
-====================
-compiler/backpack/NameShape.hs.rst
-====================
+compiler/backpack/NameShape.hs
+==============================
+
 
 Note [NameShape]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/backpack/NameShape.hs#L32>`__
+
 When we write a declaration in a signature, e.g., data T, we
 ascribe to it a *name variable*, e.g., {m.T}.  This
 name variable may be substituted with an actual original

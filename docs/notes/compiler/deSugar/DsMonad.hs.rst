@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMonad.hs>`_
 
-====================
-compiler/deSugar/DsMonad.hs.rst
-====================
+compiler/deSugar/DsMonad.hs
+===========================
+
 
 Note [Levity polymorphism checking]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/deSugar/DsMonad.hs#L307>`__
+
 According to the "Levity Polymorphism" paper (PLDI '17), levity
 polymorphism is forbidden in precisely two places: in the type of a bound
 term-level argument and in the type of an argument to a function. The paper

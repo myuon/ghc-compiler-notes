@@ -1,16 +1,19 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Class.hs>`_
 
-====================
-compiler/types/Class.hs.rst
-====================
+compiler/types/Class.hs
+=======================
+
 
 Note [Associated type defaults]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Class.hs#L130>`__
+
 The following is an example of associated type defaults:
    class C a where
      data D a r
 
-.. code-block:: haskell
+::
 
      type F x a b :: *
      type F p q r = (p,q)->r    -- Default
@@ -42,8 +45,12 @@ The @mkClass@ function fills in the indirect superclasses.
 The SrcSpan is for the entire original declaration.
 
 
+
 Note [Associated type tyvar names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Class.hs#L208>`__
+
 The TyCon of an associated type should use the same variable names as its
 parent class. Thus
     class C a b where
@@ -59,6 +66,4 @@ header.
 
 Having the same variables for class and tycon is also used in checkValidRoles
 (in TcTyClsDecls) when checking a class's roles.
-
-
 

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmHeap.hs>`_
 
-====================
-compiler/codeGen/StgCmmHeap.hs.rst
-====================
+compiler/codeGen/StgCmmHeap.hs
+==============================
+
 
 Note [Single stack check]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmHeap.hs#L543>`__
+
 When compiling a function we can determine how much stack space it
 will use. We therefore need to perform only a single stack check at
 the beginning of a function to see if we have enough stack space.
@@ -34,8 +37,12 @@ into account changes already made to stack pointer. The idea for
 this change came from observations made while debugging #8275.
 
 
+
 Note [Stack usage]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmHeap.hs#L573>`__
+
 At the moment we convert from STG to Cmm we don't know N, the
 number of bytes of stack that the function will use, so we use a
 special late-bound CmmLit, namely
@@ -51,8 +58,11 @@ but can also (in certain hand-written RTS functions)
 If it is Nothing, we don't generate a stack check at all.
 
 
+
 Note [Self-recursive loop header]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmHeap.hs#L658>`__
 
 Self-recursive loop header is required by loopification optimization (See
 Note [Self-recursive tail calls] in StgCmmExpr). We emit it if:

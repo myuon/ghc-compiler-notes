@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs>`_
 
-====================
-compiler/basicTypes/RdrName.hs.rst
-====================
+compiler/basicTypes/RdrName.hs
+==============================
+
 
 Note [Local bindings with Exact Names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs#L415>`__
+
 With Template Haskell we can make local bindings that have Exact Names.
 Computing shadowing etc may use elemLocalRdrEnv (at least it certainly
 does so in RnTpes.bindHsQTyVars), so for an Exact Name we must consult
@@ -13,9 +16,11 @@ the in-scope-name-set.
 
 
 
-
 Note [GlobalRdrElt provenance]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs#L500>`__
+
 The gre_lcl and gre_imp fields of a GlobalRdrElt describe its "provenance",
 i.e. how the Name came to be in scope.  It can be in scope two ways:
   - gre_lcl = True: it is bound in this module
@@ -28,17 +33,17 @@ It is just possible to have *both* if there is a module loop: a Name
 is defined locally in A, and also brought into scope by importing a
 module that SOURCE-imported A.  Exapmle (#7672):
 
-.. code-block:: haskell
+::
 
  A.hs-boot   module A where
                data T
 
-.. code-block:: haskell
+::
 
  B.hs        module B(Decl.T) where
                import {-# SOURCE #-} qualified A as Decl
 
-.. code-block:: haskell
+::
 
  A.hs        module A where
                import qualified B
@@ -49,18 +54,21 @@ In A.hs, 'T' is locally bound, *and* imported as B.T.
 
 
 Note [Parents]
-~~~~~~~~~~~~~~~~~
-  Parent           Children
+~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs#L526>`__
+
+Parent           Children
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   data T           Data constructors
                    Record-field ids
 
-.. code-block:: haskell
+::
 
   data family T    Data constructors and record-field ids
                    of all visible data instances of T
 
-.. code-block:: haskell
+::
 
   class C          Class operations
                    Associated type constructors
@@ -75,11 +83,11 @@ Note [Parents]
 
 
 
-
-
-
 Note [Parents for record fields]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs#L550>`__
+
 For record fields, in addition to the Name of the type constructor
 (stored in par_is), we use FldParent to store the field label.  This
 extra information is used for identifying overloaded record fields
@@ -90,7 +98,7 @@ In a definition arising from a normal module (without
 field's label is the same as the OccName of the selector's Name.  The
 GlobalRdrEnv will contain an entry like this:
 
-.. code-block:: haskell
+::
 
     "x" |->  GRE x (FldParent T Nothing) LocalDef
 
@@ -99,7 +107,7 @@ T, the selector's Name will be mangled (see comments in FieldLabel).
 Thus we store the actual field label in par_lbl, and the GlobalRdrEnv
 entry looks like this:
 
-.. code-block:: haskell
+::
 
     "x" |->  GRE $sel:x:MkT (FldParent T (Just "x")) LocalDef
 
@@ -119,9 +127,11 @@ now `T`.
 
 
 
-
 Note [Combining parents]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs#L586>`__
+
 With an associated type we might have
    module M where
      class C a where
@@ -148,8 +158,12 @@ those.  For T that will mean we have
 That's why plusParent picks the "best" case.
 
 
+
 Note [GRE filtering]
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs#L857>`__
+
 (pickGREs rdr gres) takes a list of GREs which have the same OccName
 as 'rdr', say "x".  It does two things:
 
@@ -181,8 +195,12 @@ Now the "ambiguous occurrence" message can correctly report how the
 ambiguity arises.
 
 
+
 Note [GlobalRdrEnv shadowing]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs#L996>`__
+
 Before adding new names to the GlobalRdrEnv we nuke some existing entries;
 this is "shadowing".  The actual work is done by RdrEnv.shadowName.
 Suppose
@@ -207,7 +225,7 @@ There are two reasons for shadowing:
     External Names, like Ghci4.x.  We want a new binding for 'x' (say)
     to override the existing binding for 'x'.  Example:
 
-.. code-block:: haskell
+::
 
            ghci> :load M    -- Brings `x` and `M.x` into scope
            ghci> x
@@ -231,7 +249,7 @@ There are two reasons for shadowing:
 * Nested Template Haskell declaration brackets
   See Note [Top-level Names in Template Haskell decl quotes] in RnNames
 
-.. code-block:: haskell
+::
 
   Consider a TH decl quote:
       module M where
@@ -258,8 +276,12 @@ There are two reasons for shadowing:
       At that stage, the class op 'f' will have an Internal name.
 
 
+
 Note [Choosing the best import declaration]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/RdrName.hs#L1216>`__
+
 When reporting unused import declarations we use the following rules.
    (see [wiki:Commentary/Compiler/UnusedImports])
 
@@ -287,15 +309,15 @@ dominates import-item B if we choose A over B. In general, we try to
 choose the import that is most likely to render other imports
 unnecessary.  Here is the dominance relationship we choose:
 
-.. code-block:: haskell
+::
 
     a) import Foo dominates import qualified Foo.
 
-.. code-block:: haskell
+::
 
     b) import Foo dominates import Foo(x).
 
-.. code-block:: haskell
+::
 
     c) Otherwise choose the textually first one.
 

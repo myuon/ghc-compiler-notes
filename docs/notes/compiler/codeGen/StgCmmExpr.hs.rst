@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs>`_
 
-====================
-compiler/codeGen/StgCmmExpr.hs.rst
-====================
+compiler/codeGen/StgCmmExpr.hs
+==============================
+
 
 Note [Compiling case expressions]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L190>`__
+
 It is quite interesting to decide whether to put a heap-check at the
 start of each alternative.  Of course we certainly have to do so if
 the case forces an evaluation, or if there is a primitive op which can
@@ -13,7 +16,7 @@ trigger GC.
 
 A more interesting situation is this (a Plan-B situation)
 
-.. code-block:: haskell
+::
 
         !P!;
         ...P...
@@ -49,7 +52,7 @@ Against omitting !Q!, !R!
     worst-casing is done, because many many calls to nfib are leaf calls
     which don't need to allocate anything.
 
-.. code-block:: haskell
+::
 
     We can un-allocate, but that costs an instruction
 
@@ -79,22 +82,22 @@ single-branch cases, we may have lots of things live
 
 Hence: two basic plans for
 
-.. code-block:: haskell
+::
 
         case e of r { alts }
 
 ------ Plan A: the general case ---------
 
-.. code-block:: haskell
+::
 
         ...save current cost centre...
 
-.. code-block:: haskell
+::
 
         ...code for e,
            with sequel (SetLocals r)
 
-.. code-block:: haskell
+::
 
         ...restore current cost centre...
         ...code for alts...
@@ -105,13 +108,13 @@ Hence: two basic plans for
   (ii) either upstream code performs allocation
        or there is just one alternative
 
-.. code-block:: haskell
+::
 
   Then heap allocation in the (single) case branch
   is absorbed by the upstream check.
   Very common example: primops on unboxed values
 
-.. code-block:: haskell
+::
 
         ...code for e,
            with sequel (SetLocals r)...
@@ -121,11 +124,15 @@ Hence: two basic plans for
 -----------------------------------
 
 
+
 Note [case on bool]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L332>`__
+
 This special case handles code like
 
-.. code-block:: haskell
+::
 
   case a <# b of
     True ->
@@ -140,7 +147,7 @@ This special case handles code like
 
 If we let the ordinary case code handle it, we'll get something like
 
-.. code-block:: haskell
+::
 
  tmp1 = a < b
  tmp2 = Bool_closure_tbl[tmp1]
@@ -149,13 +156,13 @@ If we let the ordinary case code handle it, we'll get something like
 but this junk won't optimise away.  What we really want is just an
 inline comparison:
 
-.. code-block:: haskell
+::
 
  if (a < b) then ...
 
 So we add a special case to generate
 
-.. code-block:: haskell
+::
 
  tmp1 = a < b
  if (tmp1 == 0) then ...
@@ -173,6 +180,9 @@ of compilation (i.e. at the Core level).
 
 Note [Scrutinising VoidRep]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L372>`__
+
 Suppose we have this STG code:
    f = \[s : State# RealWorld] ->
        case s of _ -> blah
@@ -192,6 +202,9 @@ calls to nonVoidIds in various places.  So we must not look up
 
 Note [Dead-binder optimisation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L389>`__
+
 A case-binder, or data-constructor argument, may be marked as dead,
 because we preserve occurrence-info on binders in CoreTidy (see
 CoreTidy.tidyIdBndr).
@@ -209,8 +222,12 @@ exist, perhaps because the occurrence information preserved by
 job we deleted the hacks.
 
 
+
 Note [Dodgy unsafeCoerce 1]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L413>`__
+
 Consider
     case (x :: HValue) |> co of (y :: MutVar# Int)
         DEFAULT -> ...
@@ -226,8 +243,12 @@ MutVar#.  The types are compatible though, so we can just generate an
 assignment.
 
 
+
 Note [Dodgy unsafeCoerce 2, #3132]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L454>`__
+
 In all other cases of a lifted Id being cast to an unlifted type, the
 Id should be bound to bottom, otherwise this is an unsafe use of
 unsafeCoerce.  We can generate code to enter the Id and assume that
@@ -237,8 +258,12 @@ type-correct assignment, albeit bogus.  The (dead) continuation loops;
 it would be better to invoke some kind of panic function here.
 
 
+
 Note [Handle seq#]
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L477>`__
+
 See Note [seq# magic] in PrelRules.
 The special case for seq# in cgCase does this:
 
@@ -252,8 +277,12 @@ The special case for seq# in cgCase does this:
 is the same as the return convention for just 'a')
 
 
+
 Note [GC for conditionals]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L525>`__
+
 For boolean conditionals it seems that we have always done NoGcInAlts.
 That is, we have always done the GC check before the conditional.
 This is enshrined in the special case for
@@ -273,6 +302,9 @@ ToDo: figure out what the Right Rule should be.
 
 Note [scrut sequel]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L542>`__
+
 The job of the scrutinee is to assign its value(s) to alt_regs.
 Additionally, if we plan to do a heap-check in the alternatives (see
 Note [Compiling case expressions]), then we *must* retreat Hp to
@@ -283,17 +315,22 @@ check will reset the heap usage. Slop in the heap breaks LDV profiling
 
 
 
-
 Note [Inlining out-of-line primops and heap checks]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L553>`__
+
 If shouldInlinePrimOp returns True when called from StgCmmExpr for the
 purpose of heap check placement, we *must* inline the primop later in
 StgCmmPrim. If we don't things will go wrong.
 ---------------
 
 
+
 Note [Self-recursive tail calls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L798>`__
 
 Self-recursive tail calls can be optimized into a local jump in the same
 way as let-no-escape bindings (see Note [What is a non-escaping let] in
@@ -377,9 +414,10 @@ Implementation is spread across a couple of places in the code:
 
 
 
-
 Note [Void arguments in self-recursive tail calls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmExpr.hs#L882>`__
 
 State# tokens can get in the way of the loopification optimization as seen in
 #11372. Consider this:
@@ -399,5 +437,4 @@ We would like to compile the call to foo as a local jump instead of a call
 an arity of 2 while we apply it to 3 arguments, one of them being of void
 type. Thus, we mustn't count arguments of void type when checking whether
 we can turn a call into a self-recursive jump.
-
 

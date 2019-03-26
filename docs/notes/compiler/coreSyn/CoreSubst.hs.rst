@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSubst.hs>`_
 
-====================
-compiler/coreSyn/CoreSubst.hs.rst
-====================
+compiler/coreSyn/CoreSubst.hs
+=============================
+
 
 Note [Extending the Subst]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSubst.hs#L102>`__
+
 For a core Subst, which binds Ids as well, we make a different choice for Ids
 than we do for TyVars.
 
@@ -20,7 +23,7 @@ In consequence:
 * If all subst envs are empty, substExpr would be a
   no-op, so substExprSC ("short cut") does nothing.
 
-.. code-block:: haskell
+::
 
   However, substExpr still goes ahead and substitutes.  Reason: we may
   want to replace existing Ids with new ones from the in-scope set, to
@@ -61,8 +64,12 @@ TvSubstEnv and CvSubstEnv?
   easy to spot
 
 
+
 Note [Substitute lazily]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSubst.hs#L716>`__
+
 The functions that substitute over IdInfo must be pretty lazy, because
 they are knot-tied by substRecBndrs.
 
@@ -76,9 +83,11 @@ because the simplifier will do that.
 
 
 
-
 Note [substTickish]
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSubst.hs#L730>`__
+
 A Breakpoint contains a list of Ids.  What happens if we ever want to
 substitute an expression for one of these Ids?
 
@@ -93,8 +102,12 @@ an unlifted type in a Breakpoint - see Coverage.mkTickish.
 Breakpoints can't handle free variables with unlifted types anyway.
 
 
+
 Note [Worker inlining]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSubst.hs#L747>`__
+
 A worker can get sustituted away entirely.
         - it might be trivial
         - it might simply be very small

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs>`_
 
-====================
-compiler/main/TidyPgm.hs.rst
-====================
+compiler/main/TidyPgm.hs
+========================
+
 
 Note [Choosing external Ids]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs#L234>`__
+
 See also the section "Interface stability" in the
 RecompilationAvoidance commentary:
   http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance
@@ -48,6 +51,9 @@ affect the names we assign.
 
 Note [Tidy the top-level bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs#L274>`__
+
 Next we traverse the bindings top to bottom.  For each *top-level*
 binder
 
@@ -59,12 +65,12 @@ binder
     [Even non-exported things need system-wide Uniques because the
     byte-code generator builds a single Name->BCO symbol table.]
 
-.. code-block:: haskell
+::
 
     We use the NameCache kept in the HscEnv as the
     source of such system-wide uniques.
 
-.. code-block:: haskell
+::
 
     For external Ids, use the original-name cache in the NameCache
     to ensure that the unique assigned is the same as the Id had
@@ -88,37 +94,41 @@ throughout, including in unfoldings.  We also tidy binders in
 RHSs, so that they print nicely in interfaces.
 
 
+
 Note [Don't attempt to trim data types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs#L486>`__
+
 For some time GHC tried to avoid exporting the data constructors
 of a data type if it wasn't strictly necessary to do so; see #835.
 But "strictly necessary" accumulated a longer and longer list
 of exceptions, and finally I gave up the battle:
 
-.. code-block:: haskell
+::
 
     commit 9a20e540754fc2af74c2e7392f2786a81d8d5f11
     Author: Simon Peyton Jones <simonpj@microsoft.com>
     Date:   Thu Dec 6 16:03:16 2012 +0000
 
-.. code-block:: haskell
+::
 
     Stop attempting to "trim" data types in interface files
 
-.. code-block:: haskell
+::
 
     Without -O, we previously tried to make interface files smaller
     by not including the data constructors of data types.  But
     there are a lot of exceptions, notably when Template Haskell is
     involved or, more recently, DataKinds.
 
-.. code-block:: haskell
+::
 
     However #7445 shows that even without TemplateHaskell, using
     the Data class and invoking Language.Haskell.TH.Quote.dataToExpQ
     is enough to require us to expose the data constructors.
 
-.. code-block:: haskell
+::
 
     So I've given up on this "optimisation" -- it's probably not
     important anyway.  Now I'm simply not attempting to trim off
@@ -130,6 +140,9 @@ of exceptions, and finally I gave up the battle:
 
 Note [Injecting implicit bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs#L520>`__
+
 We inject the implicit bindings right at the end, in CoreTidy.
 Some of these bindings, notably record selectors, are not
 constructed in an optimised form.  E.g. record selector for
@@ -175,8 +188,12 @@ really just a code generation trick.... binding itself makes no sense.
 See Note [Data constructor workers] in CorePrep.
 
 
+
 Note [Finding external rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs#L843>`__
+
 The complete rules are gotten by combining
    a) local rules for imported Ids
    b) rules embedded in the top-level Ids
@@ -189,6 +206,9 @@ There are two complications:
 
 Note [Which rules to expose]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs#L853>`__
+
 The function 'expose_rule' filters out rules that mention, on the LHS,
 Ids that aren't externally visible; these rules can't fire in a client
 module.
@@ -201,7 +221,10 @@ export more than we need.  (It's a sort of mutual recursion.)
 
 
 Note [Trimming auto-rules]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs#L864>`__
+
 Second, with auto-specialisation we may specialise local or imported
 dfuns or INLINE functions, and then later inline them.  That may leave
 behind something like
@@ -236,8 +259,12 @@ called in the final code), we keep the rule too.
 This stuff is the only reason for the ru_auto field in a Rule.
 
 
+
 Note [Disgusting computation of CafRefs]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs#L1295>`__
+
 We compute hasCafRefs here, because IdInfo is supposed to be finalised
 after TidyPgm.  But CorePrep does some transformations that affect CAF-hood.
 So we have to *predict* the result here, which is revolting.
@@ -247,8 +274,12 @@ prediction code here we resort to applying the same expansion (cvt_literal).
 Ugh!
 
 
+
 Note [When we can't trim types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/TidyPgm.hs#L1386>`__
+
 The basic idea of type trimming is to export algebraic data types
 abstractly (without their data constructors) when compiling without
 -O, unless of course they are explicitly exported by the user.
@@ -292,39 +323,39 @@ mustExposeTyCon no_trim_types exports tc
   | no_trim_types               -- See Note [When we can't trim types]
   = True
 
-.. code-block:: haskell
+::
 
   | not (isAlgTyCon tc)         -- Always expose synonyms (otherwise we'd have to
                                 -- figure out whether it was mentioned in the type
                                 -- of any other exported thing)
   = True
 
-.. code-block:: haskell
+::
 
   | isEnumerationTyCon tc       -- For an enumeration, exposing the constructors
   = True                        -- won't lead to the need for further exposure
 
-.. code-block:: haskell
+::
 
   | isFamilyTyCon tc            -- Open type family
   = True
 
-.. code-block:: haskell
+::
 
   -- Below here we just have data/newtype decls or family instances
 
-.. code-block:: haskell
+::
 
   | null data_cons              -- Ditto if there are no data constructors
   = True                        -- (NB: empty data types do not count as enumerations
                                 -- see Note [Enumeration types] in TyCon
 
-.. code-block:: haskell
+::
 
   | any exported_con data_cons  -- Expose rep if any datacon or field is exported
   = True
 
-.. code-block:: haskell
+::
 
   | isNewTyCon tc && isFFITy (snd (newTyConRhs tc))
   = True   -- Expose the rep for newtypes if the rep is an FFI type.
@@ -332,7 +363,7 @@ mustExposeTyCon no_trim_types exports tc
            -- be able to look through newtypes transparently, but it
            -- can only do that if it can "see" the newtype representation
 
-.. code-block:: haskell
+::
 
   | otherwise
   = False

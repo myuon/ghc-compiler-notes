@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IO/Encoding/Failure.hs>`_
 
-====================
-libraries/base/GHC/IO/Encoding/Failure.hs.rst
-====================
+libraries/base/GHC/IO/Encoding/Failure.hs
+=========================================
+
 
 Note [Roundtripping]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/GHC/IO/Encoding/Failure.hs#L59>`__
 
 Roundtripping is based on the ideas of PEP383.
 

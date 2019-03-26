@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DriverPipeline.hs>`_
 
-====================
-compiler/main/DriverPipeline.hs.rst
-====================
+compiler/main/DriverPipeline.hs
+===============================
+
 
 Note [-Xlinker -rpath vs -Wl,-rpath]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DriverPipeline.hs#L1569>`__
 
 -Wl takes a comma-separated list of options which in the case of
 -Wl,-rpath -Wl,some,path,with,commas parses the path with commas
@@ -17,8 +19,11 @@ it is supported by both gcc and clang. Anecdotally nvcc supports
 -Xlinker, but not -Wl.
 
 
+
 Note [Produce big objects on Windows]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/DriverPipeline.hs#L2041>`__
 
 The Windows Portable Executable object format has a limit of 32k sections, which
 we tend to blow through pretty easily. Thankfully, there is a "big object"

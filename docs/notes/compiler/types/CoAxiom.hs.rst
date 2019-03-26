@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs>`_
 
-====================
-compiler/types/CoAxiom.hs.rst
-====================
+compiler/types/CoAxiom.hs
+=========================
+
 
 Note [Coercion axiom branches]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs#L54>`__
+
 In order to allow closed type families, an axiom needs to contain an
 ordered list of alternatives, called branches. The kind of the coercion built
 from an axiom is determined by which index is used when building the coercion
@@ -54,6 +57,9 @@ derive Int ~ Bool, and that is a Bad Thing.
 
 Note [Branched axioms]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs#L100>`__
+
 Although a CoAxiom has the capacity to store many branches, in certain cases,
 we want only one. These cases are in data/newtype family instances, newtype
 coercions, and type family instances.
@@ -72,6 +78,9 @@ type variable is accurate.
 
 Note [Storing compatibility]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs#L182>`__
+
 During axiom application, we need to be aware of which branches are compatible
 with which others. The full explanation is in Note [Compatibility] in
 FamInstEnv. (The code is placed there to avoid a dependency from CoAxiom on
@@ -90,19 +99,26 @@ During serialization, the list is converted into a list of the indices
 of the branches.
 
 
+
 Note [CoAxiom saturation]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs#L313>`__
+
 * When co
 
 
 
 Note [CoAxBranch type variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs#L317>`__
+
 In the case of a CoAxBranch of an associated type-family instance,
 we use the *same* type variables (where possible) as the
 enclosing class or instance.  Consider
 
-.. code-block:: haskell
+::
 
   instance C Int [z] where
      type F Int [z] = ...   -- Second param must be [z]
@@ -118,21 +134,24 @@ are fresh wrt each other, or any other CoAxBranch.
 
 Note [CoAxBranch roles]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs#L333>`__
+
 Consider this code:
 
-.. code-block:: haskell
+::
 
   newtype Age = MkAge Int
   newtype Wrap a = MkWrap a
 
-.. code-block:: haskell
+::
 
   convert :: Wrap Age -> Int
   convert (MkWrap (MkAge i)) = i
 
 We want this to compile to:
 
-.. code-block:: haskell
+::
 
   NTCo:Wrap :: forall a. Wrap a ~R a
   NTCo:Age  :: Age ~R Int
@@ -149,6 +168,9 @@ the newtype tycon; family axioms are all at role N.
 
 Note [CoAxiom locations]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs#L356>`__
+
 The source location of a CoAxiom is stored in two places in the
 datatype tree.
   * The first is in the location info buried in the Name of the
@@ -165,6 +187,9 @@ giving rise to the FamInstBranch.
 
 Note [Implicit axioms]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs#L370>`__
+
 See also Note [Implicit TyThings] in HscTypes
 * A CoAxiom arising from data/type family instances is not "implicit".
   That is, it has its own IfaceAxiom declaration in an interface file
@@ -178,6 +203,9 @@ See also Note [Implicit TyThings] in HscTypes
 
 Note [Eta reduction for data families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/CoAxiom.hs#L381>`__
+
 Consider this
    data family T a b :: *
    newtype instance T Int a = MkT (IO a) deriving( Monad )

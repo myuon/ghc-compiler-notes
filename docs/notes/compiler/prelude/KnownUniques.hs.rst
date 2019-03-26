@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/KnownUniques.hs>`_
 
-====================
-compiler/prelude/KnownUniques.hs.rst
-====================
+compiler/prelude/KnownUniques.hs
+================================
+
 
 Note [Uniques for tuple type and data constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/prelude/KnownUniques.hs#L118>`__
 
 Wired-in type constructor keys occupy *two* slots:
    * u: the TyCon itself

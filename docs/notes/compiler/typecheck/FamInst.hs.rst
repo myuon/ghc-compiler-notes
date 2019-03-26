@@ -1,22 +1,24 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FamInst.hs>`_
 
-====================
-compiler/typecheck/FamInst.hs.rst
-====================
+compiler/typecheck/FamInst.hs
+=============================
+
 
 Note [The type family instance consistency story]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FamInst.hs#L49>`__
 
 To preserve type safety we must ensure that for any given module, all
 the type family instances used either in that module or in any module
 it directly or indirectly imports are consistent. For example, consider
 
-.. code-block:: haskell
+::
 
   module F where
     type family F a
 
-.. code-block:: haskell
+::
 
   module A where
     import F( F )
@@ -24,7 +26,7 @@ it directly or indirectly imports are consistent. For example, consider
     f :: F Int -> Bool
     f x = x
 
-.. code-block:: haskell
+::
 
   module B where
     import F( F )
@@ -32,7 +34,7 @@ it directly or indirectly imports are consistent. For example, consider
     g :: Char -> F Int
     g x = x
 
-.. code-block:: haskell
+::
 
   module Bad where
     import A( f )
@@ -107,8 +109,12 @@ addressed yet.
   See Note [Loading your own hi-boot file] in LoadIface.
 
 
+
 Note [Checking family instance consistency]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FamInst.hs#L213>`__
+
 For any two family instance modules that we import directly or indirectly, we
 check whether the instances in the two modules are consistent, *unless* we can
 be certain that the instances of the two modules have already been checked for
@@ -141,6 +147,9 @@ Note [Don't check hs-boot type family instances too early]
 
 Note [Checking family instance optimization]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FamInst.hs#L243>`__
+
 As explained in Note [Checking family instance consistency]
 we need to ensure that every pair of transitive imports that define type family
 instances is consistent.
@@ -198,8 +207,12 @@ tcExtendLocalFamInstEnv.
 See Note [The type family instance consistency story].
 
 
+
 Note [Home package family instances]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/FamInst.hs#L637>`__
+
 Optimization: If we're only defining type family instances
 for type families *defined in the home package*, then we
 only have to load interface files that belong to the home

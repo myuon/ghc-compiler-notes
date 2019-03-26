@@ -1,12 +1,15 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs>`_
 
-====================
-compiler/types/TyCoRep.hs.rst
-====================
+compiler/types/TyCoRep.hs
+=========================
+
 
 Note [The Type-related module hierarchy]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Class
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L6>`__
+
+Class
   CoAxiom
   TyCon    imports Class, CoAxiom
   TyCoRep  imports Class, CoAxiom, TyCon
@@ -17,8 +20,12 @@ Note [The Type-related module hierarchy]
 We expose the relevant stuff from this module via the Type module
 
 
+
 Note [ATyCon for classes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L216>`__
+
 Both classes and type constructors are represented in the type environment
 as ATyCon.  You can tell the difference, and get to the class, with
    isClassTyCon :: TyCon -> Bool
@@ -26,8 +33,12 @@ as ATyCon.  You can tell the difference, and get to the class, with
 The Class and its associated TyCon have the same Name.
 
 
+
 Note [Function types]
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L344>`__
+
 FFunTy is the constructor for a function type.  Lots of things to say
 about it!
 
@@ -46,7 +57,7 @@ about it!
                            i.e. t1 :: Constraint
   See Note [Types for coercions, predicates, and evidence]
 
-.. code-block:: haskell
+::
 
   This visibility info makes no difference in Core; it matters
   only when we regard the type as a Haskell source type.
@@ -58,7 +69,7 @@ about it!
       Commented out until the pattern match
       checker can handle it; see #16185
 
-.. code-block:: haskell
+::
 
       For now we use the CPP macro #define FunTy FFunTy _
       (see HsVersions.h) to allow pattern matching on a
@@ -74,14 +85,18 @@ pattern FunTy :: Type -> Type -> Type
 pattern FunTy arg res <- FFunTy { ft_arg = arg, ft_res = res }
 
        End of commented out block
----------------------------------- 
+----------------------------------
+
 
 
 Note [Types for coercions, predicates, and evidence]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L392>`__
+
 We treat differently:
 
-.. code-block:: haskell
+::
 
   (a) Predicate types
         Test: isPredTy
@@ -89,7 +104,7 @@ We treat differently:
         Kind: Constraint
         Examples: (Eq a), and (a ~ b)
 
-.. code-block:: haskell
+::
 
   (b) Coercion types are primitive, unboxed equalities
         Test: isCoVarTy
@@ -97,7 +112,7 @@ We treat differently:
         Kind: TYPE (TupleRep [])
         Examples: (t1 ~# t2) or (t1 ~R# t2)
 
-.. code-block:: haskell
+::
 
   (c) Evidence types is the type of evidence manipulated by
       the type constraint solver.
@@ -125,6 +140,9 @@ a Predicate type.
 
 Note [Constraints in kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L430>`__
+
 Do we allow a type constructor to have a kind like
    S :: Eq a => a -> Type
 
@@ -199,74 +217,76 @@ How does this work?
   that occurrence forces GHC to unify the types in question. For
   example:
 
-.. code-block:: haskell
+::
 
   data G a where
     MkG :: G Bool
 
-.. code-block:: haskell
+::
 
   type family F (x :: G a) :: a where
     F MkG = False
 
-.. code-block:: haskell
+::
 
   When checking the LHS `F MkG`, GHC sees the MkG constructor and then must
   unify F's implicit parameter `a` with Bool. This succeeds, making the equation
 
-.. code-block:: haskell
+::
 
     F Bool (MkG @Bool <Bool>) = False
 
-.. code-block:: haskell
+::
 
   Note that we never need unpack the coercion. This is because type
   family equations are *not* parametric in their kind variables. That
   is, we could have just said
 
-.. code-block:: haskell
+::
 
   type family H (x :: G a) :: a where
     H _ = False
 
-.. code-block:: haskell
+::
 
   The presence of False on the RHS also forces `a` to become Bool,
   giving us
 
-.. code-block:: haskell
+::
 
     H Bool _ = False
 
-.. code-block:: haskell
+::
 
   The fact that any of this works stems from the lack of phase
   separation between types and kinds (unlike the very present phase
   separation between terms and types).
 
-.. code-block:: haskell
+::
 
   Once we have the ability to pattern-match on types below top-level,
   this will no longer cut it, but it seems fine for now.
 
 
 
-
 Note [Arguments to type constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L537>`__
+
 Because of kind polymorphism, in addition to type application we now
 have kind instantiation. We reuse the same notations to do so.
 
 For example:
 
-.. code-block:: haskell
+::
 
   Just (* -> *) Maybe
   Right * Nat Zero
 
 are represented by:
 
-.. code-block:: haskell
+::
 
   TyConApp (PromotedDataCon Just) [* -> *, Maybe]
   TyConApp (PromotedDataCon Right) [*, Nat, (PromotedDataCon Zero)]
@@ -282,6 +302,9 @@ This kind instantiation only happens in TyConApp currently.
 
 Note [Non-trivial definitional equality]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L559>`__
+
 Is Int |> <*> the same as Int? YES! In order to reduce headaches,
 we decide that any reflexive casts in types are just ignored.
 (Indeed they must be. See Note [Respecting definitional equality].)
@@ -341,7 +364,7 @@ constructors and destructors in Type respect whatever relation is chosen.
 
 Another helpful principle with eqType is this:
 
-.. code-block:: haskell
+::
 
  (EQ) If (t1 `eqType` t2) then I can replace t1 by t2 anywhere.
 
@@ -352,6 +375,9 @@ same kinds.
 
 Note [Respecting definitional equality]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L625>`__
+
 Note [Non-trivial definitional equality] introduces the property (EQ).
 How is this upheld?
 
@@ -398,7 +424,7 @@ to have nested casts: we update (t |> co1 |> co2) to (t |> (co1 `TransCo` co2)).
 
 In sum, in order to uphold (EQ), we need the following three invariants:
 
-.. code-block:: haskell
+::
 
   (EQ1) No decomposable CastTy to the left of an AppTy, where a decomposable
         cast is one that relates either a FunTy to a FunTy or a
@@ -413,7 +439,10 @@ These invariants are all documented above, in the declaration for Type.
 
 
 Note [Unused coercion variable in ForAllTy]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L683>`__
+
 Suppose we have
   \(co:t1 ~ t2). e
 
@@ -440,7 +469,10 @@ is a type variable.  In those cases, we use mkForAllTy.
 
 
 Note [TyCoBinders]
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L762>`__
+
 A ForAllTy contains a TyCoVarBinder.  But a type can be decomposed
 to a telescope consisting of a [TyCoBinder]
 
@@ -463,9 +495,11 @@ words, if `x` is either a function or a polytype, `x arg` makes sense
 
 
 
-
 Note [VarBndrs, TyCoVarBinders, TyConBinders, and visibility]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L785>`__
+
 * A ForAllTy (used for both types and kinds) contains a TyCoVarBinder.
   Each TyCoVarBinder
       Bndr a tvis
@@ -542,7 +576,7 @@ This table summarises the visibility rules:
   Here T1's kind is  T1 :: forall {k:*}. (k->*) -> k -> *
   The kind variable 'k' is Inferred, since it is not mentioned
 
-.. code-block:: haskell
+::
 
   Note that 'a' and 'b' correspond to /Anon/ TyCoBinders in T1's kind,
   and Anon binders don't have a visibility flag. (Or you could think
@@ -583,25 +617,25 @@ See also Note [Required, Specified, and Inferred for types] in TcTyClsDecls
 
 ---- Printing -----
 
-.. code-block:: haskell
+::
 
  We print forall types with enough syntax to tell you their visibility
  flag.  But this is not source Haskell, and these types may not all
  be parsable.
 
-.. code-block:: haskell
+::
 
  Specified: a list of Specified binders is written between `forall` and `.`:
                const :: forall a b. a -> b -> a
 
-.. code-block:: haskell
+::
 
  Inferred:  with -fprint-explicit-foralls, Inferred binders are written
             in braces:
                f :: forall {k} (a:k). S k a -> Int
             Otherwise, they are printed like Specified binders.
 
-.. code-block:: haskell
+::
 
  Required: binders are put between `forall` and `->`:
               T :: forall k -> *
@@ -618,6 +652,9 @@ See also Note [Required, Specified, and Inferred for types] in TcTyClsDecls
 
 Note [No Required TyCoBinder in terms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L925>`__
+
 We don't allow Required foralls for term variables, including pattern
 synonyms and data constructors.  Why?  Because then an application
 would need a /compulsory/ type argument (possibly without an "@"?),
@@ -630,8 +667,12 @@ However the type of a term can (just about) have a required quantifier;
 see Note [Required quantifiers in the type of a term] in TcExpr.
 
 
+
 Note [Refl invariant]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1263>`__
+
 Invariant 1:
 
 Coercions have the following invariant
@@ -651,17 +692,19 @@ have no coercion variables.
 Note [Generalized reflexive coercion]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1279>`__
+
 GRefl is a generalized reflexive coercion (see #15192). It wraps a kind
 coercion, which might be reflexive (MRefl) or any coercion (MCo co). The typing
 rules for GRefl:
 
-.. code-block:: haskell
+::
 
   ty : k1
   ------------------------------------
   GRefl r ty MRefl: ty ~r ty
 
-.. code-block:: haskell
+::
 
   ty : k1       co :: k1 ~ k2
   ------------------------------------
@@ -669,7 +712,7 @@ rules for GRefl:
 
 Consider we have
 
-.. code-block:: haskell
+::
 
    g1 :: s ~r t
    s  :: k1
@@ -677,19 +720,19 @@ Consider we have
 
 and we want to construct a coercions co which has type
 
-.. code-block:: haskell
+::
 
    (s |> g2) ~r t
 
 We can define
 
-.. code-block:: haskell
+::
 
    co = Sym (GRefl r s g2) ; g1
 
 It is easy to see that
 
-.. code-block:: haskell
+::
 
    Refl == GRefl Nominal ty MRefl :: ty ~n ty
 
@@ -700,6 +743,9 @@ save allocation.
 
 Note [Coercion axioms applied to coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1315>`__
+
 The reason coercion axioms can be applied to coercions and not just
 types is to allow for better optimization.  There are some cases where
 we need to be able to "push transitivity inside" an axiom in order to
@@ -707,20 +753,20 @@ expose further opportunities for optimization.
 
 For example, suppose we have
 
-.. code-block:: haskell
+::
 
   C a : t[a] ~ F a
   g   : b ~ c
 
 and we want to optimize
 
-.. code-block:: haskell
+::
 
   sym (C b) ; t[g] ; C c
 
 which has the kind
 
-.. code-block:: haskell
+::
 
   F b ~ F c
 
@@ -735,7 +781,7 @@ case, e.g., we match t[g] against the LHS of (C c)'s kind, to
 obtain the substitution  a |-> g  (note this operation is sort
 of the dual of lifting!) and hence end up with
 
-.. code-block:: haskell
+::
 
   C g : t[b] ~ F c
 
@@ -743,7 +789,7 @@ which indeed has the same kind as  t[g] ; C c.
 
 Now we have
 
-.. code-block:: haskell
+::
 
   sym (C b) ; C g
 
@@ -753,6 +799,9 @@ which can be optimized to F g.
 
 Note [CoAxiom index]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1356>`__
+
 A CoAxiom has 1 or more branches. Each branch has contains a list
 of the free type variables in that branch, the LHS type patterns,
 and the RHS type for that branch. When we apply an axiom to a list
@@ -768,13 +817,16 @@ of the chosen branch.
 
 Note [Forall coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1369>`__
+
 Constructing coercions between forall-types can be a bit tricky,
 because the kinds of the bound tyvars can be different.
 
 The typing rule is:
 
 
-.. code-block:: haskell
+::
 
   kind_co : k1 ~ k2
   tv1:k1 |- co : t1 ~ t2
@@ -810,6 +862,9 @@ setTyVarKind.
 
 Note [Predicate coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1407>`__
+
 Suppose we have
    g :: a~b
 How can we coerce between types
@@ -821,14 +876,14 @@ where the equality predicate *itself* differs?
 Answer: we simply treat (~) as an ordinary type constructor, so these
 types really look like
 
-.. code-block:: haskell
+::
 
    ((~) [c] a) -> [a] -> c
    ((~) [c] b) -> [b] -> c
 
 So the coercion between the two is obviously
 
-.. code-block:: haskell
+::
 
    ((~) [c] g) -> [g] -> c
 
@@ -845,6 +900,9 @@ See Simplify.simplCoercionF, which generates such selections.
 
 Note [Roles]
 ~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1436>`__
+
 Roles are a solution to the GeneralizedNewtypeDeriving problem, articulated
 in #1496. The full story is in docs/core-spec/core-spec.pdf. Also, see
 http://ghc.haskell.org/trac/ghc/wiki/RolesImplementation
@@ -925,12 +983,15 @@ See the paper cited above for more examples and information.
 
 Note [TyConAppCo roles]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1514>`__
+
 The TyConAppCo constructor has a role parameter, indicating the role at
 which the coercion proves equality. The choice of this parameter affects
 the required roles of the arguments of the TyConAppCo. To help explain
 it, assume the following definition:
 
-.. code-block:: haskell
+::
 
   type instance F Int = Bool   -- Axiom axF : F Int ~N Bool
   newtype Age = MkAge Int      -- Axiom axAge : Age ~R Int
@@ -947,7 +1008,7 @@ TyConAppCo Representational Foo axAge       : Foo Age     ~R Foo Int
   whole point of having roles on the TyCon to begin with. So, we can
   have Foo Age ~R Foo Int, if Foo's parameter has role R.
 
-.. code-block:: haskell
+::
 
   If a Representational TyConAppCo is over-saturated (which is otherwise fine),
   the spill-over arguments must all be at Nominal. This corresponds to the
@@ -964,22 +1025,25 @@ The rules here dictate the roles of the parameters to mkTyConAppCo
 
 Note [NthCo and newtypes]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1547>`__
+
 Suppose we have
 
-.. code-block:: haskell
+::
 
   newtype N a = MkN Int
   type role N representational
 
 This yields axiom
 
-.. code-block:: haskell
+::
 
   NTCo:N :: forall a. N a ~R Int
 
 We can then build
 
-.. code-block:: haskell
+::
 
   co :: forall a b. N a ~R N b
   co = NTCo:N a ; sym (NTCo:N b)
@@ -987,7 +1051,7 @@ We can then build
 for any `a` and `b`. Because of the role annotation on N, if we use
 NthCo, we'll get out a representational coercion. That is:
 
-.. code-block:: haskell
+::
 
   NthCo r 0 co :: forall a b. a ~R b
 
@@ -1002,10 +1066,13 @@ in the "Safe Coercions" paper (ICFP '14).
 
 Note [NthCo Cached Roles]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1575>`__
+
 Why do we cache the role of NthCo in the NthCo constructor?
 Because computing role(Nth i co) involves figuring out that
 
-.. code-block:: haskell
+::
 
   co :: T tys1 ~ T tys2
 
@@ -1023,6 +1090,9 @@ See #11735
 
 Note [InstCo roles]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1592>`__
+
 Here is (essentially) the typing rule for InstCo:
 
 g :: (forall a. t1) ~r (forall a. t2)
@@ -1058,7 +1128,10 @@ role and kind, which is done in the UnivCo constructor.
 
 
 Note [Phantom coercions]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1681>`__
+
 Consider
      data T a = T1 | T2
 Then we have
@@ -1072,7 +1145,10 @@ The role of the UnivCo is always Phantom.  The Coercion stored is the
 
 
 Note [Coercion holes]
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1693>`__
+
 During typechecking, constraint solving for type classes works by
   - Generate an evidence Id,  d7 :: Num a
   - Wrap it in a Wanted constraint, [W] d7 :: Num a
@@ -1134,15 +1210,17 @@ Other notes about HoleCo:
 
 
 
-
 Note [CoercionHoles and coercion free variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1755>`__
+
 Why does a CoercionHole contain a CoVar, as well as reference to
 fill in?  Because we want to treat that CoVar as a free variable of
 the coercion.  See #14584, and Note [What prevents a
 constraint from floating] in TcSimplify, item (4):
 
-.. code-block:: haskell
+::
 
         forall k. [W] co1 :: t1 ~# t2 |> co2
                   [W] co2 :: k ~# *
@@ -1153,19 +1231,21 @@ implication.
 
 
 
-
 Note [ProofIrrelProv]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1770>`__
+
 A ProofIrrelProv is a coercion between coercions. For example:
 
-.. code-block:: haskell
+::
 
   data G a where
     MkG :: G Bool
 
 In core, we get
 
-.. code-block:: haskell
+::
 
   G :: * -> *
   MkG :: forall (a :: *). (a ~ Bool) -> G a
@@ -1173,7 +1253,7 @@ In core, we get
 Now, consider 'MkG -- that is, MkG used in a type -- and suppose we want
 a proof that ('MkG a1 co1) ~ ('MkG a2 co2). This will have to be
 
-.. code-block:: haskell
+::
 
   TyConAppCo Nominal MkG [co3, co4]
   where
@@ -1198,8 +1278,12 @@ Here,
 %************************************************************************
 
 
+
 Note [Free variables of types]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1808>`__
+
 The family of functions tyCoVarsOfType, tyCoVarsOfTypes etc, returns
 a VarSet that is closed over the types of its variables.  More precisely,
   if    S = tyCoVarsOfType( t )
@@ -1217,11 +1301,11 @@ so we profiled several versions, exploring different implementation strategies.
 
 1. Baseline version: uses FV naively. Essentially:
 
-.. code-block:: haskell
+::
 
    tyCoVarsOfType ty = fvVarSet $ tyCoFVsOfType ty
 
-.. code-block:: haskell
+::
 
    This is not nice, because FV introduces some overhead to implement
    determinism, and throught its "interesting var" function, neither of which
@@ -1230,17 +1314,17 @@ so we profiled several versions, exploring different implementation strategies.
 2. UnionVarSet version: instead of reusing the FV-based code, we simply used
    VarSets directly, trying to avoid the overhead of FV. E.g.:
 
-.. code-block:: haskell
+::
 
    -- FV version:
    tyCoFVsOfType (AppTy fun arg)    a b c = (tyCoFVsOfType fun `unionFV` tyCoFVsOfType arg) a b c
 
-.. code-block:: haskell
+::
 
    -- UnionVarSet version:
    tyCoVarsOfType (AppTy fun arg)    = (tyCoVarsOfType fun `unionVarSet` tyCoVarsOfType arg)
 
-.. code-block:: haskell
+::
 
    This looks deceptively similar, but while FV internally builds a list- and
    set-generating function, the VarSet functions manipulate sets directly, and
@@ -1258,6 +1342,9 @@ See #14880.
 
 Note [Closing over free variable kinds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L1854>`__
+
 tyCoVarsOfType and tyCoFVsOfType, while traversing a type, will also close over
 free variable kinds. In previous GHC versions, this happened naively: whenever
 we would encounter an occurrence of a free type variable, we would close over
@@ -1301,7 +1388,7 @@ above:
 
 So now consider:
 
-.. code-block:: haskell
+::
 
     forall k. b -> k
 
@@ -1313,7 +1400,7 @@ with no bound vars in scope.
 
 So the solution is easy. The old code was this:
 
-.. code-block:: haskell
+::
 
   ty_co_vars_of_type (TyVarTy v) is acc
     | v `elemVarSet` is  = acc
@@ -1336,6 +1423,8 @@ And that's it.
 Note [CoVarsOfX and the InterestingVarFun]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L2173>`__
+
 The coVarsOfType, coVarsOfTypes, coVarsOfCo, and coVarsOfCos functions are
 implemented in terms of the respective FV equivalents (tyCoFVsOf...), rather
 than the VarSet-based flavors (tyCoVarsOf...), despite the performance
@@ -1351,6 +1440,9 @@ See #14880.
 
 Note [When does a tycon application need an explicit kind signature?]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L2381>`__
+
 There are a couple of places in GHC where we convert Core Types into forms that
 more closely resemble user-written syntax. These include:
 
@@ -1361,7 +1453,7 @@ This conversion presents a challenge: how do we ensure that the resulting type
 has enough kind information so as not to be ambiguous? To better motivate this
 question, consider the following Core type:
 
-.. code-block:: haskell
+::
 
   -- Foo :: Type -> Type
   type Foo = Proxy Type
@@ -1380,7 +1472,7 @@ Our solution is to annotate certain tycons with their kinds whenever they
 appear in applied form in order to resolve the ambiguity. For instance, we
 would reify the RHS of Foo like so:
 
-.. code-block:: haskell
+::
 
   type Foo = (Proxy :: Type -> Type)
 
@@ -1389,7 +1481,7 @@ these explicit kind signatures. We certainly don't want to annotate _every_
 tycon with a kind signature, or else we might end up with horribly bloated
 types like the following:
 
-.. code-block:: haskell
+::
 
   (Either :: Type -> Type -> Type) (Int :: Type) (Char :: Type)
 
@@ -1409,13 +1501,13 @@ is through explicit kind signatures.
 
 What do we mean by "fill in"? Let's consider this small example:
 
-.. code-block:: haskell
+::
 
   T :: forall {k}. Type -> (k -> Type) -> k
 
 Moreover, we have this application of T:
 
-.. code-block:: haskell
+::
 
   T @{j} Int aty
 
@@ -1448,7 +1540,7 @@ where S1 and S2 are arbitrary substitutions.
 
 For example, is `F` is a non-injective type family, then
 
-.. code-block:: haskell
+::
 
   injectiveVarsOfType(Either c (Maybe (a, F b c))) = {a, c}
 
@@ -1467,7 +1559,7 @@ each form of tycon binder:
 * Anonymous binders are injective positions. For example, in the promoted data
   constructor '(:):
 
-.. code-block:: haskell
+::
 
     '(:) :: forall a. a -> [a] -> [a]
 
@@ -1480,7 +1572,7 @@ each form of tycon binder:
   - Inferred binders are never injective positions. For example, in this data
     type:
 
-.. code-block:: haskell
+::
 
       data Proxy a
       Proxy :: forall {k}. k -> Type
@@ -1490,7 +1582,7 @@ each form of tycon binder:
     injective_vars_of_binder(forall {k}. ...) = {}.
   - Required binders are injective positions. For example, in this data type:
 
-.. code-block:: haskell
+::
 
       data Wurble k (a :: k) :: k
       Wurble :: forall k -> k -> k
@@ -1502,11 +1594,11 @@ each form of tycon binder:
   - Specified binders /might/ be injective positions, depending on how you
     approach things. Continuing the '(:) example:
 
-.. code-block:: haskell
+::
 
       '(:) :: forall a. a -> [a] -> [a]
 
-.. code-block:: haskell
+::
 
     Normally, the (forall a. ...) tyvar binder wouldn't contribute to the kind
     of '(:) 'True '[], since it's not explicitly instantiated by the user. But
@@ -1514,7 +1606,7 @@ each form of tycon binder:
     user can write '(:) @Bool 'True '[]. (In that case,
     injective_vars_of_binder(forall a. ...) = {a}.)
 
-.. code-block:: haskell
+::
 
     There are some situations where using visible kind application is appropriate
     (e.g., HsUtils.typeToLHsType) and others where it is not (e.g., TH
@@ -1539,13 +1631,13 @@ be tempted to think that it corresponds to all of the arguments in the kind of
 T that would normally be instantiated by omitted arguments. But this isn't
 quite right, strictly speaking. Consider the following (silly) example:
 
-.. code-block:: haskell
+::
 
   S :: forall {k}. Type -> Type
 
 And suppose we have this application of S:
 
-.. code-block:: haskell
+::
 
   S Int Bool
 
@@ -1576,17 +1668,17 @@ arguments, in the case that the concrete application instantiates a result
 kind variable with an arrow kind? If we run out of arguments, we do not attach
 a kind annotation. This should be a rare case, indeed. Here is an example:
 
-.. code-block:: haskell
+::
 
    data T1 :: k1 -> k2 -> *
    data T2 :: k1 -> k2 -> *
 
-.. code-block:: haskell
+::
 
    type family G (a :: k) :: k
    type instance G T1 = T2
 
-.. code-block:: haskell
+::
 
    type instance F Char = (G T1 Bool :: (* -> *) -> *)   -- F from above
 
@@ -1598,7 +1690,7 @@ rare special case, and we choose not to annotate the application of G with
 a kind signature. After all, we needn't do this, since that instance would
 be reified as:
 
-.. code-block:: haskell
+::
 
    type instance F Char = G (T1 :: * -> (* -> *) -> *) Bool
 
@@ -1607,12 +1699,16 @@ on its argument. See #8953 and test th/T8953.
 ----------- No free vars -----------------
 
 
+
 Note [The substitution invariant]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L2700>`__
+
 When calling (substTy subst ty) it should be the case that
 the in-scope set in the substitution is a superset of both:
 
-.. code-block:: haskell
+::
 
   (SIa) The free vars of the range of the substitution
   (SIb) The free vars of ty minus the domain of the substitution
@@ -1642,6 +1738,9 @@ ignore (SIa).
 
 Note [Substitutions apply only once]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L2729>`__
+
 We use TCvSubsts to instantiate things, and we might instantiate
         forall a b. ty
 with the types
@@ -1652,7 +1751,7 @@ when we find a beta redex like
 Then we also end up with a substitution that permutes type variables. Other
 variations happen to; for example [a -> (a, b)].
 
-.. code-block:: haskell
+::
 
         ********************************************************
         *** So a substitution must be applied precisely once ***
@@ -1665,6 +1764,9 @@ we use during unifications, it must not be repeatedly applied.
 
 Note [Extending the TvSubstEnv]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L2748>`__
+
 See #tcvsubst_invariant# for the invariants that must hold.
 
 This invariant allows a short-cut when the subst envs are empty:
@@ -1691,6 +1793,9 @@ This invariant has several crucial consequences:
 
 Note [Substituting types and coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L2772>`__
+
 Types and coercions are mutually recursive, and either may have variables
 "belonging" to the other. Thus, every time we wish to substitute in a
 type, we may also need to substitute in a coercion, and vice versa.
@@ -1705,8 +1810,12 @@ the range of the TvSubstEnv should *never* include a type headed with
 CoercionTy.
 
 
+
 Note [Sym and ForAllCo]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L3046>`__
+
 In OptCoercion, we try to push "sym" out to the leaves of a coercion. But,
 how do we push sym into a ForAllCo? It's a little ugly.
 
@@ -1749,10 +1858,13 @@ ForAllCo tv (sym h) (sym g[tv |-> tv |> sym h])
 
 Note [Substituting in a coercion hole]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L3086>`__
+
 It seems highly suspicious to be substituting in a coercion that still
 has coercion holes. Yet, this can happen in a situation like this:
 
-.. code-block:: haskell
+::
 
   f :: forall k. k :~: Type -> ()
   f Refl = let x :: forall (a :: k). [a] -> ...
@@ -1781,6 +1893,9 @@ substitution.
 
 Note [When to print foralls]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L3813>`__
+
 Mostly we want to print top-level foralls when (and only when) the user specifies
 -fprint-explicit-foralls.  But when kind polymorphism is at work, that suppresses
 too much information; see #9018.
@@ -1801,23 +1916,26 @@ on m and a.  The latter comes from pprTCvBndr.
 
 Note [Infix type variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCoRep.hs#L3831>`__
+
 With TypeOperators you can say
 
-.. code-block:: haskell
+::
 
    f :: (a ~> b) -> b
 
 and the (~>) is considered a type variable.  However, the type
 pretty-printer in this module will just see (a ~> b) as
 
-.. code-block:: haskell
+::
 
    App (App (TyVarTy "~>") (TyVarTy "a")) (TyVarTy "b")
 
 So it'll print the type in prefix form.  To avoid confusion we must
 remember to parenthesise the operator, thus
 
-.. code-block:: haskell
+::
 
    (~>) a b -> b
 

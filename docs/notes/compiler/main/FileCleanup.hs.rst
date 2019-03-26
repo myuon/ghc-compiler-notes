@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/FileCleanup.hs>`_
 
-====================
-compiler/main/FileCleanup.hs.rst
-====================
+compiler/main/FileCleanup.hs
+============================
+
 
 Note [Deterministic base name]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/FileCleanup.hs#L211>`__
 
 The filename of temporary files, especially the basename of C files, can end
 up in the output in some form, e.g. as part of linker debug information. In the

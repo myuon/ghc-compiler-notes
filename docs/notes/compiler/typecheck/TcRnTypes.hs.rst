@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs>`_
 
-====================
-compiler/typecheck/TcRnTypes.hs.rst
-====================
+compiler/typecheck/TcRnTypes.hs
+===============================
+
 
 Note [Identity versus semantic module]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L432>`__
+
 When typechecking an hsig file, it is convenient to keep track
 of two different "this module" identifiers:
 
@@ -27,12 +30,12 @@ Which one should you use?
        signatures (we just generate blank object files for
        hsig files.)
 
-.. code-block:: haskell
+::
 
        A corrolary of this is that the following invariant holds at any point
        past desugaring,
 
-.. code-block:: haskell
+::
 
            if I have a Module, this_mod, in hand representing the module
            currently being compiled,
@@ -55,8 +58,11 @@ Which one should you use?
        want to track (and recompile if it changes)
 
 
+
 Note [Constraints in static forms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L705>`__
 
 When a static form produces constraints like
 
@@ -77,15 +83,19 @@ static form wouldn't be closed because the Show dictionary would come from
 g's context instead of coming from the top level.
 
 
+
 Note [Tracking unused binding and imports]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L751>`__
+
 We gather two sorts of usage information
 
  * tcg_dus (defs/uses)
       Records *defined* Names (local, top-level)
           and *used*    Names (local or imported)
 
-.. code-block:: haskell
+::
 
       Used (a) to report "defined but not used"
                (see RnNames.reportUnusedNames)
@@ -97,7 +107,7 @@ We gather two sorts of usage information
  * tcg_used_gres
       Used only to report unused import declarations
 
-.. code-block:: haskell
+::
 
       Records each *occurrence* an *imported* (not locally-defined) entity.
       The occurrence is recorded by keeping a GlobalRdrElt for it.
@@ -108,9 +118,11 @@ We gather two sorts of usage information
 
 
 
-
 Note [The Global-Env/Local-Env story]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L783>`__
+
 During type checking, we keep in the tcg_type_env
         * All types and classes
         * All Ids derived from types and classes (constructors, selectors)
@@ -125,20 +137,24 @@ Why?  Because they are now Ids not TcIds.  This final GlobalEnv is
         b) used in the ModDetails of this module
 
 
+
 Note [Escaping the arrow scope]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1032>`__
+
 In arrow notation, a variable bound by a proc (or enclosed let/kappa)
 is not in scope to the left of an arrow tail (-<) or the head of (|..|).
 For example
 
-.. code-block:: haskell
+::
 
         proc x -> (e1 -< e2)
 
 Here, x is not in scope in e1, but it is in scope in e2.  This can get
 a bit complicated:
 
-.. code-block:: haskell
+::
 
         let x = 3 in
         proc y -> (proc z -> e1) -< e2
@@ -162,8 +178,12 @@ constraints from further out.  So we must capture the constraint bag
 from further out in the ArrowCtxt that we push inwards.
 
 
+
 Note [Meaning of IdBindingInfo]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1158>`__
+
 NotLetBound means that
   the Id is not let-bound (e.g. it is bound in a
   lambda-abstraction or in a case pattern)
@@ -176,7 +196,7 @@ ClosedLet means that
    These ClosedLets can definitely be floated to top level; and we
    may need to do so for static forms.
 
-.. code-block:: haskell
+::
 
    Property:   ClosedLet
              is equivalent to
@@ -203,9 +223,12 @@ or otherwise) is just so we can produce better error messages
 
 Note [Bindings with closed types: ClosedTypeId]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1193>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
   f x = let g ys = map not ys
         in ...
@@ -264,20 +287,23 @@ a top-level binding with a free type variable.)
 
 Note [Type variables in the type environment]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1250>`__
+
 The type environment has a binding for each lexically-scoped
 type variable that is in scope.  For example
 
-.. code-block:: haskell
+::
 
   f :: forall a. a -> a
   f x = (x :: a)
 
-.. code-block:: haskell
+::
 
   g1 :: [a] -> a
   g1 (ys :: [b]) = head ys :: b
 
-.. code-block:: haskell
+::
 
   g2 :: [Int] -> Int
   g2 (ys :: [c]) = head ys :: c
@@ -311,8 +337,12 @@ in the type environment.
   unified with a type (such as Int in 'g2').
 
 
+
 Note [Complete and partial type signatures]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1518>`__
+
 A type signature is partial when it contains one or more wildcards
 (= type holes).  The wildcard can either be:
 * A (type) wildcard occurring in sig_theta or sig_tau. These are
@@ -327,8 +357,12 @@ wildcards in the type signature, i.e. iff sig_wcs is empty and
 sig_extra_cts is Nothing.
 
 
+
 Note [sig_inst_tau may be polymorphic]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1567>`__
+
 Note that "sig_inst_tau" might actually be a polymorphic type,
 if the original function had a signature like
    forall a. Eq a => forall b. Ord b => ....
@@ -339,6 +373,9 @@ It happens, too!  See Note [Polymorphic methods] in TcClassDcl.
 
 Note [Wildcards in partial signatures]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1575>`__
+
 The wildcards in psig_wcs may stand for a type mentioning
 the universally-quantified tyvars of psig_ty
 
@@ -358,8 +395,12 @@ Here we get
    sig_inst_wcs   = [ _22::k ]
 
 
+
 Note [Hole constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1782>`__
+
 CHoleCan constraints are used for two kinds of holes,
 distinguished by cc_hole:
 
@@ -373,7 +414,10 @@ distinguished by cc_hole:
 
 
 Note [CIrredCan constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1794>`__
+
 CIrredCan constraints are used for constraints that are "stuck"
    - we can't solve them (yet)
    - we can't use them to solve other constraints
@@ -393,6 +437,9 @@ Example 2:  a ~ b, where a :: *, b :: k, where k is a kind variable
 
 Note [Ct/evidence invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1811>`__
+
 If  ct :: Ct, then extra fields of 'ct' cache precisely the ctev_pred field
 of (cc_ev ct), and is fully rewritten wrt the substitution.   Eg for CDictCan,
    ctev_pred (cc_ev ct) = (cc_class ct) (cc_tyargs ct)
@@ -407,6 +454,9 @@ during constraint solving. See Note [Evidence field of CtEvidence].
 
 Note [Ct kind invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L1823>`__
+
 CTyEqCan and CFunEqCan both require that the kind of the lhs matches the kind
 of the rhs. This is necessary because both constraints are used for substitutions
 during solving. If the kinds differed, then the substitution would take a well-kinded
@@ -416,6 +466,9 @@ type to an ill-kinded one.
 
 Note [Resetting cc_pend_sc]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2019>`__
+
 When we discard Derived constraints, in dropDerivedSimples, we must
 set the cc_pend_sc flag to True, so that if we re-process this
 CDictCan we will re-generate its derived superclasses. Otherwise
@@ -424,8 +477,12 @@ we might miss some fundeps.  #13662 showed this up.
 See Note [The superclass story] in TcCanonical.
 
 
+
 Note [Dropping derived constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2081>`__
+
 In general we discard derived constraints at the end of constraint solving;
 see dropDerivedWC.  For example
 
@@ -452,7 +509,7 @@ But (tiresomely) we do keep *some* Derived constraints:
       - Given/Given interactions (subset of FunDepOrigin1):
         The definitely-insoluble ones reflect unreachable code.
 
-.. code-block:: haskell
+::
 
         Others not-definitely-insoluble ones like [D] a ~ Int do not
         reflect unreachable code; indeed if fundeps generated proofs, it'd
@@ -480,9 +537,10 @@ NB: we keep *all* derived insolubles under some circumstances:
 
 
 
-
 Note [Custom type errors in constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2191>`__
 
 When GHC reports a type-error about an unsolved-constraint, we check
 to see if the constraint contains any custom-type errors, and if so
@@ -508,8 +566,12 @@ Eq (F (TypeError msg))  -- Here the type error is nested under a type-function
                         -- and the called function produced a custom type error.
 
 
+
 Note [When superclasses help]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2287>`__
+
 First read Note [The superclass story] in TcCanonical.
 
 We expand superclasses and iterate only if there is at unsolved wanted
@@ -535,13 +597,13 @@ Note that
         [D] ty ~ ty2 (from the functional dependency)
         which will trigger superclass expansion.
 
-.. code-block:: haskell
+::
 
     It's a bit of a special case, but it's easy to do.  The runtime cost
     is low because the unsolved set is usually empty anyway (errors
     aside), and the first non-imlicit-parameter will terminate the search.
 
-.. code-block:: haskell
+::
 
     The special case is worth it (#11480, comment:2) because it
     applies to CallStack constraints, which aren't type errors. If we have
@@ -554,17 +616,21 @@ Note that
     constraint; it can always be solved by defaulting.
 
 
+
 Note [Given insolubles]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2493>`__
+
 Consider (#14325, comment:)
     class (a~b) => C a b
 
-.. code-block:: haskell
+::
 
     foo :: C a c => a -> c
     foo x = x
 
-.. code-block:: haskell
+::
 
     hm3 :: C (f b) b => b -> f b
     hm3 x = foo x
@@ -593,6 +659,9 @@ Bottom line: insolubleWC (called in TcSimplify.setImplicationStatus)
 
 Note [Insoluble holes]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2524>`__
+
 Hole constraints that ARE NOT treated as truly insoluble:
   a) type holes, arising from PartialTypeSignatures,
   b) "true" expression holes arising from TypedHoles
@@ -607,6 +676,9 @@ Yuk!
 
 Note [Needed evidence variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2675>`__
+
 Th ic_need_evs field holds the free vars of ic_binds, and all the
 ic_binds in nested implications.
 
@@ -621,6 +693,9 @@ ic_binds in nested implications.
 
 Note [Shadowing in a constraint]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2687>`__
+
 We assume NO SHADOWING in a constraint.  Specifically
  * The unification variables are all implicitly quantified at top
    level, and are all unique
@@ -635,6 +710,9 @@ worrying that 'b' might clash.
 
 Note [Skolems in an implication]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2699>`__
+
 The skolems in an implication are not there to perform a skolem escape
 check.  That happens because all the environment variables are in the
 untouchables, and therefore cannot be unified with anything at all,
@@ -648,12 +726,15 @@ TcSimplify.approximateImplications
 
 Note [Insoluble constraints]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2710>`__
+
 Some of the errors that we get during canonicalization are best
 reported when all constraints have been simplified as much as
 possible. For instance, assume that during simplification the
 following constraints arise:
 
-.. code-block:: haskell
+::
 
  [Wanted]   F alpha ~  uf1
  [Wanted]   beta ~ uf1 beta
@@ -679,9 +760,11 @@ never see it.
 
 
 
-
 Note [Evidence field of CtEvidence]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2780>`__
+
 During constraint solving we never look at the type of ctev_evar/ctev_dest;
 instead we look at the ctev_pred field.  The evtm/evar field
 may be un-zonked.
@@ -690,6 +773,9 @@ may be un-zonked.
 
 Note [Bind new Givens immediately]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2786>`__
+
 For Givens we make new EvVars and bind them immediately. Two main reasons:
   * Gain sharing.  E.g. suppose we start with g :: C a b, where
        class D a => C a b
@@ -716,6 +802,9 @@ So a Given has EvVar inside it rather than (as previously) an EvTerm.
 
 Note [Constraint flavours]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L2922>`__
+
 Constraints come in four flavours:
 
 * [G] Given: we have evidence
@@ -742,8 +831,12 @@ Wanted constraints are born as [WD], but are split into [W] and its
 See Note [The improvement story and derived shadows] in TcSMonad
 
 
+
 Note [eqCanRewrite]
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L3004>`__
+
 (eqCanRewrite ct1 ct2) holds if the constraint ct1 (a CTyEqCan of form
 tv ~ ty) can be used to rewrite ct2.  It must satisfy the properties of
 a can-rewrite relation, see Definition [Can-rewrite relation] in
@@ -757,6 +850,9 @@ a representational equality to rewrite a nominal one.
 
 Note [Wanteds do not rewrite Wanteds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L3015>`__
+
 We don't allow Wanteds to rewrite Wanteds, because that can give rise
 to very confusing type error messages.  A good example is #8450.
 Here's another
@@ -771,6 +867,9 @@ but we do not want to complain about Bool ~ Char!
 
 Note [Deriveds do rewrite Deriveds]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L3027>`__
+
 However we DO allow Deriveds to rewrite Deriveds, because that's how
 improvement works; see Note [The improvement story] in TcInteract.
 
@@ -791,8 +890,12 @@ ReprEq we could conceivably get a Derived NomEq improvement (by decomposing
 a type constructor with Nomninal role), and hence unify.
 
 
+
 Note [funEqCanDischarge]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L3074>`__
+
 Suppose we have two CFunEqCans with the same LHS:
     (x1:F ts ~ f1) `funEqCanDischarge` (x2:F ts ~ f2)
 Can we drop x2 in favour of x1, either unifying
@@ -802,8 +905,12 @@ f2 (if it's a flatten meta-var) or adding a new Given
 Answer: yes if funEqCanDischarge is true.
 
 
+
 Note [eqCanDischarge]
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L3109>`__
+
 Suppose we have two identical CTyEqCan equality constraints
 (i.e. both LHS and RHS are the same)
       (x1:a~t) `eqCanDischarge` (xs:a~t)
@@ -821,11 +928,15 @@ sense of Definition [Can-rewrite relation] in TcSMonad.
 
 We /do/ say that a [W] can discharge a [WD].  In evidence terms it
 certainly can, and the /caller/ arranges that the otherwise-lost [D]
-is spat out as a new Derived.  
+is spat out as a new Derived.
+
 
 
 Note [SubGoalDepth]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L3150>`__
+
 The 'SubGoalDepth' takes care of stopping the constraint solver from looping.
 
 The counter starts at zero and increases. It includes dictionary constraints,
@@ -844,7 +955,7 @@ level.
      d{7} = $dfEqList d'{8}
   where d'{8} : Eq Int, and d' has depth 8.
 
-.. code-block:: haskell
+::
 
   For civilised (decidable) instance declarations, each increase of
   depth removes a type constructor from the type, so the depth never
@@ -858,7 +969,7 @@ equalities involving type functions. Example:
     [W] d{8} : Int ~ a
   and remembered as having depth 8.
 
-.. code-block:: haskell
+::
 
   Again, without UndecidableInstances, this counter is bounded, but without it
   can resolve things ad infinitum. Hence there is a maximum level.
@@ -878,7 +989,10 @@ doesn't loop at the type level.
 
 
 Note [Skolem info for pattern synonyms]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L3433>`__
+
 For pattern synonym SkolemInfo we have
    SigSkol (PatSynCtxt p) ty _
 but the type 'ty' is not very helpful.  The full pattern-synonym type
@@ -891,6 +1005,9 @@ is fine.  We could do more, but it doesn't seem worth it.
 
 Note [SigSkol SkolemInfo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcRnTypes.hs#L3443>`__
+
 Suppose we (deeply) skolemise a type
    f :: forall a. a -> forall b. b -> a
 Then we'll instantiate [a :-> a', b :-> b'], and with the instantiated
@@ -913,6 +1030,4 @@ in the right place.  So we proceed as follows:
 * Typically a'' will have a nice pretty name like "a", but the point is
   that the foral-bound variables of the signature we report line up with
   the instantiated skolems lying  around in other types.
-
-
 

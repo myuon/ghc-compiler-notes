@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs>`_
 
-====================
-compiler/specialise/Rules.hs.rst
-====================
+compiler/specialise/Rules.hs
+============================
+
 
 Note [Overall plumbing for rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L70>`__
+
 * After the desugarer:
    - The ModGuts initially contains mg_rules :: [CoreRule] of
      locally-declared rules for imported Ids.
@@ -27,7 +30,7 @@ Note [Overall plumbing for rules]
   Ids in other packages.  This RuleBase simply grow monotonically, as
   ghc --make compiles one module after another.
 
-.. code-block:: haskell
+::
 
   During simplification, interface files may get demand-loaded,
   as the simplifier explores the unfoldings for Ids it has in
@@ -38,23 +41,23 @@ Note [Overall plumbing for rules]
 * The result of all this is that during Core-to-Core optimisation
   there are four sources of rules:
 
-.. code-block:: haskell
+::
 
     (a) Rules in the IdInfo of the Id they are a rule for.  These are
         easy: fast to look up, and if you apply a substitution then
         it'll be applied to the IdInfo as a matter of course.
 
-.. code-block:: haskell
+::
 
     (b) Rules declared in this module for imported Ids, kept in the
         ModGuts. If you do a substitution, you'd better apply the
         substitution to these.  There are seldom many of these.
 
-.. code-block:: haskell
+::
 
     (c) Rules declared in the HomePackageTable.  These never change.
 
-.. code-block:: haskell
+::
 
     (d) Rules in the ExternalPackageTable. These can grow in response
         to lazy demand-loading of interfaces.
@@ -66,7 +69,7 @@ Note [Overall plumbing for rules]
   "below" us.  That's why we can't just select the home-package RuleBase
   from HscEnv.
 
-.. code-block:: haskell
+::
 
   [NB: we are inconsistent here.  We should do the same for external
   packages, but we don't.  Same for type-class instances.]
@@ -82,9 +85,11 @@ Note [Overall plumbing for rules]
 
 
 
-
 Note [Care with roughTopName]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L240>`__
+
 Consider this
     module M where { x = a:b }
     module N where { ...f x...
@@ -102,8 +107,12 @@ functions (lambdas) except by name, so in this case it seems like
 a good idea to treat 'M.k' as a roughTopName of the call.
 
 
+
 Note [Where rules are found]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L316>`__
+
 The rules for an Id come from two places:
   (a) the ones it is born with, stored inside the Id iself (idCoreRules fn),
   (b) rules added in other modules, stored in the global RuleBase (imp_rules)
@@ -123,9 +132,11 @@ but that isn't quite right:
 
 
 
-
 Note [Extra args in rule matching]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L463>`__
+
 If we find a matching rule, we return (Just (rule, rhs)),
 but the rule firing has only consumed as many of the input args
 as the ruleArity says.  It's up to the caller to keep track
@@ -142,8 +153,12 @@ to lookupRule are the result of a lazy substitution
 ----------------------------------
 
 
+
 Note [Unbound RULE binders]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L616>`__
+
 It can be the case that the binder in a rule is not actually
 bound on the LHS:
 
@@ -151,27 +166,27 @@ bound on the LHS:
   unbound template type variables.  Consider this (#10689,
   simplCore/should_compile/T10689):
 
-.. code-block:: haskell
+::
 
     type Foo a b = b
 
-.. code-block:: haskell
+::
 
     f :: Eq a => a -> Bool
     f x = x==x
 
-.. code-block:: haskell
+::
 
     {-# RULES "foo" forall (x :: Foo a Char). f x = True #-}
     finkle = f 'c'
 
-.. code-block:: haskell
+::
 
   The rule looks like
     forall (a::*) (d::Eq Char) (x :: Foo a Char).
          f (Foo a Char) d x = True
 
-.. code-block:: haskell
+::
 
   Matching the rule won't bind 'a', and legitimately so.  We fudge by
   pretending that 'a' is bound to (Any :: *).
@@ -186,23 +201,25 @@ bound on the LHS:
     RULE forall (c :: Int~Int). f (x |> <Int>) = e
   and then perhaps drop it altogether.  Now 'c' is unbound.
 
-.. code-block:: haskell
+::
 
   It's tricky to be sure this never happens, so instead I
   say it's OK to have an unbound coercion binder in a RULE
   provided its type is (c :: t~t).  Then, when the RULE
   fires we can substitute <t> for c.
 
-.. code-block:: haskell
+::
 
   This actually happened (in a RULE for a local function)
   in #13410, and also in test T10602.
 
 
 
-
 Note [Cloning the template binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L659>`__
+
 Consider the following match (example 1):
         Template:  forall x.  f x
         Target:               f (x+1)
@@ -229,9 +246,11 @@ into a type variable, and then crashed when we wanted its idInfo.
 
 
 
-
 Note [Expanding variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L1013>`__
+
 Here is another Very Important rule: if the term being matched is a
 variable, we expand it so long as its unfolding is "expandable". (Its
 occurrence information is not necessarily up to date, so we don't use
@@ -247,6 +266,9 @@ we want to make the rule fire, to replace (f v) with (h 3).
 
 Note [Do not expand locally-bound variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L1026>`__
+
 Do *not* expand locally-bound variables, else there's a worry that the
 unfolding might mention variables that are themselves renamed.
 Example
@@ -263,6 +285,8 @@ Hence, (a) the guard (not (isLocallyBoundR v2))
 Note [Tick annotations in RULE matching]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L1039>`__
+
 We used to unconditionally look through Notes in both template and
 expression being matched. This is actually illegal for counting or
 cost-centre-scoped ticks, because we have no place to put them without
@@ -278,6 +302,9 @@ cf Note [Notes in call patterns] in SpecConstr
 
 Note [Matching lets]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L1053>`__
+
 Matching a let-expression.  Consider
         RULE forall x.  f (g x) = <rhs>
 and target expression
@@ -300,7 +327,7 @@ There are a couple of tricky points.
       --> NOT!
         let v = x+1 in f (x+1) v
 
-.. code-block:: haskell
+::
 
   (b) What if two non-nested let bindings bind the same variable?
         f (let v = e1 in b1) (let v = e2 in b2)
@@ -331,9 +358,11 @@ Our cunning plan is this:
 
 
 
-
 Note [Matching cases]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L1105>`__
+
 {- NOTE: This idea is currently disabled.  It really only works if
          the primops involved are OkForSpeculation, and, since
          they have side effects readIntOfAddr and touch are not.
@@ -355,6 +384,9 @@ That is, we'd like to behave as if it had been
 
 Note [Lookup in-scope]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/specialise/Rules.hs#L1124>`__
+
 Consider this example
         foo :: Int -> Maybe Int -> Int
         foo 0 (Just n) = n
@@ -362,7 +394,7 @@ Consider this example
 
 SpecConstr sees this fragment:
 
-.. code-block:: haskell
+::
 
         case w_smT of wild_Xf [Just A] {
           Data.Maybe.Nothing -> lvl_smf;
@@ -373,7 +405,7 @@ SpecConstr sees this fragment:
 
 and correctly generates the rule
 
-.. code-block:: haskell
+::
 
         RULES: "SC:$wfoo1" [0] __forall {y_amr [Just L] :: GHC.Prim.Int#
                                           sc_snn :: GHC.Prim.Int#}
@@ -391,6 +423,4 @@ at all.
 
 That is why the 'lookupRnInScope' call in the (Var v2) case of 'match'
 is so important.
-
-
 

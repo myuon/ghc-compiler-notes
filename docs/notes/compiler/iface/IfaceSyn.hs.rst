@@ -1,18 +1,23 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs>`_
 
-====================
-compiler/iface/IfaceSyn.hs.rst
-====================
+compiler/iface/IfaceSyn.hs
+==========================
+
 
 Note [Versioning of instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-See [http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance#Instances]
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs#L378>`__
+
+See [http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance#Instances]
 
 
 
 Note [Empty case alternatives]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs#L525>`__
+
 In IfaceSyn an IfaceCase does not record the types of the alternatives,
 unlike CorSyn Case.  But we need this type if the alternatives are empty.
 Hence IfaceECase.  See Note [Empty case alternatives] in CoreSyn.
@@ -21,6 +26,9 @@ Hence IfaceECase.  See Note [Empty case alternatives] in CoreSyn.
 
 Note [Expose recursive functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs#L531>`__
+
 For supercompilation we want to put *all* unfoldings in the interface
 file, even for functions that are recursive (or big).  So we need to
 know when an unfolding belongs to a loop-breaker so that we can refrain
@@ -30,6 +38,9 @@ from inlining it (except during supercompilation).
 
 Note [IdInfo on nested let-bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs#L538>`__
+
 Occasionally we want to preserve IdInfo on nested let bindings. The one
 that came up was a NOINLINE pragma on a let-binding inside an INLINE
 function.  The user (Duncan Coutts) really wanted the NOINLINE control
@@ -40,9 +51,11 @@ that is what is seen by importing module with --make
 
 
 
-
 Note [Printing IfaceDecl binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs#L637>`__
+
 The binders in an IfaceDecl are just OccNames, so we don't know what module they
 come from.  But when we pretty-print a TyThing by converting to an IfaceDecl
 (see PprTyThing), the TyThing may come from some other module so we really need
@@ -53,8 +66,12 @@ When printing an interface file (--show-iface), we want to print
 everything unqualified, so we can just print the OccName directly.
 
 
+
 Note [Result type of a data family GADT]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs#L1156>`__
+
 Consider
    data family T a
    data instance T (p,q) where
@@ -63,7 +80,7 @@ Consider
 
 The IfaceDecl actually looks like
 
-.. code-block:: haskell
+::
 
    data TPr p q where
       T1 :: forall p q. forall c. (p~Int,q~Maybe c) => TPr p q
@@ -79,8 +96,12 @@ universal type variables.
 ----------------------------- Printing IfaceExpr ------------------------------------
 
 
+
 Note [Tracking data constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs#L1634>`__
+
 In a case expression
    case e of { C a -> ...; ... }
 You might think that we don't need to include the datacon C
@@ -88,13 +109,13 @@ in the free names, because its type will probably show up in
 the free names of 'e'.  But in rare circumstances this may
 not happen.   Here's the one that bit me:
 
-.. code-block:: haskell
+::
 
    module DynFlags where
      import {-# SOURCE #-} Packages( PackageState )
      data DynFlags = DF ... PackageState ...
 
-.. code-block:: haskell
+::
 
    module Packages where
      import DynFlags
@@ -110,9 +131,11 @@ to take account of the use of the data constructor PS in the pattern match.
 
 
 
-
 Note [Lazy deserialization of IfaceId]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/IfaceSyn.hs#L1844>`__
+
 The use of lazyPut and lazyGet in the IfaceId Binary instance is
 purely for performance reasons, to avoid deserializing details about
 identifiers that will never be used. It's not involved in tying the

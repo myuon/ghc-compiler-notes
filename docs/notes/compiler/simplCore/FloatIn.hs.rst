@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs>`_
 
-====================
-compiler/simplCore/FloatIn.hs.rst
-====================
+compiler/simplCore/FloatIn.hs
+=============================
+
 
 Note [Dead bindings]
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs#L206>`__
+
 At a literal we won't usually have any floated bindings; the
 only way that can happen is if the binding wrapped the literal
 /in the original input program/.  e.g.
@@ -17,6 +20,9 @@ once happen (#15696).
 
 Note [Do not destroy the let/app invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs#L215>`__
+
 Watch out for
    f (x +# y)
 We don't want to float bindings into here
@@ -28,13 +34,16 @@ unlifted function arguments to be ok-for-speculation.
 
 Note [Join points]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs#L224>`__
+
 Generally, we don't need to worry about join points - there are places we're
 not allowed to float them, but since they can't have occurrences in those
 places, we're not tempted.
 
 We do need to be careful about jumps, however:
 
-.. code-block:: haskell
+::
 
   joinrec j x y z = ... in
   jump j a b c
@@ -42,7 +51,7 @@ We do need to be careful about jumps, however:
 Previous versions often floated the definition of a recursive function into its
 only non-recursive occurrence. But for a join point, this is a disaster:
 
-.. code-block:: haskell
+::
 
   (joinrec j x y z = ... in
   jump j) a b c -- wrong!
@@ -55,6 +64,9 @@ the arguments just fine).
 
 Note [Floating in past a lambda group]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs#L245>`__
+
 * We must be careful about floating inside a value lambda.
   That risks losing laziness.
   The float-out pass might rescue us, but then again it might not.
@@ -76,19 +88,19 @@ Note [Floating in past a lambda group]
   case of FloatOut.floatExpr) and we don't want to float straight
   back in again.
 
-.. code-block:: haskell
+::
 
   It *is* important to float into one-shot lambdas, however;
   see the remarks with noFloatIntoRhs.
 
 So we treat lambda in groups, using the following rule:
 
-.. code-block:: haskell
+::
 
  Float in if (a) there is at least one Id,
          and (b) there are no non-one-shot Ids
 
-.. code-block:: haskell
+::
 
  Otherwise drop all the bindings outside the group.
 
@@ -102,9 +114,11 @@ Urk! if all are tyvars, and we don't float in, we may miss an
 
 
 
-
 Note [Floating coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs#L287>`__
+
 We could, in principle, have a coercion binding like
    case f x of co { DEFAULT -> e1 e2 }
 It's not common to have a function that returns a coercion, but nothing
@@ -126,6 +140,9 @@ be dropped right away.
 
 Note [extra_fvs (1): avoid floating into RHS]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs#L356>`__
+
 Consider let x=\y....t... in body.  We do not necessarily want to float
 a binding for t into the RHS, because it'll immediately be floated out
 again.  (It won't go inside the lambda else we risk losing work.)
@@ -146,6 +163,9 @@ arrange to dump bindings that bind extra_fvs before the entire let.
 
 Note [extra_fvs (2): free variables of rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs#L374>`__
+
 Consider
   let x{rule mentioning y} = rhs in body
 Here y is not free in rhs or body; but we still want to dump bindings
@@ -154,8 +174,12 @@ idRuleAndUnfoldingVars of x.  No need for type variables, hence not using
 idFreeVars.
 
 
+
 Note [Floating primops]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs#L391>`__
+
 We try to float-in a case expression over an unlifted type.  The
 motivating example was #5658: in particular, this change allows
 array indexing operations, which have a single DEFAULT alternative
@@ -184,7 +208,7 @@ But there are wrinkles
   because it can't be floated out (can_fail), the thunk will stay
   there.  Disaster!  (This happened in nofib 'simple' and 'scs'.)
 
-.. code-block:: haskell
+::
 
   Solution: only float cases into the branches of other cases, and
   not into the arguments of an application, or the RHS of a let. This
@@ -199,7 +223,7 @@ But there are wrinkles
   not create any new thunks, but it will keep the array 'a' alive
   for much longer than the programmer expected.
 
-.. code-block:: haskell
+::
 
   So again, not floating a case into a let or argument seems like
   the Right Thing
@@ -212,7 +236,10 @@ bindings are:
 
 
 Note [noFloatInto considerations]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs#L603>`__
+
 When do we want to float bindings into
    - noFloatIntoRHs: the RHS of a let-binding
    - noFloatIntoArg: the argument of a function application
@@ -226,7 +253,7 @@ would destroy the let/app invariant.
   In both cases we'll float straight back out again
   NB: Must line up with fiExpr (AnnLam...); see #7088
 
-.. code-block:: haskell
+::
 
   (a) is important: we /must/ float into a one-shot lambda group
   (which includes join points). This makes a big difference
@@ -241,7 +268,7 @@ would destroy the let/app invariant.
 * Wrinkle 2: for RHSs, do not float into a HNF; we'll just float right
   back out again... not tragic, but a waste of time.
 
-.. code-block:: haskell
+::
 
   For function arguments we will still end up with this
   in-then-out stuff; consider
@@ -254,9 +281,10 @@ would destroy the let/app invariant.
 
 
 
-
 Note [Duplicating floats]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/FloatIn.hs#L737>`__
 
 For case expressions we duplicate the binding if it is reasonably
 small, and if it is not used in all the RHSs This is good for

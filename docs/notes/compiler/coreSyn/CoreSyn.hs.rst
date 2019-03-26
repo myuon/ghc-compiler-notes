@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs>`_
 
-====================
-compiler/coreSyn/CoreSyn.hs.rst
-====================
+compiler/coreSyn/CoreSyn.hs
+===========================
+
 
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L316>`__
+
 While various passes attempt to rename on-the-fly in a manner that
 avoids "shadowing" (thereby simplifying downstream optimizations),
 neither the simplifier nor any other pass GUARANTEES that shadowing is
@@ -28,6 +31,9 @@ printable name, which makes debugging easier.
 
 Note [Literal alternatives]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L336>`__
+
 Literal alternatives (LitAlt lit) are always for *un-lifted* literals.
 We have one literal, a literal Integer, that is lifted, and we don't
 allow in a LitAlt, because LitAlt cases don't do any evaluation. Also
@@ -50,6 +56,9 @@ PrelRules for the rationale for this restriction.
 
 Note [Variable occurrences in Core]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L356>`__
+
 Variable /occurrences/ are never CoVars, though /bindings/ can be.
 All CoVars appear in Coercions.
 
@@ -62,6 +71,9 @@ a Coercion, (sym c).
 
 Note [CoreSyn letrec invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L366>`__
+
 The right hand sides of all top-level and recursive @let@s
 /must/ be of lifted type (see "Type#type_classification" for
 the meaning of /lifted/ vs. /unlifted/).
@@ -74,13 +86,16 @@ Note [CoreSyn top-level string literals].
 
 Note [CoreSyn top-level string literals]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L376>`__
+
 As an exception to the usual rule that top-level binders must be lifted,
 we allow binding primitive string literals (of type Addr#) of type Addr# at the
 top level. This allows us to share string literals earlier in the pipeline and
 crucially allows other optimizations in the Core2Core pipeline to fire.
 Consider,
 
-.. code-block:: haskell
+::
 
   f n = let a::Addr# = "foo"#
         in \x -> blah
@@ -104,6 +119,9 @@ Also see Note [Compilation plan for top-level string literals].
 
 Note [Compilation plan for top-level string literals]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L402>`__
+
 Here is a summary on how top-level string literals are handled by various
 parts of the compilation pipeline.
 
@@ -125,6 +143,9 @@ parts of the compilation pipeline.
 
 Note [CoreSyn let/app invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L421>`__
+
 The let/app invariant
      the right hand side of a non-recursive 'Let', and
      the argument of an 'App',
@@ -135,14 +156,14 @@ The let/app invariant
 This means that the let can be floated around
 without difficulty. For example, this is OK:
 
-.. code-block:: haskell
+::
 
    y::Int# = x +# 1#
 
 But this is not, as it may affect termination if the
 expression is floated out:
 
-.. code-block:: haskell
+::
 
    y::Int# = fac 4#
 
@@ -158,6 +179,9 @@ coreSyn/MkCore.
 
 Note [CoreSyn type and coercion invariant]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L448>`__
+
 We allow a /non-recursive/, /non-top-level/ let to bind type and
 coercion variables.  These can be very convenient for postponing type
 substitutions until the next run of the simplifier.
@@ -166,14 +190,14 @@ substitutions until the next run of the simplifier.
 
 * A coercion variable binding must have a RHS of (Coercion co)
 
-.. code-block:: haskell
+::
 
   It is possible to have terms that return a coercion, but we use
   case-binding for those; e.g.
      case (eq_sel d) of (co :: a ~# b) -> blah
   where eq_sel :: (a~b) -> (a~#b)
 
-.. code-block:: haskell
+::
 
   Or even even
       case (df @Int) of (co :: a ~# b) -> blah
@@ -185,12 +209,18 @@ substitutions until the next run of the simplifier.
 
 Note [CoreSyn case invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L469>`__
+
 See #case_invariants#
 
 
 
 Note [Levity polymorphism invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L473>`__
+
 The levity-polymorphism invariants are these (as per "Levity Polymorphism",
 PLDI '17):
 
@@ -213,6 +243,9 @@ invariants are established for user-written code.
 
 Note [CoreSyn let goal]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L493>`__
+
 * The simplifier tries to ensure that if the RHS of a let is a constructor
   application, its arguments are trivial, so that the constructor can be
   inlined vigorously.
@@ -221,12 +254,18 @@ Note [CoreSyn let goal]
 
 Note [Type let]
 ~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L499>`__
+
 See #type_let#
 
 
 
 Note [Empty case alternatives]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L503>`__
+
 The alternatives of a case expression should be exhaustive.  But
 this exhaustive list can be empty!
 
@@ -254,24 +293,24 @@ this exhaustive list can be empty!
 * We can use the empty-alternative construct to coerce error values from
   one type to another.  For example
 
-.. code-block:: haskell
+::
 
     f :: Int -> Int
     f n = error "urk"
 
-.. code-block:: haskell
+::
 
     g :: Int -> (# Char, Bool #)
     g x = case f x of { 0 -> ..., n -> ... }
 
-.. code-block:: haskell
+::
 
   Then if we inline f in g's RHS we get
     case (error Int "urk") of (# Char, Bool #) { ... }
   and we can discard the alternatives since the scrutinee is bottom to give
     case (error Int "urk") of (# Char, Bool #) {}
 
-.. code-block:: haskell
+::
 
   This is nicer than using an unsafe coerce between Int ~ (# Char,Bool #),
   if for no other reason that we don't need to instantiate the (~) at an
@@ -289,6 +328,9 @@ this exhaustive list can be empty!
 
 Note [Join points]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L555>`__
+
 In Core, a *join point* is a specially tagged function whose only occurrences
 are saturated tail calls. A tail call can appear in these places:
 
@@ -311,7 +353,7 @@ The former has join arity 1, while the latter has join arity 0.
 The identifier for a join point is called a join id or a *label.* An invocation
 is called a *jump.* We write a jump using the jump keyword:
 
-.. code-block:: haskell
+::
 
   jump j 3
 
@@ -329,12 +371,12 @@ join arity.
 
 For more details, see the paper:
 
-.. code-block:: haskell
+::
 
   Luke Maurer, Paul Downen, Zena Ariola, and Simon Peyton Jones. "Compiling
   without continuations." Submitted to PLDI'17.
 
-.. code-block:: haskell
+::
 
   https://www.microsoft.com/en-us/research/publication/compiling-without-continuations/
 
@@ -342,6 +384,9 @@ For more details, see the paper:
 
 Note [Invariants on join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L600>`__
+
 Join points must follow these invariants:
 
   1. All occurrences must be tail calls. Each of these tail calls must pass the
@@ -373,7 +418,7 @@ However, join points have simpler invariants in other ways
 
 Examples:
 
-.. code-block:: haskell
+::
 
   join j1  x = 1 + x in jump j (jump j x)  -- Fails 1: non-tail call
   join j1' x = 1 + x in if even a
@@ -403,13 +448,16 @@ simplifier (or simpleOptPgm) runs.
 
 Note [The type of a join point]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L657>`__
+
 A join point has the same type it would have as a function. That is, if it takes
 an Int and a Bool and its body produces a String, its type is `Int -> Bool ->
 String`. Natural as this may seem, it can be awkward. A join point shouldn't be
 thought to "return" in the same sense a function does---a jump is one-way. This
 is crucial for understanding how case-of-case interacts with join points:
 
-.. code-block:: haskell
+::
 
   case (join
           j :: Int -> Bool -> String
@@ -422,7 +470,7 @@ is crucial for understanding how case-of-case interacts with join points:
 The simplifier will pull the case into the join point (see Note [Case-of-case
 and join points] in Simplify):
 
-.. code-block:: haskell
+::
 
   join
     j :: Int -> Bool -> Bool -- changed!
@@ -441,7 +489,7 @@ paper, we instead give j the type `Int -> Bool -> forall a. a`. Then each jump
 carries the "return type" as a parameter, exactly the way other non-returning
 functions like `error` work:
 
-.. code-block:: haskell
+::
 
   case (join
           j :: Int -> Bool -> forall a. a
@@ -453,7 +501,7 @@ functions like `error` work:
 
 Now we can move the case inward and we only have to change the jump:
 
-.. code-block:: haskell
+::
 
   join
     j :: Int -> Bool -> forall a. a
@@ -469,10 +517,13 @@ that type would simply not be reflected in the join id.)
 
 Note [The polymorphism rule of join points]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L713>`__
+
 Invariant 4 of Note [Invariants on join points] forbids a join point to be
 polymorphic in its return type. That is, if its type is
 
-.. code-block:: haskell
+::
 
   forall a1 ... ak. t1 -> ... -> tn -> r
 
@@ -480,7 +531,7 @@ where its join arity is k+n, none of the type parameters ai may occur free in r.
 
 In some way, this falls out of the fact that given
 
-.. code-block:: haskell
+::
 
   join
      j @a1 ... @ak x1 ... xn = e1
@@ -496,7 +547,7 @@ thus neither can the type of `e1`.
 This unfortunately prevents the `go` in the following code from being a
 join-point:
 
-.. code-block:: haskell
+::
 
   iter :: forall a. Int -> (a -> a) -> a -> a
   iter @a n f x = go @a n f x
@@ -508,7 +559,7 @@ join-point:
 In this case, a static argument transformation would fix that (see
 ticket #14620):
 
-.. code-block:: haskell
+::
 
   iter :: forall a. Int -> (a -> a) -> a -> a
   iter @a n f x = go' @a n f x
@@ -523,18 +574,18 @@ Can we simply drop the requirement, and allow `go` to be a join-point? We
 could, and it would work. But we could not longer apply the case-of-join-point
 transformation universally. This transformation would do:
 
-.. code-block:: haskell
+::
 
   case (join go @a n f x = case n of 0 -> x
                                      n -> go @a (n-1) f (f x)
         in go @Bool n neg True) of
     True -> e1; False -> e2
 
-.. code-block:: haskell
+::
 
  ===>
 
-.. code-block:: haskell
+::
 
   join go @a n f x = case n of 0 -> case x of True -> e1; False -> e2
                           n -> go @a (n-1) f (f x)
@@ -552,6 +603,9 @@ ideas how to fix this.
 
 Note [Orphans]
 ~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L1142>`__
+
 Class instances, rules, and family instances are divided into orphans
 and non-orphans.  Roughly speaking, an instance/rule is an orphan if
 its left hand side mentions nothing defined in this module.  Orphan-hood
@@ -571,12 +625,12 @@ has two major consequences
       instance Eq T where ....
    The instance (Eq T) is incorprated as part of T's fingerprint.
 
-.. code-block:: haskell
+::
 
    In contrast, orphans are all fingerprinted together in the
    mi_orph_hash field of the ModIface.
 
-.. code-block:: haskell
+::
 
    See MkIface.addFingerprints.
 
@@ -590,8 +644,12 @@ Orphan-hood is computed
                      or IfaceFamInst (MkIface.instanceToIfaceInst)
 
 
+
 Note [Historical note: unfoldings for wrappers]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L1455>`__
+
 We used to have a nice clever scheme in interface files for
 wrappers. A wrapper's unfolding can be reconstructed from its worker's
 id and its strictness. This decreased .hi file size (sometimes
@@ -611,27 +669,29 @@ an Id, so, eg, substitutions need not traverse them.
 
 
 
-
 Note [DFun unfoldings]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L1475>`__
+
 The Arity in a DFunUnfolding is total number of args (type and value)
 that the DFun needs to produce a dictionary.  That's not necessarily
 related to the ordinary arity of the dfun Id, esp if the class has
 one method, so the dictionary is represented by a newtype.  Example
 
-.. code-block:: haskell
+::
 
      class C a where { op :: a -> Int }
      instance C a -> C [a] where op xs = op (head xs)
 
 The instance translates to
 
-.. code-block:: haskell
+::
 
      $dfCList :: forall a. C a => C [a]  -- Arity 2!
      $dfCList = /\a.\d. $copList {a} d |> co
 
-.. code-block:: haskell
+::
 
      $copList :: forall a. C a => [a] -> Int  -- Arity 2!
      $copList = /\a.\d.\xs. op {a} d (head xs)
@@ -647,17 +707,21 @@ site in exprIsConApp_maybe.
 Constants for the UnfWhen constructor
 
 
+
 Note [Fragile unfoldings]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L1634>`__
+
 An unfolding is "fragile" if it mentions free variables (and hence would
 need substitution) or might be affected by optimisation.  The non-fragile
 ones are
 
-.. code-block:: haskell
+::
 
    NoUnfolding, BootUnfolding
 
-.. code-block:: haskell
+::
 
    OtherCon {}    If we know this binder (say a lambda binder) will be
                   bound to an evaluated thing, we want to retain that
@@ -668,7 +732,10 @@ We consider even a StableUnfolding as fragile, because it needs substitution.
 
 
 Note [InlineStable]
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L1648>`__
+
 When you say
       {-# INLINE f #-}
       f x = <rhs>
@@ -699,9 +766,11 @@ See also Note [Inlining an InlineRule] in CoreUnfold.
 
 
 
-
 Note [OccInfo in unfoldings and rules]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L1679>`__
+
 In unfoldings and rules, we guarantee that the template is occ-analysed,
 so that the occurrence info on the binders is correct.  This is important,
 because the Simplifier does not re-analyse the template when using it. If
@@ -713,9 +782,11 @@ the occurrence info is wrong
 
 
 
-
 Note [CoreProgram]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/CoreSyn.hs#L1737>`__
+
 The top level bindings of a program, a CoreProgram, are represented as
 a list of CoreBind
 

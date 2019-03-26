@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/FV.hs>`_
 
+compiler/utils/FV.hs
 ====================
-compiler/utils/FV.hs.rst
-====================
+
 
 Note [Deterministic FV]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/FV.hs#L38>`__
+
 When computing free variables, the order in which you get them affects
 the results of floating and specialization. If you use UniqFM to collect
 them and then turn that into a list, you get them in nondeterministic
@@ -16,8 +19,12 @@ factor. It's cheaper to incrementally add to a list and use a set to check
 for duplicates.
 
 
+
 Note [FV naming conventions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/FV.hs#L60>`__
+
 To get the performance and determinism that FV provides, FV computations
 need to built up from smaller FV computations and then evaluated with
 one of `fvVarList`, `fvDVarSet`, `fvVarListVarSet`. That means the functions
@@ -41,8 +48,12 @@ in terms of the worker evaluated with fvVarSet, fvVarList, fvDVarSet
 respectively.
 
 
+
 Note [FV eta expansion]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/FV.hs#L108>`__
+
 Let's consider an eta-reduced implementation of freeVarsOf using FV:
 
 freeVarsOf (App a b) = freeVarsOf a `unionFV` freeVarsOf b

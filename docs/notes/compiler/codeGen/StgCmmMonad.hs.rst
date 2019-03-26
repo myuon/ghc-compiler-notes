@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmMonad.hs>`_
 
-====================
-compiler/codeGen/StgCmmMonad.hs.rst
-====================
+compiler/codeGen/StgCmmMonad.hs
+===============================
+
 
 Note [Virtual and real heap pointers]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmMonad.hs#L323>`__
+
 The code generator can allocate one or more objects contiguously, performing
 one heap check to cover allocation of all the objects at once.  Let's call
 this little chunk of heap space an "allocation chunk".  The code generator

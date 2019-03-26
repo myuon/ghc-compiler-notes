@@ -1,21 +1,24 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Traversable.hs>`_
 
-====================
-libraries/base/Data/Traversable.hs.rst
-====================
+libraries/base/Data/Traversable.hs
+==================================
+
 
 Note [Inline default methods]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Traversable.hs#L174>`__
+
 Consider
 
-.. code-block:: haskell
+::
 
    class ... => Traversable t where
        ...
        mapM :: Monad m => (a -> m b) -> t a -> m (t b)
        mapM = traverse   -- Default method
 
-.. code-block:: haskell
+::
 
    instance Traversable [] where
        {-# INLINE traverse #-}
@@ -23,7 +26,7 @@ Consider
 
 This gives rise to a list-instance of mapM looking like this
 
-.. code-block:: haskell
+::
 
   $fTraversable[]_$ctraverse = ...code for traverse on lists...
        {-# INLINE $fTraversable[]_$ctraverse #-}
@@ -32,7 +35,7 @@ This gives rise to a list-instance of mapM looking like this
 Now the $ctraverse obediently inlines into the RHS of $cmapM, /but/
 that's all!  We get
 
-.. code-block:: haskell
+::
 
   $fTraversable[]_$cmapM = ...code for traverse on lists...
 

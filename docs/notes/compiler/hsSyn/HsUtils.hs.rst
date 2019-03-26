@@ -1,31 +1,34 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsUtils.hs>`_
 
-====================
-compiler/hsSyn/HsUtils.hs.rst
-====================
+compiler/hsSyn/HsUtils.hs
+=========================
+
 
 Note [Kind signatures in typeToLHsType]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsUtils.hs#L703>`__
+
 There are types that typeToLHsType can produce which require explicit kind
 signatures in order to kind-check. Here is an example from #14579:
 
-.. code-block:: haskell
+::
 
   -- type P :: forall {k} {t :: k}. Proxy t
   type P = 'Proxy
 
-.. code-block:: haskell
+::
 
   -- type Wat :: forall a. Proxy a -> *
   newtype Wat (x :: Proxy (a :: Type)) = MkWat (Maybe a)
     deriving Eq
 
-.. code-block:: haskell
+::
 
   -- type Wat2 :: forall {a}. Proxy a -> *
   type Wat2 = Wat
 
-.. code-block:: haskell
+::
 
   -- type Glurp :: * -> *
   newtype Glurp a = MkGlurp (Wat2 (P :: Proxy a))
@@ -33,7 +36,7 @@ signatures in order to kind-check. Here is an example from #14579:
 
 The derived Eq instance for Glurp (without any kind signatures) would be:
 
-.. code-block:: haskell
+::
 
   instance Eq a => Eq (Glurp a) where
     (==) = coerce @(Wat2 P  -> Wat2 P  -> Bool)
@@ -55,8 +58,12 @@ visible kind applications, so even specified arguments count towards injective
 positions in the kind of the tycon.
 
 
+
 Note [Collect binders only after renaming]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsUtils.hs#L889>`__
+
 These functions should only be used on HsSyn *after* the renamer,
 to return a [Name] or [Id].  Before renaming the record punning
 and wild-card mechanism makes it hard to know what is bound.
@@ -66,6 +73,9 @@ So these functions should not be applied to (HsSyn RdrName)
 
 Note [Unlifted id check in isUnliftedHsBind]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsUtils.hs#L896>`__
+
 The function isUnliftedHsBind is used to complain if we make a top-level
 binding for a variable of unlifted type.
 
@@ -80,7 +90,7 @@ E.g.
 The top-level bindings for f,g are not unlifted (because of the Num a =>),
 but the local, recursive, monomorphic bindings are:
 
-.. code-block:: haskell
+::
 
       t = /\a \(d:Num a).
          letrec fm :: (# a, a #) = ...g...
@@ -94,8 +104,12 @@ BUT we have a special case when abs_sig is true;
 --------------- Bindings --------------------------
 
 
+
 Note [SrcSpan for binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsUtils.hs#L1298>`__
+
 When extracting the (Located RdrNme) for a binder, at least for the
 main name (the TyCon of a type declaration etc), we want to give it
 the @SrcSpan@ of the whole /declaration/, not just the name itself
@@ -107,10 +121,11 @@ finally produced, and hence for error messages.  (See #8607.)
 
 Note [Binders in family instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hsSyn/HsUtils.hs#L1307>`__
+
 In a type or data family instance declaration, the type
 constructor is an *occurrence* not a binding site
     type instance T Int = Int -> Int   -- No binders
     data instance S Bool = S1 | S2     -- Binders are S1,S2
-
-
 

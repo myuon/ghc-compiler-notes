@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs>`_
 
-====================
-compiler/main/HscTypes.hs.rst
-====================
+compiler/main/HscTypes.hs
+=========================
+
 
 Note [hsc_type_env_var hack]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs#L441>`__
+
 hsc_type_env_var is used to initialize tcg_type_env_var, and
 eventually it is the mutable variable that is queried from
 if_rec_types to get a TypeEnv.  So, clearly, it's something
@@ -23,7 +26,7 @@ checking starts.
 Here is a concrete example. Suppose we are running
 "ghc -c A.hs", and we have this file system state:
 
-.. code-block:: haskell
+::
 
  A.hs-boot   A.hi-boot **up to date**
  B.hs        B.hi      **up to date**
@@ -49,8 +52,12 @@ should not populate the EPS. But that's a refactor for
 another day.
 
 
+
 Note [The interactive package]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs#L1403>`__
+
 Type, class, and value declarations at the command prompt are treated
 as if they were defined in modules
    interactive:Ghci1
@@ -62,7 +69,7 @@ PrelNames.mkInteractiveModule).
 
 This scheme deals well with shadowing.  For example:
 
-.. code-block:: haskell
+::
 
    ghci> data T = A
    ghci> data T = B
@@ -100,7 +107,7 @@ The details are a bit tricky though:
    call to initTc in initTcInteractive, which in turn get the module
    from it 'icInteractiveModule' field of the interactive context.
 
-.. code-block:: haskell
+::
 
    The 'thisPackage' field stays as 'main' (or whatever -this-unit-id says.
 
@@ -117,7 +124,7 @@ The details are a bit tricky though:
   refer to stuff define in a single GHCi command, *not* all the commands
   so far.
 
-.. code-block:: haskell
+::
 
   In contrast, tcg_inst_env, tcg_fam_inst_env, have instances from
   all GhciN modules, which makes sense -- they are all "home package"
@@ -125,28 +132,30 @@ The details are a bit tricky though:
 
 
 
-
 Note [Interactively-bound Ids in GHCi]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs#L1472>`__
+
 The Ids bound by previous Stmts in GHCi are currently
         a) GlobalIds, with
         b) An External Name, like Ghci4.foo
            See Note [The interactive package] above
         c) A tidied type
 
-.. code-block:: haskell
+::
 
  (a) They must be GlobalIds (not LocalIds) otherwise when we come to
      compile an expression using these ids later, the byte code
      generator will consider the occurrences to be free rather than
      global.
 
-.. code-block:: haskell
+::
 
  (b) Having an External Name is important because of Note
      [GlobalRdrEnv shadowing] in RdrName
 
-.. code-block:: haskell
+::
 
  (c) Their types are tidied. This is important, because :info may ask
      to look at them, and :info expects the things it looks up to have
@@ -172,9 +181,11 @@ Where do interactively-bound Ids come from?
 
 
 
-
 Note [ic_tythings]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs#L1511>`__
+
 The ic_tythings field contains
   * The TyThings declared by the user at the command prompt
     (eg Ids, TyCons, Classes)
@@ -196,6 +207,9 @@ See also Note [Interactively-bound Ids in GHCi]
 
 Note [Override identical instances in GHCi]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs#L1530>`__
+
 If you declare a new instance in GHCi that is identical to a previous one,
 we simply override the previous one; we don't regard it as overlapping.
 e.g.    Prelude> data T = A | B
@@ -205,8 +219,12 @@ e.g.    Prelude> data T = A | B
 It's exactly the same for type-family instances.  See #7102
 
 
+
 Note [Printing original names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs#L1760>`__
+
 Deciding how to print names is pretty tricky.  We are given a name
 P:M.T, where P is the package name, M is the defining module, and T is
 the occurrence name, and we have to decide in which form to display
@@ -238,7 +256,10 @@ the (ppr mod) of case (3), in Name.pprModulePrefix
 
 
 Note [Printing unit ids]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs#L1790>`__
+
 In the old days, original names were tied to PackageIds, which directly
 corresponded to the entities that users wrote in Cabal files, and were perfectly
 suitable for printing when we need to disambiguate packages.  However, with
@@ -246,9 +267,13 @@ UnitId, the situation can be different: if the key is instantiated with
 some holes, we should try to give the user some more useful information.
 
 
+
 Note [Implicit TyThings]
 ~~~~~~~~~~~~~~~~~~~~~~~~
-  DEFINITION: An "implicit" TyThing is one that does not have its own
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs#L1905>`__
+
+DEFINITION: An "implicit" TyThing is one that does not have its own
   IfaceDecl in an interface file.  Instead, its binding in the type
   environment is created as part of typechecking the IfaceDecl for
   some other thing.
@@ -271,13 +296,17 @@ Examples:
     for data/type family instances are *not* implicit (like DFunIds).
 
 
+
 Note [Implementation of COMPLETE signatures]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/main/HscTypes.hs#L3094>`__
+
 A COMPLETE signature represents a set of conlikes (i.e., constructors or
 pattern synonyms) such that if they are all pattern-matched against in a
 function, it gives rise to a total function. An example is:
 
-.. code-block:: haskell
+::
 
   newtype Boolean = Boolean Int
   pattern F, T :: Boolean
@@ -285,7 +314,7 @@ function, it gives rise to a total function. An example is:
   pattern T = Boolean 1
   {-# COMPLETE F, T #-}
 
-.. code-block:: haskell
+::
 
   -- This is a total function
   booleanToInt :: Boolean -> Int
@@ -295,7 +324,7 @@ function, it gives rise to a total function. An example is:
 COMPLETE sets are represented internally in GHC with the CompleteMatch data
 type. For example, {-# COMPLETE F, T #-} would be represented as:
 
-.. code-block:: haskell
+::
 
   CompleteMatch { complateMatchConLikes = [F, T]
                 , completeMatchTyCon    = Boolean }
@@ -304,7 +333,7 @@ Note that GHC was able to infer the completeMatchTyCon (Boolean), but for the
 cases in which it's ambiguous, you can also explicitly specify it in the source
 language by writing this:
 
-.. code-block:: haskell
+::
 
   {-# COMPLETE F, T :: Boolean #-}
 
@@ -313,7 +342,7 @@ about into a CompleteMatchMap, which is a map that is keyed by the
 completeMatchTyCon. In other words, you could have a multiple COMPLETE sets
 for the same TyCon:
 
-.. code-block:: haskell
+::
 
   {-# COMPLETE F, T1 :: Boolean #-}
   {-# COMPLETE F, T2 :: Boolean #-}

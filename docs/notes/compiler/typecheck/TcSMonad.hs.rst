@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs>`_
 
-====================
-compiler/typecheck/TcSMonad.hs.rst
-====================
+compiler/typecheck/TcSMonad.hs
+==============================
+
 
 Note [WorkList priorities]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L193>`__
+
 A WorkList contains canonical and non-canonical items (of all flavors).
 Notice that each Ct now has a simplification depth. We may
 consider using this depth for prioritization as well in the future.
@@ -20,6 +23,9 @@ As a simple form of priority queue, our worklist separates out
 
 Note [Prioritise equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L205>`__
+
 It's very important to process equalities /first/:
 
 * (Efficiency)  The general reason to do so is that if we process a
@@ -56,6 +62,9 @@ It's very important to process equalities /first/:
 
 Note [Prioritise class equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L239>`__
+
 We prioritise equalities in the solver (see selectWorkItem). But class
 constraints like (a ~ b) and (a ~~ b) are actually equalities too;
 see Note [The equality types story] in TysPrim.
@@ -73,8 +82,12 @@ So we arrange to put these particular class constraints in the wl_eqs.
 See Note [WorkList priorities]
 
 
+
 Note [Solved dictionaries]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L464>`__
+
 When we apply a top-level instance declaration, we add the "solved"
 dictionary to the inert_solved_dicts.  In general, we use it to avoid
 creating a new EvVar when we have a new goal that we have solved in
@@ -112,11 +125,14 @@ Other notes about solved dictionaries
 
 Note [Do not add superclasses of solved dictionaries]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L499>`__
+
 Every member of inert_solved_dicts is the result of applying a dictionary
 function, NOT of applying superclass selection to anything.
 Consider
 
-.. code-block:: haskell
+::
 
         class Ord a => C a where
         instance Ord [a] => C [a] where ...
@@ -127,7 +143,7 @@ Suppose we are trying to solve
 
 Then we'll use the instance decl to give
 
-.. code-block:: haskell
+::
 
   [G] d1 : Ord a     Solved: d2 : C [a] = $dfCList d3
   [W] d3 : Ord [a]
@@ -144,20 +160,23 @@ a dictionary function.
 
 Note [Example of recursive dictionaries]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L525>`__
+
 --- Example 1
 
-.. code-block:: haskell
+::
 
     data D r = ZeroD | SuccD (r (D r));
 
-.. code-block:: haskell
+::
 
     instance (Eq (r (D r))) => Eq (D r) where
         ZeroD     == ZeroD     = True
         (SuccD a) == (SuccD b) = a == b
         _         == _         = False;
 
-.. code-block:: haskell
+::
 
     equalDC :: D [] -> D [] -> Bool;
     equalDC = (==);
@@ -176,22 +195,22 @@ Now this wanted can interact with our "solved" d1 to get:
 -- Example 2:
 This code arises in the context of "Scrap Your Boilerplate with Class"
 
-.. code-block:: haskell
+::
 
     class Sat a
     class Data ctx a
     instance  Sat (ctx Char)             => Data ctx Char       -- dfunData1
     instance (Sat (ctx [a]), Data ctx a) => Data ctx [a]        -- dfunData2
 
-.. code-block:: haskell
+::
 
     class Data Maybe a => Foo a
 
-.. code-block:: haskell
+::
 
     instance Foo t => Sat (Maybe t)                             -- dfunSat
 
-.. code-block:: haskell
+::
 
     instance Data Maybe a => Foo a                              -- dfunFoo1
     instance Foo a        => Foo [a]                            -- dfunFoo2
@@ -263,8 +282,12 @@ Result
    d5 := d0
 
 
+
 Note [Detailed InertCans Invariants]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L684>`__
+
 The InertCans represents a collection of constraints with the following properties:
 
   * All canonical
@@ -289,8 +312,11 @@ The InertCans represents a collection of constraints with the following properti
 
 
 Note [EqualCtList invariants]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    * All are equalities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L707>`__
+
+* All are equalities
     * All these equalities have the same LHS
     * The list is never empty
     * No element of the list can rewrite any other
@@ -306,6 +332,9 @@ The Wanteds can't rewrite anything which is why we put them last
 
 Note [Type family equations]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L721>`__
+
 Type-family equations, CFunEqCans, of form (ev : F tys ~ ty),
 live in three places
 
@@ -317,7 +346,7 @@ live in three places
   * The inert_flat_cache.  This is used when flattening, to get maximal
     sharing. Everthing in the inert_flat_cache is [G] or [WD]
 
-.. code-block:: haskell
+::
 
     It contains lots of things that are still in the work-list.
     E.g Suppose we have (w1: F (G a) ~ Int), and (w2: H (G a) ~ Int) in the
@@ -343,14 +372,16 @@ The CFunEqCan Ownership Invariant:
 
 
 
-
 Note [inert_eqs: the inert equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L757>`__
+
 Definition [Can-rewrite relation]
 A "can-rewrite" relation between flavours, written f1 >= f2, is a
 binary relation with the following properties
 
-.. code-block:: haskell
+::
 
   (R1) >= is transitive
   (R2) If f1 >= f, and f2 >= f,
@@ -389,7 +420,7 @@ Notation: repeated application.
 Definition: inert generalised substitution
 A generalised substitution S is "inert" iff
 
-.. code-block:: haskell
+::
 
   (IG1) there is an n such that
         for every f,t, S^n(f,t) = S^(n+1)(f,t)
@@ -410,6 +441,9 @@ guarantee that this recursive use will terminate.
 
 Note [Extending the inert equalities]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L815>`__
+
 Main Theorem [Stability under extension]
    Suppose we have a "work item"
        a -fw-> t
@@ -421,7 +455,7 @@ Main Theorem [Stability under extension]
       (T2) S(fw,t) = t     -- RHS of work-item is a fixpoint of S(fw,_)
       (T3) a not in t      -- No occurs check in the work item
 
-.. code-block:: haskell
+::
 
       AND, for every (b -fs-> s) in S:
            (K0) not (fw >= fs)
@@ -430,20 +464,20 @@ Main Theorem [Stability under extension]
                         The latter can't rewrite the former,
                         so the kick-out achieved nothing
 
-.. code-block:: haskell
+::
 
            OR { (K1) not (a = b)
                      Reason: if fw >= fs, WF1 says we can't have both
                              a -fw-> t  and  a -fs-> s
 
-.. code-block:: haskell
+::
 
                 AND (K2): guarantees inertness of the new substitution
                     {  (K2a) not (fs >= fs)
                     OR (K2b) fs >= fw
                     OR (K2d) a not in s }
 
-.. code-block:: haskell
+::
 
                 AND (K3) See Note [K3: completeness of solving]
                     { (K3a) If the role of fs is nominal: s /= a
@@ -503,7 +537,7 @@ The idea is that
     and hence this triple never plays a role in application S(f,a).
     It is always safe to extend S with such a triple.
 
-.. code-block:: haskell
+::
 
     (NB: we could strengten K1) in this way too, but see K3.
 
@@ -518,7 +552,7 @@ The idea is that
   - (K2d): if a not in s, we hae no further opportunity to apply the
     work item, similar to (K2b)
 
-.. code-block:: haskell
+::
 
   NB: Dimitrios has a PDF that does this in more detail
 
@@ -532,6 +566,9 @@ Also, consider roles more carefully. See Note [Flavours with roles]
 
 Note [K3: completeness of solving]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L923>`__
+
 (K3) is not necessary for the extended substitution
 to be inert.  In fact K1 could be made stronger by saying
    ... then (not (fw >= fs) or not (fs >= fs))
@@ -539,7 +576,7 @@ But it's not enough for S to be inert; we also want completeness.
 That is, we want to be able to solve all soluble wanted equalities.
 Suppose we have
 
-.. code-block:: haskell
+::
 
    work-item   b -G-> a
    inert-item  a -W-> b
@@ -547,14 +584,14 @@ Suppose we have
 Assuming (G >= W) but not (W >= W), this fulfills all the conditions,
 so we could extend the inerts, thus:
 
-.. code-block:: haskell
+::
 
    inert-items   b -G-> a
                  a -W-> b
 
 But if we kicked-out the inert item, we'd get
 
-.. code-block:: haskell
+::
 
    work-item     a -W-> b
    inert-item    b -G-> a
@@ -571,7 +608,7 @@ is somewhat accidental.
 
 When considering roles, we also need the second clause (K3b). Consider
 
-.. code-block:: haskell
+::
 
   work-item    c -G/N-> a
   inert-item   a -W/R-> b c
@@ -607,6 +644,9 @@ loop.  All we need is to have the tyvar at the head.
 
 Note [Flavours with roles]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L988>`__
+
 The system described in Note [inert_eqs: the inert equalities]
 discusses an abstract
 set of flavours. In GHC, flavours have two components: the flavour proper,
@@ -617,12 +657,12 @@ as described in Note [inert_eqs: the inert equalities],
 we must be careful to respect all components of a flavour.
 For example, if we have
 
-.. code-block:: haskell
+::
 
   inert set: a -G/R-> Int
              b -G/R-> Bool
 
-.. code-block:: haskell
+::
 
   type role T nominal representational
 
@@ -633,8 +673,12 @@ substitution means that the proof in Note [The inert equalities] may need
 to be revisited, but we don't think that the end conclusion is wrong.
 
 
+
 Note [lookupFlattenTyVar]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L1465>`__
+
 Suppose we have an injective function F and
   inert_funeqs:   F t1 ~ fsk1
                   F t2 ~ fsk2
@@ -646,11 +690,15 @@ cc_fsk of CFunEqCans in the inert_eqs when trying to find derived
 equalities arising from injectivity.
 
 
+
 Note [Do not add duplicate quantified instances]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L1499>`__
+
 Consider this (#15244):
 
-.. code-block:: haskell
+::
 
   f :: (C g, D g) => ....
   class S g => C g where ...
@@ -667,8 +715,12 @@ RHS.
 The simplest thing is simply to eliminate duplicattes, which we do here.
 
 
+
 Note [kickOutRewritable]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L1772>`__
+
 See also Note [inert_eqs: the inert equalities].
 
 When we add a new inert equality (a ~N ty) to the inert set,
@@ -680,7 +732,7 @@ new equality, to maintain the inert-set invariants.
     b) 'a' is free in the inert constraint (so that it *will*)
        rewrite it if we kick it out.
 
-.. code-block:: haskell
+::
 
     For (b) we use tyCoVarsOfCt, which returns the type variables /and
     the kind variables/ that are directly visible in the type. Hence
@@ -698,9 +750,11 @@ new equality, to maintain the inert-set invariants.
 
 
 
-
 Note [Rewrite insolubles]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L1800>`__
+
 Suppose we have an insoluble alpha ~ [alpha], which is insoluble
 because an occurs check.  And then we unify alpha := [Int].  Then we
 really want to rewrite the insoluble to [Int] ~ [[Int]].  Now it can
@@ -725,8 +779,12 @@ Hence:
 ------------
 
 
+
 Note [Unsolved Derived equalities]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L2143>`__
+
 In getUnsolvedInerts, we return a derived equality from the inert_eqs
 because it is a candidate for floating out of this implication.  We
 only float equalities with a meta-tyvar on the left, so we only pull
@@ -736,6 +794,9 @@ those out here.
 
 Note [When does an implication have given equalities?]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L2150>`__
+
 Consider an implication
    beta => alpha ~ Int
 where beta is a unification variable that has already been unified
@@ -781,6 +842,9 @@ are some wrinkles:
 
 Note [Let-bound skolems]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L2193>`__
+
 If   * the inert set contains a canonical Given CTyEqCan (a ~ ty)
 and  * 'a' is a skolem bound in this very implication,
 
@@ -806,12 +870,12 @@ You might wonder whether the skokem really needs to be bound "in the
 very same implication" as the equuality constraint.
 (c.f. #15009) Consider this:
 
-.. code-block:: haskell
+::
 
   data S a where
     MkS :: (a ~ Int) => S a
 
-.. code-block:: haskell
+::
 
   g :: forall a. S a -> a -> blah
   g x y = let h = \z. ( z :: Int
@@ -823,7 +887,7 @@ From the type signature for `g`, we get `y::a` .  Then when when we
 encounter the `\z`, we'll assign `z :: alpha[1]`, say.  Next, from the
 body of the lambda we'll get
 
-.. code-block:: haskell
+::
 
   [W] alpha[1] ~ Int                             -- From z::Int
   [W] forall[2]. (a ~ Int) => [W] alpha[1] ~ a   -- From [y,z]
@@ -834,8 +898,12 @@ and then unify `alpha := a`.  Now we are stuck!  But if treat
 But we absolutely cannot float that equality or we will get stuck.
 
 
+
 Note [Tuples hiding implicit parameters]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L2395>`__
+
 Consider
    f,g :: (?x::Int, C a) => a -> a
    f v = let ?x = 4 in g v
@@ -854,7 +922,10 @@ constraints, but it seemed more direct to deal with the lookup.
 
 
 Note [Solving CallStack constraints]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L2412>`__
+
 Suppose f :: HasCallStack => blah.  Then
 
 * Each call to 'f' gives rise to
@@ -878,8 +949,12 @@ we ensure this by arranging that findDict always misses when looking
 up souch constraints.
 
 
+
 Note [The TcS monad]
 ~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L2570>`__
+
 The TcS monad is a weak form of the main Tc monad
 
 All you can do is
@@ -892,8 +967,12 @@ for it, so TcS carries a mutable location where the binding can be
 added.  This is initialised from the innermost implication constraint.
 
 
+
 Note [Do not inherit the flat cache]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L2814>`__
+
 We do not want to inherit the flat cache when processing nested
 implications.  Consider
    a ~ F b, forall c. b~Int => blah
@@ -904,8 +983,12 @@ flattened out after solving the outer level, but and we don't
 do that flattening recursively.
 
 
+
 Note [Propagate the solved dictionaries]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L2931>`__
+
 It's really quite important that nestTcS does not discard the solved
 dictionaries from the thing_inside.
 Consider
@@ -920,8 +1003,12 @@ Getters and setters of TcEnv fields
 Getter of inerts and worklist
 
 
+
 Note [Residual implications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/TcSMonad.hs#L3513>`__
+
 The wl_implics in the WorkList are the residual implication
 constraints that are generated while solving or canonicalising the
 current worklist.  Specifically, when canonicalising

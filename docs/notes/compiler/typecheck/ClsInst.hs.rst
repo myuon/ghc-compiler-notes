@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs>`_
 
-====================
-compiler/typecheck/ClsInst.hs.rst
-====================
+compiler/typecheck/ClsInst.hs
+=============================
+
 
 Note [Shortcut solving: overlap]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs#L199>`__
+
 Suppose we have
   instance {-# OVERLAPPABLE #-} C a where ...
 and we are typechecking
@@ -24,24 +27,28 @@ only final instances are OK for short-cut solving.  Sigh. #15135
 was a puzzling example.
 
 
+
 Note [KnownNat & KnownSymbol and EvLit]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs#L243>`__
+
 A part of the type-level literals implementation are the classes
 "KnownNat" and "KnownSymbol", which provide a "smart" constructor for
 defining singleton values.  Here is the key stuff from GHC.TypeLits
 
-.. code-block:: haskell
+::
 
   class KnownNat (n :: Nat) where
     natSing :: SNat n
 
-.. code-block:: haskell
+::
 
   newtype SNat (n :: Nat) = SNat Integer
 
 Conceptually, this class has infinitely many instances:
 
-.. code-block:: haskell
+::
 
   instance KnownNat 0       where natSing = SNat 0
   instance KnownNat 1       where natSing = SNat 1
@@ -66,7 +73,7 @@ Also note that `natSing` and `SNat` are never actually exposed from the
 library---they are just an implementation detail.  Instead, users see
 a more convenient function, defined in terms of `natSing`:
 
-.. code-block:: haskell
+::
 
   natVal :: KnownNat n => proxy n -> Integer
 
@@ -81,9 +88,10 @@ The story for kind `Symbol` is analogous:
 
 
 
-
 Note [Fabricating Evidence for Literals in Backpack]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs#L291>`__
 
 Let `T` be a type of kind `Nat`. When solving for a purported instance
 of `KnownNat T`, ghc tries to resolve the type `T` to an integer `n`,
@@ -129,7 +137,10 @@ A similar generation works for `KnownSymbol` as well
 
 
 Note [Typeable (T a b c)]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs#L491>`__
+
 For type applications we always decompose using binary application,
 via doTyApp, until we get to a *kind* instantiation.  Example
    Proxy :: forall k. k -> *
@@ -146,9 +157,11 @@ doTyConApp
 
 
 
-
 Note [No Typeable for polytypes or qualified types]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs#L508>`__
+
 We do not support impredicative typeable, such as
    Typeable (forall a. a->a)
    Typeable (Eq a => a -> a)
@@ -170,9 +183,11 @@ a TypeRep for them.  For qualified but not polymorphic types, like
 
 
 
-
 Note [Typeable for Nat and Symbol]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs#L530>`__
+
 We have special Typeable instances for Nat and Symbol.  Roughly we
 have this instance, implemented here by doTyLit:
       instance KnownNat n => Typeable (n :: Nat) where
@@ -192,23 +207,27 @@ if you'd written
     f :: Eq [a] => blah
 
 
+
 Note [HasField instances]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/typecheck/ClsInst.hs#L591>`__
+
 Suppose we have
 
-.. code-block:: haskell
+::
 
     data T y = MkT { foo :: [y] }
 
 and `foo` is in scope.  Then GHC will automatically solve a constraint like
 
-.. code-block:: haskell
+::
 
     HasField "foo" (T Int) b
 
 by emitting a new wanted
 
-.. code-block:: haskell
+::
 
     T alpha -> [alpha] ~# T Int -> b
 
@@ -217,7 +236,7 @@ appropriately cast.
 
 The HasField class is defined (in GHC.Records) thus:
 
-.. code-block:: haskell
+::
 
     class HasField (x :: k) r a | x r -> a where
       getField :: r -> a
@@ -227,31 +246,31 @@ Hence we can solve `HasField "foo" (T Int) b` by taking an expression
 of type `T Int -> b` and casting it using the newtype coercion.
 Note that
 
-.. code-block:: haskell
+::
 
     foo :: forall y . T y -> [y]
 
 so the expression we construct is
 
-.. code-block:: haskell
+::
 
     foo @alpha |> co
 
 where
 
-.. code-block:: haskell
+::
 
     co :: (T alpha -> [alpha]) ~# HasField "foo" (T Int) b
 
 is built from
 
-.. code-block:: haskell
+::
 
     co1 :: (T alpha -> [alpha]) ~# (T Int -> b)
 
 which is the new wanted, and
 
-.. code-block:: haskell
+::
 
     co2 :: (T Int -> b) ~# HasField "foo" (T Int) b
 

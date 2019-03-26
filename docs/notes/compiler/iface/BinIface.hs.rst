@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/BinIface.hs>`_
 
-====================
-compiler/iface/BinIface.hs.rst
-====================
+compiler/iface/BinIface.hs
+==========================
+
 
 Note [Symbol table representation of names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/iface/BinIface.hs#L321>`__
 
 An occurrence of a name in an interface file is serialized as a single 32-bit
 word. The format of this word is:

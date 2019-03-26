@@ -1,15 +1,18 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs>`_
 
-====================
-compiler/types/TyCon.hs.rst
-====================
+compiler/types/TyCon.hs
+=======================
+
 
 Note [Type synonym families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L170>`__
+
 * Type synonym families, also known as "type functions", map directly
   onto the type functions in FC:
 
-.. code-block:: haskell
+::
 
         type family F a :: *
         type instance F Int = Bool
@@ -31,7 +34,7 @@ Note [Type synonym families]
   translates to
     a FamilyTyCon 'F', whose FamTyConFlav is OpenSynFamilyTyCon
 
-.. code-block:: haskell
+::
 
         type family G a :: * where
           G Int = Bool
@@ -47,13 +50,16 @@ We also support injective type families -- see Note [Injective type families]
 
 Note [Data type families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L205>`__
+
 See also Note [Wrappers for data instance tycons] in MkId.hs
 
 * Data type families are declared thus
         data family T a :: *
         data instance T Int = T1 | T2 Bool
 
-.. code-block:: haskell
+::
 
   Here T is the "family TyCon".
 
@@ -66,13 +72,13 @@ See also Note [Wrappers for data instance tycons] in MkId.hs
 
 * Here's the FC version of the above declarations:
 
-.. code-block:: haskell
+::
 
         data T a
         data R:TInt = T1 | T2 Bool
         axiom ax_ti : T Int ~R R:TInt
 
-.. code-block:: haskell
+::
 
   Note that this is a *representational* coercion
   The R:TInt is the "representation TyCons".
@@ -88,47 +94,47 @@ See also Note [Wrappers for data instance tycons] in MkId.hs
 * The data constructor T2 has a wrapper (which is what the
   source-level "T2" invokes):
 
-.. code-block:: haskell
+::
 
         $WT2 :: Bool -> T Int
         $WT2 b = T2 b `cast` sym ax_ti
 
 * A data instance can declare a fully-fledged GADT:
 
-.. code-block:: haskell
+::
 
         data instance T (a,b) where
           X1 :: T (Int,Bool)
           X2 :: a -> b -> T (a,b)
 
-.. code-block:: haskell
+::
 
   Here's the FC version of the above declaration:
 
-.. code-block:: haskell
+::
 
         data R:TPair a b where
           X1 :: R:TPair Int Bool
           X2 :: a -> b -> R:TPair a b
         axiom ax_pr :: T (a,b)  ~R  R:TPair a b
 
-.. code-block:: haskell
+::
 
         $WX1 :: forall a b. a -> b -> T (a,b)
         $WX1 a b (x::a) (y::b) = X2 a b x y `cast` sym (ax_pr a b)
 
-.. code-block:: haskell
+::
 
   The R:TPair are the "representation TyCons".
   We have a bit of work to do, to unpick the result types of the
   data instance declaration for T (a,b), to get the result type in the
   representation; e.g.  T (a,b) --> R:TPair a b
 
-.. code-block:: haskell
+::
 
   The representation TyCon R:TList, has an AlgTyConFlav of
 
-.. code-block:: haskell
+::
 
         DataFamInstTyCon T [(a,b)] ax_pr
 
@@ -140,7 +146,7 @@ See also Note [Wrappers for data instance tycons] in MkId.hs
         - do pattern matching
   Rather like newtype, in fact
 
-.. code-block:: haskell
+::
 
   As a result
 
@@ -155,7 +161,7 @@ See also Note [Wrappers for data instance tycons] in MkId.hs
   - It's fine to have T in the LHS of a type function:
     type instance F (T a) = [a]
 
-.. code-block:: haskell
+::
 
   It was this last point that confused me!  The big thing is that you
   should not think of a data family T as a *type function* at all, not
@@ -167,7 +173,7 @@ See also Note [Wrappers for data instance tycons] in MkId.hs
         type instance G Int = Bool
         type instance F Bool = Char
 
-.. code-block:: haskell
+::
 
   So a data type family is not an injective type function. It's just a
   data type with some axioms that connect it to other data types.
@@ -180,7 +186,10 @@ See also Note [Wrappers for data instance tycons] in MkId.hs
 
 
 Note [Associated families and their parent class]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L309>`__
+
 *Associated* families are just like *non-associated* families, except
 that they have a famTcParent field of (Just cls_tc), which identifies the
 parent class.
@@ -189,7 +198,7 @@ However there is an important sharing relationship between
   * the tyConTyVars of the parent Class
   * the tyConTyVars of the associated TyCon
 
-.. code-block:: haskell
+::
 
    class C a b where
      data T p a
@@ -203,7 +212,7 @@ This is important. In an instance declaration we expect
   * the non-shared variables of the associated type should not
     be instantiated at all
 
-.. code-block:: haskell
+::
 
   instance C [x] (Tree y) where
      data T p [x] = T1 x | T2 p
@@ -213,6 +222,9 @@ This is important. In an instance declaration we expect
 
 Note [TyCon Role signatures]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L335>`__
+
 Every tycon has a role signature, assigning a role to each of the tyConTyVars
 (or of equal length to the tyConArity, if there are no tyConTyVars). An
 example demonstrates these best: say we have a tycon T, with parameters a at
@@ -222,7 +234,7 @@ nominal equality between a1 and a2, representational equality between b1 and
 b2, and nothing in particular (i.e., phantom equality) between c1 and c2. This
 might happen, say, with the following declaration:
 
-.. code-block:: haskell
+::
 
   data T a b c where
     MkT :: b -> T Int b c
@@ -239,11 +251,14 @@ N.
 
 Note [Unboxed tuple RuntimeRep vars]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L357>`__
+
 The contents of an unboxed tuple may have any representation. Accordingly,
 the kind of the unboxed tuple constructor is runtime-representation
 polymorphic. For example,
 
-.. code-block:: haskell
+::
 
    (#,#) :: forall (q :: RuntimeRep) (r :: RuntimeRep). TYPE q -> TYPE r -> #
 
@@ -255,9 +270,12 @@ datacon arity were the same.
 
 Note [Injective type families]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L369>`__
+
 We allow injectivity annotations for type families (both open and closed):
 
-.. code-block:: haskell
+::
 
   type family F (a :: k) (b :: k) = r | r -> a
   type family G a b = res | res -> a b where ...
@@ -278,7 +296,10 @@ See also:
 
 
 Note [AnonTCB InivsArg]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L490>`__
+
 It's pretty rare to have an (AnonTCB InvisArg) binder.  The
 only way it can occur is in a PromotedDataCon whose
 kind has an equality constraint:
@@ -299,7 +320,10 @@ the first place.
 
 
 Note [Building TyVarBinders from TyConBinders]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L509>`__
+
 We sometimes need to build the quantified type of a value from
 the TyConBinders of a type or class.  For that we need not
 TyConBinders but TyVarBinders (used in forall-type)  E.g:
@@ -322,13 +346,13 @@ Since they are user-callable we must get their type-argument visibility
 information right; and that info is in the TyConBinders.
 Here is an example:
 
-.. code-block:: haskell
+::
 
   data App a b = MkApp (a b) -- App :: forall {k}. (k->*) -> k -> *
 
 The TyCon has
 
-.. code-block:: haskell
+::
 
   tyConTyBinders = [ Named (Bndr (k :: *) Inferred), Anon (k->*), Anon k ]
 
@@ -339,7 +363,7 @@ But the DataCon MkApp has the type
 
 That is, its TyCoVarBinders should be
 
-.. code-block:: haskell
+::
 
   dataConUnivTyVarBinders = [ Bndr (k:*)    Inferred
                             , Bndr (a:k->*) Specified
@@ -356,8 +380,12 @@ the TyCoBinders for a term (see Note [No Required TyCoBinder in terms]
 in TyCoRep), so we change it to Specified when making MkT's TyCoBinders
 
 
+
 Note [The binders/kind/arity fields of a TyCon]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L562>`__
+
 All TyCons have this group of fields
   tyConBinders   :: [TyConBinder/TyConTyCoBinder]
   tyConResKind   :: Kind
@@ -373,17 +401,17 @@ They fit together like so:
 * tyConBinders gives the telescope of type/coercion variables on the LHS of the
   type declaration.  For example:
 
-.. code-block:: haskell
+::
 
     type App a (b :: k) = a b
 
-.. code-block:: haskell
+::
 
   tyConBinders = [ Bndr (k::*)   (NamedTCB Inferred)
                  , Bndr (a:k->*) AnonTCB
                  , Bndr (b:k)    AnonTCB ]
 
-.. code-block:: haskell
+::
 
   Note that that are three binders here, including the
   kind variable k.
@@ -403,12 +431,12 @@ They fit together like so:
   E.g for our App example:
       App :: forall k. (k->*) -> k -> *
 
-.. code-block:: haskell
+::
 
   We get a 'forall' in the kind for each NamedTCB, and an arrow
   for each AnonTCB
 
-.. code-block:: haskell
+::
 
   tyConKind is the full kind of the TyCon, not just the result kind
 
@@ -423,8 +451,12 @@ They fit together like so:
   but it's enforced by etaExpandAlgTyCon
 
 
+
 Note [Closed type families]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L1140>`__
+
 * In an open type family you can add new instances later.  This is the
   usual case.
 
@@ -438,9 +470,11 @@ nothing for the axiom to prove!
 
 
 
-
 Note [Promoted data constructors]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L1154>`__
+
 All data constructors can be promoted to become a type constructor,
 via the PromotedDataCon alternative in TyCon.
 
@@ -467,6 +501,9 @@ via the PromotedDataCon alternative in TyCon.
 
 Note [Enumeration types]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L1178>`__
+
 We define datatypes with no constructors to *not* be
 enumerations; this fixes trac #2578,  Otherwise we
 end up generating an empty table for
@@ -489,11 +526,14 @@ See #4528.
 
 Note [Newtype coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L1198>`__
+
 The NewTyCon field nt_co is a CoAxiom which is used for coercing from
 the representation type of the newtype, to the newtype itself. For
 example,
 
-.. code-block:: haskell
+::
 
    newtype T a = MkT (a -> a)
 
@@ -503,7 +543,7 @@ In the case that the right hand side is a type application
 ending with the same type variables as the left hand side, we
 "eta-contract" the coercion.  So if we had
 
-.. code-block:: haskell
+::
 
    newtype S a = MkT [a]
 
@@ -520,6 +560,9 @@ which encodes as (TyConApp instCoercionTyCon [TyConApp CoT [], s])
 
 Note [Newtype eta]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L1223>`__
+
 Consider
         newtype Parser a = MkParser (IO a) deriving Monad
 Are these two types equal (to Core)?
@@ -537,12 +580,12 @@ Source code:
         newtype T a = MkT [a]
         newtype Foo m = MkFoo (forall a. m a -> Int)
 
-.. code-block:: haskell
+::
 
         w1 :: Foo []
         w1 = ...
 
-.. code-block:: haskell
+::
 
         w2 :: Foo T
         w2 = MkFoo (\(MkT x) -> case w1 of MkFoo f -> f x)
@@ -558,9 +601,11 @@ This eta-reduction is implemented in BuildTyCl.mkNewTyConRhs.
 
 
 
-
 Note [Product types]
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L1919>`__
+
 A product type is
  * A data type (not a newtype)
  * With one, boxed data constructor
@@ -584,8 +629,12 @@ constraints, type classes etc.  So it can be GADT.  These evidence
 arguments are simply value arguments, and should not get in the way.
 
 
+
 Note [Constructor tag allocation]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L2445>`__
+
 When typechecking we need to allocate constructor tags to constructors.
 They are allocated based on the position in the data_cons field of TyCon,
 with the first constructor getting fIRST_TAG.
@@ -600,19 +649,23 @@ Name to ConTag and pass it down to buildDataCon for efficient lookup.
 Relevant ticket: #14657
 
 
+
 Note [Expanding newtypes and products]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L2614>`__
+
 When expanding a type to expose a data-type constructor, we need to be
 careful about newtypes, lest we fall into an infinite loop. Here are
 the key examples:
 
-.. code-block:: haskell
+::
 
   newtype Id  x = MkId x
   newtype Fix f = MkFix (f (Fix f))
   newtype T     = MkT (T -> T)
 
-.. code-block:: haskell
+::
 
   Type           Expansion
  --------------------------
@@ -644,14 +697,18 @@ good to be able to unwrap multiple layers.
 The function that manages all this is checkRecTc.
 
 
+
 Note [Skolem abstract data]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/TyCon.hs#L2689>`__
+
 Skolem abstract data arises from data declarations in an hsig file.
 
 The best analogy is to interpret the types declared in signature files as
 elaborating to universally quantified type variables; e.g.,
 
-.. code-block:: haskell
+::
 
    unit p where
        signature H where
@@ -664,7 +721,7 @@ elaborating to universally quantified type variables; e.g.,
 
 elaborates as (with some fake structural types):
 
-.. code-block:: haskell
+::
 
    p :: forall t s. { f :: forall a b. t ~ s => a -> b }
    p = { f = \x -> x } -- ill-typed
@@ -679,7 +736,7 @@ instantiated eventually!
 
 Skolem abstractness can apply to "non-abstract" data as well):
 
-.. code-block:: haskell
+::
 
    unit p where
        signature H1 where

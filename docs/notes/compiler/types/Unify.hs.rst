@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs>`_
 
-====================
-compiler/types/Unify.hs.rst
-====================
+compiler/types/Unify.hs
+=======================
+
 
 Note [tcMatchTy vs tcMatchTyKi]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L74>`__
+
 This module offers two variants of matching: with kinds and without.
 The TyKi variant takes two types, of potentially different kinds,
 and matches them. Along the way, it necessarily also matches their
@@ -24,7 +27,7 @@ How do you choose between them?
    families. Note that the types of the variables in instances can indeed
    mention type families, so instance lookup must use the Ty variant.
 
-.. code-block:: haskell
+::
 
    (Nothing goes terribly wrong -- no panics -- if there might be type
    families in kinds in the TyKi variant. You just might get match
@@ -35,18 +38,22 @@ How do you choose between them?
    equals the kind of the target, then use the TyKi version.
 
 
+
 Note [Pruning dead case alternatives]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L258>`__
+
 Consider        data T a where
                    T1 :: T Int
                    T2 :: T a
 
-.. code-block:: haskell
+::
 
                 newtype X = MkX Int
                 newtype Y = MkY Char
 
-.. code-block:: haskell
+::
 
                 type family F a
                 type instance F Bool = Int
@@ -69,8 +76,12 @@ apart. Note that since we are simply dropping dead code, a conservative test
 suffices.
 
 
+
 Note [Fine-grained unification]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L306>`__
+
 Do the types (x, x) and ([y], y) unify? The answer is seemingly "no" --
 no substitution to finite types makes these match. But, a substitution to
 *infinite* types can unify these two types: [x |-> [[[...]]], y |-> [[[...]]] ].
@@ -107,6 +118,9 @@ example.
 
 Note [The substitution in MaybeApart]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L340>`__
+
 The constructor MaybeApart carries data with it, typically a TvSubstEnv. Why?
 Because consider unifying these:
 
@@ -124,15 +138,22 @@ indexed-types/should_compile/Overlap14.
 
 
 Note [Unifying with skolems]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L356>`__
+
 If we discover that two types unify if and only if a skolem variable is
 substituted, we can't properly unify the types. But, that skolem variable
 may later be instantiated with a unifyable type. So, we return maybeApart
 in these cases.
 
 
+
 Note [Non-idempotent substitution]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L535>`__
+
 During unification we use a TvSubstEnv/CvSubstEnv pair that is
   (a) non-idempotent
   (b) loop-free; ie repeatedly applying it yields a fixed point
@@ -141,6 +162,9 @@ During unification we use a TvSubstEnv/CvSubstEnv pair that is
 
 Note [Finding the substitution fixpoint]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L541>`__
+
 Finding the fixpoint of a non-idempotent substitution arising from a
 unification is much trickier than it looks, because of kinds.  Consider
    T k (H k (f:k)) ~ T * (g:*)
@@ -214,8 +238,12 @@ variables in the in-scope set; it is used only to ensure no
 shadowing.
 
 
+
 Note [Specification of unification]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L673>`__
+
 The pure unifier, unify_ty, defined in this module, tries to work out
 a substitution to make two types say True to eqType. NB: eqType is
 itself not purely syntactic; it accounts for CastTys;
@@ -237,7 +265,7 @@ Notation:
  τ,σ  other types
  τ♭   type τ, flattened
 
-.. code-block:: haskell
+::
 
  ≡    eqType
 
@@ -285,7 +313,7 @@ but only when using this algorithm for matching:
 (M1) If (match σ τ) succeeds with θ, then all matchable tyvars
      in σ are bound in θ.
 
-.. code-block:: haskell
+::
 
      Property M1 means that we must extend the substitution with,
      say (a ↦ a) when appropriate during matching.
@@ -326,6 +354,9 @@ having two separate, almost-identical algorithms.
 
 Note [Self-substitution when matching]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L777>`__
+
 What should happen when we're *matching* (not unifying) a1 with a1? We
 should get a substitution [a1 |-> a1]. A successful match should map all
 the template variables (except ones that disappear when expanding synonyms).
@@ -349,18 +380,21 @@ compiling Data.List.NonEmpty.)
 
 Note [Matching coercion variables]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L798>`__
+
 Consider this:
 
-.. code-block:: haskell
+::
 
    type family F a
 
-.. code-block:: haskell
+::
 
    data G a where
      MkG :: F a ~ Bool => G a
 
-.. code-block:: haskell
+::
 
    type family Foo (x :: G a) :: F a
    type instance Foo MkG = False
@@ -370,7 +404,7 @@ a coercion variable on the left and then use it on the right. Accordingly,
 at use sites of Foo, we need to be able to use matching to figure out the
 value for the coercion. (See the desugared version:
 
-.. code-block:: haskell
+::
 
    axFoo :: [a :: *, c :: F a ~ Bool]. Foo (MkG c) = False |> (sym c)
 
@@ -381,6 +415,9 @@ all bets are off.
 
 Note [Kind coercions in Unify]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L820>`__
+
 We wish to match/unify while ignoring casts. But, we can't just ignore
 them completely, or we'll end up with ill-kinded substitutions. For example,
 say we're matching `a` with `ty |> co`. If we just drop the cast, we'll
@@ -435,6 +472,9 @@ coercions in this manner.
 
 Note [Matching in the presence of casts]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L872>`__
+
 When matching, it is crucial that no variables from the template
 end up in the range of the matching substitution (obviously!).
 When unifying, that's not a constraint; instead we take the fixpoint
@@ -471,6 +511,9 @@ Note that
 
 Note [Polykinded tycon applications]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Unify.hs#L906>`__
+
 Suppose  T :: forall k. Type -> K
 and we are unifying
   ty1:  T @Type         Int       :: Type

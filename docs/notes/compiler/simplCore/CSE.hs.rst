@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs>`_
 
-====================
-compiler/simplCore/CSE.hs.rst
-====================
+compiler/simplCore/CSE.hs
+=========================
+
 
 Note [Shadowing]
 ~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L57>`__
+
 We have to be careful about shadowing.
 For example, consider
         f = \x -> let y = x+x in
@@ -18,25 +21,27 @@ We can simply add clones to the substitution already described.
 
 
 
-
 Note [CSE for bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L70>`__
+
 Let-bindings have two cases, implemented by addBinding.
 
 * SUBSTITUTE: applies when the RHS is a variable
 
-.. code-block:: haskell
+::
 
      let x = y in ...(h x)....
 
-.. code-block:: haskell
+::
 
   Here we want to extend the /substitution/ with x -> y, so that the
   (h x) in the body might CSE with an enclosing (let v = h y in ...).
   NB: the substitution maps InIds, so we extend the substitution with
       a binding for the original InId 'x'
 
-.. code-block:: haskell
+::
 
   How can we have a variable on the RHS? Doesn't the simplifier inline them?
 
@@ -55,16 +60,16 @@ Let-bindings have two cases, implemented by addBinding.
 
 * EXTEND THE REVERSE MAPPING: applies in all other cases
 
-.. code-block:: haskell
+::
 
      let x = h y in ...(h y)...
 
-.. code-block:: haskell
+::
 
   Here we want to extend the /reverse mapping (cs_map)/ so that
   we CSE the (h y) call to x.
 
-.. code-block:: haskell
+::
 
   Note that we use EXTEND even for a trivial expression, provided it
   is not a variable or literal. In particular this /includes/ type
@@ -74,7 +79,7 @@ Let-bindings have two cases, implemented by addBinding.
   Here we want to common-up the two uses of (f @ Int) so we can
   remove one of the case expressions.
 
-.. code-block:: haskell
+::
 
   See also Note [Corner case for case expressions] for another
   reason not to use SUBSTITUTE for all trivial expressions.
@@ -97,6 +102,9 @@ will do it next.
 
 Note [CSE for case expressions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L130>`__
+
 Consider
   case scrut_expr of x { ...alts... }
 This is very like a strict let-binding
@@ -111,31 +119,31 @@ For example:
                  (a:as) -> case a of wild1 {
                              (p,q) -> ...(wild1:as)...
 
-.. code-block:: haskell
+::
 
   Here, (wild1:as) is morally the same as (a:as) and hence equal to
   wild. But that's not quite obvious.  In the rest of the compiler we
   want to keep it as (wild1:as), but for CSE purpose that's a bad
   idea.
 
-.. code-block:: haskell
+::
 
   By using addBinding we add the binding (wild1 -> a) to the substitution,
   which does exactly the right thing.
 
-.. code-block:: haskell
+::
 
   (Notice this is exactly backwards to what the simplifier does, which
   is to try to replaces uses of 'a' with uses of 'wild1'.)
 
-.. code-block:: haskell
+::
 
   This is the main reason that addBinding is called with a trivial rhs.
 
 * Non-trivial scrutinee
      case (f x) of y { pat -> ...let z = f x in ... }
 
-.. code-block:: haskell
+::
 
   By using addBinding we'll add (f x :-> y) to the cs_map, and
   thereby CSE the inner (f x) to y.
@@ -144,30 +152,33 @@ For example:
 
 Note [CSE for INLINE and NOINLINE]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L165>`__
+
 There are some subtle interactions of CSE with functions that the user
 has marked as INLINE or NOINLINE. (Examples from Roman Leshchinskiy.)
 Consider
 
-.. code-block:: haskell
+::
 
         yes :: Int  {-# NOINLINE yes #-}
         yes = undefined
 
-.. code-block:: haskell
+::
 
         no :: Int   {-# NOINLINE no #-}
         no = undefined
 
-.. code-block:: haskell
+::
 
         foo :: Int -> Int -> Int  {-# NOINLINE foo #-}
         foo m n = n
 
-.. code-block:: haskell
+::
 
         {-# RULES "foo/no" foo no = id #-}
 
-.. code-block:: haskell
+::
 
         bar :: Int -> Int
         bar = foo yes
@@ -180,12 +191,12 @@ have substituted even if 'yes' was NOINLINE).
 
 But we do need to take care.  Consider
 
-.. code-block:: haskell
+::
 
         {-# NOINLINE bar #-}
         bar = <rhs>     -- Same rhs as foo
 
-.. code-block:: haskell
+::
 
         foo = <rhs>
 
@@ -194,7 +205,7 @@ If CSE produces
 then foo will never be inlined to <rhs> (when it should be, if <rhs>
 is small).  The conclusion here is this:
 
-.. code-block:: haskell
+::
 
    We should not add
        <rhs> :-> bar
@@ -216,6 +227,9 @@ originally was.
 
 Note [CSE for stable unfoldings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L219>`__
+
 Consider
    {-# Unf = Stable (\pq. build blah) #-}
    foo = x
@@ -230,7 +244,7 @@ SimplUtils Note [Stable unfoldings and postInlineUnconditionally].
 
 Nor do we want to change the reverse mapping. Suppose we have
 
-.. code-block:: haskell
+::
 
    {-# Unf = Stable (\pq. build blah) #-}
    foo = <expr>
@@ -250,6 +264,9 @@ isAnyInlinePragma rather than isStableUnfolding.
 
 Note [Corner case for case expressions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L249>`__
+
 Here is another reason that we do not use SUBSTITUTE for
 all trivial expressions. Consider
    case x |> co of (y::Array# Int) { ... }
@@ -268,6 +285,9 @@ had
 
 Note [CSE for join points?]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L265>`__
+
 We must not be naive about join points in CSE:
    join j = e in
    if b then jump j else 1 + e
@@ -283,9 +303,12 @@ less to gain by trying to CSE them. (#13219)
 
 Note [Look inside join-point binders]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L278>`__
+
 Another way how CSE for joint points is tricky is
 
-.. code-block:: haskell
+::
 
   let join foo x = (x, 42)
       join bar x = (x, 42)
@@ -293,7 +316,7 @@ Another way how CSE for joint points is tricky is
 
 naively, CSE would turn this into
 
-.. code-block:: haskell
+::
 
   let join foo x = (x, 42)
       join bar = foo
@@ -310,6 +333,9 @@ the body of the join point.
 
 Note [CSE for recursive bindings]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L299>`__
+
 Consider
   f = \x ... f....
   g = \y ... g ...
@@ -330,12 +356,14 @@ the program; it's a kind of synthetic key for recursive bindings.
 
 
 
-
 Note [Take care with literal strings]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L447>`__
+
 Consider this example:
 
-.. code-block:: haskell
+::
 
   x = "foo"#
   y = "foo"#
@@ -343,7 +371,7 @@ Consider this example:
 
 We would normally turn this into:
 
-.. code-block:: haskell
+::
 
   x = "foo"#
   y = x
@@ -356,7 +384,7 @@ of type Addr# must be a string literal, not another variable. See Note
 For this reason, we special case top-level bindings to literal strings and leave
 the original RHS unmodified. This produces:
 
-.. code-block:: haskell
+::
 
   x = "foo"#
   y = "foo"#
@@ -374,6 +402,9 @@ This is done by cse_bind.  I got it wrong the first time (#13367).
 
 Note [Delay inlining after CSE]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L480>`__
+
 Suppose (#15445) we have
    f,g :: Num a => a -> a
    f x = ...f (x-1).....
@@ -398,8 +429,12 @@ Why top level only?  Because for nested bindings we are already past
 phase 2 and will never return there.
 
 
+
 Note [Combine case alternatives]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/simplCore/CSE.hs#L609>`__
+
 combineAlts is just a more heavyweight version of the use of
 combineIdenticalAlts in SimplUtils.prepareAlts.  The basic idea is
 to transform
@@ -419,6 +454,4 @@ to be doing, which is why I put it here.
 
 I acutally saw some examples in the wild, where some inlining made e1 too
 big for cheapEqExpr to catch it.
-
-
 

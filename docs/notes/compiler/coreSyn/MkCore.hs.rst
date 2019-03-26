@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/MkCore.hs>`_
 
-====================
-compiler/coreSyn/MkCore.hs.rst
-====================
+compiler/coreSyn/MkCore.hs
+==========================
+
 
 Note [Flattening one-tuples]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/MkCore.hs#L325>`__
+
 This family of functions creates a tuple of variables/expressions/types.
   mkCoreTup [e1,e2,e3] = (e1,e2,e3)
 What if there is just one variable/expression/type in the argument?
@@ -21,8 +24,12 @@ We could do one of two things:
 Usually we want the former, but occasionally the latter.
 
 
+
 Note [aBSENT_SUM_FIELD_ERROR_ID]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/MkCore.hs#L749>`__
+
 Absent argument error for unused unboxed sum fields are different than absent
 error used in dummy worker functions (see `mkAbsentErrorApp`):
 
@@ -33,7 +40,7 @@ error used in dummy worker functions (see `mkAbsentErrorApp`):
 - `absentSumFieldError` can't be CAFFY because that would mean making some
   non-CAFFY definitions that use unboxed sums CAFFY in unarise.
 
-.. code-block:: haskell
+::
 
   To make `absentSumFieldError` non-CAFFY we get a stable pointer to it in
   RtsStartup.c and mark it as non-CAFFY here.
@@ -46,8 +53,12 @@ TODO: Remove stable pointer hack after fixing #9718.
       efficient, and none of the other unboxed literals make things CAFFY.
 
 
+
 Note [Error and friends have an "open-tyvar" forall]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/MkCore.hs#L809>`__
+
 'error' and 'undefined' have types
         error     :: forall (v :: RuntimeRep) (a :: TYPE v). String -> a
         undefined :: forall (v :: RuntimeRep) (a :: TYPE v). a
@@ -57,23 +68,25 @@ This is OK because it never returns, so the return type is irrelevant.
 
 
 
-
 Note [aBSENT_ERROR_ID]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/coreSyn/MkCore.hs#L825>`__
+
 We use aBSENT_ERROR_ID to build dummy values in workers.  E.g.
 
-.. code-block:: haskell
+::
 
    f x = (case x of (a,b) -> b) + 1::Int
 
 The demand analyser figures ot that only the second component of x is
 used, and does a w/w split thus
 
-.. code-block:: haskell
+::
 
    f x = case x of (a,b) -> $wf b
 
-.. code-block:: haskell
+::
 
    $wf b = let a = absentError "blah"
                x = (a,b)
@@ -84,7 +97,7 @@ After some simplification, the (absentError "blah") thunk goes away.
 ------ Tricky wrinkle -------
 #14285 had, roughly
 
-.. code-block:: haskell
+::
 
    data T a = MkT a !a
    {-# INLINABLE f #-}
@@ -129,7 +142,7 @@ it is in HNF :-)
 
 It might seem a bit surprising that seq on absentError is simply erased
 
-.. code-block:: haskell
+::
 
     absentError "foo" `seq` x ==> x
 

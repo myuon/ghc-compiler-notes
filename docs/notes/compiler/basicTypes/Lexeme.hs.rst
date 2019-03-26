@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Lexeme.hs>`_
 
-====================
-compiler/basicTypes/Lexeme.hs.rst
-====================
+compiler/basicTypes/Lexeme.hs
+=============================
+
 
 Note [Classification of generated names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/Lexeme.hs#L50>`__
 
 Some names generated for internal use can show up in debugging output,
 e.g.  when using -ddump-simpl. These generated names start with a $

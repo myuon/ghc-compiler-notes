@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/StgSyn.hs>`_
 
-====================
-compiler/stgSyn/StgSyn.hs.rst
-====================
+compiler/stgSyn/StgSyn.hs
+=========================
+
 
 Note [CAF consistency]
 ~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/stgSyn/StgSyn.hs#L488>`__
 
 `topStgBindHasCafRefs` is only used by an assert (`consistentCafInfo` in
 `CoreToStg`) to make sure CAF-ness predicted by `TidyPgm` is consistent with

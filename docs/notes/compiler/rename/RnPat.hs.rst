@@ -1,21 +1,24 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnPat.hs>`_
 
-====================
-compiler/rename/RnPat.hs.rst
-====================
+compiler/rename/RnPat.hs
+========================
+
 
 Note [CpsRn monad]
 ~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnPat.hs#L86>`__
+
 The CpsRn monad uses continuation-passing style to support this
 style of programming:
 
-.. code-block:: haskell
+::
 
         do { ...
            ; ns <- bindNames rs
            ; ...blah... }
 
-.. code-block:: haskell
+::
 
    where rs::[RdrName], ns::[Name]
 
@@ -30,18 +33,22 @@ has a *left-to-right* scoping: it makes the binders in
 p1 scope over p2,p3.
 
 
+
 Note [Patterns are uses]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnPat.hs#L150>`__
+
 Consider
   module Foo( f, g ) where
   data T = T1 | T2
 
-.. code-block:: haskell
+::
 
   f T1 = True
   f T2 = False
 
-.. code-block:: haskell
+::
 
   g _ = T1
 
@@ -51,7 +58,7 @@ pattern, because it never occurs in a constructed position.  See
 However, implementing this in the face of pattern synonyms would be
 less straightforward, since given two pattern synonyms
 
-.. code-block:: haskell
+::
 
   pattern P1 <- P2
   pattern P2 <- ()
@@ -67,6 +74,9 @@ uses.
 
 Note [View pattern usage]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnPat.hs#L254>`__
+
 Consider
   let (r, (r -> x)) = x in ...
 Here the pattern binds 'r', and then uses it *only* in the view pattern.
@@ -76,9 +86,11 @@ here, *not* bindLocalNameFV.  #3943.
 
 
 
-
 Note [Don't report shadowing for pattern synonyms]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnPat.hs#L264>`__
+
 There is one special context where a pattern doesn't introduce any new binders -
 pattern synonym declarations. Therefore we don't check to see if pattern
 variables shadow existing identifiers as they are never bound to anything
@@ -99,7 +111,10 @@ See #12615 for some more examples.
 
 
 Note [Negative zero]
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/rename/RnPat.hs#L848>`__
+
 There were problems with negative zero in conjunction with Negative Literals
 extension. Numeric literal value is contained in Integer and Rational types
 inside IntegralLit and FractionalLit. These types cannot represent negative

@@ -1,11 +1,13 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmPrim.hs>`_
 
-====================
-compiler/codeGen/StgCmmPrim.hs.rst
-====================
+compiler/codeGen/StgCmmPrim.hs
+==============================
+
 
 Note [Comparing stable names]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/codeGen/StgCmmPrim.hs#L1481>`__
 
 A StableName# is actually a pointer to a stable name object (SNO)
 containing an index into the stable name table (SNT). We

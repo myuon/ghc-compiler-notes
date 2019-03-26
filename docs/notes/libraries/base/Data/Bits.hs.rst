@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Bits.hs>`_
 
-====================
-libraries/base/Data/Bits.hs.rst
-====================
+libraries/base/Data/Bits.hs
+===========================
+
 
 Note [toIntegralSized optimization]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/libraries/base/Data/Bits.hs#L676>`__
+
 The code in 'toIntegralSized' relies on GHC optimizing away statically
 decidable branches.
 

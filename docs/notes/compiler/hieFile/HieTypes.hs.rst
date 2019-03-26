@@ -1,16 +1,18 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hieFile/HieTypes.hs>`_
 
-====================
-compiler/hieFile/HieTypes.hs.rst
-====================
+compiler/hieFile/HieTypes.hs
+============================
+
 
 Note [Efficient serialization of redundant type info]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/hieFile/HieTypes.hs#L101>`__
+
 The type information in .hie files is highly repetitive and redundant. For
 example, consider the expression
 
-.. code-block:: haskell
+::
 
     const True 'a'
 
@@ -24,13 +26,13 @@ Since all 3 of these types need to be stored in the .hie file, it is worth
 making an effort to deduplicate this shared structure. The trick is to define
 a new data type that is a flattened version of 'Type':
 
-.. code-block:: haskell
+::
 
     data HieType a = HAppTy a a  -- data Type = AppTy Type Type
                    | HFunTy a a  --           | FunTy Type Type
                    | ...
 
-.. code-block:: haskell
+::
 
     type TypeIndex = Int
 

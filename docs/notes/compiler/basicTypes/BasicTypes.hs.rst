@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs>`_
 
-====================
-compiler/basicTypes/BasicTypes.hs.rst
-====================
+compiler/basicTypes/BasicTypes.hs
+=================================
+
 
 Note [Precedence in types]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs#L711>`__
+
 Many pretty-printing functions have type
     ppr_ty :: PprPrec -> Type -> SDoc
 
@@ -21,10 +24,13 @@ We use this consistently for Type and HsType.
 
 Note [Type operator precedence]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs#L724>`__
+
 We don't keep the fixity of type operators in the operator. So the
 pretty printer follows the following precedence order:
 
-.. code-block:: haskell
+::
 
    TyConPrec         Type constructor application
    TyOpPrec/FunPrec  Operator application and function arrow
@@ -42,12 +48,16 @@ But the two are different constructors of PprPrec so we could make
 (->) bind more or less tightly if we wanted.
 
 
+
 Note [LoopBreaker OccInfo]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   IAmALoopBreaker True  <=> A "weak" or rules-only loop breaker
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs#L872>`__
+
+IAmALoopBreaker True  <=> A "weak" or rules-only loop breaker
                              Do not preInlineUnconditionally
 
-.. code-block:: haskell
+::
 
    IAmALoopBreaker False <=> A "strong" loop breaker
                              Do not inline at all
@@ -55,8 +65,12 @@ Note [LoopBreaker OccInfo]
 See OccurAnal Note [Weak loop breakers]
 
 
+
 Note [TailCallInfo]
 ~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs#L989>`__
+
 The occurrence analyser determines what can be made into a join point, but it
 doesn't change the binder into a JoinId because then it would be inconsistent
 with the occurrences. Thus it's left to the simplifier (or to simpleOptExpr) to
@@ -75,7 +89,7 @@ being tail-called would mean that the variable could only appear once per branch
 (thus getting a `OneOcc { occ_one_br = True }` occurrence info), but a join
 point can also be invoked from other join points, not just from case branches:
 
-.. code-block:: haskell
+::
 
   let j1 x = ...
       j2 y = ... j1 z {- tail call -} ...
@@ -91,12 +105,15 @@ ManyOccs and j2 will get `OneOcc { occ_one_br = True }`.
 
 Note [Pragma source text]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs#L1073>`__
+
 The lexer does a case-insensitive match for pragmas, as well as
 accepting both UK and US spelling variants.
 
 So
 
-.. code-block:: haskell
+::
 
   {-# SPECIALISE #-}
   {-# SPECIALIZE #-}
@@ -110,7 +127,7 @@ source text for the token needs to be preserved, hence the
 
 So the lexer will then generate
 
-.. code-block:: haskell
+::
 
   ITspec_prag "{ -# SPECIALISE"
   ITspec_prag "{ -# SPECIALIZE"
@@ -121,9 +138,11 @@ for the cases above.
 
 
 
-
 Note [Literal source text]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs#L1100>`__
+
 The lexer/parser converts literals from their original source text
 versions to an appropriate internal representation. This is a problem
 for tools doing source to source conversions, so the original source
@@ -131,7 +150,7 @@ text is stored in literals where this can occur.
 
 Motivating examples for HsLit
 
-.. code-block:: haskell
+::
 
   HsChar          '\n'       == '\x20`
   HsCharPrim      '\x41`#    == `A`
@@ -146,14 +165,18 @@ Motivating examples for HsLit
 
 For OverLitVal
 
-.. code-block:: haskell
+::
 
   HsIntegral      003      == 0x003
   HsIsString      "\x41nd" == "And"
 
 
+
 Note [InlinePragma]
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs#L1218>`__
+
 This data type mirrors what you can write in an INLINE or NOINLINE pragma in
 the source program.
 
@@ -173,6 +196,9 @@ If you want to know where InlinePragmas take effect: Look in DsBinds.makeCorePai
 
 Note [inl_inline and inl_act]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs#L1235>`__
+
 * inl_inline says what the user wrote: did she say INLINE, NOINLINE,
   INLINABLE, or nothing at all
 
@@ -192,6 +218,9 @@ Note [inl_inline and inl_act]
 
 Note [CONLIKE pragma]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs#L1252>`__
+
 The ConLike constructor of a RuleMatchInfo is aimed at the following.
 Consider first
     {-# RULE "r/cons" forall a as. r (a:as) = f (a+1) #-}
@@ -227,8 +256,12 @@ The main effects of CONLIKE are:
       Note [Expanding variables] in Rules.hs.
 
 
+
 Note [Competing activations]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/basicTypes/BasicTypes.hs#L1429>`__
+
 Sometimes a RULE and an inlining may compete, or two RULES.
 See Note [Rules and inlining/other rules] in Desugar.
 

@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs>`_
 
-====================
-compiler/types/Coercion.hs.rst
-====================
+compiler/types/Coercion.hs
+==========================
+
 
 Note [Function coercions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L282>`__
+
 Remember that
   (->) :: forall r1 r2. TYPE r1 -> TYPE r2 -> TYPE LiftedRep
 
@@ -16,8 +19,12 @@ is short for
 where co_rep1, co_rep2 are the coercions on the representations.
 
 
+
 Note [Pushing a coercion into a pi-type]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L321>`__
+
 Suppose we have this:
     (f |> co) t1 .. tn
 Then we want to push the coercion into the arguments, so as to make
@@ -43,8 +50,11 @@ Notes:
   they are both foralls or both arrows.  Not doing this caused #15343.
 
 
+
 Note [Role twiddling functions]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L605>`__
 
 There are a plethora of functions for twiddling roles:
 
@@ -96,21 +106,28 @@ role is bizarre and a caller should have to ask for this behavior explicitly.
 
 
 Note [mkCoVarCo]
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L850>`__
+
 In the past, mkCoVarCo optimised (c :: t~t) to (Refl t).  That is
 valid (although see Note [Unbound RULE binders] in Rules), but
 it's a relatively expensive test and perhaps better done in
 optCoercion.  Not a big deal either way.
 
 
+
 Note [Lifting coercions over types: liftCoSubst]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L1697>`__
+
 The KPUSH rule deals with this situation
    data T a = K (a -> Maybe a)
    g :: T t1 ~ T t2
    x :: t1 -> Maybe t1
 
-.. code-block:: haskell
+::
 
    case (K @t1 x) |> g of
      K (y:t2 -> Maybe t2) -> rhs
@@ -118,11 +135,11 @@ The KPUSH rule deals with this situation
 We want to push the coercion inside the constructor application.
 So we do this
 
-.. code-block:: haskell
+::
 
    g' :: t1~t2  =  Nth 0 g
 
-.. code-block:: haskell
+::
 
    case K @t2 (x |> g' -> Maybe g') of
      K (y:t2 -> Maybe t2) -> rhs
@@ -139,12 +156,15 @@ available at www.cis.upenn.edu/~sweirich/papers/fckinds-extended.pdf
 
 
 Note [extendLiftingContextEx]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L1724>`__
+
 Consider we have datatype
   K :: \/k. \/a::k. P -> T k  -- P be some type
   g :: T k1 ~ T k2
 
-.. code-block:: haskell
+::
 
   case (K @k1 @t1 x) |> g of
     K y -> rhs
@@ -178,8 +198,12 @@ See Note [Lifting coercions over types: liftCoSubst]
 ----------------------------------------------------
 
 
+
 Note [liftCoSubstTyVar]
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L1929>`__
+
 This function can fail if a coercion in the environment is of too low a role.
 
 liftCoSubstTyVar is called from two places: in liftCoSubst (naturally), and
@@ -191,8 +215,11 @@ that match, but it may fail, and this is healthy behavior.
 See Note [liftCoSubstTyVar]
 
 
+
 Note [Nested ForAllCos]
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L2288>`__
 
 Suppose we need `coercionKind (ForAllCo a1 (ForAllCo a2 ... (ForAllCo an
 co)...) )`.   We do not want to perform `n` single-type-variable
@@ -208,6 +235,9 @@ change reduces /total/ compile time by a factor of more than ten.
 
 Note [Nested InstCos]
 ~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L2335>`__
+
 In #5631 we found that 70% of the entire compilation time was
 being spent in coercionKind!  The reason was that we had
    (g @ ty1 @ ty2 .. @ ty100)    -- The "@s" are InstCos
@@ -224,30 +254,33 @@ cf Type.piResultTys (which in fact we call here).
 
 Note [simplifyArgsWorker]
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L2453>`__
+
 Invariant (F2) of Note [Flattening] says that flattening is homogeneous.
 This causes some trouble when flattening a function applied to a telescope
 of arguments, perhaps with dependency. For example, suppose
 
-.. code-block:: haskell
+::
 
   type family F :: forall (j :: Type) (k :: Type). Maybe j -> Either j k -> Bool -> [k]
 
 and we wish to flatten the args of (with kind applications explicit)
 
-.. code-block:: haskell
+::
 
   F a b (Just a c) (Right a b d) False
 
 where all variables are skolems and
 
-.. code-block:: haskell
+::
 
   a :: Type
   b :: Type
   c :: a
   d :: k
 
-.. code-block:: haskell
+::
 
   [G] aco :: a ~ fa
   [G] bco :: b ~ fb
@@ -257,7 +290,7 @@ where all variables are skolems and
 The first step is to flatten all the arguments. This is done before calling
 simplifyArgsWorker. We start from
 
-.. code-block:: haskell
+::
 
   a
   b
@@ -267,7 +300,7 @@ simplifyArgsWorker. We start from
 
 and get
 
-.. code-block:: haskell
+::
 
   (fa,                             co1 :: fa ~ a)
   (fb,                             co2 :: fb ~ b)
@@ -326,7 +359,7 @@ getting res_co :: [fb] ~ [b], and we cast our result.
 
 Accordingly, the final result is
 
-.. code-block:: haskell
+::
 
   F fa fb (Just fa (fc |> aco) |> Maybe (sym aco) |> sym (Maybe (sym aco)))
           (Right fa fb (fd |> bco) |> Either (sym aco) (sym bco) |> sym (Either (sym aco) (sym bco)))
@@ -340,6 +373,9 @@ is returned as the third return value from simplifyArgsWorker.
 
 Note [Last case in simplifyArgsWorker]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/types/Coercion.hs#L2553>`__
+
 In writing simplifyArgsWorker's `go`, we know here that args cannot be empty,
 because that case is first. We've run out of
 binders. But perhaps inner_ki is a tyvar that has been instantiated with a
@@ -347,7 +383,7 @@ binders. But perhaps inner_ki is a tyvar that has been instantiated with a
 
 Here is an example.
 
-.. code-block:: haskell
+::
 
   a :: forall (k :: Type). k -> k
   type family Star
@@ -358,12 +394,12 @@ Here is an example.
   bo :: Type
   [G] bc :: bo ~ Bool   (in inert set)
 
-.. code-block:: haskell
+::
 
   co :: (forall j. j -> Type) ~ (forall (j :: Star). (j |> axStar) -> Star)
   co = forall (j :: sym axStar). (<j> -> sym axStar)
 
-.. code-block:: haskell
+::
 
   We are flattening:
   a (forall (j :: Star). (j |> axStar) -> Star)   -- 1
@@ -374,7 +410,7 @@ Here is an example.
 
 First, we flatten all the arguments (before simplifyArgsWorker), like so:
 
-.. code-block:: haskell
+::
 
     (forall j. j -> Type, co1 :: (forall j. j -> Type) ~
                                  (forall (j :: Star). (j |> axStar) -> Star))  -- 1
@@ -428,7 +464,7 @@ coercionKind.)
 
 So we now call
 
-.. code-block:: haskell
+::
 
   decomposePiCos co1
                  (Pair (forall j. j -> Type) (forall (j :: Star). (j |> axStar) -> Star))
@@ -436,7 +472,7 @@ So we now call
 
 to get
 
-.. code-block:: haskell
+::
 
   co5 :: Star ~ Type
   co6 :: (j |> axStar) ~ (j |> co5), substituted to
@@ -446,14 +482,14 @@ to get
 
 We then use these casts on (the flattened) (3) and (4) to get
 
-.. code-block:: haskell
+::
 
   (Bool |> sym axStar |> co5 :: Type)   -- (C3)
   (False |> sym bc |> co6    :: bo)     -- (C4)
 
 We can simplify to
 
-.. code-block:: haskell
+::
 
   Bool                        -- (C3)
   (False |> sym bc :: bo)     -- (C4)
@@ -477,28 +513,28 @@ So, we have to twiddle the result coercion appropriately.
 
 Let's check whether this is well-typed. We know
 
-.. code-block:: haskell
+::
 
   a :: forall (k :: Type). k -> k
 
-.. code-block:: haskell
+::
 
   a (forall j. j -> Type) :: (forall j. j -> Type) -> forall j. j -> Type
 
-.. code-block:: haskell
+::
 
   a (forall j. j -> Type)
     Proxy
       :: forall j. j -> Type
 
-.. code-block:: haskell
+::
 
   a (forall j. j -> Type)
     Proxy
     Bool
       :: Bool -> Type
 
-.. code-block:: haskell
+::
 
   a (forall j. j -> Type)
     Proxy
@@ -506,7 +542,7 @@ Let's check whether this is well-typed. We know
     False
       :: Type
 
-.. code-block:: haskell
+::
 
   a (forall j. j -> Type)
     Proxy

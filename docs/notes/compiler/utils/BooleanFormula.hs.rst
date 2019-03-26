@@ -1,11 +1,14 @@
 `[source] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/BooleanFormula.hs>`_
 
-====================
-compiler/utils/BooleanFormula.hs.rst
-====================
+compiler/utils/BooleanFormula.hs
+================================
+
 
 Note [Simplification of BooleanFormulas]
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`[note link] <https://gitlab.haskell.org/ghc/ghc/tree/master/compiler/utils/BooleanFormula.hs#L80>`__
+
 The smart constructors (`mkAnd` and `mkOr`) do some attempt to simplify expressions. In particular,
  1. Collapsing nested ands and ors, so
      `(mkAnd [x, And [y,z]]`
