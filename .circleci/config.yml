@@ -12,3 +12,14 @@ workflows:
           run-check: false
           after-test:
             - run: cabal new-test --enable-tests -fdev
+      - haskell/build:
+          requires:
+            - haskell/build
+          filters:
+            branches:
+              only: master
+          executor: haskell/ghc-8_6_3
+          run-tests: false
+          run-check: false
+          after-test:
+            - run: make generate
