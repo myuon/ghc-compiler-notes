@@ -23,3 +23,6 @@ instance Monoid CollectedNotes where
 
 addNoteByCollecting :: Located Note -> CollectedNotes -> CollectedNotes
 addNoteByCollecting n ns = ns { notes = notes ns :|> n }
+
+class HasSourceResourceGetter m where
+  sourceResourceGetter :: FilePath -> Maybe SrcSpan -> m Text

@@ -8,12 +8,16 @@ format:
 
 .PHONY: test
 test:
-	cabal new-test
+	cabal new-test --flag dev
 
 .PHONY: generate
 generate:
 	rm -rf docs/notes
 	cabal new-build && cabal new-exec -- ghc-compiler-notes conf/ghc-8.6.4.yml
+
+.PHONY: docs
+docs:
+	sphinx-build docs docs/_build
 
 .PHONY: serve-docs
 serve-docs:
