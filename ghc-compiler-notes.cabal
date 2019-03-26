@@ -35,7 +35,7 @@ common general
     text                 >= 1.2.3  && < 1.3,
     exceptions           >= 0.10.0 && < 0.11,
     capability           >= 0.1.0  && < 0.2,
-    transformers         >= 0.5.6  && < 0.6,
+    transformers         >= 0.5.5  && < 0.6,
     rio                  >= 0.1.8  && < 0.2,
     template-haskell     >= 2.14.0 && < 2.15,
 
