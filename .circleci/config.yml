@@ -21,6 +21,7 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - run: cabal new-update
       - run: make generate
       - run: git add docs/notes/ && git commit -m 'build' && git push --force --quiet https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git master >/dev/null 2>&1
 
