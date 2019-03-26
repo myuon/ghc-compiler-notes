@@ -17,14 +17,14 @@ formatRstDoc :: (HasSourceResourceGetter m, Monad m) => FilePath -> CollectedNot
 formatRstDoc targetFn CollectedNotes{..} = do
   fileNameLink <- sourceResourceGetter targetFn Nothing
   let textTargetFn = Text.pack targetFn
-  contentHeader <- pure $ Text.unlines
-    [ -- Link to source
-      "`[source] <" <> fileNameLink <> ">`_",
-      "",
-      -- Filename header
-      textTargetFn,
-      Text.replicate (Text.length textTargetFn) "="
-    ]
+  contentHeader <- pure $
+    Text.unlines [ -- Link to source
+                   "`[source] <" <> fileNameLink <> ">`_"
+                 , ""
+                   -- Filename header
+                 , textTargetFn
+                 , Text.replicate (Text.length textTargetFn) "="
+                 ]
   foldM combineNotes contentHeader notes
   where
     combineNotes txt (L p Note{..}) = do

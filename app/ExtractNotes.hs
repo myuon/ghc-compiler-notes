@@ -30,4 +30,4 @@ app opt = do
   r <- parseCollectedNotesFromHsFile $ optHsSrcPath opt
   case r of
     Left lf  -> liftIO $ print lf
-    Right ns -> liftIO $ Text.putStrLn $ formatRstDoc ns
+    Right ns -> liftIO . Text.putStrLn =<< formatRstDoc (optHsSrcPath opt) ns
