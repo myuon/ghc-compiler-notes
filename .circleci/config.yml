@@ -24,6 +24,7 @@ jobs:
       - run: make generate
 
 workflows:
+  version: 2
   build:
     jobs:
       - build-test-8_6_3
