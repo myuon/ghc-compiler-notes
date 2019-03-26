@@ -1,25 +1,35 @@
-version: 2.1
+version: 2
 
-orbs:
-  haskell: haskell-works/haskell-build@1.6.3
+jobs:
+  build-test-8_6_3:
+    working_directory: ~/workspace
+    docker:
+      - image: haskell:8.6.3
+    steps:
+      - checkout
+      - run: cabal new-update
+      - run: make build
+      - run: make test
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  generate:
+    working_directory: ~/workspace
+    docker:
+      - image: haskell:8.6.3
+    steps:
+      - attach_workspace:
+          at: .
+      - run: make generate
 
 workflows:
-  multiple-ghc-build:
+  build:
     jobs:
-      - haskell/build:
-          name: GHC 8.6.3
-          executor: haskell/ghc-8_6_3
-          run-check: false
-          after-test:
-            - run: cabal new-test --enable-tests -fdev
-      - haskell/build:
+      - build-test-8_6_3
+      - generate:
           requires:
-            - haskell/build
+            - build-test-8_6_3
           filters:
             branches:
               only: master
-          executor: haskell/ghc-8_6_3
-          run-tests: false
-          run-check: false
-          after-test:
-            - run: make generate

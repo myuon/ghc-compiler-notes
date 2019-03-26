@@ -19,7 +19,7 @@ make generate
 make docs
 ```
 
-See `output/doc`
+Run `make serve-docs` and enjoy reading the notes from `http://localhost:8000`.
 
 ## Development
 
