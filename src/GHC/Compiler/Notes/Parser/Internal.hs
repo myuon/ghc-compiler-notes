@@ -285,7 +285,8 @@ completeParsingNote (L p buf) = addNoteByCollectingInState $ L p $
             if i >= 2 then pure False else do
               when (c == '\n') do
                 put $ i + 1
-              pure True in Text.stripEmptyLines $ evalState (Text.dropWhileM skipTwoLine buf) (0 :: Int)
+              pure True in Text.stripEmptyLines $
+                evalState (Text.dropWhileM skipTwoLine buf) (0 :: Int)
 
 isTopLevelSrcLoc :: SrcLoc -> Bool
 isTopLevelSrcLoc UnhelpfulLoc{} = False

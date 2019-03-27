@@ -1,9 +1,9 @@
 module Data.Text.Extra where
 
+import qualified Data.Char          as Char
 import           Data.Text          () -- instance Monoid Text
 import           Data.Text.Internal
 import           Data.Text.Unsafe
-import qualified Data.Char as Char
 
 takeWhileM :: Monad m => (Char -> m Bool) -> Text -> m Text
 takeWhileM p t@(Text arr off len) = loop 0
@@ -35,13 +35,11 @@ stripEmptyLinesStart :: Text -> Text
 stripEmptyLinesStart t@(Text arr off len) = loop 0 0
   where
     loop !ri !i
-      | i >= len  = loopEnd ri
-      | otherwise =
-        let Iter c d = iter t i
-        in if
-          | c == '\n'      -> let !ni = i + d in loop ni ni
-          | Char.isSpace c -> loop ri (i + d)
-          | otherwise      -> loopEnd ri
+      | i >= len = loopEnd ri
+      | otherwise = let Iter c d = iter t i in if
+        | c == '\n' -> let !ni = i + d in loop ni ni
+        | Char.isSpace c -> loop ri (i + d)
+        | otherwise -> loopEnd ri
 
     loopEnd ri
       | ri >= len = mempty
@@ -50,20 +48,17 @@ stripEmptyLinesStart t@(Text arr off len) = loop 0 0
 {-# INLINE stripEmptyLinesStart #-}
 
 stripEmptyLinesEnd :: Text -> Text
-stripEmptyLinesEnd t@(Text arr off len)
-  = let !i0 = len - 1 in loop i0 i0
+stripEmptyLinesEnd t@(Text arr off len) = let !i0 = len - 1 in loop i0 i0
   where
     loop !ri !i
-      | i < 0     = loopEnd i
-      | otherwise =
-        let (c, d) = reverseIter t i
-        in if
-          | c == '\n'      -> loop i (i + d)
-          | Char.isSpace c -> loop ri (i + d)
-          | otherwise      -> loopEnd ri
+      | i < 0 = loopEnd i
+      | otherwise = let (c, d) = reverseIter t i in if
+        | c == '\n' -> loop i (i + d)
+        | Char.isSpace c -> loop ri (i + d)
+        | otherwise -> loopEnd ri
 
     loopEnd ri
-      | ri < 0    = mempty
+      | ri < 0 = mempty
       | otherwise = text arr off (ri + 1)
 
 {-# INLINE stripEmptyLinesEnd #-}
