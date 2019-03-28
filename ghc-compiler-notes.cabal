@@ -105,7 +105,7 @@ library
     GHC.Compiler.Utils.Lexer
     GHC.Compiler.Utils.HeaderOptions
 
-    Data.Text.Monadic
+    Data.Text.Extra
 
 executable ghc-compiler-notes
   import: general, exec
