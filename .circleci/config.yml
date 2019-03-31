@@ -16,30 +16,18 @@ jobs:
           paths:
             - ~/.cabal
       - run: make test
-  release-tag:
-    working_directory: ~/workspace
-    docker:
-      - image: node
-    steps:
-      - checkout
-      - run: git config --global user.email "ci@example.com"
-      - run: git config --global user.name "ci-build"
-      - run: git tag release-$(date "+%Y%m%d-%H%M%S")
-      - run: git remote add gh-release "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git"
-      - run: git push gh-release master --tag
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
   generate:
     working_directory: ~/workspace
     docker:
       - image: haskell:8.6.3
     steps:
-      - checkout
-      - run: cabal new-update
+      - attach_workspace:
+          at: .
       - run: make generate
-      - run: git config --global user.email "ci@example.com"
-      - run: git config --global user.name "ci-build"
-      - run: git add docs/notes/ && git commit -m '[ci] build'
-      - run: git remote add gh-release "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git"
-      - run: git push gh-release master
 
 workflows:
   version: 2
@@ -48,19 +36,6 @@ workflows:
   build_and_test:
     jobs:
       - build-test-8_6_3
-      - release-tag:
+      - generate:
           requires:
             - build-test-8_6_3
-          filters:
-            branches:
-              only: master
-
-  # A release tag has pushed, generate docs
-  docs:
-    jobs:
-      - generate:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^release-.*/
