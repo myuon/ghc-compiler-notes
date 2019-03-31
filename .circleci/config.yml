@@ -38,6 +38,7 @@ jobs:
       - attach_workspace:
           at: .
       - run: make generate
+      - run: git rm -rf --cached docs/notes/
       - run: git add -f docs/notes
       - run: git status
       - run: git remote add gh-release "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git"
