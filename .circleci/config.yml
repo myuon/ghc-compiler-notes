@@ -37,6 +37,7 @@ jobs:
       - run: git rebase master
       - attach_workspace:
           at: .
+      - run: git clone --depth 1 https://gitlab.haskell.org/ghc/ghc.git output/ghc
       - run: make generate
       - run: git add -f docs/notes/
       - run: git status
