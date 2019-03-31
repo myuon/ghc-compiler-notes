@@ -49,7 +49,15 @@ workflows:
   # When test has passed, tag a release
   build_and_test:
     jobs:
-      - build-test-8_6_3
+      - build-test-8_6_3:
+          filters:
+            branches:
+              ignore:
+                - docs
       - generate:
           requires:
             - build-test-8_6_3
+          filters:
+            branches:
+              only:
+                - master
