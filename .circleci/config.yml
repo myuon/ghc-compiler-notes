@@ -28,6 +28,10 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - run: cabal new-update
+      - restore_cache:
+          keys:
+            - cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
       - run: make generate
 
 workflows:
