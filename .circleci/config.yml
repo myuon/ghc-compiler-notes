@@ -7,9 +7,9 @@ jobs:
       - image: haskell:8.6.3
     steps:
       - checkout
+      - run: cabal new-update
       - restore_cache:
           keys: cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
-      - run: cabal new-update
       - run: make build
       - save_cache:
           key: cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
