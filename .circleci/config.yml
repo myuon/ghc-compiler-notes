@@ -10,11 +10,11 @@ jobs:
       - run: cabal new-update
       - restore_cache:
           keys:
-            - cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
+            - cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}-v1
       - run: make build
       - run: make test
       - save_cache:
-          key: cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
+          key: cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}-v1
           paths:
             - ~/.cabal
       - persist_to_workspace:
@@ -30,7 +30,7 @@ jobs:
       - run: cabal new-update
       - restore_cache:
           keys:
-            - cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
+            - cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}-v1
       - run: git config --global user.email "ci@example.com"
       - run: git config --global user.name "ci-build"
       - run: git checkout -B docs
