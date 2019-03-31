@@ -33,6 +33,13 @@ jobs:
           keys:
             - cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
       - run: make generate
+      - run: git config --global user.email "ci@example.com"
+      - run: git config --global user.name "ci-build"
+      - run: git checkout -b docs
+      - run: git add -f docs/notes
+      - run: git status
+      - run: git remote add gh-release "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git"
+      - run: git commit -m 'build' && git push gh-release docs
 
 workflows:
   version: 2
