@@ -9,7 +9,8 @@ jobs:
       - checkout
       - run: cabal new-update
       - restore_cache:
-          keys: cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
+          keys:
+            - cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
       - run: make build
       - save_cache:
           key: cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
