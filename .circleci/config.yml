@@ -12,11 +12,11 @@ jobs:
           keys:
             - cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
       - run: make build
+      - run: make test
       - save_cache:
           key: cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
           paths:
             - ~/.cabal
-      - run: make test
       - persist_to_workspace:
           root: .
           paths:
