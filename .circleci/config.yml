@@ -20,22 +20,24 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - .
+            - dist-newstyle
   generate:
     working_directory: ~/workspace
     docker:
       - image: haskell:8.6.3
     steps:
-      - attach_workspace:
-          at: .
+      - checkout
       - run: cabal new-update
       - restore_cache:
           keys:
             - cabal-index-{{ checksum "~/.cabal/packages/hackage.haskell.org/01-index.cache" }}
-      - run: make generate
       - run: git config --global user.email "ci@example.com"
       - run: git config --global user.name "ci-build"
       - run: git checkout -b docs
+      - run: git rebase master
+      - attach_workspace:
+          at: .
+      - run: make generate
       - run: git add -f docs/notes
       - run: git status
       - run: git remote add gh-release "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git"
