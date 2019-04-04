@@ -52,6 +52,7 @@ $ cabal new-test --enable-tests -fdev
   - e.g. "A note about the stupid context" at `compiler/basicTypes/DataCon.hs`.
   - e.g. "Note [About the NameSorts]" at `compiler/basicTypes/Name.hs`.
   - e.g. "Note [Continuation BlockId]" at `compiler/cmm/CmmNode.hs`.
+  - e.g. "Soundness checks" at `compiler/ghci/RtClosureInspect.hs`.
 
 * Collect note references
   - Collect `See Note [...]` and relate them to notes
