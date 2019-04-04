@@ -42,7 +42,7 @@ jobs:
       - run: git add -f docs/notes/
       - run: git status
       - run: git remote add gh-release "https://${GITHUB_TOKEN}@github.com/myuon/ghc-compiler-notes.git"
-      - run: git commit -m 'build' && git push gh-release docs
+      - run: git commit -m 'build' && git push -f gh-release docs
 
 workflows:
   version: 2
