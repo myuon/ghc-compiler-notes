@@ -124,6 +124,15 @@ noteTitleSectionLineMatcher = lineMatcher
           , '#'
           ]
 
+isHorizontalRuleLineComment :: String -> Bool
+isHorizontalRuleLineComment ('-':'-':s) = case Regex.match horizontalRuleMatcher s of
+  Just{} -> True
+  Nothing -> False
+isHorizontalRuleLineComment _ = error "illegal line comment"
+
+horizontalRuleMatcher :: Regex.RE Char String
+horizontalRuleMatcher = some (Regex.sym '-') <* spacesMatcher
+
 spacesMatcher :: Regex.RE Char String
 spacesMatcher = many $ Regex.psym Char.isSpace
 
@@ -252,14 +261,16 @@ sinkParsingNoteComment ctx = lift await >>= \case
     True  -> case t of
       ITdocCommentNamed s -> let nctx = addBufferByCollecting True (removeNamedTag $ L p s) ctx
         in sinkParsingNoteComment nctx
-      ITlineComment s -> isNoteStartLineComment (L p s) >>= \case
-        Just ns -> do
-          completeParsingNote ctx
-          sinkParsingNoteComment $ initialParsingCtx True ns
-        Nothing -> do
-          ns <- stripIndentedLineComment $ L p s
-          let nctx = addBufferByCollecting True ns ctx
-          sinkParsingNoteComment nctx
+      ITlineComment s -> if isHorizontalRuleLineComment s
+        then m
+        else isNoteStartLineComment (L p s) >>= \case
+          Just ns -> do
+            completeParsingNote ctx
+            sinkParsingNoteComment $ initialParsingCtx True ns
+          Nothing -> do
+            ns <- stripIndentedLineComment $ L p s
+            let nctx = addBufferByCollecting True ns ctx
+            sinkParsingNoteComment nctx
       ITblockComment s -> parseBlockComment (Just ctx) $ L p s
       _ -> m
   where

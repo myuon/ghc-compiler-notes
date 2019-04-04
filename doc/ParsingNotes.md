@@ -124,6 +124,16 @@ Some notes end by a subsection.
 {-
 Note [Example Note]
 ~~~~~~~~~~~~~~~~~~~
+Some notes end by a horizontal rule
+-}
+
+-------------------------------
+```
+
+```haskell
+{-
+Note [Example Note]
+~~~~~~~~~~~~~~~~~~~
 Some notes end by a indented comment.
 -}
 
