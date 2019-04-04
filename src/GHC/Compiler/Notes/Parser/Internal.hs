@@ -51,7 +51,7 @@ addBufferByCollecting b (L p2 s) (L p1 t) = L (combineSrcSpans p1 p2) $
     ls = Text.replicate n "\n"
 
 betweenLineCount :: SrcSpan -> SrcSpan -> Int
-betweenLineCount (RealSrcSpan sp1) (RealSrcSpan sp2) = srcSpanEndLine sp1 - srcSpanEndLine sp2 - 1
+betweenLineCount (RealSrcSpan sp1) (RealSrcSpan sp2) = srcSpanEndLine sp2 - srcSpanEndLine sp1 - 1
 betweenLineCount _ _ = 0
 
 stripIndentedLineComment :: Monad m
