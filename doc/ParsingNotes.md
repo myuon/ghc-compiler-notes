@@ -21,6 +21,7 @@ many notes start by multi-line comment.
 ~~~~~~~~~~~~~~~~~~~~~~
 Titles of some notes start by multi-line comment without newline.
 -}
+```
 
 ```haskell
 -- Note [Example Note]
