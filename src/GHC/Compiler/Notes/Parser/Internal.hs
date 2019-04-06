@@ -272,6 +272,7 @@ sinkParsingNoteComment ctx = lift await >>= \case
             let nctx = addBufferByCollecting True ns ctx
             sinkParsingNoteComment nctx
       ITblockComment s -> parseBlockComment (Just ctx) $ L p s
+      ITsemi -> sinkParsingNoteComment ctx -- skip layout tokens
       _ -> m
   where
     removeNamedTag (L p s)      = removeNamedTag' (srcSpanStart p) (srcSpanEnd p) s
