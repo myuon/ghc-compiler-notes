@@ -21,7 +21,7 @@ formatRstDoc targetFn CollectedNotes{..} = do
     Text.unlines [ -- Link to source
                    "`[source] <" <> fileNameLink <> ">`_"
                  , ""
-                   -- Filename header
+                    -- Filename header
                  , textTargetFn
                  , Text.replicate (Text.length textTargetFn) "="
                  ]
@@ -58,6 +58,11 @@ codeBlocks = Text.concat . map Text.unlines
            Text.head (Text.stripStart line) `notElem` ['1' .. '9'] &&
            -- A code block should not be start with `* ` nor `- ` (that's probably a list)
            not (Text.isPrefixOf "* " (Text.stripStart line))
-           && not (Text.isPrefixOf "- " (Text.stripStart line)))
+           && not (Text.isPrefixOf "- " (Text.stripStart line)) &&
+           -- In a code block a peroid symbol should be placed with spaces back and forth, or
+           -- a part of `forall a.`, following one-length variable
+           all (\t -> if Text.last t == '.' then Text.length t == 2 else Text.find (== '.') t
+                  == Nothing)
+               (Text.words (Text.replace " . " "" line)))
 
     insertCodeBlock = ("::\n" :)
