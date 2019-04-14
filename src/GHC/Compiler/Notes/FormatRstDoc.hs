@@ -17,14 +17,13 @@ formatRstDoc :: (HasSourceResourceGetter m, Monad m) => FilePath -> CollectedNot
 formatRstDoc targetFn CollectedNotes{..} = do
   fileNameLink <- sourceResourceGetter targetFn Nothing
   let textTargetFn = Text.pack targetFn
-  contentHeader <- pure $
-    Text.unlines [ -- Link to source
-                   "`[source] <" <> fileNameLink <> ">`_"
-                 , ""
-                    -- Filename header
-                 , textTargetFn
-                 , Text.replicate (Text.length textTargetFn) "="
-                 ]
+  contentHeader <- pure $ Text.unlines   -- Link to source
+    [ "`[source] <" <> fileNameLink <> ">`_"
+    , ""
+      -- Filename header
+    , textTargetFn
+    , Text.replicate (Text.length textTargetFn) "="
+    ]
   foldM combineNotes contentHeader notes
   where
     combineNotes txt (L p Note{..}) = do
@@ -43,26 +42,29 @@ formatRstDoc targetFn CollectedNotes{..} = do
 
 codeBlocks :: Text.Text -> Text.Text
 codeBlocks = Text.concat . map Text.unlines
-  . map (\p -> if detectBlocks p then insertCodeBlock p else p) . paragraphs
+  . map (\p -> if detectBlocks p then wrapCodeBlock p else p) . paragraphs
   where
     paragraphs      = groupBy (\x y -> Text.stripStart x /= "" && Text.stripStart y /= "")
       . Text.lines
 
     detectBlocks    =
       all (\line ->
-           -- A code block should not be an empty line
+           -- A code block should not be empty
            Text.length (Text.stripStart line) /= 0 &&
            -- A code block should be indented
            " " `Text.isPrefixOf` line &&
-           -- A code block should not be start with numbers (that's probably an ordered list)
-           Text.head (Text.stripStart line) `notElem` ['1' .. '9'] &&
-           -- A code block should not be start with `* ` nor `- ` (that's probably a list)
-           not (Text.isPrefixOf "* " (Text.stripStart line))
-           && not (Text.isPrefixOf "- " (Text.stripStart line)) &&
-           -- In a code block a peroid symbol should be placed with spaces back and forth, or
-           -- a part of `forall a.`, following one-length variable
-           all (\t -> if Text.last t == '.' then Text.length t == 2 else Text.find (== '.') t
-                  == Nothing)
-               (Text.words (Text.replace " . " "" line)))
+           -- A (long enough) code block at least contains code words (word starting symbols) >= 20%
+           (let codeWordSize = length $ filter codeWord $ tokenize line
+                wordSize = length $ tokenize line
+            in wordSize > 5 || fromIntegral codeWordSize / fromIntegral wordSize >= 0.2) &&
+           -- A code block should not be an ordered list
+           all (not . (`Text.isPrefixOf` Text.stripStart line)) ["(1", "(2", "(3", "(4"] &&
+           -- A code block should not start with * or - (that might be a list)
+           all (not . (`Text.isPrefixOf` Text.stripStart line)) ["-", "*"])
 
-    insertCodeBlock = ("::\n" :)
+    tokenize t      = Text.words t
+
+    codeWord t      = t `elem` ["class", "data", "where", "module", "forall", "pattern", "case"]
+      || Text.head t `elem` ("!\"#$%&'()-=~^\\|@`[{;+:*]}<,>/?_" :: String)
+
+    wrapCodeBlock p = ("::\n" : p) ++ ["\n.."]
