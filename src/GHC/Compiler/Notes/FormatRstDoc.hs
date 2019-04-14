@@ -21,7 +21,7 @@ formatRstDoc targetFn CollectedNotes{..} = do
     Text.unlines [ -- Link to source
                    "`[source] <" <> fileNameLink <> ">`_"
                  , ""
-                    -- Filename header
+                      -- Filename header
                  , textTargetFn
                  , Text.replicate (Text.length textTargetFn) "="
                  ]
@@ -43,7 +43,7 @@ formatRstDoc targetFn CollectedNotes{..} = do
 
 codeBlocks :: Text.Text -> Text.Text
 codeBlocks = Text.concat . map Text.unlines
-  . map (\p -> if detectBlocks p then insertCodeBlock p else p) . paragraphs
+  . map (\p -> if detectBlocks p then wrapCodeBlock p else p) . paragraphs
   where
     paragraphs      = groupBy (\x y -> Text.stripStart x /= "" && Text.stripStart y /= "")
       . Text.lines
@@ -65,4 +65,4 @@ codeBlocks = Text.concat . map Text.unlines
                   == Nothing)
                (Text.words (Text.replace " . " "" line)))
 
-    insertCodeBlock = ("::\n" :)
+    wrapCodeBlock p = ("::\n" : p) ++ ["\n.."]
