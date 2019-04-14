@@ -53,15 +53,18 @@ codeBlocks = Text.concat . map Text.unlines
            Text.length (Text.stripStart line) /= 0 &&
            -- A code block should be indented
            " " `Text.isPrefixOf` line &&
-           -- A code block at least contains code words (word starting symbols) > 30%
+           -- A (long enough) code block at least contains code words (word starting symbols) >= 20%
            (let codeWordSize = length $ filter codeWord $ tokenize line
                 wordSize = length $ tokenize line
-            in fromIntegral codeWordSize / fromIntegral wordSize > 0.3) &&
+            in wordSize > 5 || fromIntegral codeWordSize / fromIntegral wordSize >= 0.2) &&
            -- A code block should not be an ordered list
-           all (not . (`Text.isPrefixOf` Text.stripStart line)) ["(1", "(2", "(3", "(4"])
+           all (not . (`Text.isPrefixOf` Text.stripStart line)) ["(1", "(2", "(3", "(4"] &&
+           -- A code block should not start with * or - (that might be a list)
+           all (not . (`Text.isPrefixOf` Text.stripStart line)) ["-", "*"])
 
     tokenize t      = Text.words t
 
-    codeWord t      = Text.head t `elem` ("!\"#$%&'()-=~^\\|@`[{;+:*]}<,>/?_" :: String)
+    codeWord t      = t `elem` ["class", "data", "where", "module", "forall", "pattern", "case"]
+      || Text.head t `elem` ("!\"#$%&'()-=~^\\|@`[{;+:*]}<,>/?_" :: String)
 
     wrapCodeBlock p = ("::\n" : p) ++ ["\n.."]
